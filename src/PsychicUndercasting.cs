@@ -28,10 +28,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!reconciling.Add(book)) return;
             try {
                 var known = book.GetAllKnownSpells().ToArray();
-                var required = known.Where(a => !a.IsTemporary && Owned(a.Blueprint))
+                var required = known.Where(a => (!a.IsTemporary || TemporaryKnowledge01464.Owns(book,a)) && Owned(a.Blueprint))
                     .SelectMany(a => a.Blueprint.GetComponent<PsychicUndercastFamily>().LowerSpells ?? Array.Empty<BlueprintAbilityReference>())
                     .Select(r => r.Get()).Where(Owned).Distinct().ToArray();
-                foreach (var extra in known.Where(a => a.IsTemporary && Owned(a.Blueprint) && !required.Contains(a.Blueprint)))
+                foreach (var extra in known.Where(a => a.IsTemporary && Owned(a.Blueprint) && !required.Contains(a.Blueprint) && !TemporaryKnowledge01464.Owns(book,a)))
                     book.RemoveTemporarySpell(extra);
                 foreach (var lower in required) {
                     var family = lower.GetComponent<PsychicUndercastFamily>();
@@ -69,6 +69,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 foreach(var source in original.Descriptor.Spellbooks.Where(b=>PsychicCasting.IsPsychic(b.Blueprint))) {
                     var destination=target.Descriptor.GetSpellbook(source.Blueprint);
                     if(destination==null || ReferenceEquals(source,destination)) continue;
+                    TemporaryKnowledge01464.RestoreCopy(source,destination);
                     var provenance=source.GetAllKnownSpells().Where(a=>Owned(a.Blueprint) && a.MetamagicData==null)
                         .GroupBy(a=>new {a.Blueprint.AssetGuid,a.SpellLevel})
                         .ToDictionary(g=>g.Key,g=>g.All(a=>a.IsTemporary));

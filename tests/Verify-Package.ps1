@@ -70,6 +70,8 @@ try {
     if ([Version]$manifest.Version -ge [Version]'0.14.61') { $required += @('0.14.61异能者菜单与猎人变体测试说明.txt') }
     if ([Version]$manifest.Version -ge [Version]'0.14.62') { $required += @('0.14.62PsychicFeedback-test-guide.txt') }
     if ([Version]$manifest.Version -ge [Version]'0.14.63') { $required += @('0.14.63UrbanBloodrager-test-guide.txt') }
+    if ([Version]$manifest.Version -ge [Version]'0.14.64') { $required += @('0.14.64Amnesiac-test-guide.txt') }
+    if ([Version]$manifest.Version -ge [Version]'0.14.65') { $required += @('0.14.65UrbanBloodrager-feedback-test-guide.txt') }
     foreach ($name in $required) {
         if (!$zip.GetEntry($prefix + $name)) { throw "Missing required archive entry: $name" }
     }
@@ -129,7 +131,7 @@ try {
         $qlText=[Text.UTF8Encoding]::new($false,$true).GetString($qlBytes)
         if (!$qlText.TrimStart().StartsWith('[')) { throw '01460 QL source requires an array root.' }
         $qlRows=@($qlText | ConvertFrom-Json)
-        $expectedQL = if ([Version]$manifest.Version -ge [Version]'0.14.63') { 5516 } elseif ([Version]$manifest.Version -ge [Version]'0.14.61') { 5482 } else { 5130 }
+        $expectedQL = if ([Version]$manifest.Version -ge [Version]'0.14.65') { 6749 } elseif ([Version]$manifest.Version -ge [Version]'0.14.64') { 6679 } elseif ([Version]$manifest.Version -ge [Version]'0.14.63') { 5516 } elseif ([Version]$manifest.Version -ge [Version]'0.14.61') { 5482 } else { 5130 }
         if ($qlRows.Count -ne $expectedQL) { throw "Exact versioned complete QL catalog requires $expectedQL entries." }
         $qlMap=[Collections.Generic.Dictionary[string,object]]::new([StringComparer]::Ordinal)
         foreach ($row in $qlRows) {

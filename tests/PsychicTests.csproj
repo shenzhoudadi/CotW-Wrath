@@ -6,6 +6,8 @@
     <GameManaged>$(WrathPath)\Wrath_Data\Managed</GameManaged>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="TemporaryKnowledge01464Tests.cs" />
+    <Compile Include="Amnesiac01464Tests.cs" />
     <Compile Include="UrbanBloodrager01463Tests.cs" /><Compile Include="ScopedAvailable01463Tests.cs" />
     <Compile Include="PsychicFeedback01458Tests.cs" />
     <Compile Include="PsychicFeedback01459Tests.cs" />

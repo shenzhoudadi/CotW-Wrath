@@ -157,7 +157,10 @@
     ],
     "Hunter archetype: Feral Hunter": [],
     "Hunter archetype: Totem-Bonded": [],
-    "Bloodrager archetype: Urban Bloodrager": []
+    "Bloodrager archetype: Urban Bloodrager": [],
+    "Psychic archetype: Amnesiac": [
+      "Psychic remaining disciplines and amplifications"
+    ]
   },
   "optionalRootTokens": [
     "ArcaneCrafterSchool",
@@ -198,6 +201,6 @@
       "PainDiscipline01458"
     ]
   },
-  "catalogueCount": 93,
+  "catalogueCount": 94,
   "scope": "Reviewed required intra-package producer order for every named dispatcher entry. Empty dependency lists mean native/external inputs, not verified initialization of external providers. Ki and Spiritual Guardian require Expansion to have its initial publication opportunity; their existing partial-provider behavior is unchanged. Optional branches use typed reachability markers only in the dispatch model. Actual cold amplification/Terror bodies execute separately."
 }

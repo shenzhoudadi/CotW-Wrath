@@ -4,7 +4,7 @@ using System;using System.Reflection;using HarmonyLib;
 internal static class ScopedAvailable01463Tests{
  internal static void Bind(Harmony owner,Type registrar,string prefix){owner.Patch(AccessTools.Method(registrar,"RegisterAvailableModule"),prefix:new HarmonyMethod(typeof(ScopedAvailable01463Tests),prefix));}
  static bool Scope(string name,Type fixture,string method){
-  if(name!="Bloodrager archetype: Urban Bloodrager")return true;
+  if(name!="Bloodrager archetype: Urban Bloodrager"&&name!="Psychic archetype: Amnesiac")return true;
   var scope=AccessTools.Method(fixture,method);object[] args;
   if(scope.GetParameters().Length==1)args=new object[]{name};
   else args=new object[]{name,(Action)(()=>{throw new InvalidOperationException("A scoped non-target Urban action must never execute.");})};

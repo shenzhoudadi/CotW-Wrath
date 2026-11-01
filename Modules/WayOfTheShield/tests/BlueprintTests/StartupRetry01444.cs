@@ -23,7 +23,7 @@ internal static class ShieldStartupRetry01444
     static bool Skip() => false;
     static bool Absent(ref bool __result) { __result = false; return false; }
     static bool OtherModule(ref Action register) { register = () => { }; return true; }
-    static bool UrbanAvailableScope063(string name) => name != "Bloodrager archetype: Urban Bloodrager";
+    static bool UrbanAvailableScope063(string name) => name != "Bloodrager archetype: Urban Bloodrager" && name != "Psychic archetype: Amnesiac";
     static void Installed() => installs++;
     static void Configured() => configurations++;
     

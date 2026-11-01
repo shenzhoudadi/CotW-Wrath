@@ -71,6 +71,20 @@ internal static class PsychicPatchCoverage01458Tests
             }).ToArray();
             if(rows.Length!=31||rows.Any(r=>r.Target==null)||rows.Select(r=>r.Type).Distinct().Count()!=31)throw new Exception("063 exact four scoped Urban bloodrage hooks changed.");
         }
+        if(mod.GetType("CallOfTheWild.Wrath.Prototype.TemporaryKnowledge01464")!=null){
+            const string patch="TemporaryKnowledge01464+",part="Kingmaker.UnitLogic.Parts.UnitPartTemporarySpellsKnown";
+            var remove=AccessTools.Method(game.GetType(part,true),"RemoveEntry",new[]{game.GetType("Kingmaker.EntitySystem.EntityFact",true),game.GetType("Kingmaker.UnitLogic.FactLogic.AddSpellKnownTemporary",true)});
+            rows=rows.Concat(new[]{M(patch+"SourcesAddedPatch",part,"AddEntry",HarmonyPatchType.Postfix),new Row{Target=remove,Type=patch+"SourcesRemovedPatch",Method="Postfix",Kind=HarmonyPatchType.Postfix},M(patch+"SourcesLoadedPatch",part,"OnPostLoad",HarmonyPatchType.Postfix),M(patch+"SourcesLeveledPatch",part,"HandleUnitGainLevel",HarmonyPatchType.Postfix)}).ToArray();
+            if(rows.Length!=35||rows.Any(r=>r.Target==null)||rows.Select(r=>r.Target+"/"+r.Type+"/"+r.Kind).Distinct().Count()!=35)throw new Exception("064 exact four native temporary-knowledge source targets changed.");
+            rows=rows.Concat(new[]{new Row{Target=remove,Type="TemporaryKnowledge01464+PruneSourcesPatch",Method="Prefix",Kind=HarmonyPatchType.Prefix}}).ToArray();
+            if(rows.Length!=36||rows.Any(r=>r.Target==null)||rows.Select(r=>r.Target+"/"+r.Type+"/"+r.Kind).Distinct().Count()!=36)throw new Exception("064 native source-removal identity guard changed.");
+            rows=rows.Concat(new[]{M("AmnesiaLevelUp01464Patch","Kingmaker.UnitLogic.Class.LevelUp.LevelUpConfig","StartController",HarmonyPatchType.Prefix)}).ToArray();
+            if(rows.Length!=37||rows.Any(r=>r.Target==null)||rows.Select(r=>r.Target+"/"+r.Type+"/"+r.Kind).Distinct().Count()!=37)throw new Exception("064 exact pre-preview amnesia cleanup target changed.");
+        }
+        if(mod.GetType("CallOfTheWild.Wrath.Prototype.UrbanBloodrageBuffConsumerPatch")!=null){
+            rows=rows.Concat(new[]{M("UrbanBloodrageBuffConsumerPatch","Kingmaker.Designers.Mechanics.Facts.BuffExtraEffects","CheckHadPrerequiredBuff",HarmonyPatchType.Transpiler),M("UrbanBloodrageConditionConsumerPatch","Kingmaker.UnitLogic.Mechanics.Conditions.ContextConditionHasFact","CheckCondition",HarmonyPatchType.Transpiler),M("UrbanBloodrageAdded01463Patch","Kingmaker.Designers.Mechanics.Facts.BuffExtraEffects","HandleBuffDidAdded",HarmonyPatchType.Postfix)}).ToArray();
+            if(rows.Length!=40||rows.Any(r=>r.Target==null)||rows.Select(r=>r.Target+"/"+r.Type+"/"+r.Kind).Distinct().Count()!=40)throw new Exception("Urban controlled rage exact two native consumers and isolated diagnostic hook changed.");
+        }
         return rows;
     }
     internal static int Verify(Assembly mod,Harmony owner)

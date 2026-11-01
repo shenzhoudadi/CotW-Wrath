@@ -12,7 +12,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = $PSScriptRoot
 $workspaceRoot = [IO.Path]::GetFullPath((Join-Path $projectRoot '../..'))
 $manifest = Get-Content -LiteralPath (Join-Path $projectRoot 'package/OwlcatModificationManifest.json') -Raw | ConvertFrom-Json
-$latestGuideText = Get-Content -LiteralPath (Join-Path $projectRoot '0.14.63UrbanBloodrager-test-guide.txt') -Raw
+$latestGuideText = Get-Content -LiteralPath (Join-Path $projectRoot '0.14.65UrbanBloodrager-feedback-test-guide.txt') -Raw
 foreach ($incompleteGuideText in @('未实测', '未验收', '不替代游戏验收', '本节在最终构建与安装包实际 DLL 回归完成后写入')) {
     if ($latestGuideText.Contains($incompleteGuideText)) { throw 'The latest test guide contains an unfinished section or disallowed wording.' }
 }
@@ -278,7 +278,7 @@ if ($null -eq $war01443 -or !$war01443.passed -or $war01443.assertions -lt 4 -or
 $sun01443 = $psychicResults.sunsinger01443Contracts
 if ($null -eq $sun01443 -or !$sun01443.passed -or $sun01443.assertions -lt 442 -or $sun01443.additionalItemCount -ne 1 -or $sun01443.archetypeCount -ne 1 -or $sun01443.privateResourceCount -ne 13 -or $sun01443.newSpellRootCount -ne 0 -or $sun01443.newHarmonyPatchCount -ne 0 -or $sun01443.newSerializedComponentTypeCount -ne 0 -or $sun01443.resourceSpends -ne 12 -or $sun01443.castPrepares -ne 52 -or $sun01443.outlinePaths -ne 20 -or $sun01443.nativeAreaSaveEntries -ne 3 -or $sun01443.nativeChannelHealingRuleCalls -ne 6 -or $sun01443.nativeChannelDamageDispatches -ne 6 -or $sun01443.nativeRepeatableRankChanges -ne 12 -or $sun01443.nativeOriginalGuidImmunityBranches -ne 4 -or $sun01443.warmNativeDonorsPreserved -ne 9 -or $sun01443.nativeJsonRoundTrips -ne 3 -or $sun01443.nativeResourceLinkLoads -ne 1 -or $sun01443.sarenraeCatalogueEndpoints -ne 2 -or $sun01443.postCacheWriteFaults -ne 1 -or $sun01443.postAppendFaults -ne 1 -or !$sun01443.baseProgressionPreserved) { throw '01443 sunsinger01443Contracts exact native-path contract failed.' }
 $urban01443 = $psychicResults.urbanSkald01443Contracts
-if ($null -eq $urban01443 -or !$urban01443.passed -or $urban01443.assertions -lt 614 -or $urban01443.additionalItemCount -ne 1 -or $urban01443.archetypeCount -ne 1 -or $urban01443.privateResourceCount -ne 52 -or $urban01443.newSpellRootCount -ne 0 -or $urban01443.newHarmonyPatchCount -ne 0 -or $urban01443.newSerializedComponentTypeCount -ne 3 -or $urban01443.nativeControlledSongApplications -ne 38 -or $urban01443.nativeAreaCallbacks -ne 95 -or $urban01443.nativeCrowdRules -ne 7035 -or $urban01443.cacheWriteFailures -ne 1 -or $urban01443.appendFailures -ne 2 -or $urban01443.foreignOwnerCases -ne 6 -or $urban01443.nativeTypeIdAttributeReads -ne 2 -or $urban01443.nativeSerializedComponentRoundTrips -ne 1 -or $urban01443.nativeTypeIdsScanned -ne 2924 -or $urban01443.productionTypeIdsScanned -ne 301 -or !$urban01443.fixtureSchemaRegistration -or !$urban01443.authoredGraphMutationRejected -or !$urban01443.warmedDonorElementOwnershipPreserved -or !$urban01443.exactOwnerReferenceGuards -or !$urban01443.publishedAppendRollback -or !$urban01443.nativeFactionGroups -or !$urban01443.nativePerformanceResources -or !$urban01443.nativeRagePowerSharing -or !$urban01443.nativeAcceptRefuseMasterMythic -or !$urban01443.nativeMockerySaveImmunityReplace -or !$urban01443.nativeCrowdEnumerationAndEventBus -or !$urban01443.noMovementOrTickSubscription) { throw '01443 urbanSkald01443Contracts exact native-path contract failed.' }
+if ($null -eq $urban01443 -or !$urban01443.passed -or $urban01443.assertions -lt 614 -or $urban01443.additionalItemCount -ne 1 -or $urban01443.archetypeCount -ne 1 -or $urban01443.privateResourceCount -ne 52 -or $urban01443.newSpellRootCount -ne 0 -or $urban01443.newHarmonyPatchCount -ne 0 -or $urban01443.newSerializedComponentTypeCount -ne 3 -or $urban01443.nativeControlledSongApplications -ne 38 -or $urban01443.nativeAreaCallbacks -ne 95 -or $urban01443.nativeCrowdRules -ne 7035 -or $urban01443.cacheWriteFailures -ne 1 -or $urban01443.appendFailures -ne 2 -or $urban01443.foreignOwnerCases -ne 6 -or $urban01443.nativeTypeIdAttributeReads -ne 2 -or $urban01443.nativeSerializedComponentRoundTrips -ne 1 -or $urban01443.nativeTypeIdsScanned -ne 2924 -or $urban01443.productionTypeIdsScanned -ne 306 -or !$urban01443.fixtureSchemaRegistration -or !$urban01443.authoredGraphMutationRejected -or !$urban01443.warmedDonorElementOwnershipPreserved -or !$urban01443.exactOwnerReferenceGuards -or !$urban01443.publishedAppendRollback -or !$urban01443.nativeFactionGroups -or !$urban01443.nativePerformanceResources -or !$urban01443.nativeRagePowerSharing -or !$urban01443.nativeAcceptRefuseMasterMythic -or !$urban01443.nativeMockerySaveImmunityReplace -or !$urban01443.nativeCrowdEnumerationAndEventBus -or !$urban01443.noMovementOrTickSubscription) { throw '01443 urbanSkald01443Contracts exact native-path contract failed.' }
 $rogue01443 = $psychicResults.rogueSwashbuckler01443Contracts
 if ($null -eq $rogue01443 -or !$rogue01443.passed -or $rogue01443.assertions -lt 230 -or $rogue01443.additionalItemCount -ne 1 -or $rogue01443.privateResourceCount -ne 4 -or $rogue01443.newSpellRootCount -ne 0 -or $rogue01443.newHarmonyPatchCount -ne 0 -or $rogue01443.newSerializedComponentTypeCount -ne 0 -or $rogue01443.nativeSavingThrowHandlers -ne 54 -or $rogue01443.nativeSelectFeatureApplyCalls -ne 12 -or $rogue01443.postCacheWriteFaults -ne 1 -or $rogue01443.postAppendFaults -ne 1 -or $rogue01443.postConnectFaults -ne 2 -or !$rogue01443.baseProgressionPreserved -or !$rogue01443.nativeCombatTrickRetained -or !$rogue01443.lateTTTCapAdapted -or !$rogue01443.thirdCappedChoiceRejected -or !$rogue01443.duplicateVanillaChoiceAvoided) { throw '01443 rogueSwashbuckler01443Contracts exact native-path contract failed.' }
 $caller01443 = $psychicResults.migration01443CallerContracts
@@ -304,7 +304,7 @@ if ($null -eq $repair044 -or !$repair044.passed -or $repair044.additionalMigrati
 # END 01444 ADDITIVE CONTRACT GATES
 # BEGIN 01444 REGISTRATION ORDER GATE
 $order044 = $psychicResults.registrationOrder01444Contracts
-if ($null -eq $order044 -or !$order044.passed -or $order044.assertions -lt 331 -or $order044.catalogueModulesReviewed -ne 93 -or $order044.dispatcherEntriesChecked -ne 213 -or $order044.modulesReached -ne 91 -or $order044.optionalPasses -ne 3 -or $order044.actualColdDispatches -ne 4 -or $order044.preFixDependencyFailures -ne 1 -or $order044.injectedProviderFailures -ne 1 -or $order044.providerFailureRetries -ne 1 -or !$order044.actualDispatcherOrder -or !$order044.oldOrderRejected -or !$order044.actualColdAmplificationAndTerrorBodies -or !$order044.actualPsychicArchetypeOptionPresent -or !$order044.allOtherProductionBodiesPreserved) { throw '01444 actual dispatcher dependency/cold registration contract failed.' }
+if ($null -eq $order044 -or !$order044.passed -or $order044.assertions -lt 332 -or $order044.catalogueModulesReviewed -ne 94 -or $order044.dispatcherEntriesChecked -ne 214 -or $order044.modulesReached -ne 92 -or $order044.optionalPasses -ne 3 -or $order044.actualColdDispatches -ne 4 -or $order044.preFixDependencyFailures -ne 1 -or $order044.injectedProviderFailures -ne 1 -or $order044.providerFailureRetries -ne 1 -or !$order044.actualDispatcherOrder -or !$order044.oldOrderRejected -or !$order044.actualColdAmplificationAndTerrorBodies -or !$order044.actualPsychicArchetypeOptionPresent -or !$order044.allOtherProductionBodiesPreserved) { throw '01444 actual dispatcher dependency/cold registration contract failed.' }
 # END 01444 REGISTRATION ORDER GATE
 # BEGIN 01444 REAL STARTUP RETRY GATE
 $startup044 = $psychicResults.startupRetry01444Contracts
@@ -621,6 +621,17 @@ $urban063Path=Join-Path $workspaceRoot ("work/prototype-build/01463-required-"+[
 if ($LASTEXITCODE -ne 0) { throw "01463 Urban Bloodrager native paths failed." }
 $urban063=Get-Content -LiteralPath $urban063Path -Raw | ConvertFrom-Json
 if (!$urban063.passed -or $urban063.rows.Count -ne 1 -or $urban063.controls.Count -ne 1 -or $urban063.additionalMigrationItems -ne 1) { throw "01463 exact Urban Bloodrager native graph required." }
+$urbanMonoPath=Join-Path $workspaceRoot ("work/prototype-build/urban-mono-identity-"+[guid]::NewGuid().ToString("N")+".json")
+& python (Join-Path $projectRoot 'tests/Test-UrbanMonoIdentity.py') $assemblyPath $urbanMonoPath $WrathPath
+if ($LASTEXITCODE -ne 0) { throw 'Urban identity must pass actual game Mono and CLR with the delivered 063 negative control.' }
+$urbanMono=Get-Content -LiteralPath $urbanMonoPath -Raw | ConvertFrom-Json
+if (!$urbanMono.passed -or $urbanMono.rows.Count -ne 3 -or !$urbanMono.notGameProcess) { throw 'Urban identity runtime evidence is incomplete.' }
+
+$amnesiac064Path=Join-Path $workspaceRoot ("work/prototype-build/01464-required-"+[guid]::NewGuid().ToString("N")+".json")
+& python (Join-Path $projectRoot "tests/Test-Amnesiac01464.py") $assemblyPath $amnesiac064Path
+if ($LASTEXITCODE -ne 0) { throw "01464 Amnesiac and temporary knowledge native paths failed." }
+$amnesiac064=Get-Content -LiteralPath $amnesiac064Path -Raw | ConvertFrom-Json
+if (!$amnesiac064.passed -or $amnesiac064.rows.Count -ne 2 -or $amnesiac064.additionalMigrationItems -ne 1) { throw "01464 exact Amnesiac and shared native graph required." }
 
 if (!$magus055.passed -or !$magus055.allRequestedNativePaths -or $magus055.rows.Count -ne 8 -or $magus055.currentCasesPerRuntime -ne 4 -or $magus055.old054NegativeControlsPerRuntime -ne 3 -or $magus055.badDraftSourceKeysControlsPerRuntime -ne 1 -or $magus055.newMigrationItems -ne 0 -or $magus055.shieldACProductionUnchanged -or !$magus055.shieldACPolicy056 -or !$magus055.noSourceOwnershipOrQualificationBypass) { throw "01455 complete feedback contracts and exact old054 controls required before packaging." }
 
@@ -664,6 +675,8 @@ try {
         '0.14.55心刃与盾法师反馈修复测试说明.txt' = Join-Path $projectRoot '0.14.55心刃与盾法师反馈修复测试说明.txt'
         '0.14.56盾法师施法战斗调整测试说明.txt' = Join-Path $projectRoot '0.14.56盾法师施法战斗调整测试说明.txt'
         '0.14.57两项心灵变体测试说明.txt' = Join-Path $projectRoot '0.14.57两项心灵变体测试说明.txt'
+        '0.14.65UrbanBloodrager-feedback-test-guide.txt' = Join-Path $projectRoot '0.14.65UrbanBloodrager-feedback-test-guide.txt'
+        '0.14.64Amnesiac-test-guide.txt' = Join-Path $projectRoot '0.14.64Amnesiac-test-guide.txt'
         '0.14.63UrbanBloodrager-test-guide.txt' = Join-Path $projectRoot '0.14.63UrbanBloodrager-test-guide.txt'
         '0.14.62PsychicFeedback-test-guide.txt' = Join-Path $projectRoot '0.14.62PsychicFeedback-test-guide.txt'
         '0.14.61异能者菜单与猎人变体测试说明.txt' = Join-Path $projectRoot '0.14.61异能者菜单与猎人变体测试说明.txt'
@@ -964,7 +977,9 @@ $record = [ordered]@{
         magusFeedback01455 = [ordered]@{ passed=$true; result=$magus055Path; resultSHA256=(Get-FileHash -LiteralPath $magus055Path).Hash; contract=$magus055 }
         skirnir01456 = [ordered]@{ passed=$true; result=$skirnir056Path; resultSHA256=(Get-FileHash -LiteralPath $skirnir056Path).Hash; rows=$skirnir056.rows }
         psychicArchetypes01457 = [ordered]@{ passed=$true; result=$psychic057Path; resultSHA256=(Get-FileHash -LiteralPath $psychic057Path).Hash; rows=$psychic057.rows }
+        amnesiac01464 = [ordered]@{ passed=$true; result=$amnesiac064Path; resultSHA256=(Get-FileHash -LiteralPath $amnesiac064Path).Hash; rows=$amnesiac064.rows }
         urbanBloodrager01463 = [ordered]@{ passed=$true; result=$urban063Path; resultSHA256=(Get-FileHash -LiteralPath $urban063Path).Hash; rows=$urban063.rows; controls=$urban063.controls }
+        urbanMonoIdentity = [ordered]@{ passed=$true; result=$urbanMonoPath; resultSHA256=(Get-FileHash -LiteralPath $urbanMonoPath).Hash; rows=$urbanMono.rows }
         psychicFeedback01462 = [ordered]@{ passed=$true; result=$psychic062Path; resultSHA256=(Get-FileHash -LiteralPath $psychic062Path).Hash; rows=$psychic062.rows; controls=$psychic062.controls }
         psychicFeedback01461 = [ordered]@{ passed=$true; result=$psychic061Path; resultSHA256=(Get-FileHash -LiteralPath $psychic061Path).Hash; rows=$psychic061.rows; controls=$psychic061.controls }
         psychicFeedback01460 = [ordered]@{ passed=$true; result=$psychic060Path; resultSHA256=(Get-FileHash -LiteralPath $psychic060Path).Hash; rows=$psychic060.rows; controls=$psychic060.controls; newBlueprints=$psychic060.newBlueprints }
@@ -1058,7 +1073,7 @@ $record = [ordered]@{
     testerReports = @(if (Test-Path -LiteralPath (Join-Path $workspaceRoot 'outputs/测试者反馈记录.json')) {
         (Get-Content -LiteralPath (Join-Path $workspaceRoot 'outputs/测试者反馈记录.json') -Raw | ConvertFrom-Json).reports
     })
-    scope = '0.14.63: Urban Bloodrager. All historical contracts and verified Feral Hunter/Mimic/Physical Mutation behavior retained; two dependency-blocked candidates deferred.'
+    scope = '0.14.65: Urban Bloodrager controlled allocation and scoped bloodrage compatibility. Prior content retained; reported Primalist failure remains under diagnosis.'
 }
 $record | ConvertTo-Json -Depth 60 | Set-Content -LiteralPath $recordPath -Encoding utf8
 Write-Output "Staged experimental package (not published): $archivePath"
