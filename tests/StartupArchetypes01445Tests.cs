@@ -107,7 +107,7 @@ internal static class StartupArchetypes01445Tests
         var h=new Harmony("CotW.StartupArchetypes01445.Boundaries");
         try {
             var mod=(OwlcatModification)FormatterServices.GetUninitializedObject(typeof(OwlcatModification));Set(mod,"Logger",FormatterServices.GetUninitializedObject(typeof(Owlcat.Runtime.Core.Logging.LogChannel)));Static(entry,"modification",mod);
-            h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(StartupArchetypes01445Tests),nameof(ModuleBoundary)));
+            h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(StartupArchetypes01445Tests),nameof(ModuleBoundary)));ScopedAvailable01463Tests.Bind(h,T("BlueprintRegistration"),"ScopeStartupArchetypes01445Tests");
             h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterAll"),prefix:new HarmonyMethod(typeof(StartupArchetypes01445Tests),nameof(CountAll)));
             h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterOptional"),prefix:new HarmonyMethod(typeof(StartupArchetypes01445Tests),nameof(CountOptional)));
             h.Patch(AccessTools.Method(T("ExtraInvestigatorTalent"),"Register"),prefix:new HarmonyMethod(typeof(StartupArchetypes01445Tests),nameof(Investigator)));

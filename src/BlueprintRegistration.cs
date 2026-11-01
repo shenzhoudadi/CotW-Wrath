@@ -163,6 +163,7 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(PsychicClassCompletion01458.ModuleName, () => PsychicClassCompletion01458.Register(cache), report);
             RegisterModule(FeralHunter01461.ModuleName, () => FeralHunter01461.Register(cache), report);
             RegisterModule(TotemBonded01461.ModuleName, () => TotemBonded01461.Register(cache), report);
+            RegisterAvailableModule(UrbanBloodrager01463.ModuleName, () => UrbanBloodrager01463.Register(cache), report);
             RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
         }
 

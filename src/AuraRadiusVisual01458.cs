@@ -21,7 +21,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal const string RingAsset="20caf000cd4c3434da00a74f4a49dccc";
         internal const float SourceRadiusFeet=30f;
         static readonly HashSet<BlueprintGuid> Areas=new HashSet<BlueprintGuid>(
-            PsychicMarauder01457.OwnTokens.Where(t=>t.EndsWith("Area01457")).Select(PsychicAssets.Id).Concat(new[]{PsychicAssets.Id("HallucinogenicAuraArea01458")}));
+            PsychicMarauder01457.OwnTokens.Where(t=>t.EndsWith("Area01457")).Select(PsychicAssets.Id).Concat(new[]{PsychicAssets.Id("HallucinogenicAuraArea01458"),PsychicAssets.Id(UrbanBloodrager01463.AreaToken)}));
         static readonly ConditionalWeakTable<IFxHandle,object> Scaled=new ConditionalWeakTable<IFxHandle,object>();
         internal static bool Owns(BlueprintAbilityAreaEffect area)=>area!=null&&Areas.Contains(area.AssetGuid)&&area.Fx?.AssetId==RingAsset;
         internal static void Bind(AreaEffectView view)

@@ -95,7 +95,7 @@ internal static class StartupSpellBatch01447Tests
         try {
             var mod=(OwlcatModification)FormatterServices.GetUninitializedObject(typeof(OwlcatModification));Set(mod,"Logger",FormatterServices.GetUninitializedObject(typeof(Owlcat.Runtime.Core.Logging.LogChannel)));Static(entry,"modification",mod);
             foreach(var module in Modules)h.Patch(AccessTools.Method(T(module),"Register"),prefix:new HarmonyMethod(typeof(StartupSpellBatch01447Tests),nameof(CountActual)));
-            h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(StartupSpellBatch01447Tests),nameof(ModuleBoundary)));
+            h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(StartupSpellBatch01447Tests),nameof(ModuleBoundary)));ScopedAvailable01463Tests.Bind(h,T("BlueprintRegistration"),"ScopeStartupSpellBatch01447Tests");
             h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterAll"),prefix:new HarmonyMethod(typeof(StartupSpellBatch01447Tests),nameof(CountAll)));
             h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterOptional"),prefix:new HarmonyMethod(typeof(StartupSpellBatch01447Tests),nameof(CountOptional)));
             h.Patch(AccessTools.Method(T("ExtraInvestigatorTalent"),"Register"),prefix:new HarmonyMethod(typeof(StartupSpellBatch01447Tests),nameof(Investigator)));

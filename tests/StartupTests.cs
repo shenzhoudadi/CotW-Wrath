@@ -76,7 +76,7 @@ internal static class StartupChecks
         Action earlyMedium=()=>Call(main,"InstallEarlyPatches",a);
         Action earlyCotw=()=>{Call(entry,"InstallEarlyCorePatches",core);Call(entry,"InstallEarlyPsychicPatches",b);};
         if(args[5]=="mediumfirst"){earlyMedium();earlyCotw();}else{earlyCotw();earlyMedium();}
-        if(PsychicPatchCoverage01458Tests.Rows(cotw).Length!=0)Check(PsychicPatchCoverage01458Tests.Verify(cotw,core)==(cotw.GetType("CallOfTheWild.Wrath.Prototype.MimicCatalogue01461")!=null?27:cotw.GetType("CallOfTheWild.Wrath.Prototype.PsychicSurgeCast01460Patch")!=null?19:cotw.GetType("CallOfTheWild.Wrath.Prototype.PhysicalMutationCount01459Patch")!=null?17:15),"all exact versioned058/059/060/061 production hooks installed once by actual core installer");
+        if(PsychicPatchCoverage01458Tests.Rows(cotw).Length!=0)Check(PsychicPatchCoverage01458Tests.Verify(cotw,core)==(cotw.GetType("CallOfTheWild.Wrath.Prototype.UrbanBloodrageFact01463Patch")!=null?31:cotw.GetType("CallOfTheWild.Wrath.Prototype.MimicCatalogue01461")!=null?27:cotw.GetType("CallOfTheWild.Wrath.Prototype.PsychicSurgeCast01460Patch")!=null?19:cotw.GetType("CallOfTheWild.Wrath.Prototype.PhysicalMutationCount01459Patch")!=null?17:15),"all exact versioned058/059/060/061 production hooks installed once by actual core installer");
         StartupBlueprintCoreCoverage.VerifyInstalled(medium,a);
         Check(true,"all five BlueprintCore patch classes installed");
         Check(eagerCalls==0,"Both production early installers avoid UI type initialization");

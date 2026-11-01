@@ -237,7 +237,7 @@ internal static class Migration01434CallerTests
         checks=0;observations.Clear();legacyDerived=null;var strings=(Dictionary<string,string>)AccessTools.Field(Module("PsychicAssets"),"Strings").GetValue(null);var beforeStrings=strings.ToArray();var snapshot=new ParentSnapshot(parent);
         targets=new HashSet<string>(new[]{Constant("RagePowers","ModuleName"),Constant("SuperstitionRage01434","SuperstitionModule"),Constant("SuperstitionRage01434","WitchHunterModule"),Constant("AntimagicRage01434","GhostModule"),Constant("AntimagicRage01434","DisruptiveModule"),Constant("AntimagicRage01434","SpellbreakerModule"),Constant("FerociousBeast01431","ModuleName")});
         var h=new Harmony("CotW01434.ActualScopedRegistrationCaller");JObject[] added=null;
-        h.Patch(AccessTools.Method(Module("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(Migration01434CallerTests),nameof(CallerScope)));
+        h.Patch(AccessTools.Method(Module("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(Migration01434CallerTests),nameof(CallerScope)));ScopedAvailable01463Tests.Bind(h,Module("BlueprintRegistration"),"ScopeMigration01434CallerTests");
         // This optional provider integration is called directly by the real
         // dispatcher. Bound its action explicitly, without a success report.
         h.Patch(AccessTools.Method(Module("ExtraInvestigatorTalent"),"Register"),prefix:new HarmonyMethod(typeof(Migration01434CallerTests),nameof(DirectInvestigatorBoundary)));

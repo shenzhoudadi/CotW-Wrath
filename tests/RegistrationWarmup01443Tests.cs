@@ -203,7 +203,7 @@ internal static class RegistrationWarmup01443Tests
         AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, cache);
         try {
             TimeStutter01437Tests.PrepareNative(cache); RegistrationFeatKi01432Tests.PrepareMetadataFrightfulDonor(cache); Old(typeof(BardMasterpieces01435Tests), "Hydrate", cache);
-            harmony.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(RegistrationWarmup01443Tests), nameof(Scope)));
+            harmony.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(RegistrationWarmup01443Tests), nameof(Scope)));ScopedAvailable01463Tests.Bind(harmony,Module("BlueprintRegistration"),"ScopeRegistrationWarmup01443Tests");
             Retry(cache, "MonkKiPowers01427"); Retry(cache, "BardMasterpieces01435"); Retry(cache, "TimeStop01438"); Dispatch(cache);
             cache.ForEachLoaded((guid, blueprint) => { if (blueprint is BlueprintScriptableObject bp && (bp.name.StartsWith("CotWWrathPsychicKi") || bp.name.Contains("Masterpiece") || bp.name.StartsWith("CotWWrathPsychicTimeStop"))) { bp.OnEnable(); nativeEnables++; } }); nativeScans++;
             foreach (var ability in Loaded(cache).OfType<BlueprintAbility>().Where(a => a.name.StartsWith("CotWWrathPsychicKi"))) { var restrictions = ability.Restrictions; var targets = ability.TargetRestrictions; var casters = ability.CasterRestrictions; var full = ability.IsFullRoundAction; }

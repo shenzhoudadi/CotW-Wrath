@@ -4,7 +4,7 @@ R=Path(__file__).resolve().parents[3];W=R/'work/repair01456';B=R/'work/prototype
 def sha(p):return hashlib.sha256(Path(p).read_bytes()).hexdigest().upper()
 def load(p):return json.loads(Path(p).read_text('utf-8-sig'))
 assert not out.exists();old=W/'baseline/zip-dll/CallOfTheWild.Wrath.Prototype.dll';c=load(W/'baseline/root/outputs/0.14.55交付自检.json');assert sha(old)==c['dlls'][0]['sha256']
-inspect=subprocess.run(['dotnet',str(R/'work/api-audit/Inspector/bin/Release/net9.0/Inspector.dll'),'names',str(main),'Skirnir01454'],capture_output=True,text=True,encoding='utf-8-sig',check=True).stdout;assert any('Version='+v+'.0' in inspect for v in ['0.14.56','0.14.57','0.14.58','0.14.59','0.14.60','0.14.61','0.14.62'])
+inspect=subprocess.run(['dotnet',str(R/'work/api-audit/Inspector/bin/Release/net9.0/Inspector.dll'),'names',str(main),'Skirnir01454'],capture_output=True,text=True,encoding='utf-8-sig',check=True).stdout;assert any('Version='+v+'.0' in inspect for v in ['0.14.56','0.14.57','0.14.58','0.14.59','0.14.60','0.14.61','0.14.62','0.14.63'])
 host=B/'PsychicTests/bin/Release/net472/PsychicTests.exe';runner=W/'devrun.py';inputs={str(p):sha(p) for p in [main,old,host,runner,Path(__file__),W/'feedback.json']};prefix='required056-'+uuid.uuid4().hex
 def run(pair):
  runtime,prior=pair;target=old if prior else main;name=prefix+'-'+runtime+('-old055' if prior else '-current');args=[sys.executable,str(runner),name,'skirnir056',str(target)]

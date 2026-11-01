@@ -57,7 +57,7 @@ internal static class HedgeWitch01443Tests
         var registration=Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.BlueprintRegistration");var investigator=Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.ExtraInvestigatorTalent");var catalogue=Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.ModuleCatalog");
         var states=(Dictionary<string,string>)Call(catalogue,"InitialStates");var before=states.ToDictionary(x=>x.Key,x=>x.Value);int reports=0;
         Action<string,bool,Exception> report=(name,passed,error)=>{Check(name=="Witch archetype: Hedge Witch"&&passed&&error==null,"actual RegisterAll reports successful Hedge Witch action");states[name]="Registered";reports++;};
-        h.Patch(AccessTools.Method(registration,"RegisterModule"),prefix:new HarmonyMethod(typeof(HedgeWitch01443Tests),nameof(Scope)));
+        h.Patch(AccessTools.Method(registration,"RegisterModule"),prefix:new HarmonyMethod(typeof(HedgeWitch01443Tests),nameof(Scope)));ScopedAvailable01463Tests.Bind(h,registration,"ScopeHedgeWitch01443Tests");
         h.Patch(AccessTools.Method(investigator,"Register"),prefix:new HarmonyMethod(typeof(HedgeWitch01443Tests),nameof(SkipInvestigator)));
         try {Call(registration,"RegisterAll",cache,report);dispatches++;Check(reports==1&&states["Witch archetype: Hedge Witch"]=="Registered","real dispatcher reaches new catalogue module exactly once");Check(states.Where(x=>x.Key!="Witch archetype: Hedge Witch").All(x=>x.Value==before[x.Key]),"non-target catalogue states remain honest");}
         finally {h.Unpatch(AccessTools.Method(registration,"RegisterModule"),HarmonyPatchType.Prefix,h.Id);h.Unpatch(AccessTools.Method(investigator,"Register"),HarmonyPatchType.Prefix,h.Id);}

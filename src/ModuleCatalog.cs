@@ -114,6 +114,7 @@ namespace CallOfTheWild.Wrath.Prototype
             new ModuleDefinition(PsychicClassCompletion01458.ModuleName, "Original CotW Pain, Psychedelia and Abomination disciplines and remaining six phrenic amplification groups.", "Not registered"),
             new ModuleDefinition(FeralHunter01461.ModuleName, "Original CotW Feral Hunter: unlimited self animal focus, nature's ally, teamwork and animal wild shape.", "Not registered"),
             new ModuleDefinition(TotemBonded01461.ModuleName, "Original CotW Totem-Bonded: primeval companion and shared strength aspects.", "Not registered"),
+            new ModuleDefinition(UrbanBloodrager01463.ModuleName, "Original CotW Urban Bloodrager: controlled bloodrage, restrained magic and adopted magic.", "Not registered"),
             new ModuleDefinition(PsychicDisciplineBridge01458.ModuleName, "Add the three completed disciplines to Magaambyan Telepath while preserving its replacement of discipline bonus spells.", "Not registered"),
         };
         internal static Dictionary<string, string> InitialStates() =>

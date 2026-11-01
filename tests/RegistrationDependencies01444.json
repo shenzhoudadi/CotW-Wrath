@@ -156,7 +156,8 @@
       "Psychic archetype: Magaambyan Telepath"
     ],
     "Hunter archetype: Feral Hunter": [],
-    "Hunter archetype: Totem-Bonded": []
+    "Hunter archetype: Totem-Bonded": [],
+    "Bloodrager archetype: Urban Bloodrager": []
   },
   "optionalRootTokens": [
     "ArcaneCrafterSchool",
@@ -193,8 +194,10 @@
     "SkirnirArchetype01454"
   ],
   "delayedOptionalRootTokens": {
-    "Psychic remaining disciplines and amplifications": ["PainDiscipline01458"]
+    "Psychic remaining disciplines and amplifications": [
+      "PainDiscipline01458"
+    ]
   },
-  "catalogueCount": 92,
+  "catalogueCount": 93,
   "scope": "Reviewed required intra-package producer order for every named dispatcher entry. Empty dependency lists mean native/external inputs, not verified initialization of external providers. Ki and Spiritual Guardian require Expansion to have its initial publication opportunity; their existing partial-provider behavior is unchanged. Optional branches use typed reachability markers only in the dispatch model. Actual cold amplification/Terror bodies execute separately."
 }

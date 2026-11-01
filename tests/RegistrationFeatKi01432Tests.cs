@@ -278,7 +278,7 @@ internal static class RegistrationFeatKi01432Tests
         var direct = new BlueprintFeature { AssetGuid = Id("01432CallerDirectFeat"), name = "01432CallerDirectFeat", ComponentsArray = Array.Empty<BlueprintComponent>() }; cache.AddCachedBlueprint(direct.AssetGuid, direct);
         BasicEntries(basic, Ref<BlueprintFeatureReference>(direct));
         callerExecuted.Clear(); callerSkipped.Clear(); var h = new Harmony("CotW01432.ScopedActualRegistrationCaller");
-        h.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(RegistrationFeatKi01432Tests), nameof(CallerScope)));
+        h.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(RegistrationFeatKi01432Tests), nameof(CallerScope)));ScopedAvailable01463Tests.Bind(h,Module("BlueprintRegistration"),"ScopeRegistrationFeatKi01432Tests");
         var outcomes = new List<Tuple<string, bool, Exception>>(); Action<string, bool, Exception> report = (name, ok, error) => outcomes.Add(Tuple.Create(name, ok, error));
         try {
             AccessTools.Method(Module("BlueprintRegistration"), "RegisterAll").Invoke(null, new object[] { cache, report });

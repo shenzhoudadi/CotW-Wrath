@@ -23,6 +23,7 @@ internal static class ShieldStartupRetry01444
     static bool Skip() => false;
     static bool Absent(ref bool __result) { __result = false; return false; }
     static bool OtherModule(ref Action register) { register = () => { }; return true; }
+    static bool UrbanAvailableScope063(string name) => name != "Bloodrager archetype: Urban Bloodrager";
     static void Installed() => installs++;
     static void Configured() => configurations++;
     
@@ -94,6 +95,7 @@ internal static class ShieldStartupRetry01444
             Set(entry, "modification", FormatterServices.GetUninitializedObject(typeof(OwlcatModification)));
             Set(entry, "registrationInProgress", 0); Set(entry, "registrationCompleted", false); Set(entry, "deferredPatchesAttempted", true);
             Prefix(T("BlueprintRegistration"), "RegisterModule", nameof(OtherModule));
+            Prefix(T("BlueprintRegistration"), "RegisterAvailableModule", nameof(UrbanAvailableScope063));
             Prefix(T("ExtraInvestigatorTalent"), "Register", nameof(Absent)); Prefix(T("ProviderResourceFeats"), "Available", nameof(Absent));
             Prefix(T("MediumIntegration"), "Register", nameof(Skip));
             foreach (string method in new[] { "WriteDiagnostics", "TryMenu", "ApplyLocalization" }) Prefix(entry, method, nameof(Skip));

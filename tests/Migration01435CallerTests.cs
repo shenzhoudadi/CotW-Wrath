@@ -230,7 +230,7 @@ internal static class Migration01435CallerTests
         var strings=(Dictionary<string,string>)AccessTools.Field(Module("PsychicAssets"),"Strings").GetValue(null);var beforeStrings=strings.ToArray();var snapshot=new ParentSnapshot(parent);targets=new HashSet<string>(ModuleNames());
         var diagnostics=new[]{Module("WizardDiscoveries01435"),Module("BardMasterpieces01435")}.SelectMany(AccessTools.GetDeclaredFields).Where(f=>f.IsStatic&&f.FieldType==typeof(string)&&f.Name.Contains("Diagnostic")).Select(f=>Tuple.Create(f,f.GetValue(null))).ToArray();
         var h=new Harmony("CotW01435.ActualScopedRegistrationCaller");JObject[] observed=null;
-        h.Patch(AccessTools.Method(Module("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(Migration01435CallerTests),nameof(CallerScope)));
+        h.Patch(AccessTools.Method(Module("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(Migration01435CallerTests),nameof(CallerScope)));ScopedAvailable01463Tests.Bind(h,Module("BlueprintRegistration"),"ScopeMigration01435CallerTests");
         h.Patch(AccessTools.Method(Module("ExtraInvestigatorTalent"),"Register"),prefix:new HarmonyMethod(typeof(Migration01435CallerTests),nameof(DirectInvestigatorBoundary)));
         h.Patch(AccessTools.Method(Module("T09CombatFeats"),"Append"),postfix:new HarmonyMethod(typeof(Migration01435CallerTests),nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache),"AddCachedBlueprint"),prefix:new HarmonyMethod(typeof(Migration01435CallerTests),nameof(CacheFault)));

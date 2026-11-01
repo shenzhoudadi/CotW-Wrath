@@ -131,7 +131,7 @@ internal static class StartupRetry01444Tests
         var h=new Harmony("CotW.StartupRetry01444.Boundaries");
         try {
             var mod=(OwlcatModification)FormatterServices.GetUninitializedObject(typeof(OwlcatModification));Set(mod,"Logger",FormatterServices.GetUninitializedObject(typeof(Owlcat.Runtime.Core.Logging.LogChannel)));Static(entry,"modification",mod);
-            h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(StartupRetry01444Tests),nameof(ModuleBoundary)));
+            h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterModule"),prefix:new HarmonyMethod(typeof(StartupRetry01444Tests),nameof(ModuleBoundary)));ScopedAvailable01463Tests.Bind(h,T("BlueprintRegistration"),"ScopeStartupRetry01444Tests");
             h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterAll"),prefix:new HarmonyMethod(typeof(StartupRetry01444Tests),nameof(CountAll)));
             h.Patch(AccessTools.Method(T("BlueprintRegistration"),"RegisterOptional"),prefix:new HarmonyMethod(typeof(StartupRetry01444Tests),nameof(CountOptional)));
             h.Patch(AccessTools.Method(T("PsychicAmplifications"),"Register"),prefix:new HarmonyMethod(typeof(StartupRetry01444Tests),nameof(CountAmp)));

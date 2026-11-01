@@ -27,7 +27,7 @@ internal static partial class MagusBatch01454Tests
         var h=new Harmony("CotW.Psychic058Presentation");
         foreach(var type in Main.GetTypes().Where(PresentationType058))foreach(var method in type.GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.DeclaredOnly).Where(m=>m.GetMethodBody()!=null&&!m.ContainsGenericParameters))h.Patch(method,transpiler:new HarmonyMethod(typeof(MagusBatch01454Tests),nameof(Labels)));
     }
-    static bool PresentationType058(Type t)=>t.Name=="PsychicRemainingDisciplines01458"||t.Name=="PsychicCompletionAmplifications01458"||t.Name=="PsychicClassCompletion01458"||t.Name=="PsychicDisciplineBridge01458"||t.Name=="FeralHunter01461"||t.Name=="TotemBonded01461"||(t.DeclaringType!=null&&PresentationType058(t.DeclaringType));
+    static bool PresentationType058(Type t)=>t.Name=="UrbanBloodrager01463"||t.Name=="PsychicRemainingDisciplines01458"||t.Name=="PsychicCompletionAmplifications01458"||t.Name=="PsychicClassCompletion01458"||t.Name=="PsychicDisciplineBridge01458"||t.Name=="FeralHunter01461"||t.Name=="TotemBonded01461"||(t.DeclaringType!=null&&PresentationType058(t.DeclaringType));
     static bool Pick058(UnitEntityData unit,BlueprintFeatureSelection pool,BlueprintFeature feature)
     {
         var state=(LevelUpState)FormatterServices.GetUninitializedObject(typeof(LevelUpState));Set(state,"m_Unit",unit);Set(state,"Selections",new List<FeatureSelectionState>());Set(state,"NextCharacterLevel",unit.Progression.Classes[0].Level);state.NextClassLevel=unit.Progression.Classes[0].Level;state.SelectedClass=unit.Progression.Classes[0].CharacterClass;

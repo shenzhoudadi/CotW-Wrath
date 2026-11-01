@@ -192,7 +192,7 @@ internal static partial class MagusBatch01454Tests
     {
         checks=0;Coverage.Clear();equipmentPatched=false;Actors.Clear();var oldSave=Kingmaker.Game.Instance.SaveManager;Set(Kingmaker.Game.Instance,"SaveManager",FormatterServices.GetUninitializedObject(typeof(Kingmaker.EntitySystem.Persistence.SaveManager)));var oldUI=Kingmaker.Game.Instance.UI;Set(Kingmaker.Game.Instance,"UI",FormatterServices.GetUninitializedObject(typeof(Kingmaker.UI.UIAccess)));var index=Path.Combine(Root(),"work/batch01454/native-archive-index.json");paths=JObject.Parse(File.ReadAllText(index)).Properties().ToDictionary(p=>p.Name,p=>(string)p.Value);archive=ZipFile.OpenRead(Path.Combine(Root(),"work/batch01454/native-clr-fixture.zip"));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache),nameof(BlueprintsCache.Load)),prefix:new HarmonyMethod(typeof(MagusBatch01454Tests),nameof(NativeLoad)){priority=Priority.First});
-        var binder=(GuidClassBinder)Kingmaker.Blueprints.JsonSystem.Json.Serializer.Binder;foreach(var type in Main.GetTypes().Where(t=>t.Name.EndsWith("01454")||t.Name.EndsWith("01455")||t.Name.EndsWith("01457")||t.Name.EndsWith("01458")))foreach(var attribute in type.GetCustomAttributes(typeof(TypeIdAttribute),false).Cast<TypeIdAttribute>())binder.AddToCache(type,attribute.GuidString);
+        var binder=(GuidClassBinder)Kingmaker.Blueprints.JsonSystem.Json.Serializer.Binder;foreach(var type in Main.GetTypes().Where(t=>t.Name.EndsWith("01454")||t.Name.EndsWith("01455")||t.Name.EndsWith("01457")||t.Name.EndsWith("01458")||t.Name.EndsWith("01463")))foreach(var attribute in type.GetCustomAttributes(typeof(TypeIdAttribute),false).Cast<TypeIdAttribute>())binder.AddToCache(type,attribute.GuidString);
         // Standalone CLR cannot resolve Unity's shared localization assets.
         // This existing presentation-only transpiler replaces localization/name
         // endpoints; registration, costs, prerequisites and rule branches remain.
@@ -207,6 +207,7 @@ internal static partial class MagusBatch01454Tests
             if(Environment.GetEnvironmentVariable("COTW_01454_CASE")=="structural"||Environment.GetEnvironmentVariable("COTW_01454_CASE")=="all")Structural(parent);
             Console.WriteLine("054 structural checks complete: "+checks);
             var chosen=Environment.GetEnvironmentVariable("COTW_01454_CASE");
+            if((chosen??"").EndsWith("063",StringComparison.Ordinal))Urban063(parent,h);
             if((chosen??"").EndsWith("062",StringComparison.Ordinal))Feedback058(parent,h);
             if(chosen=="graph059"||chosen=="display059"||chosen=="reach059"||(chosen??"").EndsWith("060",StringComparison.Ordinal)||(chosen??"").EndsWith("061",StringComparison.Ordinal))Feedback058(parent,h);
             if(chosen=="feedback058"||chosen=="disciplines058"||chosen=="discipline-effects058"||chosen=="amplifications058"||chosen=="registration058")Feedback058(parent,h);

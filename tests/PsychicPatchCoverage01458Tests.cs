@@ -62,6 +62,15 @@ internal static class PsychicPatchCoverage01458Tests
             var mimic=rows.Single(r=>r.Type=="MimicMetamagicEligibility01458Patch");
             mimic.Target=AccessTools.Method(game.GetType("Kingmaker.UnitLogic.Abilities.AbilityData",true),"HasMetamagic",new[]{typeof(Kingmaker.UnitLogic.Abilities.Metamagic)});mimic.Method="Postfix";mimic.Kind=HarmonyPatchType.Postfix;
         }
+        if(mod.GetType("CallOfTheWild.Wrath.Prototype.UrbanBloodrageFact01463Patch")!=null){
+            rows=rows.Concat(new[]{
+                new Row{Target=AccessTools.Method(game.GetType("Kingmaker.UnitLogic.UnitHelper",true),"HasFact",new[]{typeof(Kingmaker.UnitLogic.UnitDescriptor),typeof(Kingmaker.Blueprints.Facts.BlueprintFact)}),Type="UrbanBloodrageFact01463Patch",Method="Postfix",Kind=HarmonyPatchType.Postfix},
+                M("UrbanBloodragePrerequisite01463Patch","Kingmaker.Blueprints.Classes.Prerequisites.PrerequisiteFeature","CheckInternal",HarmonyPatchType.Transpiler),
+                M("UrbanBloodrageAdded01463Patch","Kingmaker.Designers.Mechanics.Facts.BuffExtraEffects","HandleBuffDidAdded",HarmonyPatchType.Transpiler),
+                M("UrbanBloodrageRemoved01463Patch","Kingmaker.Designers.Mechanics.Facts.BuffExtraEffects","HandleBuffDidRemoved",HarmonyPatchType.Transpiler)
+            }).ToArray();
+            if(rows.Length!=31||rows.Any(r=>r.Target==null)||rows.Select(r=>r.Type).Distinct().Count()!=31)throw new Exception("063 exact four scoped Urban bloodrage hooks changed.");
+        }
         return rows;
     }
     internal static int Verify(Assembly mod,Harmony owner)

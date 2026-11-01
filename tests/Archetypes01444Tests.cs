@@ -195,7 +195,7 @@ internal static class Archetypes01444Tests
     static void Caller(BlueprintsCache parent,Harmony h)
     {
         var c=Fresh(parent);var registrar=Main.GetType("CallOfTheWild.Wrath.Prototype.BlueprintRegistration");var investigator=Main.GetType("CallOfTheWild.Wrath.Prototype.ExtraInvestigatorTalent");
-        h.Patch(AccessTools.Method(registrar,"RegisterModule"),prefix:new HarmonyMethod(typeof(Archetypes01444Tests),nameof(Scope)));h.Patch(AccessTools.Method(investigator,"Register"),prefix:new HarmonyMethod(typeof(Archetypes01444Tests),nameof(NoInvestigator)));
+        h.Patch(AccessTools.Method(registrar,"RegisterModule"),prefix:new HarmonyMethod(typeof(Archetypes01444Tests),nameof(Scope)));ScopedAvailable01463Tests.Bind(h,registrar,"ScopeArchetypes01444Tests");h.Patch(AccessTools.Method(investigator,"Register"),prefix:new HarmonyMethod(typeof(Archetypes01444Tests),nameof(NoInvestigator)));
         var reports=new List<string>();Action<string,bool,Exception> report=(name,passed,error)=>{Check(passed&&error==null,"real new archetype dispatcher: "+name+" "+error);reports.Add(name);};
         try{Call(registrar,"RegisterAll",c,report);var first=Names.SelectMany((n,i)=>Tokens(i)).Select(t=>c.Load(Id(t))).ToArray();Call(registrar,"RegisterAll",c,report);Check(reports.Count==6&&reports.Distinct().Count()==3,"actual dispatcher twice reaches exactlythree new modules");Check(Names.SelectMany((n,i)=>Tokens(i)).Select((t,i)=>ReferenceEquals(c.Load(Id(t)),first[i])).All(x=>x),"actual caller retry retains all49 identities");}
         finally{h.Unpatch(AccessTools.Method(registrar,"RegisterModule"),HarmonyPatchType.Prefix,h.Id);h.Unpatch(AccessTools.Method(investigator,"Register"),HarmonyPatchType.Prefix,h.Id);}

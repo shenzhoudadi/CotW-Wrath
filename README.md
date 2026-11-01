@@ -1,8 +1,14 @@
 # Call of the Wild — Wrath Prototype
 
-Pathfinder: Wrath of the Righteous 的 Call of the Wild 内容移植项目。当前源码快照对应已交付的 **0.14.62**；下一批 Urban Bloodrager、Cryptid Scholar 与 Iroran Paladin 处于依赖核查阶段，尚未计入实现。
+Pathfinder: Wrath of the Righteous 的 Call of the Wild 内容移植项目。当前源码快照对应已交付的 **0.14.63**。本版完成 Urban Bloodrager 一项职业变体；Cryptid Scholar 与 Iroran Paladin 因真实依赖尚未就绪而暂缓。
 
-项目中的游戏玩法文本保持原语言；`README.zh-CN.md` 与各版本测试说明记录历史工作。0.14.62 的回归步骤见 [测试说明](0.14.62PsychicFeedback-test-guide.txt)。
+项目中的游戏玩法文本保持原语言；`README.zh-CN.md` 与各版本测试说明记录历史工作。0.14.63 的回归步骤见 [测试说明](0.14.63UrbanBloodrager-test-guide.txt)。完整托管门禁、最终安装包 DLL 双运行时检查与独立只读复查通过；没有启动游戏或 UMM，游戏表现由测试者观察。
+
+## 下载
+
+[最新版本与全部附件](https://github.com/shenzhoudadi/CotW-Wrath/releases/latest) · [0.14.63 安装包](https://github.com/shenzhoudadi/CotW-Wrath/releases/download/v0.14.63/CallOfTheWildWrathPrototype-0.14.63-experimental.zip)
+
+安装包、源码包、测试说明和公开自检摘要均在 Releases 的 Assets 中。安装请使用 experimental.zip 安装包；GitHub 自动生成的 Source code 归档是仓库源码。
 
 ## 源码与构建
 

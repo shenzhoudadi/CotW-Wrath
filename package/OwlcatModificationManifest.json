@@ -1,6 +1,6 @@
 {
   "UniqueName": "CallOfTheWildWrathPrototype",
-  "Version": "0.14.62",
+  "Version": "0.14.63",
   "DisplayName": "Call of the Wild — Wrath Prototype",
   "Description": "CotW with bundled Medium Class: shared Psychic casting and Logical Spell, 126 migrated spell roots (Ghostbane Dirge pair retained with a known issue), Ferocity/Faith/Pageantry, nine basic phrenic amplifications, level-19 selection and Phrenic Mastery, Medium spirits and optional spell links. Disable the old standalone Medium Class installation. The bundled Medium module retains its UMM framework, ModMenu and Tabletop Tweaks Core dependencies. Other Psychic disciplines, major amplifications, Occultist and Spiritualist remain in progress.",
   "Author": "Local migration prototype; original rule implementation by Holic75",

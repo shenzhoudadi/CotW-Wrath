@@ -32890,5 +32890,209 @@
     "ProcessTemplates": false,
     "enGB": "When you use Combat Expertise, reduce the penalty on melee attack rolls and combat maneuvers by 2. Prerequisites: Intelligence 13, base attack bonus +8, and Combat Expertise.",
     "zhCN": "When you use Combat Expertise, reduce the penalty on melee attack rolls and combat maneuvers by 2. Prerequisites: Intelligence 13, base attack bonus +8, and Combat Expertise."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicFeature01463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction.",
+    "zhCN": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicFeature01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Adopted Magic",
+    "zhCN": "Adopted Magic"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel101463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction.",
+    "zhCN": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel101463.name",
+    "ProcessTemplates": false,
+    "enGB": "Adopted Magic (Level 1)",
+    "zhCN": "Adopted Magic (Level 1)"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel201463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction.",
+    "zhCN": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel201463.name",
+    "ProcessTemplates": false,
+    "enGB": "Adopted Magic (Level 2)",
+    "zhCN": "Adopted Magic (Level 2)"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel301463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction.",
+    "zhCN": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel301463.name",
+    "ProcessTemplates": false,
+    "enGB": "Adopted Magic (Level 3)",
+    "zhCN": "Adopted Magic (Level 3)"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel401463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction.",
+    "zhCN": "At 7th level, and at 10th, 13th, 16th and 19th levels, learn one bard or magus spell of a level you can cast that is not already on the bloodrager spell list. The spell becomes a bloodrager spell known for this character. This replaces damage reduction."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanAdoptedMagicLevel401463.name",
+    "ProcessTemplates": false,
+    "enGB": "Adopted Magic (Level 4)",
+    "zhCN": "Adopted Magic (Level 4)"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageConstitutionBuff01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageConstitutionBuff01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage: Constitution",
+    "zhCN": "Controlled Bloodrage: Constitution"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageConstitutionToggle01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageConstitutionToggle01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage: Constitution",
+    "zhCN": "Controlled Bloodrage: Constitution"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageDexterityBuff01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageDexterityBuff01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage: Dexterity",
+    "zhCN": "Controlled Bloodrage: Dexterity"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageDexterityToggle01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageDexterityToggle01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage: Dexterity",
+    "zhCN": "Controlled Bloodrage: Dexterity"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageFeature01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageFeature01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage",
+    "zhCN": "Controlled Bloodrage"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageStrengthBuff01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageStrengthBuff01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage: Strength",
+    "zhCN": "Controlled Bloodrage: Strength"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageStrengthToggle01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable.",
+    "zhCN": "Choose Strength, Dexterity or Constitution: controlled bloodrage grants a +4 morale bonus to that ability, +6 at bloodrager level 11 and +8 at 20. It grants none of the ordinary bloodrage attack, damage, temporary hit point, Will or AC adjustments. It counts as bloodrage for bloodline powers and prerequisites. Native rage rounds, fatigue restrictions and Limitless Rage are retained. Charisma-, Dexterity- and Intelligence-based skills remain usable."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodrageStrengthToggle01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Controlled Bloodrage: Strength",
+    "zhCN": "Controlled Bloodrage: Strength"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodragerArchetype01463.description",
+    "ProcessTemplates": false,
+    "enGB": "An urban bloodrager controls her bloodrage in polite society, directs it into one physical ability and learns magic from other urban traditions.",
+    "zhCN": "An urban bloodrager controls her bloodrage in polite society, directs it into one physical ability and learns magic from other urban traditions."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodragerArchetype01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Urban Bloodrager",
+    "zhCN": "Urban Bloodrager"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodragerProficiencies01463.description",
+    "ProcessTemplates": false,
+    "enGB": "Proficient with simple and martial weapons and light and medium armor. Not proficient with shields. Native armored bloodrager spellcasting is retained.",
+    "zhCN": "Proficient with simple and martial weapons and light and medium armor. Not proficient with shields. Native armored bloodrager spellcasting is retained."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanBloodragerProficiencies01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Urban Bloodrager Proficiencies",
+    "zhCN": "Urban Bloodrager Proficiencies"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanRestrainedMagicBuff01463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 3rd level, non-enemies within 60 feet gain a +2 bonus on saving throws against spells cast by this bloodrager. Other casters' spells and non-spell effects do not receive this bonus. This replaces blood sanctuary.",
+    "zhCN": "At 3rd level, non-enemies within 60 feet gain a +2 bonus on saving throws against spells cast by this bloodrager. Other casters' spells and non-spell effects do not receive this bonus. This replaces blood sanctuary."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanRestrainedMagicBuff01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Restrained Magic",
+    "zhCN": "Restrained Magic"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanRestrainedMagicFeature01463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 3rd level, non-enemies within 60 feet gain a +2 bonus on saving throws against spells cast by this bloodrager. Other casters' spells and non-spell effects do not receive this bonus. This replaces blood sanctuary.",
+    "zhCN": "At 3rd level, non-enemies within 60 feet gain a +2 bonus on saving throws against spells cast by this bloodrager. Other casters' spells and non-spell effects do not receive this bonus. This replaces blood sanctuary."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanRestrainedMagicFeature01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Restrained Magic",
+    "zhCN": "Restrained Magic"
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanRestrainedMagicHost01463.description",
+    "ProcessTemplates": false,
+    "enGB": "At 3rd level, non-enemies within 60 feet gain a +2 bonus on saving throws against spells cast by this bloodrager. Other casters' spells and non-spell effects do not receive this bonus. This replaces blood sanctuary.",
+    "zhCN": "At 3rd level, non-enemies within 60 feet gain a +2 bonus on saving throws against spells cast by this bloodrager. Other casters' spells and non-spell effects do not receive this bonus. This replaces blood sanctuary."
+  },
+  {
+    "Key": "cotw-wrath.psychic.full.UrbanRestrainedMagicHost01463.name",
+    "ProcessTemplates": false,
+    "enGB": "Restrained Magic",
+    "zhCN": "Restrained Magic"
   }
 ]

@@ -172,7 +172,7 @@ internal static class Migration01437CallerTests
         var snapshot = Activator.CreateInstance(oldSnapshotType, BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { parent }, null);
         var diagnostics = new[] { Module("WizardDiscoveries01435"), Module("BardMasterpieces01435") }.SelectMany(AccessTools.GetDeclaredFields).Where(f => f.IsStatic && f.FieldType == typeof(string) && f.Name.Contains("Diagnostic")).Select(f => Tuple.Create(f, f.GetValue(null))).ToArray();
         var h = new Harmony("CotW037.ActualRegistrationCaller"); JObject[] inventory;
-        h.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(Migration01437CallerTests), nameof(Scope)));
+        h.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(Migration01437CallerTests), nameof(Scope)));ScopedAvailable01463Tests.Bind(h,Module("BlueprintRegistration"),"ScopeMigration01437CallerTests");
         h.Patch(AccessTools.Method(Module("ExtraInvestigatorTalent"), "Register"), prefix: new HarmonyMethod(typeof(Migration01437CallerTests), nameof(Investigator)));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache), "AddCachedBlueprint"), prefix: new HarmonyMethod(typeof(Migration01437CallerTests), nameof(Fault)));
         try { inventory = Success(parent); InsertionFailure(parent, false); InsertionFailure(parent, true); ForeignRoot(parent, false); ForeignRoot(parent, true); }

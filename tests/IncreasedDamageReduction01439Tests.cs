@@ -473,7 +473,7 @@ internal static class IncreasedDamageReduction01439Tests
             Check(InvokeRegister(cache) == null, "registration remains idempotent after the prerequisite probe");
             var badOrder = new List<string>();
             EnumSet(rank, "m_Progression", "Div2");
-            harmony.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.BlueprintRegistration", true), "RegisterModule"), prefix: new HarmonyMethod(typeof(IncreasedDamageReduction01439Tests), nameof(Scope)));
+            harmony.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.BlueprintRegistration", true), "RegisterModule"), prefix: new HarmonyMethod(typeof(IncreasedDamageReduction01439Tests), nameof(Scope)));ScopedAvailable01463Tests.Bind(harmony,typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.BlueprintRegistration", true),"ScopeIncreasedDamageReduction01439Tests");
             var failed = Dispatch(cache);
             badOrder.AddRange(order);
             var skippedFailure = new HashSet<string>(badOrder.Where(name => name != "Increased Damage Reduction"));

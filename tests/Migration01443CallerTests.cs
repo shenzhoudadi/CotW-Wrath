@@ -127,7 +127,7 @@ internal static class Migration01443CallerTests
         var parentSnapshot = Activator.CreateInstance(snapshotType, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, new object[] { parent }, null);
         var harmony = new Harmony("CotW01443.ActualScopedCaller");
         try {
-            harmony.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(Migration01443CallerTests), nameof(Scope)));
+            harmony.Patch(AccessTools.Method(Module("BlueprintRegistration"), "RegisterModule"), prefix: new HarmonyMethod(typeof(Migration01443CallerTests), nameof(Scope)));ScopedAvailable01463Tests.Bind(harmony,Module("BlueprintRegistration"),"ScopeMigration01443CallerTests");
             harmony.Patch(AccessTools.Method(Module("ExtraInvestigatorTalent"), "Register"), prefix: new HarmonyMethod(typeof(Migration01443CallerTests), nameof(DirectInvestigatorBoundary)));
             var cache = Fresh(parent); var before = Loaded(cache);
             string refusalId = Constant("UrbanSkald01443", "RefusalId");
