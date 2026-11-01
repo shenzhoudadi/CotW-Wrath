@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems><StartupObject>StartupLauncher</StartupObject>
+    <WrathPath Condition="'$(WrathPath)' == ''">$(WOTR_GAME_PATH)</WrathPath>
+    <GameManaged>$(WrathPath)\Wrath_Data\Managed</GameManaged>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="IntegratedStartupTests.cs" />
+    <Compile Include="PsychicPatchCoverage01458Tests.cs" />
+    <ProjectReference Include="..\CallOfTheWild.Wrath.Prototype.csproj"><Private>false</Private></ProjectReference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(GameManaged)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManaged)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

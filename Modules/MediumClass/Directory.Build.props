@@ -1,0 +1,7 @@
+<Project>
+  <!-- Preserve Medium's existing bin/obj layout while inheriting the same
+       mandatory game Harmony reference and validation as the parent mod. -->
+  <PropertyGroup><IsBundledMediumProject>true</IsBundledMediumProject></PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)MediumClass.local.props" Condition="Exists('$(MSBuildThisFileDirectory)MediumClass.local.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)..\..\Directory.Build.props" />
+</Project>

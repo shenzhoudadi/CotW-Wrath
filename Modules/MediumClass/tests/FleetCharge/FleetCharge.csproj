@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference><OutputType>Exe</OutputType><TargetFramework>net472</TargetFramework><LangVersion>latest</LangVersion><StartupObject>Launcher</StartupObject><GameManaged>$(WrathPath)/Wrath_Data/Managed</GameManaged></PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp"><HintPath>$(GameManaged)/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Owlcat.Runtime.Core"><HintPath>$(GameManaged)/Owlcat.Runtime.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(GameManaged)/Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,17 @@
+{
+  "cotwCommit": "1332fb0db844b7863f484ca978bea2349fe49769",
+  "icons": [
+    {
+      "token": "SavageMaw",
+      "source": "CallOfTheWild/Icons/AbilityIcons/SavageMaw.png",
+      "sha256": "50803E9BA8C7E6B16184D7CF5CBC22521B85ABA2453460E21F1738ED048BC4E5",
+      "embeddedResource": "CotW.SavageMaw.png"
+    },
+    {
+      "token": "BloodArmor",
+      "source": "CallOfTheWild/Icons/AbilityIcons/BloodArmor.png",
+      "sha256": "0B8BEE9BD9D47A502D9551CCB6AB7B9AB9C5B4FABC83BFE0A7CC6C4F470D7FB9",
+      "embeddedResource": "CotW.BloodArmor.png"
+    }
+  ]
+}

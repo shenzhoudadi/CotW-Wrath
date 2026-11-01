@@ -1,0 +1,32 @@
+<Project>
+  <ItemGroup Condition="'$(UseGameHarmonyReference)' != 'true'">
+    <!-- The game's Harmony embeds Mono.Cecil. Pure Cecil auditors must not
+         import that namespace a second time; they still validate the pin. -->
+    <Reference Remove="0Harmony, Version=2.0.4.0, Culture=neutral, PublicKeyToken=null" />
+  </ItemGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'HarmonyTests' or '$(MSBuildProjectName)' == 'IntegratedStartupTests' or '$(MSBuildProjectName)' == 'StartupTests' or '$(MSBuildProjectName)' == 'PsychicTests' or '$(MSBuildProjectName)' == 'PsychicCasting' or '$(MSBuildProjectName)' == 'FleetCharge' or '$(MSBuildProjectName)' == 'RobinHood'">
+    <UseExplicitGameHarmonyResolver>true</UseExplicitGameHarmonyResolver>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'HarmonyTests' or '$(MSBuildProjectName)' == 'IntegratedStartupTests' or '$(MSBuildProjectName)' == 'StartupTests' or '$(MSBuildProjectName)' == 'PsychicTests' or '$(MSBuildProjectName)' == 'PsychicCasting' or '$(MSBuildProjectName)' == 'FleetCharge' or '$(MSBuildProjectName)' == 'RobinHood'">
+    <Compile Include="$(MSBuildThisFileDirectory)tests/RequiredHarmonyRuntime.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'IntegratedStartupTests' or '$(MSBuildProjectName)' == 'StartupTests'">
+    <Compile Include="$(MSBuildThisFileDirectory)tests/StartupBlueprintCoreCoverage.cs" />
+    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>$(WrathPath)/Wrath_Data/Managed/UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Update="0Harmony, Version=2.0.4.0, Culture=neutral, PublicKeyToken=null">
+      <!-- Medium's merge tool and ordinary test hosts need a local identical
+           runtime copy. CLR launchers deliberately resolve the game path. -->
+      <Private Condition="'$(MSBuildProjectName)' == 'MediumClass' or ('$(OutputType)' == 'Exe' and '$(UseExplicitGameHarmonyResolver)' != 'true')">true</Private>
+    </Reference>
+  </ItemGroup>
+  <!-- A stale copy beside a test EXE wins over AssemblyResolve. CLR launchers
+       explicitly resolve the game path; leave no competing copy in their bin.
+       Other test hosts receive a byte-identical selected reference copy. -->
+  <Target Name="PinTestHarmonyRuntime" AfterTargets="Build"
+          Condition="'$(OutputType)' == 'Exe' and Exists('$(HarmonyReferencePath)')">
+    <Delete Files="$(TargetDir)0Harmony.dll" Condition="'$(UseExplicitGameHarmonyResolver)' == 'true'" />
+    <Copy SourceFiles="$(_CotwGameHarmonyPath)" DestinationFiles="$(TargetDir)0Harmony.dll" Condition="'$(UseExplicitGameHarmonyResolver)' != 'true'" />
+  </Target>
+</Project>

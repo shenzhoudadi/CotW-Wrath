@@ -1,0 +1,32 @@
+// Original Holic75/KingmakerRebalance Psychic.cs text (MIT), exact pinned source.
+using System.Collections.Generic;
+namespace CallOfTheWild.Wrath.Prototype {
+ internal static class PsychicOriginalTexts01457 {
+  static readonly Dictionary<string,string[]> Data=new Dictionary<string,string[]> {
+   ["MutationMindArchetype"]=new[]{"Mutation Mind","Exposure to unintended spell effects, curses, or sources of radiation cause some to manifest psychic powers. When a mutation mind uses her psychic abilities, her physical body changes under the stress, and she risks losing control if she pushes too far."},
+   ["PsychicMaraudeurArchetype"]=new[]{"Psychic Marauder","When one encounters aberrant creatures, it can unlock psychic potential within a person, though this experience is traumatic for those who endure it. The psychic marauder’s powers come hand in hand with madness, either from exposure to alien psyches or from terrifying glimpses into the cosmos that the psychic can’t suppress. But she does not crumble under the strain of this insanity; instead, she cordons it off to use as a shield against other psychic intrusions and harnesses it to unleash it upon the world around her."},
+   ["PhysicalMutationBuff"]=new[]{"Physical Mutation","A mutation mind’s psychic powers warp her body, allowing her to physically mutate herself as a swift action, which grants her a +4 alchemical bonus to Strength and a –2 penalty to Intelligence. At 12th level, the bonus to Strength increases to +6, and at 16th level to +8. A mutation mind can assume her physically mutated form for a number of minutes per day equal to her psychic level. The minutes don’t have to be used consecutively, but must be used in 1-minute increments. After the mutation ends, the mutation mind is fatigued and can’t activate a physical mutation again for 1 round."},
+   ["BodilyMutationsFeature"]=new[]{"Bodily Mutations","Starting at 3rd level, whenever a mutation mind gains a phrenic amplification, she can select either a phrenic amplification or a bodily mutation. A bodily mutation grants its benefit only when the mutation mind is affected by her physical mutation. Each time she activates her physical mutation, she can activate any number of bodily mutations she possesses."},
+   ["ImprovedBodilyMutationsFeature"]=new[]{"Improved Bodily Mutations","At 11th level, a mutation mind can select one of the improved bodily mutations instead of a phrenic amplification."},
+   ["SkewedMentalityFeature"]=new[]{"Skewed Mentality","At 2nd level, a psychic marauder becomes alienated from reality as others perceive it. The psychic marauder uses her Charisma modifier on Will saves instead of her Wisdom modifier."},
+   ["CrackedPerspectivesFeature"]=new[]{"Cracked Perspectives","At 9th level, a psychic marauder’s growing madness renders her immune to confusion and insanity effects."},
+   ["UnrealUnderstandingFeature"]=new[]{"Unreal Understanding","At 20th level, a psychic marauder’s mindset becomes completely aberrant, to the point that no outside force can penetrate her psyche. Because of this, the psychic marauder becomes immune to all mind-affecting effects."},
+   ["AuraOfInsanityIFeature"]=new[]{"Aura of Insanity I","At 3rd level, a psychic marauder’s madness begins to leak out. As a standard action, the psychic marauder can spend 1 point from her phrenic pool to manifest an aura of insanity, letting bits of her psyche penetrate the minds of those around her. The aura is centered on the psychic marauder and has a radius of 10 feet, increasing by 5 feet for every 3 class levels beyond 3rd. Any hostile creature starting its turn within the aura must succeed at a Will save (DC = 10 + half the psychic marauder’s level + the psychic marauder’s Intelligence modifier) or be confused for 1 round. The aura of insanity lasts for a number of rounds equal to the psychic marauder’s Charisma modifier. This is a mind-affecting effect."},
+   ["AuraOfInsanityIIFeature"]=new[]{"Aura of Insanity II","At 11th level, the psychic can decide to spend 1 extra phrenic pool point when using aura of insanity to force affected creatures to always reroll 'acts normally' confused condition."},
+   ["AuraOfInsanityIIIFeature"]=new[]{"Aura of Insanity III","At 19th level, the psychic can decide to spend 2 extra phrenic pool points when using aura of insanity to select the result of the affected creatures’ confused condition without rolling."},
+   ["Adhesive"]=new[]{"Adhesive","The mutation mind’s skin becomes sticky, granting her a +4 bonus on disarm and grapple combat maneuver checks."},
+   ["BiteAttack"]=new[]{"Bite Attack","The mutation mind’s mouth fills with sharp teeth, allowing her to make a bite attack as part of a full-attack action at her highest base attack bonus. This attack deals 1d4 points of damage (1d3 if Small) and counts as a primary attack unless combined with manufactured weapon attacks, as normal."},
+   ["Claws"]=new[]{"Claws","The mutation mind’s hands turn into claws, allowing her to make two claw attacks as a full-attack action at her highest base attack bonus. Each of these attacks deals 1d4 points of damage (1d3 if Small) and counts as a primary attack unless combined with manufactured weapon attacks, as normal."},
+   ["ElongatedLegs"]=new[]{"Elongated Legs","The mutation mind’s legs become long and spindly, increasing her base movement by 10 feet."},
+   ["ElongatedTorso"]=new[]{"Elongated Torso","The mutation mind’s torso enlarges disproportionately with the rest of her body, granting her a +2 natural armor bonus to AC."},
+   ["Rubbery"]=new[]{"Rubbery","The mutation mind’s body becomes soft and rubbery, granting her DR 2/—."},
+   ["Slimy"]=new[]{"Slimy","The mutation mind exudes a thin layer of oily slime over her body, granting her a +4 bonus to CMD."},
+   ["EnlargedBody"]=new[]{"Enlarged Body","The mutation mind’s body swells and stretches, enlarging her as the enlarge person spell but by 2 size categories. Mutation mind receives + 4 size bonus to strength and -2 bonus to dexterity."},
+   ["MultipleEyes"]=new[]{"Multiple Eyes","Multiple eyes erupt all over the mutation mind’s body. She can’t be flanked and gains a +4 bonus on Perception checks."},
+   ["Recuperation"]=new[]{"Recuperation","The mutation mind heals quickly from physical wounds, gaining fast healing 5."},
+   ["Wings"]=new[]{"Wings","The mutation mind sprouts a pair of fleshy, batlike wings."}
+  };
+  internal static string Name(string key)=>Data[key][0];
+  internal static string Description(string key)=>Data[key][1];
+ }
+}

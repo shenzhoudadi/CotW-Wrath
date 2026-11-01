@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference>
+    <OutputType>Exe</OutputType>
+    <TestFramework Condition="'$(TestFramework)' == ''">net472</TestFramework>
+    <TargetFramework>$(TestFramework)</TargetFramework><LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <ProductionPatchesPath Condition="'$(ProductionPatchesPath)' == ''">../../Medium/MediumSpiritSpellbookPatches.cs</ProductionPatchesPath>
+  </PropertyGroup>
+  <Target Name="ValidateHarmonyPath" BeforeTargets="ResolveReferences">
+    <Error Condition="'$(HarmonyReferencePath)' == '' Or !Exists('$(HarmonyReferencePath)')" Text="Pass /p:HarmonyReferencePath=the absolute path to the Harmony DLL used for compilation." />
+  </Target>
+  <ItemGroup>
+    <Compile Include="../SpiritSpellcastingScenarios/GameApiModel.cs" Link="GameApiModel.cs" />
+    <Compile Include="$(ProductionPatchesPath)" Link="Production/MediumSpiritSpellbookPatches.cs" />
+    <Compile Include="../../Medium/NewUnitParts/UnitPartMediumPreparedSpells.cs" Link="Production/UnitPartMediumPreparedSpells.cs" />
+    <Compile Include="../../Medium/SpiritSpellcastingMath.cs" Link="Production/SpiritSpellcastingMath.cs" />
+  </ItemGroup>
+</Project>

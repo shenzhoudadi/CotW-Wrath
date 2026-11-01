@@ -1,0 +1,67 @@
+0.6.0 Psychic 实验包测试说明
+本版新增内容没有游戏验收。独立自检使用构造的托管游戏对象，不等于游戏实测。
+范围：异能施法底层、17个专属法术、三组降阶施法、完整Ferocity流派。
+未包含其他五个流派、Phrenic Amplifications和全部缺失CotW法术，不是完整Psychic职业。
+
+准备
+完全退出游戏后替换同名整包，保留旧包及测试前存档。不要同时启用多个版本。
+百宝袋可用于经验、属性和敌方测试状态；职业/法术/流派尽量正常升级取得。
+记录游戏、百宝袋和其他模组版本。ModMenu应有版本行+10个模块状态，共11行。
+Psychic casting prototype与Psychic spells and Ferocity应为Registered。
+
+A. 建角、升级和休息
+1. 新建或洗点测试角色，选Psychic (Casting Prototype)，INT18/WIS14/CHA10，流派选Ferocity。
+   此版本流派只有Ferocity一个完整选项；不要把旧的Wisdom/Charisma临时选择另行添加。
+   验证1–20级能完成升级和选法术，4级2环、18级9环。法术DC为10+环级+智力调整值。
+   1级额外已知True Strike，4级Bull's Strength，6级Heroism，8级Freedom of Movement，
+   10级Stoneskin，12级Transformation，14级Mind Blank，16级Frightful Aspect，18级Foresight。
+   奖励法术不占正常选择数。完整休息后恢复法术位、灵能池及Primal Fury轮数。
+
+B. 思想/情感成分
+2. 敌人威胁范围内防御施法，比较集中检定。未Center Self时额外-10；
+   花移动动作Center Self后1轮内恢复正常，其他集中加值保留，到期再有-10。
+3. 用百宝袋添加Shaken或施加恐惧/负面情绪效果，普通异能法术应不可用。
+   Heroism等正面情绪不禁用。已压制或移除的负面效果不继续禁用。
+4. 正常选Metamagic (Logical Spell)，将1环异能法术加Logical，应占2环；
+   负面情绪下可用，集中仍-10。确认可与其他适用超魔组合，Piercing保持原效果。
+   恐慌、昏迷等无法行动和其他禁施法仍按原生限制，不能靠Logical强行行动。
+5. 穿甲持盾，异能法术应不受奥术失败；混职法师的法术仍受原生限制。
+   用动物变形检查异能法术可用，物品/其他法术书不获得同样豁免。
+   Primal Fury/Transformation自带的禁施法仍有效，不应被视为普通变形而绕过。
+6. 两个已审计沉默效果ThrowingAxeOfSilenceBuff/SlaughteringSilenceBuff单独存在时，
+   异能法术仍可用；叠加其他禁施法后仍禁用。未保证外部mod新增沉默效果。
+
+C. 17个专属法术与降阶施法
+7. Mind Thrust I–VI为1–6环，Will减半，法术抗力有效。I为每等级1d6、最多5骰；
+   II为1d8最多5骰，III最多10骰，IV/V最多15骰，VI最多20骰。
+   IV失败疲乏1轮；V失败力竭1轮；VI失败力竭+震慑1轮，成功疲乏1轮。
+   无智力的构装体/虫类及心灵免疫目标不应成为有效伤害对照。检查Empower/Maximize/Intensified。
+8. Mental Barrier I–V为2–6环，迅捷动作、持续2轮，盾牌AC+4/+6/+8/+8/+8，
+   IV/V另有25%/50%抵消重击/偷袭额外伤害，不与同类概率相加。
+   Thought Shield I–III为2–4环，迅捷动作、2轮，对心灵效果豁免环境加值+4/+6/+8。
+   本版使用原生Extend将2轮延长为4轮；尚未移植CotW的Extra Round Duration（额外1轮）。
+9. Intellect Fortress为4环，迅捷动作、2轮、周围20尺；压制范围内双方的恐惧/情绪。
+   离开/结束后原效果应恢复；检查负面情绪被压制期间普通异能法术恢复可用。
+10. Synaptic Pulse为3环，周围30尺、Will成功无效，失败震慑1轮，施法者排除；
+    Greater为5环，失败震慑1d4轮，成功恶心1轮。检查友军影响及Selective。
+11. 正常学会Mind Thrust VI后应获得I–V，低阶施法分别消耗其自身环级法术位。
+    学会Mental Barrier V或Thought Shield III后同样有低阶版本。
+    正常已知法术不被自动版本替代；洗点/遗忘高阶后自动低阶应随来源更新。
+    跨环调制超魔、升级、保存退出重载后再次确认，避免只用百宝袋强行添加高阶。
+
+D. Ferocity完整流派
+12. WIS14，1/4/13/20级灵能池上限预期2/4/8/12。以永久属性及完整休息后的上限比较。
+    Enhanced Senses消耗1点、标准动作，1分钟30尺盲感；11级改为永久30尺盲感，
+    付费动作改为1分钟30尺盲视。验证旧动作替换，隐形目标的表现有区别，耗尽后禁用。
+13. 5级获得Diehard。以最大HP100构造对照：HP25时无额外加成，HP24时STR/DEX各+4、
+    Fortitude+2，均为士气；治疗到25及以上消失，不与其他士气加值相加。
+    13级Primal Fury自由动作开启/关闭，保留原生Transformation效果和禁施法。
+    每日轮数等于Psychic等级，13级13轮、20级20轮；结束疲乏1分钟，疲乏/力竭不可重新开。
+    昏迷/无法行动应终止，轮数用尽停止，完整休息恢复。
+
+E. 保存、洗点、回归
+14. 保存→完全退出游戏→重载，确认职业、流派、奖励法术、低阶版本和Logical调制法术。
+    再正常升级/洗点测试能力和资源清理；跨区域检查感知/光环/Primal Fury。
+15. 回归0.5.1 Sharpened Accuracy和歌者共享、Shielded Mage、Exemplar轮数。
+
+反馈请给游戏/模组版本、异常项目编号、截图及日志。启动不崩溃不代表上述项目全部通过。

@@ -1,0 +1,56 @@
+{
+  "source": "D:\\steam\\steamapps\\common\\Pathfinder Kingmaker\\Kingmaker_Data\\sharedassets1.assets",
+  "sourceSha256": "CC779CAF2FEF21D111856A57D40B510677B0C236AD2723D1849564626445F785",
+  "icons": [
+    {
+      "token": "Invigorate",
+      "blueprint": "4ebaf39efb8ffb64baf92784808dc49c",
+      "sourceBlueprintName": "DestructionJudgmentAbility",
+      "blueprintPathId": 74327,
+      "spritePathId": 5853,
+      "spriteName": "JudjemntDestruction",
+      "offset": 160,
+      "sha256": "1AF20E02FAAE1E6F27A63B071025B7F4D8AE692CDECA6EF2A1D09E2887288F94"
+    },
+    {
+      "token": "ControlUndead",
+      "blueprint": "1a5e7191279e7cd479b17a6ca438498c",
+      "sourceBlueprintName": "BloodlineUndeadArcana",
+      "blueprintPathId": 77391,
+      "spritePathId": 6254,
+      "spriteName": "CommandUndead",
+      "offset": 216,
+      "sha256": "364B1644C65121FF4527449D89C8AFC6631D1852C9FD8D1526336306DC7FA0AD"
+    },
+    {
+      "token": "LocateWeakness",
+      "blueprint": "2c38da66e5a599347ac95b3294acbe00",
+      "sourceBlueprintName": "TrueStrike",
+      "blueprintPathId": 93228,
+      "spritePathId": 5440,
+      "spriteName": "TrueStrike",
+      "offset": 252,
+      "sha256": "F56F5ABDA1DCAA7CA291AAB5CDB4D39D7FF3E00E5054E0B7622100DB1F666218"
+    },
+    {
+      "token": "HowlingAgony",
+      "blueprint": "d42c6d3f29e07b6409d670792d72bc82",
+      "sourceBlueprintName": "BansheeBlast",
+      "blueprintPathId": 94152,
+      "spritePathId": 4663,
+      "spriteName": "BansheeBlast",
+      "offset": 288,
+      "sha256": "7D581DF79DBCF7025B55D0C268FD416A57D31F15515052377C243DE55B177CB3"
+    },
+    {
+      "token": "DivideMind",
+      "blueprint": "fb96d35da88acb1498dc51a934f6c4d5",
+      "sourceBlueprintName": "SwitchTo_Kanerah_Ability",
+      "blueprintPathId": 98929,
+      "spritePathId": 5068,
+      "spriteName": "TieflingsSwitch",
+      "offset": 264,
+      "sha256": "660AF3BD0D3332F2727DCA2E71466E06A5BDE86F7F3BC61220C556E1B8023CA9"
+    }
+  ]
+}

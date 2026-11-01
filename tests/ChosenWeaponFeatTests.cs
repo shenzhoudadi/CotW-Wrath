@@ -1,0 +1,161 @@
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+using HarmonyLib;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Prerequisites;
+using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Blueprints.Items.Weapons;
+using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.EntitySystem;
+using Kingmaker.EntitySystem.Entities;
+using Kingmaker.EntitySystem.Stats;
+using Kingmaker.Enums;
+using Kingmaker.Enums.Damage;
+using Kingmaker.Items;
+using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules;
+using Kingmaker.RuleSystem.Rules.Damage;
+using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Abilities;
+using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Buffs;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Commands;
+using Kingmaker.UnitLogic.Commands.Base;
+using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.UnitLogic.Parts;
+using Kingmaker.Utility;
+using CallOfTheWild.Wrath.Prototype;
+internal static class ChosenWeaponFeatTests {
+ static Kingmaker.Game game;
+ static bool Game(ref Kingmaker.Game __result){__result=game;return false;}
+ static bool Time(ref TimeSpan __result){__result=TimeSpan.Zero;return false;}
+ static bool Combat(ref bool __result){__result=false;return false;}
+ static ActivatableAbility Toggle(UnitEntityData u,string choice) {
+  var bp=Asset<BlueprintActivatableAbility>("Chosen"+choice+"PreferenceToggle");var a=Empty<ActivatableAbility>();Set(a,"Components",new List<EntityFactComponent>());a.RestoreOwnerLink(u.Facts);AccessTools.Method(typeof(EntityFact),"Setup").Invoke(a,new object[]{bp});Set(a,"IsActive",true);Set(a,"IsTurnedOn",true);Set(a,"m_IsOn",true);Set(a,"IsStarted",true);a.TimeToNextRound=6;var b=Psychic034Tests.Fact(u,bp.Buff,u,1);Set(a,"m_AppliedBuff",b);u.Facts.List.Add(a);Refresh(u);Call(b,typeof(ChosenPreference),"OnTurnOn");return a;
+ }
+ static int n;static BlueprintsCache cache;static UnitDescriptor wielder;static RulebookEventContext current;static readonly Queue<int> dice=new Queue<int>();
+ static readonly Type Module=typeof(ChosenWeaponBlessing).Assembly.GetType("CallOfTheWild.Wrath.Prototype.ChosenWeaponFeats");
+ static T Empty<T>()where T:class=>(T)FormatterServices.GetUninitializedObject(typeof(T));
+ static object Get(object o,string f)=>(AccessTools.Field(o.GetType(),f)??AccessTools.Field(o.GetType(),"<"+f+">k__BackingField")).GetValue(o);
+ static void Set(object o,string f,object v)=>(AccessTools.Field(o.GetType(),f)??AccessTools.Field(o.GetType(),"<"+f+">k__BackingField")??throw new Exception("Chosen fixture field: "+f)).SetValue(o,v);
+ static void Check(bool b,string why){if(!b)throw new Exception("Chosen weapon: "+why);n++;}
+ static object Helper(string m,params object[] a)=>AccessTools.Method(Module,m).Invoke(null,a);
+ static BlueprintGuid Id(string t)=>(BlueprintGuid)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicAssets"),"Id").Invoke(null,new object[]{t});
+ static T Asset<T>(string t)where T:SimpleBlueprint=>(T)cache.Load(Id(t));
+ static BlueprintFeature Native(string name)=>(BlueprintFeature)cache.Load(BlueprintGuid.Parse((string)PsychicExpansionTests.NativeRows.Single(r=>(string)r["name"]==name)["blueprint"]["AssetId"]));
+ static UnitEntityData Unit(string name){var u=(UnitEntityData)AccessTools.Method(typeof(T11TrainingTests),"Unit").Invoke(null,new object[]{cache,name});Set(u,"Commands",new UnitCommands(u));return u;}
+ static Feature Feature(UnitEntityData u,BlueprintFeature bp)=>(Feature)AccessTools.Method(typeof(T11TrainingTests),"Fact").Invoke(null,new object[]{u,bp});
+ static void Refresh(UnitEntityData u){var c=Get(u.Facts,"m_Cache");AccessTools.Method(c.GetType(),"Clear").Invoke(c,null);}
+ static EntityFactComponent Runtime(UnitFact f,Type t)=>f.Components.Single(c=>c.SourceBlueprintComponent.GetType()==t);
+ static void Call(UnitFact f,Type t,string m,object evt=null){var r=Runtime(f,t);using(r.RequestEventContext())AccessTools.Method(t,m,evt==null?Type.EmptyTypes:new[]{evt.GetType()}).Invoke(r.SourceBlueprintComponent,evt==null?null:new[]{evt});}
+ static bool Need(Prerequisite p,UnitEntityData u)=>(bool)AccessTools.Method(p.GetType(),"CheckInternal").Invoke(p,new object[]{null,u.Descriptor,null});
+ static bool Skip()=>false;static bool False(ref bool __result){__result=false;return false;}static bool Zero(ref int __result){__result=0;return false;}
+ static bool Wielder(ref UnitDescriptor __result){__result=wielder;return false;}static bool Context(ref RulebookEventContext __result){if(current==null)return true;__result=current;return false;}
+ static bool Dice(ref int __result){__result=dice.Dequeue();return false;}
+ static Buff added;
+ static bool Add(BuffCollection __instance,BlueprintBuff blueprint,MechanicsContext parentContext,TimeSpan? duration,ref Buff __result){if(blueprint.AssetGuid!=Id("WeaponOfChosenBuff"))return true;Check(duration==TimeSpan.FromSeconds(6)&&parentContext.MaybeCaster==__instance.Owner,"native arm endpoint uses one-round self context");__result=added=Bless(__instance.Owner);return false;}
+ static bool Remove(Buff __instance){if(__instance.Blueprint.AssetGuid!=Id("WeaponOfChosenBuff")&&!__instance.Blueprint.name.StartsWith("CotWWrathPsychicChosen"))return true;Set(__instance,"IsTurnedOn",false);__instance.Owner.Facts.List.Remove(__instance);Refresh(__instance.Owner);return false;}
+ static ItemEntityWeapon Weapon(WeaponCategory category,AttackType attackType=AttackType.Melee) {
+  var donor=Psychic034Tests.Asset<BlueprintItemWeapon>(cache,"SpiritualWeaponItem");var bp=(BlueprintItemWeapon)AccessTools.Method(typeof(object),"MemberwiseClone").Invoke(donor,null);var type=(BlueprintWeaponType)AccessTools.Method(typeof(object),"MemberwiseClone").Invoke(donor.Type,null);Set(type,"Category",category);Set(type,"m_AttackType",attackType);var r=BlueprintReferenceBase.CreateTyped<BlueprintWeaponTypeReference>(type);AccessTools.Property(typeof(BlueprintReferenceBase),"Cached").SetValue(r,type);Set(bp,"m_Type",r);Set(bp,"m_DamageType",donor.DamageType.Copy());
+  Set(bp,"m_OverrideDamageType",true);Set(bp,"m_DamageType",new DamageTypeDescription{Type=DamageType.Physical,Physical=new DamageTypeDescription.PhysicalData{Form=PhysicalDamageForm.Slashing}});Set(bp,"m_OverrideDamageDice",true);Set(bp,"m_DamageDice",new DiceFormula(1,DiceType.D8));var w=Empty<ItemEntityWeapon>();Set(w,"m_Blueprint",bp);return w;
+ }
+ static Buff Bless(UnitEntityData u){var b=Psychic034Tests.Fact(u,Asset<BlueprintBuff>("WeaponOfChosenBuff"),u,1);Call(b,typeof(ChosenWeaponBlessing),"OnActivate");return b;}
+ static RuleAttackWithWeapon Attack(UnitEntityData u,UnitEntityData target,ItemEntityWeapon w){return new RuleAttackWithWeapon(u,target,w,0){IsFirstAttack=true,AttacksCount=1};}
+ static PhysicalDamage Damage(Buff b,RuleAttackWithWeapon a){Call(b,typeof(ChosenWeaponBlessing),"OnEventAboutToTrigger",a);a.WeaponStats.OnTrigger(null);Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a.WeaponStats);return (PhysicalDamage)a.WeaponStats.DamageDescription[0].CreateDamage();}
+ static RuleAttackRoll RollParent(RuleAttackWithWeapon a){var r=Empty<RuleAttackRoll>();Set(r,"Initiator",a.Initiator);Set(r,"Target",a.Target);Set(r,"WeaponStats",a.WeaponStats);r.RuleAttackWithWeapon=a;return r;}
+ static RuleRollD20 Roll(Feature fact,RuleAttackWithWeapon a,string mode,int first,int second) {
+  var parent=RollParent(a);var cmd=Empty<UnitAttack>();Set(cmd,"Type",UnitCommand.CommandType.Standard);Set(cmd,"LastAttackRule",a);a.Initiator.Commands.Raw[(int)UnitCommand.CommandType.Standard]=cmd;
+  switch(mode){case "full":a.IsFullAttack=true;break;case "charge":a.IsCharge=true;break;case "opportunity":a.IsAttackOfOpportunity=true;break;case "extra":a.ExtraAttack=true;break;case "many":a.AttacksCount=2;break;case "late":a.AttackNumber=1;break;case "critical":Set(parent,"IsCriticalRoll",true);break;case "fake":Set(parent,"IsFake",true);break;case "other-command":Set(cmd,"LastAttackRule",Attack(a.Initiator,a.Target,a.Weapon));break;case "cleave":var bad=Empty<UnitUseAbility>();Set(bad,"Type",UnitCommand.CommandType.Standard);Set(bad,"Ability",new AbilityData(new BlueprintAbility(),a.Initiator.Descriptor));a.Initiator.Commands.Raw[(int)UnitCommand.CommandType.Standard]=bad;break;case "vital":var bp=PsychicExpansionTests.NativeCase<BlueprintAbility>("efc60c91b8e64f244b95c66b270dbd7c");var ability=new AbilityData(bp,a.Initiator.Descriptor);var use=Empty<UnitUseAbility>();Set(use,"Type",UnitCommand.CommandType.Standard);Set(use,"Ability",ability);a.Initiator.Commands.Raw[(int)UnitCommand.CommandType.Standard]=use;var reason=Empty<RuleReason>();Set(reason,"Ability",ability);a.Reason=reason;a.AttacksCount=0;break;}
+  current=new RulebookEventContext();var d=new RuleRollD20(a.Initiator);current.PushEvent(parent);current.PushEvent(d);dice.Clear();dice.Enqueue(first);dice.Enqueue(second);Call(fact,typeof(GreaterChosenAttack),"OnEventAboutToTrigger",d);Call(fact,typeof(GreaterChosenAttack),"OnEventAboutToTrigger",d);d.OnTrigger(current);current=null;return d;
+ }
+ internal static int Run(BlueprintsCache c) {
+  cache=c;n=0;var h=new Harmony("CotW.Chosen0145.Native");void Patch(System.Reflection.MethodBase m,string method){if(m==null)throw new Exception("Missing chosen fixture endpoint: "+method);h.Patch(m,prefix:new HarmonyMethod(typeof(ChosenWeaponFeatTests),method){priority=Priority.First});}
+  Patch(AccessTools.Method(typeof(FeatureCollection),"CheckStatPrerequisitesAndUpdate"),nameof(Skip));Patch(AccessTools.Method(typeof(Buff),"Remove"),nameof(Remove));Patch(AccessTools.PropertyGetter(typeof(ItemEntityWeapon),"HoldInTwoHands"),nameof(False));Patch(AccessTools.PropertyGetter(typeof(ItemEntity),"EnchantmentValue"),nameof(Zero));Patch(AccessTools.PropertyGetter(typeof(ItemEntity),"Wielder"),nameof(Wielder));Patch(AccessTools.Method(typeof(RuleCalculateWeaponSizeBonus),"OnTrigger"),nameof(Skip));Patch(AccessTools.PropertyGetter(typeof(Rulebook),"CurrentContext"),nameof(Context));Patch(AccessTools.Method(typeof(RulebookEvent.Dice),"D",new[]{typeof(DiceFormula)}),nameof(Dice));
+  try {
+   Patch(AccessTools.Method(typeof(BuffCollection),"AddBuff",new[]{typeof(BlueprintBuff),typeof(MechanicsContext),typeof(TimeSpan?)}),nameof(Add));
+   var register=AccessTools.Method(Module,"Register");register.Invoke(null,new object[]{cache});var first=Asset<BlueprintFeature>("WeaponOfChosenFeat");register.Invoke(null,new object[]{cache});Check(ReferenceEquals(first,Asset<BlueprintFeature>("WeaponOfChosenFeat")),"idempotent feat identity");bool failed=false;var empty=new BlueprintsCache();try{register.Invoke(null,new object[]{empty});}catch{failed=true;}Check(failed&&empty.Load(Id("WeaponOfChosenFeat"))==null,"missing dependency leaves no partial module");
+   foreach(string selection in new[]{"247a4068296e8be42890143f451b4b45","66befe7b24c42dd458952e3c47c93563","41c8486641f7d6d4283ca9dae4147a9f","da03141df23f3fe45b0c7c323a8e5a0e","79c6421dbdb028c4fa0c31b8eea95f16","c5158a6622d0b694a99efb1d0025d2c1"})foreach(string token in new[]{"WeaponOfChosenFeat","ImprovedWeaponOfChosenFeat","GreaterWeaponOfChosenFeat"})Check(((BlueprintFeatureSelection)cache.Load(BlueprintGuid.Parse(selection))).AllFeatures.Count(f=>f?.AssetGuid==Id(token))==1,"one root in native general/combat pool "+token);
+   var god=Native("IomedaeFeature");Check(((WeaponCategory[])Helper("Weapons",god)).Contains(WeaponCategory.Longsword),"native Iomedae longsword identity");var u=Unit("0145-devout");var target=Unit("0145-target");wielder=u.Descriptor;var deity=Feature(u,god);var root=Feature(u,first);var focus=Feature(u,(BlueprintFeature)cache.Load(BlueprintGuid.Parse("1e1f627d26ad36f43bbd26cc2bf8ac7e")));focus.Param=WeaponCategory.Longsword;
+   var clericRow=PsychicExpansionTests.NativeRows.Single(r=>(string)r["name"]=="ClericClass");Check((bool)clericRow["blueprint"]["Data"]["IsDivineCaster"],"audited native cleric flag is divine");var cls=new BlueprintCharacterClass{AssetGuid=BlueprintGuid.Parse((string)clericRow["blueprint"]["AssetId"]),IsDivineCaster=true};var book=(Spellbook)AccessTools.Method(typeof(SpellResourceFeatTests),"Book").Invoke(null,new object[]{u,true,cls});book.Blueprint.IsArcane=false;var bookRow=PsychicExpansionTests.NativeRows.Single(r=>(string)r["blueprint"]["AssetId"]==((string)clericRow["blueprint"]["Data"]["m_Spellbook"]).Replace("!bp_",""));string tableId=((string)bookRow["blueprint"]["Data"]["m_SpellsPerDay"]).Replace("!bp_","");var table=(BlueprintSpellsTable)cache.Load(BlueprintGuid.Parse(tableId));var tableRow=PsychicExpansionTests.NativeRows.Single(r=>(string)r["blueprint"]["AssetId"]==tableId);Set(table,"Levels",PsychicExpansionTests.Read(tableRow["blueprint"]["Data"]["Levels"],AccessTools.Field(typeof(BlueprintSpellsTable),"Levels").FieldType));Set(book.Blueprint,"m_SpellsPerDay",PsychicExpansionTests.Read(bookRow["blueprint"]["Data"]["m_SpellsPerDay"],typeof(BlueprintSpellsTableReference)));Set(book,"MaxCasterLevel",20);Set(book,"m_BaseLevelInternal",1);var br=BlueprintReferenceBase.CreateTyped<BlueprintSpellbookReference>(book.Blueprint);AccessTools.Property(typeof(BlueprintReferenceBase),"Cached").SetValue(br,book.Blueprint);Set(cls,"m_Spellbook",br);u.Progression.Classes.Add(new ClassData(cls){Level=1});Set(u.Descriptor,"m_Spellbooks",new Dictionary<BlueprintSpellbook,Spellbook>{{book.Blueprint,book}});
+   Check(first.GetComponents<Prerequisite>().All(p=>Need(p,u)),"native divine first-level spells plus matching focus qualify");focus.Param=WeaponCategory.Dagger;Check(!Need(first.GetComponent<PrerequisiteChosenWeapon>(),u),"wrong focus denied");focus.Param=WeaponCategory.Longsword;cls.IsDivineCaster=false;Check(!Need(first.GetComponent<PrerequisiteChosenWeapon>(),u),"psychic/nondivine caster flag denied");cls.IsDivineCaster=true;Set(book,"m_BaseLevelInternal",0);Check(!Need(first.GetComponent<PrerequisiteCasterTypeSpellLevel>(),u),"native spellbook level zero denied");Set(book,"m_BaseLevelInternal",1);
+   // Exercise the original native CanSelect membership + full prerequisite chain.
+   // Only the game's global Trickster lookup is bounded; no feat prerequisite is bypassed.
+   Patch(AccessTools.Method(typeof(BlueprintFeatureSelection),"IsIgnorePrerequisites"),nameof(False));
+   Patch(AccessTools.PropertyGetter(typeof(IgnorePrerequisites),"Ignore"),nameof(False));
+   var pool=(BlueprintFeatureSelection)cache.Load(BlueprintGuid.Parse("41c8486641f7d6d4283ca9dae4147a9f"));
+   var selectionState=new Kingmaker.UnitLogic.Class.LevelUp.FeatureSelectionState(null,default,pool,0,1);
+   var levelState=Empty<Kingmaker.UnitLogic.Class.LevelUp.LevelUpState>();
+   var improvedBp=Asset<BlueprintFeature>("ImprovedWeaponOfChosenFeat");var greaterBp=Asset<BlueprintFeature>("GreaterWeaponOfChosenFeat");
+   u.Facts.List.Remove(root);Refresh(u);
+   Check(pool.CanSelect(u.Descriptor,levelState,selectionState,first),"actual Fighter CanSelect accepts qualified base feat");
+   focus.Param=WeaponCategory.Dagger;Check(!pool.CanSelect(u.Descriptor,levelState,selectionState,first),"actual Fighter selector rejects wrong favored focus");focus.Param=WeaponCategory.Longsword;
+   Set(book,"m_BaseLevelInternal",0);Check(!pool.CanSelect(u.Descriptor,levelState,selectionState,first),"actual Fighter selector rejects lack of first-level divine spells");Set(book,"m_BaseLevelInternal",1);
+   Check(!pool.CanSelect(u.Descriptor,levelState,selectionState,improvedBp)&&!pool.CanSelect(u.Descriptor,levelState,selectionState,greaterBp),"actual selector rejects missing chain");
+   u.Facts.List.Add(root);Refresh(u);Check(!pool.CanSelect(u.Descriptor,levelState,selectionState,first),"actual selector rejects duplicate rank-one feat");
+   Check(pool.CanSelect(u.Descriptor,levelState,selectionState,improvedBp),"actual selector accepts Improved with base");
+   Check(!pool.CanSelect(u.Descriptor,levelState,selectionState,greaterBp),"actual selector rejects Greater without Improved");
+   var chainFact=Feature(u,improvedBp);Check(pool.CanSelect(u.Descriptor,levelState,selectionState,greaterBp),"actual selector accepts Greater with full chain");u.Facts.List.Remove(chainFact);Refresh(u);
+   h.Unpatch(AccessTools.Method(typeof(BlueprintFeatureSelection),"IsIgnorePrerequisites"),HarmonyPatchType.Prefix,h.Id);
+   h.Unpatch(AccessTools.PropertyGetter(typeof(IgnorePrerequisites),"Ignore"),HarmonyPatchType.Prefix,h.Id);
+   var longsword=Weapon(WeaponCategory.Longsword);var dagger=Weapon(WeaponCategory.Dagger);u.Stats.AdditionalDamage.BaseValue=10;
+   var b=Bless(u);var a=Attack(u,target,longsword);var damage=Damage(b,a);Check(damage.Enchantment==1&&damage.Bonus==10&&a.WeaponStats.Enhancement==0,"magic descriptor only, no damage or attack enhancement bonus");Check(!new AddDamageResistancePhysical{BypassedByMagic=true}.Hit(null,damage,longsword),"actual native DR/magic predicate is bypassed");Check(damage.Reality==0,"does not grant ghost touch");Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a);Check(!u.Buffs.Enumerable.Contains(b),"base next attack consumes blessing once");
+   b=Bless(u);a=Attack(u,target,dagger);damage=Damage(b,a);Check(damage.Enchantment==0,"nonfavored main packet remains mundane");Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a);Check(u.Buffs.Enumerable.Contains(b),"nonfavored attack preserves charge");b.Remove();
+   b=Bless(u);a=Attack(u,target,longsword);var fake=RollParent(a);Set(fake,"IsFake",true);Set(a,"AttackRoll",fake);Damage(b,a);Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a);Check(u.Buffs.Enumerable.Contains(b)&&Runtime(b,typeof(ChosenWeaponBlessing)).GetData<ChosenBlessingState>().ClaimedAttack==null,"fake attack preview cannot consume or retain a claim");b.Remove();
+   b=Bless(u);Set(b,"IsSuppressed",true);Check(Damage(b,Attack(u,target,longsword)).Enchantment==0,"suppressed blessing cannot change a native damage packet");b.Remove();
+   var armAbility=Asset<BlueprintAbility>("WeaponOfChosenAbility");armAbility.GetComponent<ChosenWeaponArm>().Apply(new AbilityExecutionContext(new AbilityData(armAbility,u.Descriptor),new AbilityParams(),new TargetWrapper(u)),new TargetWrapper(u));Check(added.IsNotDispelable&&Runtime(added,typeof(ChosenWeaponBlessing)).GetData<ChosenBlessingState>().Initialized,"actual arm marks nondispelable initialized blessing");added.Remove();
+   // Retain each physical form and packet identity, including added elemental packets.
+   foreach(var form in new[]{PhysicalDamageForm.Slashing,PhysicalDamageForm.Piercing,PhysicalDamageForm.Bludgeoning}) {
+    var w=Weapon(WeaponCategory.Longsword);w.Blueprint.DamageType.Physical.Form=form;var source=JsonConvert.SerializeObject(w.Blueprint.DamageType);b=Bless(u);a=Attack(u,target,w);a.WeaponStats.OnTrigger(null);var native=a.WeaponStats.DamageDescription[0];var shared=native.TypeDescription;
+    var extra=new DamageDescription{TypeDescription=new DamageTypeDescription{Type=DamageType.Energy,Energy=DamageEnergyType.Cold},Dice=new DiceFormula(1,DiceType.D6)};a.WeaponStats.DamageDescription.Add(extra);Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a.WeaponStats);Check(native.CreateDamage() is PhysicalDamage&&native.TypeDescription.Physical.Form==form,"physical weapon original damage form retained");Check(!ReferenceEquals(shared,native.TypeDescription)&&shared.Physical.Enhancement==0&&JsonConvert.SerializeObject(w.Blueprint.DamageType)==source,"no shared descriptor or source blueprint mutation");Check(ReferenceEquals(extra,a.WeaponStats.DamageDescription[1])&&extra.CreateDamage() is EnergyDamage,"separate frost packet untouched");
+    native.TypeDescription.Type=DamageType.Force;Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a.WeaponStats);Check(native.CreateDamage() is PhysicalDamage&&native.TypeDescription.Physical.Form==form,"blessed physical weapon cannot acquire force main packet");b.Remove();
+   }
+   var forceWeapon=Weapon(WeaponCategory.Longsword);forceWeapon.Blueprint.DamageType.Type=DamageType.Force;b=Bless(u);a=Attack(u,target,forceWeapon);a.WeaponStats.OnTrigger(null);Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a.WeaponStats);Check(a.WeaponStats.DamageDescription[0].CreateDamage() is ForceDamage,"originally force weapon stays force");b.Remove();
+   var improved=Feature(u,Asset<BlueprintFeature>("ImprovedWeaponOfChosenFeat"));foreach(int choice in Enumerable.Range(0,5)) {
+    bool expected=choice==0||choice==2;var restriction=Asset<BlueprintAbility>("Chosen"+new[]{"Good","Evil","Lawful","Chaotic","ColdIronSilver"}[choice]+"PreferenceAbility").GetComponent<ChosenWeaponRestriction>();Check(restriction.IsAbilityRestrictionPassed(new AbilityData(Asset<BlueprintAbility>("ChosenPreferenceAbility"),u.Descriptor))==expected,"LG deity permits only good or lawful preference");
+   }
+   var collection=new ActivatableAbilityCollection();collection.Initialize(u.Facts);Set(u,"ActivatableAbilities",collection);
+   game=Empty<Kingmaker.Game>();Set(game,"TimeController",Empty<Kingmaker.Controllers.TimeController>());Patch(AccessTools.PropertyGetter(typeof(Kingmaker.Game),"Instance"),nameof(Game));Patch(AccessTools.PropertyGetter(typeof(Kingmaker.Controllers.TimeController),"RealTime"),nameof(Time));Patch(AccessTools.Method(typeof(TurnBased.Controllers.CombatController),"IsInTurnBasedCombat"),nameof(Combat));
+   var grant=(BlueprintUnitFactReference[])Get(Asset<BlueprintFeature>("ImprovedWeaponOfChosenFeat").GetComponent<AddFacts>(),"m_Facts");Check(grant.Length==6&&grant.All(x=>cache.Load(x.Guid) is BlueprintActivatableAbility),"native AddFacts grants one selector plus five hidden persistent conversions");
+   // Simulate a compatibility mod removing alignment-grant components. Stable
+   // native deity identities must still retain the deity's original alignment.
+   var godComponents=god.ComponentsArray;god.ComponentsArray=godComponents.Where(x=>!(x is AddFacts)).ToArray();Check((bool)Helper("Allowed",u,0)&&(bool)Helper("Allowed",u,2)&&!(bool)Helper("Allowed",u,4),"Iomedae remains good/lawful without runtime alignment-grant facts");god.ComponentsArray=godComponents;
+   var good=Toggle(u,"Good");var law=Toggle(u,"Lawful");Check(law.IsOn&&!good.IsOn&&good.AppliedBuff==null&&law.AppliedBuff!=null,"native toggle switch-off removes previous property immediately");Check(u.Buffs.Enumerable.Count(x=>x.Blueprint.GetComponent<ChosenPreference>()!=null)==1,"only one preference buff survives");law.IsOn=false;Check(!u.Buffs.Enumerable.Any(x=>x.Blueprint.GetComponent<ChosenPreference>()!=null),"manual native toggle-off clears selected preference");
+   foreach(var choice in new[]{"Good","Evil","Lawful","Chaotic","ColdIronSilver"}) {
+    var bp=Asset<BlueprintActivatableAbility>("Chosen"+choice+"PreferenceToggle");Check(bp.Group==ActivatableAbilityGroup.None&&bp.DeactivateImmediately&&bp.ActivationType==AbilityActivationType.Immediately&&bp.DoNotTurnOffOnRest&&!bp.DeactivateIfCombatEnded,"persistent toggle flags and no foreign group collision");var t=Toggle(u,choice);var runtime=Runtime(t,typeof(ChosenToggleRestriction));bool valid;using(runtime.RequestEventContext())valid=(bool)AccessTools.Method(typeof(ChosenToggleRestriction),"IsAvailable",Type.EmptyTypes).Invoke(runtime.SourceBlueprintComponent,null);Check(valid==(choice=="Good"||choice=="Lawful"),"native Iomedae toggle restriction by deity");t.IsOn=false;
+   }
+   h.Unpatch(AccessTools.PropertyGetter(typeof(Kingmaker.Game),"Instance"),HarmonyPatchType.Prefix,h.Id);
+   h.Unpatch(AccessTools.PropertyGetter(typeof(Kingmaker.Controllers.TimeController),"RealTime"),HarmonyPatchType.Prefix,h.Id);
+   h.Unpatch(AccessTools.Method(typeof(TurnBased.Controllers.CombatController),"IsInTurnBasedCombat"),HarmonyPatchType.Prefix,h.Id);
+   var deityPool=(BlueprintFeatureSelection)cache.Load(BlueprintGuid.Parse("59e7a76987fe3b547b9cce045f4db3e4"));
+   foreach(var godBlueprint in deityPool.AllFeatures) {
+    string godName=godBlueprint.name;u.Facts.List.Remove(deity);Refresh(u);deity=Feature(u,godBlueprint);var categories=(WeaponCategory[])Helper("Weapons",deity.Blueprint);var raw=PsychicExpansionTests.NativeRows.Single(r=>(string)r["blueprint"]["AssetId"]==godBlueprint.AssetGuid.ToString());var expected=((JArray)raw["blueprint"]["Data"]["Components"]).Where(x=>((string)x["$type"]).EndsWith(", AddStartingEquipment")).SelectMany(x=>x["CategoryItems"].Select(y=>(WeaponCategory)Enum.Parse(typeof(WeaponCategory),(string)y)).Concat(x["m_BasicItems"].SelectMany(y=>{var item=PsychicExpansionTests.NativeRows.Single(r=>(string)r["blueprint"]["AssetId"]==((string)y).Replace("!bp_",""))["blueprint"]["Data"];if(!((string)item["$type"]).EndsWith(", BlueprintItemWeapon"))return Array.Empty<WeaponCategory>();var type=PsychicExpansionTests.NativeRows.Single(r=>(string)r["blueprint"]["AssetId"]==((string)item["m_Type"]).Replace("!bp_",""))["blueprint"]["Data"];return new[]{(WeaponCategory)Enum.Parse(typeof(WeaponCategory),(string)type["Category"])};}))).Distinct().ToArray();var grants=((JArray)raw["blueprint"]["Data"]["Components"]).Where(x=>((string)x["$type"]).EndsWith(", AddFacts")).SelectMany(x=>(JArray)x["m_Facts"]).Select(x=>((string)x).Replace("!bp_","")).ToArray();var alignIds=new[]{"882521af8012fc749930b03dc18a69de","351235ac5fc2b7e47801f63d117b656c","092714336606cfc45a37d2ab39fabfa8","8c7d778bc39fec642befc1435b00f613"};for(int ci=0;ci<5;ci++)Check((bool)Helper("Allowed",u,ci)==(categories.Length>0&&(ci<4?grants.Contains(alignIds[ci]):!grants.Any(x=>alignIds.Contains(x)))),"native deity choice mask matches independent game JSON "+godName);
+    Check(categories.OrderBy(x=>x).SequenceEqual(expected.OrderBy(x=>x)),"actual native deity categories match independent game JSON "+godName);if(categories.Length==0){foreach(int choice in Enumerable.Range(0,5))Check(!(bool)Helper("Allowed",u,choice),"no-favored-weapon belief cannot choose a property");continue;}
+    foreach(var category in categories)foreach(int choice in Enumerable.Range(0,5)) {
+     if(!(bool)Helper("Allowed",u,choice))continue;var p=Psychic034Tests.Fact(u,Asset<BlueprintBuff>("Chosen"+new[]{"Good","Evil","Lawful","Chaotic","ColdIronSilver"}[choice]+"PreferenceBuff"),u,1);b=Bless(u);var state=Runtime(b,typeof(ChosenWeaponBlessing)).GetData<ChosenBlessingState>();var w=Weapon(category,category==WeaponCategory.Longbow?AttackType.Ranged:AttackType.Melee);a=Attack(u,target,w);damage=Damage(b,a);
+     Check(state.Improved&&(choice<4?state.Alignment==new[]{DamageAlignment.Good,DamageAlignment.Evil,DamageAlignment.Lawful,DamageAlignment.Chaotic}[choice]:state.Material==(PhysicalDamageMaterial.ColdIron|PhysicalDamageMaterial.Silver)),"single deity property snapshot");Check(damage.Bonus==10&&damage.Enchantment==1,"favored completed native damage packet keeps flat bonus");
+     if(choice<4)foreach(var flag in new[]{DamageAlignment.Good,DamageAlignment.Evil,DamageAlignment.Lawful,DamageAlignment.Chaotic})Check(new AddDamageResistancePhysical{BypassedByAlignment=true,Alignment=flag}.Hit(null,damage,w)==(flag!=state.Alignment),"native alignment DR predicate only chosen component");
+     else foreach(var material in new[]{PhysicalDamageMaterial.ColdIron,PhysicalDamageMaterial.Silver,PhysicalDamageMaterial.Adamantite})Check(new AddDamageResistancePhysical{BypassedByMaterial=true,Material=material}.Hit(null,damage,w)==(material==PhysicalDamageMaterial.Adamantite),"native material DR predicate cold iron/silver only");
+     Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",a);Check(u.Buffs.Enumerable.Contains(b),"improved retains effect for following full/AoO attacks");p.Remove();Call(b,typeof(ChosenWeaponBlessing),"OnActivate");Check(Runtime(b,typeof(ChosenWeaponBlessing)).GetData<ChosenBlessingState>().Alignment==state.Alignment,"restored activation preserves original snapshot");Check(JsonConvert.DeserializeObject<ChosenBlessingState>(JsonConvert.SerializeObject(state)).Alignment==state.Alignment,"snapshot JSON roundtrip");var other=Unit("0145-other-turn");Call(b,typeof(ChosenWeaponBlessing),"HandleTurnStarted",other);Check(u.Buffs.Enumerable.Contains(b),"other turn does not expire blessing");Call(b,typeof(ChosenWeaponBlessing),"HandleTurnStarted",u);Check(!u.Buffs.Enumerable.Contains(b),"own next turn expires blessing");
+    }
+   }
+   u.Facts.List.Remove(deity);Refresh(u);deity=Feature(u,god);b=Bless(u);a=Attack(u,target,longsword);Call(b,typeof(ChosenWeaponBlessing),"OnEventAboutToTrigger",a);var parent=RollParent(a);var conceal=new RuleConcealmentCheck(u,target,true);Set(conceal,"Concealment",Concealment.Partial);Set(conceal,"ConcealmentValue",20);current=new RulebookEventContext();current.PushEvent(parent);current.PushEvent(conceal);dice.Clear();dice.Enqueue(10);dice.Enqueue(90);conceal.Roll.OnTrigger(current);Check(!conceal.Success,"actual native failed concealment seed");Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",conceal);Call(b,typeof(ChosenWeaponBlessing),"OnEventDidTrigger",conceal);Check(conceal.Success&&conceal.Roll.RollHistory.Count==2&&conceal.Roll.Rerolls.Single().Source==b,"native concealment reroll once with attributed fact");current=null;b.Remove();
+   var greater=Feature(u,Asset<BlueprintFeature>("GreaterWeaponOfChosenFeat"));foreach(var mode in new[]{"standard","vital","full","charge","opportunity","extra","many","late","critical","fake","other-command","cleave"})foreach(var pair in new[]{new[]{1,20},new[]{19,2},new[]{12,12}}) {
+    var d=Roll(greater,Attack(u,target,longsword),mode,pair[0],pair[1]);bool valid=mode=="standard"||mode=="vital";Check(d.RollHistory.Count==(valid?2:1)&&d.Result==(valid?Math.Max(pair[0],pair[1]):pair[0]),"native d20 history and best result with duplicate listener guard "+mode);Check(!u.Buffs.Enumerable.Any(x=>x.Blueprint.AssetGuid==Id("WeaponOfChosenBuff")),"greater passive does not require blessing");
+   }
+   Check(Roll(greater,Attack(u,target,dagger),"standard",2,20).RollHistory.Count==1,"greater excludes nonfavored weapon");Set(greater,"IsTurnedOn",false);Check(Roll(greater,Attack(u,target,longsword),"standard",2,20).RollHistory.Count==1,"inactive feat does not reroll");Set(greater,"IsTurnedOn",true);
+   b=Bless(u);Psychic034Tests.Fact(u,Asset<BlueprintBuff>("ChosenGoodPreferenceBuff"),u,1);Call(root,typeof(SpellFeatCleanup),"OnTurnOff");Check(!u.Buffs.Enumerable.Any(x=>x.Blueprint.AssetGuid==Id("WeaponOfChosenBuff")||x.Blueprint.GetComponent<ChosenPreference>()!=null),"root turn off cleans armed blessing and all saved preferences");
+   var all=new[]{"WeaponOfChosenFeat","ImprovedWeaponOfChosenFeat","GreaterWeaponOfChosenFeat","WeaponOfChosenBuff","WeaponOfChosenAbility","ChosenPreferenceAbility"}.Concat(new[]{"Good","Evil","Lawful","Chaotic","ColdIronSilver"}.SelectMany(x=>new[]{"Chosen"+x+"PreferenceBuff","Chosen"+x+"PreferenceAbility","Chosen"+x+"PreferenceToggle"}));var inventory=new JArray();foreach(string token in all){var bp=Asset<BlueprintScriptableObject>(token);Check(bp.ComponentsArray.All(x=>x.OwnerBlueprint==bp)&&bp.ComponentsArray.Select(x=>x.name).Distinct().Count()==bp.ComponentsArray.Length,"stable owned component identities "+token);inventory.Add(new JObject{["token"]=token,["guid"]=bp.AssetGuid.ToString(),["type"]=bp.GetType().Name,["name"]=bp.name});}
+   Check(Asset<BlueprintAbility>("WeaponOfChosenAbility").ActionType==UnitCommand.CommandType.Swift&&Asset<BlueprintAbility>("ChosenPreferenceAbility").GetComponent<AbilityVariants>().Variants.Length==5,"native swift activation and preserved five legacy subchoices");PsychicExpansionTests.Inventory["chosenWeapon0145Assets"]=inventory;PsychicExpansionTests.Inventory["chosenWeapon0145Assertions"]=n;Console.WriteLine("PASS: "+n+" chosen-weapon checks; native prerequisites, weapon stats/damage descriptors/DR predicates, concealment and d20 histories; command/turn inputs and scene endpoints bounded.");return n;
+  } finally {current=null;h.UnpatchAll(h.Id);}
+ }
+}

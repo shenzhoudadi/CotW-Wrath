@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference><OutputType>Exe</OutputType><TestFramework Condition="'$(TestFramework)' == ''">net472</TestFramework><TargetFramework>$(TestFramework)</TargetFramework><LangVersion>latest</LangVersion><ImplicitUsings>enable</ImplicitUsings><Nullable>disable</Nullable><Optimize>false</Optimize></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.6"><Aliases>CecilStandalone</Aliases></PackageReference>
+    <Compile Include="../../Medium/MediumSpiritActionBarPatch.cs" Link="Production/MediumSpiritActionBarPatch.cs" />
+    <Compile Include="../../Medium/MediumSpiritShortcutPatches.cs" Link="Production/MediumSpiritShortcutPatches.cs" />
+  </ItemGroup>
+</Project>

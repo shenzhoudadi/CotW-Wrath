@@ -1,0 +1,13 @@
+bin/
+obj/
+artifacts/
+lib/
+work/
+__pycache__/
+*.pyc
+*.pdb
+*.log
+*.user
+*.local.props
+*.dll
+*.exe

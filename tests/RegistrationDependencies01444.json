@@ -1,0 +1,200 @@
+{
+  "schema": 1,
+  "modules": {
+    "Steadfast Personality": [],
+    "Extended Bane": [],
+    "Improved Combat Expertise": [],
+    "Brawler combat feat integration": [],
+    "Exemplar Inspire Courage scaling": [],
+    "Shielded Mage": [],
+    "Exemplar performance rounds": [],
+    "Rage powers": [],
+    "Psychic casting prototype": [],
+    "Psychic spells and disciplines": [
+      "Psychic casting prototype"
+    ],
+    "Psychic phrenic amplifications": [
+      "Psychic casting prototype"
+    ],
+    "Psychic optional spell integration": [
+      "Psychic casting prototype",
+      "Psychic spells and disciplines"
+    ],
+    "Medium class": [],
+    "Way of the Shield": [],
+    "T09 combat feats": [],
+    "Devastating Strike": [],
+    "Feral Grace": [],
+    "T11 training and arcana": [],
+    "Spell resource feats": [],
+    "Chosen weapon feats": [],
+    "Wild shape feats": [],
+    "Teamwork feats": [],
+    "Bonded spells and gambit feats": [],
+    "Linnorm style and reaction feats": [],
+    "Spell and swordplay feats": [],
+    "Combat feat pool repair": [
+      "Chosen weapon feats"
+    ],
+    "Advanced training integration": [
+      "T11 training and arcana"
+    ],
+    "Optional resource feats": [],
+    "Improved Two-Weapon Feint": [],
+    "Extra Investigator Talent": [],
+    "Reaping Stalker": [],
+    "Advanced talent: Feat": [],
+    "Terrifying Howl": [],
+    "Inquisitions: Conversion, Valor, Persistence": [],
+    "Ki powers: five spell adaptations": [
+      "Psychic spells and disciplines"
+    ],
+    "Inquisitions: Heresy, Imprisonment": [],
+    "Purifying Flames wild talent": [],
+    "Wizard schools: Arcane Crafter and Teleportation": [],
+    "Wizard school: Enhancement": [],
+    "Wild talents: Flame Jet and Greater Flame Jet": [
+      "Psychic spells and disciplines"
+    ],
+    "Ferocious Beast rage powers": [],
+    "Inquisition: Anger": [],
+    "Wizard schools: Undead and Prophecy": [
+      "Psychic spells and disciplines"
+    ],
+    "Kinetic Invocation": [],
+    "Spiritual Guardian": [
+      "Psychic spells and disciplines"
+    ],
+    "Wild talent: Windsight": [],
+    "Wild talent: Cold Snap": [],
+    "Wild talent: Smoke Storm": [
+      "Psychic spells and disciplines"
+    ],
+    "Rage power: Superstition": [],
+    "Rage power: Witch Hunter": [
+      "Rage power: Superstition"
+    ],
+    "Rage power: Ghost Rager": [
+      "Rage power: Superstition"
+    ],
+    "Rage power: Disruptive": [
+      "Rage power: Superstition"
+    ],
+    "Rage power: Spellbreaker": [
+      "Rage power: Disruptive"
+    ],
+    "Arcane discovery: Forest's Blessing": [],
+    "Arcane discovery: Resilient Illusions": [],
+    "Arcane discovery: Time Stutter": [],
+    "Witch archetype: Invoker": [],
+    "Spell: Time Stop": [],
+    "Increased Damage Reduction": [],
+    "War Drummer": [],
+    "Sunsinger": [],
+    "Urban Skald": [],
+    "Swashbuckler (Rogue archetype)": [],
+    "Witch archetype: Hedge Witch": [],
+    "Psychic archetype: Terror Weaver": [
+      "Psychic casting prototype",
+      "Psychic spells and disciplines",
+      "Psychic phrenic amplifications"
+    ],
+    "Sorcerer archetype: Primal Sorcerer": [],
+    "Rogue archetype: Rake": [],
+    "Bardic masterpiece: Clamor of Heavens": [],
+    "Bardic masterpiece: Dance of 23 Steps": [],
+    "Bardic masterpiece: Symphony of the Elysian Heart": [],
+    "Bard archetype: Court Bard": [],
+    "Magus archetype: Nature-Bonded Magus": [],
+    "Monk archetype: Sage Counselor": [
+      "T09 combat feats",
+      "Spell and swordplay feats",
+      "Improved Two-Weapon Feint",
+      "Improved Combat Expertise"
+    ],
+    "Slayer archetype: Grave Warden": [],
+    "Fighter archetype: Drill Sergeant": [],
+    "Bloodline Familiar and ECM mutation compatibility": [
+      "Sorcerer archetype: Primal Sorcerer"
+    ],
+    "Wizard school: Admixture": [],
+    "Shaman archetype: Overseer": [
+      "Psychic spells and disciplines"
+    ],
+    "Arcanist archetype: Spell Specialist": [],
+    "Psychic archetype: Magaambyan Telepath": [
+      "Psychic casting prototype",
+      "Psychic spells and disciplines",
+      "Psychic phrenic amplifications"
+    ],
+    "Wizard discovery: Infectious Charms": [],
+    "Wizard school: Phantasm": [],
+    "Magus archetype: Mindblade": [
+      "Psychic casting prototype",
+      "Psychic spells and disciplines"
+    ],
+    "Magus archetype: Skirnir": [],
+    "Infusion: Whip Hurricane": [],
+    "Mindblade: optional Spell Blending integration": [
+      "Magus archetype: Mindblade"
+    ],
+    "Psychic archetype: Mutation Mind": [
+      "Psychic casting prototype",
+      "Psychic phrenic amplifications"
+    ],
+    "Psychic archetype: Psychic Marauder": [
+      "Psychic casting prototype",
+      "Psychic phrenic amplifications"
+    ],
+    "Psychic remaining disciplines and amplifications": [
+      "Psychic casting prototype",
+      "Psychic spells and disciplines",
+      "Psychic phrenic amplifications"
+    ],
+    "Psychic remaining disciplines: Magaambyan compatibility": [
+      "Psychic remaining disciplines and amplifications",
+      "Psychic archetype: Magaambyan Telepath"
+    ],
+    "Hunter archetype: Feral Hunter": [],
+    "Hunter archetype: Totem-Bonded": []
+  },
+  "optionalRootTokens": [
+    "ArcaneCrafterSchool",
+    "ClamorOfHeavensMasterpiece",
+    "ColdSnapWildTalent",
+    "DanceOf23StepsMasterpiece",
+    "DisruptiveRagePower",
+    "FerociousBeastFeature",
+    "ForestsBlessingDiscovery",
+    "GhostRagerRagePower",
+    "InvokerWitchArchetype01437",
+    "KineticInvocationFeat",
+    "ReapingStalkerSlayerTalent",
+    "ResilientIllusionsDiscovery",
+    "RogueAdvancedFeatTalent",
+    "RogueSwashbucklerArchetype01443",
+    "SmokeStormWildTalent",
+    "SpellbreakerRagePower",
+    "SpiritualGuardianFeat",
+    "SunsingerArchetype01443",
+    "SuperstitionRagePower",
+    "SymphonyOfElysianHeartMasterpiece",
+    "TerrifyingHowlRagePower",
+    "TimeStopSpell01438",
+    "TimeStutterDiscovery",
+    "UndeadSchool",
+    "UrbanSkaldArchetype01443",
+    "WindsightWildTalent",
+    "WitchHunterRagePower",
+    "DrillSergeantArchetype01445",
+    "InfectiousCharmsFeature01447",
+    "BloodlineFamiliar01446",
+    "MindbladeArchetype01454",
+    "SkirnirArchetype01454"
+  ],
+  "delayedOptionalRootTokens": {
+    "Psychic remaining disciplines and amplifications": ["PainDiscipline01458"]
+  },
+  "catalogueCount": 92,
+  "scope": "Reviewed required intra-package producer order for every named dispatcher entry. Empty dependency lists mean native/external inputs, not verified initialization of external providers. Ki and Spiritual Guardian require Expansion to have its initial publication opportunity; their existing partial-provider behavior is unchanged. Optional branches use typed reachability markers only in the dispatch model. Actual cold amplification/Terror bodies execute separately."
+}

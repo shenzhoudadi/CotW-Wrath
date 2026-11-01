@@ -1,0 +1,13 @@
+{
+  "Id": "Medium Class",
+  "DisplayName": "Medium Class (Psychic Casting)",
+  "Author": "Telyl",
+  "Version": "0.4.3",
+  "ManagerVersion": "0.32.4",
+  "Requirements": [
+    "TabletopTweaks-Core-0.7.14",
+    "ModMenu-2.0.14"
+  ],
+  "AssemblyName": "MediumClass.dll",
+  "EntryMethod": "MediumClass.Main.Load"
+}

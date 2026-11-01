@@ -1,0 +1,59 @@
+using BlueprintCore.Utils;
+using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.EntitySystem.Stats;
+using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Parts;
+using MediumClass.Medium.NewUnitParts;
+using MediumClass.Utilities;
+using MediumClass.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using static UnityModManagerNet.UnityModManager.ModEntry;
+
+namespace MediumClass.Medium.NewComponents.AbilitySpecific
+{
+    [TypeId("46bdb129-b66b-4fd5-9b38-6d56ad0ab9aa")]
+    class MediumSpiritComponent : UnitFactComponentDelegate
+    {
+        private static readonly ModLogger Logger = Logging.GetLogger(nameof(MediumSpiritComponent));
+        public override void OnActivate() => Register();
+        public override void OnPostLoad() => Register();
+        public override void OnTurnOn() => Register();
+
+        internal void Register()
+        {
+            if (Fact == null || !Fact.IsActive) return;
+            Owner.Ensure<UnitPartMedium>().AddSpiritEntry(SpiritClass, SpiritInfluencePenalty, SpiritInfluence, SpiritBonusFeature, SpiritSeanceBoon, base.Fact, Concentration, Stats, Penalties, 
+                SpiritLesserPower, SpiritIntermediatePower, SpiritOverwriteIntermediate, SpiritGreaterPower, SpiritOverwriteGreater, SpiritSupremePower, SpiritIntermediatePowerMove, SpiritIntermediatePowerSwift);
+        }
+
+        // TurnOff also runs for saving and scene unloading. Catalogue membership
+        // follows actual ownership of this feature, not whether its owner is on.
+        public override void OnDeactivate()
+        {
+            Owner.Get<UnitPartMedium>()?.RemoveSpiritEntry(base.Fact, SpiritClass);
+        }
+
+        public BlueprintCharacterClassReference SpiritClass;
+        public BlueprintBuffReference SpiritInfluencePenalty;
+        public BlueprintAbilityResourceReference SpiritInfluence;
+        public BlueprintFeatureReference SpiritBonusFeature;
+        public BlueprintFeatureReference SpiritSeanceBoon;
+        public BlueprintFeatureReference SpiritLesserPower;
+        public BlueprintFeatureReference SpiritIntermediatePower;
+        public BlueprintFeatureReference SpiritIntermediatePowerMove = new BlueprintFeatureReference();
+        public BlueprintFeatureReference SpiritIntermediatePowerSwift = new BlueprintFeatureReference();
+        public BlueprintFeatureReference SpiritOverwriteIntermediate = new BlueprintFeatureReference();
+        public BlueprintFeatureReference SpiritGreaterPower;
+        public BlueprintFeatureReference SpiritOverwriteGreater = new BlueprintFeatureReference();
+        public BlueprintFeatureReference SpiritSupremePower;
+        public StatType[] Stats;
+        public StatType[] Penalties;
+        public bool Concentration = false;
+    }
+}

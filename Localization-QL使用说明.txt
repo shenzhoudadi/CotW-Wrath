@@ -1,0 +1,13 @@
+QL双语JSON使用说明（0.14.60）
+
+文件：Localization-QL/CallOfTheWildWrathPrototypeLocalized.json
+格式：[{"Key":"固定文本索引","ProcessTemplates":false,"enGB":"English","zhCN":"中文"}]
+编码：UTF-8无BOM。保持Key不变，在zhCN中填入译文。当前zhCN以英文作初始内容，不代表全量汉化已经完成。
+
+方法一：直接编辑本mod目录中的这份文件，保存后冷启动游戏。本mod会按当前语言包选择zhCN或enGB，读取失败隔离，不影响能力登记。
+方法二：复制翻译完成的数组文件到游戏Mods/QuickLocalization/Localization目录，可自建子文件夹；按QL菜单重载。使用固定Key模式，不放入TTTLocalization。此项目不依赖QL运行，外部QL应用与重载画面由测试者观察。
+
+保留JSON引号、逗号、换行转义和游戏文本标签。不要改写Key，不要写入重复Key或重复字段。ProcessTemplates字段为兼容格式保留；原能力引用的模板处理方式保持。
+原生Localization/enGB.json与zhCN.json继续使用游戏格式，请勿把数组文件覆盖到那里。所有既有Key及蓝图身份保持，语言文件不会用显示名称生成身份。
+
+QL格式及使用说明：https://github.com/nixgnot/WOTR-CONTENTS-MODS-CN/blob/main/QL使用说明.md

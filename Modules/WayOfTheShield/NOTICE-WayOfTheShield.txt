@@ -1,0 +1,15 @@
+Way of the Shield integration
+Upstream: https://github.com/ScaredKurufinve/Way-of-the-shield
+Author: ScaredKurufinve
+Upstream version: 4.0.13
+Commit: 5c0490f058f2163e3edfc9b13f007e1e9534f87c (2024-07-02)
+
+This module adapts the user-requested equipment, parry/defense, Sacred Shield and eight feat entries from upstream. Original assembly name, blueprint GUIDs and serialized component TypeIds are preserved. Light Shield Parry had a description but no complete upstream blueprint; its entry is added using the upstream parry system. Integration and current-game fixes are included in this source package. Shielded Mage is already delivered by CotW and is not imported again.
+
+The upstream repository at this commit contains no LICENSE, COPYING or NOTICE file and GitHub reports no detected license. This notice records provenance and does not assert an additional license grant. No upstream license has been relabeled as MIT/GPL.
+
+2026-10-09 CotW 0.14.9 feedback revision: exact native Fact resolution, source-filtered shield AC/panel refresh, Shielded Defense lifecycle/rank counter update, mounted spear Power Attack scaling, shield-damage source fallback, same-caster Bastion aura matching, native toggle icon and parry-limit verification. Existing source identities remain.
+
+2026-10-09 CotW 0.14.10: explicitly refresh live native AC view models after buckler denial/restoration and on panel open; derive Mythic additional parries from a fresh owner-local rank context, retaining existing consumption/refresh rules and all original identities.
+
+2026-10-09 CotW 0.14.11: filter only the denied equipped shield modifier from the native generic stat-tooltip detail path. Previously accepted actual AC, live total, TWF, parry and Sacred Shield production remain unchanged.

@@ -1,0 +1,611 @@
+0.14.46 A5 原 CotW 英文文本核对（同版本覆盖，2026-10-22）
+本次仅恢复107个既定文本键及运行时英文默认值，92个值改变、15个值已相符；无新增迁移项。A1–A4、五个新项、已确认能力的机制/图标/注册顺序保持。
+逐条来源：原 CotW commit 1332fb0db844b7863f484ca978bea2349fe49769。明确字面量来自Psychic.cs、PrimalSorcerer.cs、Rake.cs、Rebalance.cs；继承文字通过本机Kingmaker sharedassets1.assets中CotW指定GUID的LocalizedString/SharedStringAsset，回查Kingmaker enGB.json。未找到原文的条目：0。
+Terror Weaver已知光环名称恢复Aura of Intimidation；9级描述与Psychic.cs逐字符一致。11/19级能力使用原说明及换行，保存提示使用原Helpers.savingThrowNone引用的None。Primal恢复克隆源描述，不再显示移植版实现摘要；Elementalist Summoning原说明末尾空格保留。Rake恢复Roman I–V及弯引号；10个隐藏减骰Buff文本字段按原源码置空。
+说明边界：依用户本次要求，减伤游戏内说明恢复CotW的防御姿态措辞；本项目已确认的常驻2/4机制保持。Elementalist Summoning原文只提抗力10；本项目已修复的已有同类抗力+5分支保持。本次不以原文倒退机制。
+界面核对步骤：打开Terror Weaver 2/9/11/19级特性，检查原文名称、说明、换行和None；查看四种Primal Bloodline的继承说明、统一Arcana/Summoning标题；查看Rake I–V开关及Rake’s Smile。中英文语言包均显示相同CotW英文，不生成翻译。
+自动检查：真实首次注册到缺键语言包的4个能力仍显示原None，且保持现有已加载键。两语言包107键、运行时106键加减伤默认值、继承资源引用和全部源文件哈希核对；原隐藏空字段显式允许。完整闸门和实际包内DLL复跑、旧方法/机制保护、双ZIP全量回读以本次交付自检为准。未启动游戏，不把托管测试视为场景渲染或完整存档流程。
+以下107项逐条记录zhCN.json行号（单行JSON编码，\n代表原文换行；双引号内保留空格）及源文件行号。enGB对应同一key同步恢复。
+
+001. zhCN L3818 | cotw-wrath.stalwart.increased-damage-reduction.description
+Before: "Each selection of this defensive power grants damage reduction 2/-; two selections grant 4/-. It remains active while the character has the power, whether or not defensive stance is active. At most two selections; existing class, archetype and mod prerequisites remain. This release copies only the numeric increase from CotW, not its stance restriction. Native shared stackable-DR accounting can also reduce a later energy component of a mixed damage bundle when class DR is present. This is inherited engine behavior, not separate energy resistance. TTT DR Rework uses its own damage-reduction accounting. Class DR, barbarian DR and defensive stance are otherwise unchanged. The same native stackable-DR branch can reduce a pure-energy bundle as well; at one selection, 30 energy damage becomes 28 (29 before the numeric change)."
+After: "The stalwart defender's damage reduction from this class increases by 2/—. This increase is always active while the stalwart defender is in a defensive stance. He can select this power up to two times. Its effects stack. The stalwart defender must be at least 6th level before selecting this defensive power."
+Source: CallOfTheWild/Rebalance.cs:1881 | CotW source literal
+
+002. zhCN L4007 | cotw-wrath.psychic.full.TerrorManipulation01444.name
+Before: "Manipulation"
+After: "Manipulation"
+Source: CallOfTheWild/Classes/Psychic.cs:233 | CotW source literal
+
+003. zhCN L4008 | cotw-wrath.psychic.full.TerrorManipulation01444.description
+Before: "At psychic level 2, learn the native Command spell as a 1st-level psychic spell."
+After: "At 2nd level, a terror weaver adds command spell to his list of known spells."
+Source: CallOfTheWild/Classes/Psychic.cs:234 | CotW source literal
+
+004. zhCN L4009 | cotw-wrath.psychic.full.TerrorAuraKnown01444.name
+Before: "Aura of Intimidation: Aura of Doom"
+After: "Aura of Intimidation"
+Source: CallOfTheWild/Classes/Psychic.cs:246 | CotW source literal
+
+005. zhCN L4010 | cotw-wrath.psychic.full.TerrorAuraKnown01444.description
+Before: "At psychic level 9, learn the existing Aura of Doom spell as a 4th-level psychic spell."
+After: "At 9th level, a terror weaver adds aura of doom spell to his list of known spells."
+Source: CallOfTheWild/Classes/Psychic.cs:247 | CotW source literal
+
+006. zhCN L4011 | cotw-wrath.psychic.full.TerrorMoveWisdomAbility01444.name
+Before: "Aura of Intimidation"
+After: "Aura of Intimidation"
+Source: CallOfTheWild/Classes/Psychic.cs:257 | CotW source literal
+
+007. zhCN L4012 | cotw-wrath.psychic.full.TerrorMoveWisdomAbility01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "At 11th level, a terror weaver can spend 1 phrenic pool point, as a move action, to make every enemy affected by his aura of doom spell frightened for one round.\nAt 19th level, he can do it a swift action instead."
+Source: CallOfTheWild/Classes/Psychic.cs:258 | CotW source literal
+
+008. zhCN L4013 | cotw-wrath.psychic.full.TerrorMoveWisdomAbility01444.duration
+Before: "1 round"
+After: "1 round"
+Source: CallOfTheWild/Helpers.cs:1041 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: 2c38da66e5a599347ac95b3294acbe00
+
+009. zhCN L4014 | cotw-wrath.psychic.full.TerrorMoveWisdomAbility01444.savingThrow
+Before: ""
+After: "None"
+Source: CallOfTheWild/Helpers.cs:1044 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: b6010dda6333bcf4093ce20f0063cd41
+
+010. zhCN L4015 | cotw-wrath.psychic.full.TerrorMoveCharismaAbility01444.name
+Before: "Aura of Intimidation"
+After: "Aura of Intimidation"
+Source: CallOfTheWild/Classes/Psychic.cs:257 | CotW source literal
+
+011. zhCN L4016 | cotw-wrath.psychic.full.TerrorMoveCharismaAbility01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "At 11th level, a terror weaver can spend 1 phrenic pool point, as a move action, to make every enemy affected by his aura of doom spell frightened for one round.\nAt 19th level, he can do it a swift action instead."
+Source: CallOfTheWild/Classes/Psychic.cs:258 | CotW source literal
+
+012. zhCN L4017 | cotw-wrath.psychic.full.TerrorMoveCharismaAbility01444.duration
+Before: "1 round"
+After: "1 round"
+Source: CallOfTheWild/Helpers.cs:1041 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: 2c38da66e5a599347ac95b3294acbe00
+
+013. zhCN L4018 | cotw-wrath.psychic.full.TerrorMoveCharismaAbility01444.savingThrow
+Before: ""
+After: "None"
+Source: CallOfTheWild/Helpers.cs:1044 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: b6010dda6333bcf4093ce20f0063cd41
+
+014. zhCN L4019 | cotw-wrath.psychic.full.TerrorAuraMove01444.name
+Before: "Aura of Intimidation"
+After: "Aura of Intimidation"
+Source: CallOfTheWild/Classes/Psychic.cs:257 | CotW source literal
+
+015. zhCN L4020 | cotw-wrath.psychic.full.TerrorAuraMove01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "At 11th level, a terror weaver can spend 1 phrenic pool point, as a move action, to make every enemy affected by his aura of doom spell frightened for one round.\nAt 19th level, he can do it a swift action instead."
+Source: CallOfTheWild/Classes/Psychic.cs:258 | CotW source literal
+
+016. zhCN L4021 | cotw-wrath.psychic.full.TerrorSwiftWisdomAbility01444.name
+Before: "Aura of Intimidation (Swift Action)"
+After: "Aura of Intimidation (Swift Action)"
+Source: CallOfTheWild/Classes/Psychic.cs:276 | CotW source literal
+
+017. zhCN L4022 | cotw-wrath.psychic.full.TerrorSwiftWisdomAbility01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "At 11th level, a terror weaver can spend 1 phrenic pool point, as a move action, to make every enemy affected by his aura of doom spell frightened for one round.\nAt 19th level, he can do it a swift action instead."
+Source: CallOfTheWild/Classes/Psychic.cs:258 | CotW source literal
+
+018. zhCN L4023 | cotw-wrath.psychic.full.TerrorSwiftWisdomAbility01444.duration
+Before: "1 round"
+After: "1 round"
+Source: CallOfTheWild/Helpers.cs:1041 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: 2c38da66e5a599347ac95b3294acbe00
+
+019. zhCN L4024 | cotw-wrath.psychic.full.TerrorSwiftWisdomAbility01444.savingThrow
+Before: ""
+After: "None"
+Source: CallOfTheWild/Helpers.cs:1044 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: b6010dda6333bcf4093ce20f0063cd41
+
+020. zhCN L4025 | cotw-wrath.psychic.full.TerrorSwiftCharismaAbility01444.name
+Before: "Aura of Intimidation (Swift Action)"
+After: "Aura of Intimidation (Swift Action)"
+Source: CallOfTheWild/Classes/Psychic.cs:276 | CotW source literal
+
+021. zhCN L4026 | cotw-wrath.psychic.full.TerrorSwiftCharismaAbility01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "At 11th level, a terror weaver can spend 1 phrenic pool point, as a move action, to make every enemy affected by his aura of doom spell frightened for one round.\nAt 19th level, he can do it a swift action instead."
+Source: CallOfTheWild/Classes/Psychic.cs:258 | CotW source literal
+
+022. zhCN L4027 | cotw-wrath.psychic.full.TerrorSwiftCharismaAbility01444.duration
+Before: "1 round"
+After: "1 round"
+Source: CallOfTheWild/Helpers.cs:1041 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: 2c38da66e5a599347ac95b3294acbe00
+
+023. zhCN L4028 | cotw-wrath.psychic.full.TerrorSwiftCharismaAbility01444.savingThrow
+Before: ""
+After: "None"
+Source: CallOfTheWild/Helpers.cs:1044 | CotW helper inherits Kingmaker localized shared asset
+Native GUID: b6010dda6333bcf4093ce20f0063cd41
+
+024. zhCN L4029 | cotw-wrath.psychic.full.TerrorAuraSwift01444.name
+Before: "Aura of Intimidation (Swift Action)"
+After: "Aura of Intimidation (Swift Action)"
+Source: CallOfTheWild/Classes/Psychic.cs:276 | CotW source literal
+
+025. zhCN L4030 | cotw-wrath.psychic.full.TerrorAuraSwift01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "At 11th level, a terror weaver can spend 1 phrenic pool point, as a move action, to make every enemy affected by his aura of doom spell frightened for one round.\nAt 19th level, he can do it a swift action instead."
+Source: CallOfTheWild/Classes/Psychic.cs:258 | CotW source literal
+
+026. zhCN L4031 | cotw-wrath.psychic.full.TerrorWeaverArchetype01444.name
+Before: "Terror Weaver"
+After: "Terror Weaver"
+Source: CallOfTheWild/Classes/Psychic.cs:208 | CotW source literal
+
+027. zhCN L4032 | cotw-wrath.psychic.full.TerrorWeaverArchetype01444.description
+Before: "Learn Command at psychic level 2 and Aura of Doom at 9. At level 11, spend 1 phrenic point as a move action to frighten enemies affected by your own Aura of Doom for 1 round, without another save. At level 19, also gain the swift-action version. Replaces only the phrenic amplification choices at 11 and 19. Other discipline, spellcasting and amplification choices are retained."
+After: "A number of exceptional tribesmen have developed potent psychic abilities, unlocked by generations of exposure to a specific combination of mind-altering fungi and radiation. Powerful manipulators, they often rule smaller tribes from the shadows, but with only few able to match their mental acuity, their only limit is their own ambition."
+Source: CallOfTheWild/Classes/Psychic.cs:209 | CotW source literal
+
+028. zhCN L4033 | cotw-wrath.psychic.full.PrimalAirArcana01444.name
+Before: "Primal Bloodline Arcana (Air)"
+After: "Primal Bloodline Arcana"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:122 | CotW source literal
+
+029. zhCN L4034 | cotw-wrath.psychic.full.PrimalAirArcana01444.description
+Before: "Your spells dealing Electricity damage deal +1 damage per die, using the native matching draconic-arcana rule."
+After: "Whenever you cast a spell with electricity damage, that spell deals +1 point of damage per die rolled."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:121 | CotW clone inherits Kingmaker localized field
+Native GUID: 0f0cb88a2ccc0814aa64c41fd251e84e
+
+030. zhCN L4035 | cotw-wrath.psychic.full.PrimalAirSummoningBuff01444.name
+Before: "Elementalist Summoning (Air)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+031. zhCN L4036 | cotw-wrath.psychic.full.PrimalAirSummoningBuff01444.description
+Before: "Resistance10, or +5 to existing matching resistance; natural/unarmed hits deal +1d6 Electricity damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+032. zhCN L4037 | cotw-wrath.psychic.full.PrimalAirSummoningFeature01444.name
+Before: "Elementalist Summoning (Air)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+033. zhCN L4038 | cotw-wrath.psychic.full.PrimalAirSummoningFeature01444.description
+Before: "At level9, your Summoning-descriptor summons gain resistance10, or +5 to existing matching resistance, and natural/unarmed hits deal +1d6 Electricity damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+034. zhCN L4039 | cotw-wrath.psychic.full.PrimalAirProgression01444.name
+Before: "Primal Elemental Air"
+After: "Primal Elemental Bloodline — Air"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:119 | CotW clone inherits Kingmaker localized field
+Native GUID: cd788df497c6f10439c7025e87864ee4
+
+035. zhCN L4040 | cotw-wrath.psychic.full.PrimalAirProgression01444.description
+Before: "Choose one primal elemental bloodline. Retain its native elemental powers, bonus spells, feats and progression, but replace its arcana with +1 damage per die for spells of the matching energy and replace its level9 Elemental Blast with Elementalist Summoning. Summoned creatures gain resistance10 to that energy, or +5 to an existing matching resistance, and +1d6 damage on natural/unarmed hits. Air uses electricity, Earth acid, Fire fire, Water cold. Cannot combine with Dragon Disciple."
+After: "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes from an elemental outsider in your family history or a time when you or your relatives were exposed to a powerful elemental force. Air infuses your being, and you can draw upon its power in times of need.\nBonus Feats of the Elemental Bloodline: Dodge, Empower Spell, Great Fortitude, Improved Initiative, Lightning Reflexes, Power Attack, Skill Focus (Knowledge: Arcana), Weapon Finesse."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:118 | CotW clone inherits Kingmaker localized field
+Native GUID: cd788df497c6f10439c7025e87864ee4
+
+036. zhCN L4041 | cotw-wrath.psychic.full.PrimalEarthArcana01444.name
+Before: "Primal Bloodline Arcana (Earth)"
+After: "Primal Bloodline Arcana"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:122 | CotW source literal
+
+037. zhCN L4042 | cotw-wrath.psychic.full.PrimalEarthArcana01444.description
+Before: "Your spells dealing Acid damage deal +1 damage per die, using the native matching draconic-arcana rule."
+After: "Whenever you cast a spell with acid damage, that spell deals +1 point of damage per die rolled."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:121 | CotW clone inherits Kingmaker localized field
+Native GUID: caebe2fa3b5a94d4bbc19ccca86d1d6f
+
+038. zhCN L4043 | cotw-wrath.psychic.full.PrimalEarthSummoningBuff01444.name
+Before: "Elementalist Summoning (Earth)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+039. zhCN L4044 | cotw-wrath.psychic.full.PrimalEarthSummoningBuff01444.description
+Before: "Resistance10, or +5 to existing matching resistance; natural/unarmed hits deal +1d6 Acid damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+040. zhCN L4045 | cotw-wrath.psychic.full.PrimalEarthSummoningFeature01444.name
+Before: "Elementalist Summoning (Earth)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+041. zhCN L4046 | cotw-wrath.psychic.full.PrimalEarthSummoningFeature01444.description
+Before: "At level9, your Summoning-descriptor summons gain resistance10, or +5 to existing matching resistance, and natural/unarmed hits deal +1d6 Acid damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+042. zhCN L4047 | cotw-wrath.psychic.full.PrimalEarthProgression01444.name
+Before: "Primal Elemental Earth"
+After: "Primal Elemental Bloodline — Earth"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:119 | CotW clone inherits Kingmaker localized field
+Native GUID: 32393034410fb2f4d9c8beaa5c8c8ab7
+
+043. zhCN L4048 | cotw-wrath.psychic.full.PrimalEarthProgression01444.description
+Before: "Choose one primal elemental bloodline. Retain its native elemental powers, bonus spells, feats and progression, but replace its arcana with +1 damage per die for spells of the matching energy and replace its level9 Elemental Blast with Elementalist Summoning. Summoned creatures gain resistance10 to that energy, or +5 to an existing matching resistance, and +1d6 damage on natural/unarmed hits. Air uses electricity, Earth acid, Fire fire, Water cold. Cannot combine with Dragon Disciple."
+After: "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes from an elemental outsider in your family history or a time when you or your relatives were exposed to a powerful elemental force. Earth infuses your being, and you can draw upon its power in times of need.\nBonus Feats of the Elemental Bloodline: Dodge, Empower Spell, Great Fortitude, Improved Initiative, Lightning Reflexes, Power Attack, Skill Focus (Knowledge: Arcana), Weapon Finesse."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:118 | CotW clone inherits Kingmaker localized field
+Native GUID: 32393034410fb2f4d9c8beaa5c8c8ab7
+
+044. zhCN L4049 | cotw-wrath.psychic.full.PrimalFireArcana01444.name
+Before: "Primal Bloodline Arcana (Fire)"
+After: "Primal Bloodline Arcana"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:122 | CotW source literal
+
+045. zhCN L4050 | cotw-wrath.psychic.full.PrimalFireArcana01444.description
+Before: "Your spells dealing Fire damage deal +1 damage per die, using the native matching draconic-arcana rule."
+After: "Whenever you cast a spell with fire damage, that spell deals +1 point of damage per die rolled."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:121 | CotW clone inherits Kingmaker localized field
+Native GUID: a8baee8eb681d53438cc17bd1d125890
+
+046. zhCN L4051 | cotw-wrath.psychic.full.PrimalFireSummoningBuff01444.name
+Before: "Elementalist Summoning (Fire)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+047. zhCN L4052 | cotw-wrath.psychic.full.PrimalFireSummoningBuff01444.description
+Before: "Resistance10, or +5 to existing matching resistance; natural/unarmed hits deal +1d6 Fire damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+048. zhCN L4053 | cotw-wrath.psychic.full.PrimalFireSummoningFeature01444.name
+Before: "Elementalist Summoning (Fire)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+049. zhCN L4054 | cotw-wrath.psychic.full.PrimalFireSummoningFeature01444.description
+Before: "At level9, your Summoning-descriptor summons gain resistance10, or +5 to existing matching resistance, and natural/unarmed hits deal +1d6 Fire damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+050. zhCN L4055 | cotw-wrath.psychic.full.PrimalFireProgression01444.name
+Before: "Primal Elemental Fire"
+After: "Primal Elemental Bloodline — Fire"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:119 | CotW clone inherits Kingmaker localized field
+Native GUID: 17cc794d47408bc4986c55265475c06f
+
+051. zhCN L4056 | cotw-wrath.psychic.full.PrimalFireProgression01444.description
+Before: "Choose one primal elemental bloodline. Retain its native elemental powers, bonus spells, feats and progression, but replace its arcana with +1 damage per die for spells of the matching energy and replace its level9 Elemental Blast with Elementalist Summoning. Summoned creatures gain resistance10 to that energy, or +5 to an existing matching resistance, and +1d6 damage on natural/unarmed hits. Air uses electricity, Earth acid, Fire fire, Water cold. Cannot combine with Dragon Disciple."
+After: "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes from an elemental outsider in your family history or a time when you or your relatives were exposed to a powerful elemental force. Fire infuses your being, and you can draw upon its power in times of need.\nBonus Feats of the Elemental Bloodline: Dodge, Empower Spell, Great Fortitude, Improved Initiative, Lightning Reflexes, Power Attack, Skill Focus (Knowledge: Arcana), Weapon Finesse."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:118 | CotW clone inherits Kingmaker localized field
+Native GUID: 17cc794d47408bc4986c55265475c06f
+
+052. zhCN L4057 | cotw-wrath.psychic.full.PrimalWaterArcana01444.name
+Before: "Primal Bloodline Arcana (Water)"
+After: "Primal Bloodline Arcana"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:122 | CotW source literal
+
+053. zhCN L4058 | cotw-wrath.psychic.full.PrimalWaterArcana01444.description
+Before: "Your spells dealing Cold damage deal +1 damage per die, using the native matching draconic-arcana rule."
+After: "Whenever you cast a spell with cold damage, that spell deals +1 point of damage per die rolled."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:121 | CotW clone inherits Kingmaker localized field
+Native GUID: 456e305ebfec3204683b72a45467d87c
+
+054. zhCN L4059 | cotw-wrath.psychic.full.PrimalWaterSummoningBuff01444.name
+Before: "Elementalist Summoning (Water)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+055. zhCN L4060 | cotw-wrath.psychic.full.PrimalWaterSummoningBuff01444.description
+Before: "Resistance10, or +5 to existing matching resistance; natural/unarmed hits deal +1d6 Cold damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+056. zhCN L4061 | cotw-wrath.psychic.full.PrimalWaterSummoningFeature01444.name
+Before: "Elementalist Summoning (Water)"
+After: "Elementalist Summoning"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:130 | CotW source literal
+
+057. zhCN L4062 | cotw-wrath.psychic.full.PrimalWaterSummoningFeature01444.description
+Before: "At level9, your Summoning-descriptor summons gain resistance10, or +5 to existing matching resistance, and natural/unarmed hits deal +1d6 Cold damage."
+After: "At 9th level, whenever you summon a creature, it gains energy resistance 10 against the energy type that matches your elemental bloodline, and its natural attacks deal an additional 1d6 points of damage of the same energy type. "
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:131 | CotW source literal
+
+058. zhCN L4063 | cotw-wrath.psychic.full.PrimalWaterProgression01444.name
+Before: "Primal Elemental Water"
+After: "Primal Elemental Bloodline — Water"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:119 | CotW clone inherits Kingmaker localized field
+Native GUID: 7c692e90592257a4e901d12ae6ec1e41
+
+059. zhCN L4064 | cotw-wrath.psychic.full.PrimalWaterProgression01444.description
+Before: "Choose one primal elemental bloodline. Retain its native elemental powers, bonus spells, feats and progression, but replace its arcana with +1 damage per die for spells of the matching energy and replace its level9 Elemental Blast with Elementalist Summoning. Summoned creatures gain resistance10 to that energy, or +5 to an existing matching resistance, and +1d6 damage on natural/unarmed hits. Air uses electricity, Earth acid, Fire fire, Water cold. Cannot combine with Dragon Disciple."
+After: "The power of the elements resides in you, and at times you can hardly control its fury. This influence comes from an elemental outsider in your family history or a time when you or your relatives were exposed to a powerful elemental force. Water infuses your being, and you can draw upon its power in times of need.\nBonus Feats of the Elemental Bloodline: Dodge, Empower Spell, Great Fortitude, Improved Initiative, Lightning Reflexes, Power Attack, Skill Focus (Knowledge: Arcana), Weapon Finesse."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:118 | CotW clone inherits Kingmaker localized field
+Native GUID: 7c692e90592257a4e901d12ae6ec1e41
+
+060. zhCN L4065 | cotw-wrath.psychic.full.PrimalBloodlineSelection01444.name
+Before: "Primal Bloodline"
+After: "Primal Bloodline"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:92 | CotW source literal
+
+061. zhCN L4066 | cotw-wrath.psychic.full.PrimalBloodlineSelection01444.description
+Before: "Choose one primal elemental bloodline. Retain its native elemental powers, bonus spells, feats and progression, but replace its arcana with +1 damage per die for spells of the matching energy and replace its level9 Elemental Blast with Elementalist Summoning. Summoned creatures gain resistance10 to that energy, or +5 to an existing matching resistance, and +1d6 damage on natural/unarmed hits. Air uses electricity, Earth acid, Fire fire, Water cold. Cannot combine with Dragon Disciple."
+After: "Each sorcerer has a source of magic somewhere in her heritage that grants her spells, bonus feats, an additional class skill, and other special abilities. This source can represent a blood relation or an extreme event involving a creature somewhere in the family's past. For example, a sorcerer might have a dragon as a distant relative or her grandfather might have signed a terrible contract with a devil. Regardless of the source, this influence manifests in a number of ways as the sorcerer gains levels. A sorcerer must pick one bloodline upon taking her first level of sorcerer. Once made, this choice cannot be changed.\nFilled with magical power that screams for release, sorcery is not so much a calling as a blessing — or a curse. For some sorcerers, this arcane birthright manifests in subtle and carefully controlled ways, assisting in their manipulation of others or the pursuit of lofty goals. For others, it is wild and unpredictable, the primal and explosive lashing out of a power greater than themselves.\nAt 3rd level, and every two levels thereafter, a sorcerer learns an additional spell, derived from her bloodline. These spells are in addition to the number of spells given at new levels. These spells cannot be exchanged for different spells at higher levels.\nAt 7th level, and every six levels thereafter, a sorcerer receives one bonus feat, chosen from a list specific to each bloodline. The sorcerer must meet the prerequisites for these bonus feats."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:90 | CotW clone inherits Kingmaker localized field
+Native GUID: 24bef8d1bee12274686f6da6ccbc8914
+
+062. zhCN L4067 | cotw-wrath.psychic.full.PrimalSorcererArchetype01444.name
+Before: "Primal Sorcerer"
+After: "Primal Sorcerer"
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:69 | CotW source literal
+
+063. zhCN L4068 | cotw-wrath.psychic.full.PrimalSorcererArchetype01444.description
+Before: "Choose one primal elemental bloodline. Retain its native elemental powers, bonus spells, feats and progression, but replace its arcana with +1 damage per die for spells of the matching energy and replace its level9 Elemental Blast with Elementalist Summoning. Summoned creatures gain resistance10 to that energy, or +5 to an existing matching resistance, and +1d6 damage on natural/unarmed hits. Air uses electricity, Earth acid, Fire fire, Water cold. Cannot combine with Dragon Disciple."
+After: "Your powers are attuned to the concentrated core of the elemental plane."
+Source: CallOfTheWild/Archetypes/PrimalSorcerer.cs:70 | CotW source literal
+
+064. zhCN L4069 | cotw-wrath.psychic.full.RakesSmile01444.name
+Before: "Rake's Smile"
+After: "Rake’s Smile"
+Source: CallOfTheWild/Archetypes/Rake.cs:119 | CotW source literal
+
+065. zhCN L4070 | cotw-wrath.psychic.full.RakesSmile01444.description
+Before: "At rogue level 3, gain +1 morale on Bluff and Diplomacy checks. This increases by1 every3 rogue levels to +6 at18."
+After: "At 3rd level, a rake gains a +1 morale bonus on Bluff and Diplomacy checks. This bonus increases by +1 for every 3 levels beyond 3rd."
+Source: CallOfTheWild/Archetypes/Rake.cs:120 | CotW source literal
+
+066. zhCN L4071 | cotw-wrath.psychic.full.BravadosBlade1Reduction01444.name
+Before: "Bravado's Blade: legacy state"
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+067. zhCN L4072 | cotw-wrath.psychic.full.BravadosBlade1Reduction01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+068. zhCN L4073 | cotw-wrath.psychic.full.BravadosBlade1Buff01444.name
+Before: "Bravado's Blade (1 dice)"
+After: "Bravado's Blade (I)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+069. zhCN L4074 | cotw-wrath.psychic.full.BravadosBlade1Buff01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+070. zhCN L4075 | cotw-wrath.psychic.full.BravadosBlade1Toggle01444.name
+Before: "Bravado's Blade (1 dice)"
+After: "Bravado's Blade (I)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+071. zhCN L4076 | cotw-wrath.psychic.full.BravadosBlade1Toggle01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+072. zhCN L4077 | cotw-wrath.psychic.full.BravadosBlade1Feature01444.name
+Before: "Bravado's Blade (1 dice)"
+After: "Bravado's Blade (I)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+073. zhCN L4078 | cotw-wrath.psychic.full.BravadosBlade1Feature01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+074. zhCN L4079 | cotw-wrath.psychic.full.BravadosBlade2Reduction01444.name
+Before: "Bravado's Blade: legacy state"
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+075. zhCN L4080 | cotw-wrath.psychic.full.BravadosBlade2Reduction01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+076. zhCN L4081 | cotw-wrath.psychic.full.BravadosBlade2Buff01444.name
+Before: "Bravado's Blade (2 dice)"
+After: "Bravado's Blade (II)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+077. zhCN L4082 | cotw-wrath.psychic.full.BravadosBlade2Buff01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+078. zhCN L4083 | cotw-wrath.psychic.full.BravadosBlade2Toggle01444.name
+Before: "Bravado's Blade (2 dice)"
+After: "Bravado's Blade (II)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+079. zhCN L4084 | cotw-wrath.psychic.full.BravadosBlade2Toggle01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+080. zhCN L4085 | cotw-wrath.psychic.full.BravadosBlade2Feature01444.name
+Before: "Bravado's Blade (2 dice)"
+After: "Bravado's Blade (II)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+081. zhCN L4086 | cotw-wrath.psychic.full.BravadosBlade2Feature01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+082. zhCN L4087 | cotw-wrath.psychic.full.BravadosBlade3Reduction01444.name
+Before: "Bravado's Blade: legacy state"
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+083. zhCN L4088 | cotw-wrath.psychic.full.BravadosBlade3Reduction01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+084. zhCN L4089 | cotw-wrath.psychic.full.BravadosBlade3Buff01444.name
+Before: "Bravado's Blade (3 dice)"
+After: "Bravado's Blade (III)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+085. zhCN L4090 | cotw-wrath.psychic.full.BravadosBlade3Buff01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+086. zhCN L4091 | cotw-wrath.psychic.full.BravadosBlade3Toggle01444.name
+Before: "Bravado's Blade (3 dice)"
+After: "Bravado's Blade (III)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+087. zhCN L4092 | cotw-wrath.psychic.full.BravadosBlade3Toggle01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+088. zhCN L4093 | cotw-wrath.psychic.full.BravadosBlade3Feature01444.name
+Before: "Bravado's Blade (3 dice)"
+After: "Bravado's Blade (III)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+089. zhCN L4094 | cotw-wrath.psychic.full.BravadosBlade3Feature01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+090. zhCN L4095 | cotw-wrath.psychic.full.BravadosBlade4Reduction01444.name
+Before: "Bravado's Blade: legacy state"
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+091. zhCN L4096 | cotw-wrath.psychic.full.BravadosBlade4Reduction01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+092. zhCN L4097 | cotw-wrath.psychic.full.BravadosBlade4Buff01444.name
+Before: "Bravado's Blade (4 dice)"
+After: "Bravado's Blade (IV)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+093. zhCN L4098 | cotw-wrath.psychic.full.BravadosBlade4Buff01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+094. zhCN L4099 | cotw-wrath.psychic.full.BravadosBlade4Toggle01444.name
+Before: "Bravado's Blade (4 dice)"
+After: "Bravado's Blade (IV)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+095. zhCN L4100 | cotw-wrath.psychic.full.BravadosBlade4Toggle01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+096. zhCN L4101 | cotw-wrath.psychic.full.BravadosBlade4Feature01444.name
+Before: "Bravado's Blade (4 dice)"
+After: "Bravado's Blade (IV)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+097. zhCN L4102 | cotw-wrath.psychic.full.BravadosBlade4Feature01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+098. zhCN L4103 | cotw-wrath.psychic.full.BravadosBlade5Reduction01444.name
+Before: "Bravado's Blade: legacy state"
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+099. zhCN L4104 | cotw-wrath.psychic.full.BravadosBlade5Reduction01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: ""
+Source: CallOfTheWild/Archetypes/Rake.cs:139 | CotW explicit empty hidden-buff field
+
+100. zhCN L4105 | cotw-wrath.psychic.full.BravadosBlade5Buff01444.name
+Before: "Bravado's Blade (5 dice)"
+After: "Bravado's Blade (V)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+101. zhCN L4106 | cotw-wrath.psychic.full.BravadosBlade5Buff01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+102. zhCN L4107 | cotw-wrath.psychic.full.BravadosBlade5Toggle01444.name
+Before: "Bravado's Blade (5 dice)"
+After: "Bravado's Blade (V)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+103. zhCN L4108 | cotw-wrath.psychic.full.BravadosBlade5Toggle01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+104. zhCN L4109 | cotw-wrath.psychic.full.BravadosBlade5Feature01444.name
+Before: "Bravado's Blade (5 dice)"
+After: "Bravado's Blade (V)"
+Source: CallOfTheWild/Archetypes/Rake.cs:154 | CotW source literal
+
+105. zhCN L4110 | cotw-wrath.psychic.full.BravadosBlade5Feature01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained."
+After: "When a rake hits an opponent and deals sneak attack damage, she can forgo 1d6 points of that damage and make a free Intimidate check to demoralize the foe. Starting from level 5 she can decide to forgo 1 additional sneak attack die + 1 more die per 4 levels thereafter. For every additional 1d6 points of sneak attack damage she forgoes, she receives a +5 circumstance bonus on this check."
+Source: CallOfTheWild/Archetypes/Rake.cs:155 | CotW source literal
+
+106. zhCN L4111 | cotw-wrath.psychic.full.RakeArchetype01444.name
+Before: "Rake"
+After: "Rake"
+Source: CallOfTheWild/Archetypes/Rake.cs:76 | CotW source literal
+
+107. zhCN L4112 | cotw-wrath.psychic.full.RakeArchetype01444.description
+Before: "Choose one Bravado's Blade stance. On a hit that deals at least the selected number of sneak-attack dice, forgo those dice from this attack's damage and make a free demoralize check. This applies to weapon and ray attacks, independently for each attack. Forgo 1 die at rogue level 1, up to 2 at 5, 3 at 9, 4 at 13 and 5 at 17. Every die beyond the first gives +5 on that check. Only these five stances exclude each other; unrelated stances are retained. Replaces Trapfinding and Danger Sense; Rake's Smile starts at level3."
+After: "The rake is a rogue who is open about her skills and talents, often to the point of being boastful. Usually she has the protection of an important figure who finds her services useful, but sometimes her bravado is enough to keep enemies away. She is often used as a face for the group for diplomacy, gathering information, negotiations, or to gain the most lucrative contracts and quests from local authorities."
+Source: CallOfTheWild/Archetypes/Rake.cs:78 | CotW source literal
+
+未能找到原文的条目：无（107/107已定位，含原生继承和显式空字段）。
+
+--- 以下原0.14.46机制测试步骤保持；以本次A5说明为准 ---
+
+Call of the Wild Wrath Prototype 0.14.46
+Blood Havoc / Blood Intensity / Blood Piercing / Bloodline Familiar / Admixture
+
+本批范围
+五项均来自 docs/用户标注与分类.txt 的「暂且正常做的东西」，实施前仍为去重明细候选。已刷新十三个官方上游 HEAD，并核对 TTT-Core、TTT-Base、ExpandedContent 最新发布包的真实 DLL。按记录范围没有完整重复实现。
+0.14.45（含 Court Bard 9 级修复）已有用户正常反馈；既有生产能力代码保持。Primal Sorcerer 的私有进度不在本批替换表内。
+名称、描述和按钮沿用原 CotW 英文。血脉原能力的选择项直接保留其原生文本引用，Blood Intensity / Blood Piercing 使用原 CotW 两张原图，其他新增选项复用其对应真实原生图标。没有新增翻译或改写语言包。
+
+Bloodline mutations
+1. 使用普通原生 Sorcerer 血脉，在 1、3、9 级的对应血脉能力处检查选择项。原能力保留为一个选项：1 级还可选 Blood Havoc 或 Bloodline Familiar，3 级可选 Blood Intensity，9 级可选 Blood Piercing。Sylvan 的动物伙伴保持原安排。
+2. 原生 Bloodrager 的对应入口为 1、4、8 级：1 级可用 Bloodline Familiar 替换原能力，4 级可用 Blood Havoc 或 Blood Piercing，8 级可用 Blood Intensity。保留各血脉其他标记和法术；后续重复授予和升级归入选择原能力的私有分支，选择替换能力后不会再获得这些成长。
+3. Blood Havoc、Blood Intensity、Blood Piercing 也进入原有 Sorcerer / Bloodrager 血脉奖励专长池，并保留原 CotW 的职业等级前置。外部自定义血脉和单独的私有变体进度不按名称猜测改写。
+4. Blood Havoc：检查已获得对应血脉赠送法术特性的伤害，每颗法术伤害骰增加 1。仅学会同名法术还不满足该条件；额外精准伤害不计入。采用原 CotW balance-fixes 分支的血脉赠送法术范围。
+5. Blood Intensity：打开持久开关后施放可强化的伤害法术。使用 Strength / Charisma 较高调整值提升上限，仍需足够实际 caster level；与 Intensified 取较高上限。以 Fireball 比较开关前后上限，再以 Scorching Ray 和 Shocking Grasp 检查一次施法、多射线及持有接触法术不会重复扣费。
+6. Blood Intensity 次数沿用 CotW 资源表：3 / 7 / 11 / 15 / 19 级分别达到 1 / 2 / 3 / 4 / 5。Blood Piercing 资源表为 4 / 9 / 14 / 19 级达到 1 / 2 / 3 / 4；原英文描述末尾的 18 与原源码表不同，本包保留英文原文并在此列出实际表。
+7. Blood Piercing：打开持久开关后施放 Sorcerer / Bloodrager 伤害法术，核对元素抗力和 spell resistance 的变化。物理减伤、能量免疫保持原规则。每次合格施法扣一次，失败结算退还，耗尽后法术仍按普通效果施放。关闭开关后，已付费的飞行中效果保留；后续普通施法不继承标记。
+8. Bloodline Familiar：选择原生 familiar 列表中的一种，检查原熟悉的奖励与按钮。选择入口清除了 Rogue talent 前置，复用原有 thirteen familiar 选项。
+
+Admixture
+1. 新建或重训 Wizard，在专精学派中选择 Focused School — Admixture。检查原有两次 opposition school、专精法术位、Intense Spells 和 20 级能力仍在。
+2. 1 级获得四个 Versatile Metamagic 开关：Acid、Electricity、Fire、Cold。可随时切换，同组仅保留一个；每天共用 3 + Intelligence modifier 次数。施放符合条件的 evocation 元素伤害法术，检查伤害种类与本次施法描述符同步变化，其他非伤害效果保持。对不合格法术不扣费。
+3. 8 级获得四个 Elemental Manipulation 光环开关，共用等于 Wizard 等级的每日轮数。按原 CotW 的实现，转换以范围内施法者为来源的魔法伤害；范围为 30 feet。魔法来源 caster level（supernatural 来源使用 Hit Dice）不超过发出者 Wizard 等级时生效。转换只覆盖 Acid / Electricity / Fire / Cold，非魔法来源和其他伤害种类保持。
+4. 光环以来源单位是否处于范围内判定，沿用 CotW 的 outgoing-damage 组件设计。英文原文关于效果与区域部分相交的逐段几何判定不属于这个组件的行为。
+5. 连续切换四类能量，开关、图标、轮数更新应正常；关闭后检查 carrier 和区域效果清理。用 caster level 低于、等于、高于发出者等级的来源分别核对边界。
+
+回归步骤
+检查付费开关的动作栏次数、资源耗尽与恢复；开关关闭后普通施法正常；存读档后重新开关并施法。保留既有 Court Bard 9 级、Urban Skald、Hedge Witch、Time Stop 等正常行为。
+
+自动验证与边界
+交付自检保存正式构建、包内实际 DLL 专项复跑、注册顺序和真实 ready 回调重试、原生资源/开关/事件总线、伤害与抗力前缀、伤害骰上限、四能量转换、原生多态组件及 context JSON 往返、源码与双 ZIP 回读的结果和哈希。
+伤害/SR 专项在真实生产前缀之后截住原生终端结算；TTT 上限后处理使用其当前源码形状构造回归输入。光环 carrier、资源和事实生命周期使用真实 API，区域场景端点受控。完整战斗、渲染动作栏、完整游戏存读档及整套外部 mod 运行时共存不由这些托管检查推定。
+编译 Harmony 固定 2.0.4.0；包含 Medium 的整包按 UMM 0.32.4 成员契约检查。仅支持最新版游戏和相关 mod。没有启动游戏、安装 UMM、上传或删除项目外文件。
+
+2026-10-22 同版本五项复查修复
+1. 四个 Elemental Manipulation 区域均提供空 PrefabLink，不生成额外粒子。自检执行原生 AreaEffectView.SpawnFxs IL 的反向副本和真实空链接 Load，另用四次空引用链接作负对照；保留 Fx 读取、Load 调用及空值分支；Unity 对象比较/gameObject 调用与 TacticalCombat 查询受控。渲染器和实际粒子绘制仍是场景边界。
+2. 原能力分支使用私有 BlueprintProgression 收纳 119 处真实后续成长。黑龙 3 级选 Blood Intensity 后升到 9 级不再拿抗性升级；选择原抗性时保持升级。不死血脉 Death's Gift、龙爪/吐息额外次数等同样检查。Bloodrager 的爪成长归回 1 级原能力分支，4/8 级替换独立的该级能力；Arcane/Sage 的 9 级 New Arcana 及后续选择归在原分支。原生能力本体与 Primal 私有进度保持。
+3. Versatile 转换移到 RulePrepareDamage；Elemental Manipulation 保持稍后的 RuleCalculateDamage 事件。开启 Versatile Fire 且处于 Cold 光环内，用低于、等于、高于光环 Wizard 等级的法术来源核对：前两者最终为 Cold，后者保持 Fire。
+4. 学派、能力、光环和按钮共用的 Elemental Manipulation 文本恢复原 CotW Subschools.cs 的 30-foot aura 英文说明。
+5. zhCN.json 原有 107 条自制中文游戏文本恢复为对应英文文本；英文包、运行时能力机制不因这次文本恢复改变。安装包两个语言文件均逐值禁止 CJK 游戏文本；另构造含 Unicode 哨兵值的坏包，确认闸门拒绝。没有编写翻译。
+版本保持 0.14.46。自动检查的具体数量、回读哈希和测试边界以本次交付自检为准。
+
+血脉选择树已调整：旧版本/早期 0.14.46 角色请通过重训重建血脉选择分支。静态蓝图更新不会自动移除旧错误包已经授予的事实；完整存档迁移不由本次托管自检推定。

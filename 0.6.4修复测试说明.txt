@@ -1,0 +1,24 @@
+CotW 0.6.4 修复测试说明（2026-10-01）
+
+本轮只更新 CotW 原生模组到0.6.4；Medium继续使用0.3.8。完全退出游戏后覆盖更新，不在加载目录保留旧副本。本轮修复尚未通过游戏验收。
+
+已记录测试者通过：统帅降灵奖励不再残留；Ferocity能力正常；Thought Shield / Mind Thrust / Mental Barrier各版本及Psychic Center Self、Intellect Fortress生效。状态到期残留、界面和Synaptic Pulse问题独立保留。反馈版本按最近交付0.6.3/0.3.8推定。
+
+本版修复：
+- 补全持续时间、豁免英文标签，以及Psychic主动能力、法术、Buff的图标。
+- 按CotW原版恢复法术及Enhanced Senses特效和Intellect Fortress光环。原版这些图标多数复用游戏资源；Center Self原版有图标但没有单独施法粒子，本版保留该设计。Enhanced Senses沿用原版Countless Eyes继承的原生图标，不要求先迁移Countless Eyes法术。
+- 初始化Buff移除特效引用，避免原生OnRemove在发送移除通知前抛空引用。已在独立进程复现旧异常；真正游戏状态栏仍待复测。
+- Synaptic Pulse补齐范围条件对象，并允许筛选友敌，效果执行时排除施法者。
+- 普通升级学高阶版本时，为每个独立学过的低阶版本增加一个同环补选；旧低阶转为免费降阶，不再占独立已知法术名额。自动获得的低阶不产生补选。旧档漏发部分在下一次Psychic升级时补选，单纯读档不会突然弹选择界面。
+
+建议使用备份测试档或百宝袋复制的角色：
+1. 启动查看两个Psychic模块均REGISTERED。打开每个法术家族、Center Self、Enhanced Senses的提示框，持续时间和豁免不应显示<null>；图标应正常，法术家族不再统一是魔法飞弹。同一家族各阶共用图标与原版一致。
+2. 回合制与即时制各测一次：Center Self 1轮；Mental Barrier / Thought Shield / Intellect Fortress 2轮；Mind Thrust高阶附带疲劳、力竭、震慑1轮。到期应自动从状态栏消失，无需存读档，相关加值/压制同时结束。旧已过期图标在更新后读档应消失。施法动画/粒子和光环显示另行观察。
+3. Synaptic Pulse：附近放置非心智免疫目标，测试30尺内友敌，施法者不受影响。失败意志豁免震慑1轮；Greater失败震慑1d4轮，成功则恶心1轮。法术抗力/免疫/成功豁免均可能正常抵消效果，请看战斗记录区分。可用百宝袋准备低意志/无抗力目标，再单独测成功豁免，不能只看一次是否出现震慑。
+4. 普通升级界面先独立学Mind Thrust I，再学II：应多出一个1环法术选择，I仍可用1环位施放。分别抽查Mental Barrier和Thought Shield；先独立学I、III，再学VI，应按两个低阶实际环级各补选一次。直接先学VI，自动得到I～V时不应补选五次。
+5. 同一次升级已选好的低环法术不应被新增补选清空；取消整个升级再进入、撤销高阶重选、确认升级后保存重读，不应重复补选或保留额外法术。旧0.6.3档已学过高低阶且未获补选者，在下一次Psychic升级检查补发；最高级测试档可备份后洗点验证，勿直接改主档。
+6. Ferocity正常项、Logical Spell、Center Self免除集中检定减值以及Medium0.3.8统帅奖励清理做简短回归即可。
+
+若仍有到期残留或Synaptic Pulse无效，请给同次Player.log、GameLogFull.txt、CallOfTheWildWrathPrototype_Log.txt及触发时间，附战斗记录/按钮名称/等级/是否通过豁免。独立测试使用实际托管类型与显式Unity服务替代，未运行游戏或修改存档；图像与粒子呈现、实际升级UI与取消/洗点/存读档流程仍须游戏验收。
+
+保留既有GUID/TypeId、英文和Harmony2.0.4编译基线。T15其余五流派、增幅及剩余法术仍未完成。

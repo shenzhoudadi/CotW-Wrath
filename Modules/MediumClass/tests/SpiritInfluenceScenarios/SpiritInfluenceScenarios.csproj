@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Optimize>false</Optimize>
+    <ProductionMirrorComponent Condition="'$(ProductionMirrorComponent)' == ''">../../Medium/NewComponents/AbilitySpecific/MediumSpiritInfluenceAllyComponent.cs</ProductionMirrorComponent>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Medium/MarshalSpiritRules.cs" Link="Production/MarshalSpiritRules.cs" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../Utilities/Guids.cs" Link="Production/Guids.cs" />
+    <Compile Include="../../Utilities/LocalizationText.cs" Link="Production/LocalizationText.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumContextSpiritInfluenceComponent.cs" Link="Production/MediumContextSpiritInfluenceComponent.cs" />
+    <Compile Include="$(ProductionMirrorComponent)" Link="Production/MediumSpiritInfluenceAllyComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumContextSpiritBonusComponent.cs" Link="Production/MediumContextSpiritBonusComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumSpiritInfluenceFeatureComponent.cs" Link="Production/MediumSpiritInfluenceFeatureComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumDeathCurseComponent.cs" Link="Production/MediumDeathCurseComponent.cs" />
+    <Compile Include="../../Medium/MediumDeathCurseRules.cs" Link="Production/MediumDeathCurseRules.cs" />
+    <Compile Include="../../Medium/MediumDeathCurseMigration.cs" Link="Production/MediumDeathCurseMigration.cs" />
+    <Compile Include="../../Medium/NewActions/ContextActionToggleDeathCurse.cs" Link="Production/ContextActionToggleDeathCurse.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilityRequirementDeathCurseSlot.cs" Link="Production/AbilityRequirementDeathCurseSlot.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilityRequirementSpecificSpirit.cs" Link="Production/AbilityRequirementSpecificSpirit.cs" />
+  </ItemGroup>
+</Project>

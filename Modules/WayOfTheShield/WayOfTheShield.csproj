@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <UseGameHarmonyReference>true</UseGameHarmonyReference><TargetFramework>net472</TargetFramework><LangVersion>latest</LangVersion><AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  <AssemblyName>Way of the shield</AssemblyName><RootNamespace>Way_of_the_shield</RootNamespace><Version>4.0.13</Version><AssemblyVersion>4.0.13.0</AssemblyVersion><Deterministic>true</Deterministic>
+  <ManagedPath>$(WrathPath)\Wrath_Data\Managed</ManagedPath><ReferenceDirectory>$(MSBuildProjectDirectory)\obj\game-reference</ReferenceDirectory><DefineConstants>TRACE</DefineConstants>
+ </PropertyGroup>
+ <ItemGroup><Compile Remove="tests\**;obj\**;bin\**;artifacts\**"/><None Remove="tests\**"/><EmbeddedResource Remove="tests\**"/></ItemGroup>
+ <ItemGroup>
+  <Compile Include="../../Shared/HarmonyRuntimeCompatibility.cs" Link="HarmonyRuntimeCompatibility.cs" />
+  <Reference Include="Assembly-CSharp"><HintPath>$(ReferenceDirectory)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Newtonsoft.Json"><HintPath>$(ManagedPath)\Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Owlcat.Runtime.Core"><HintPath>$(ManagedPath)\Owlcat.Runtime.Core.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Owlcat.Runtime.Visual"><HintPath>$(ManagedPath)\Owlcat.Runtime.Visual.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Owlcat.Runtime.Validation"><HintPath>$(ManagedPath)\Owlcat.Runtime.Validation.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Owlcat.Runtime.UI"><HintPath>$(ManagedPath)\Owlcat.Runtime.UI.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedPath)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(ManagedPath)\UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(ManagedPath)\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="UnityEngine.AnimationModule"><HintPath>$(ManagedPath)\UnityEngine.AnimationModule.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="UniRx"><HintPath>$(ManagedPath)\UniRx.dll</HintPath><Private>false</Private></Reference>
+ </ItemGroup>
+ <ItemGroup>
+  <Using Include="HarmonyLib"/><Using Include="Kingmaker.Blueprints"/><Using Include="Kingmaker.EntitySystem.Entities"/><Using Include="Kingmaker.Enums"/><Using Include="Kingmaker.Blueprints.JsonSystem"/><Using Include="Kingmaker.Localization"/><Using Include="Kingmaker.PubSubSystem"/><Using Include="Kingmaker.RuleSystem"/><Using Include="Kingmaker.Utility"/>
+  <Using Static="true" Include="Way_of_the_shield.Settings"/><Using Static="true" Include="Way_of_the_shield.Utilities"/>
+  <EmbeddedResource Include="Icons\*.png"/><EmbeddedResource Include="Localization\enGB.json"/>
+ </ItemGroup>
+ <Target Name="PrepareActualGameReference" BeforeTargets="ResolveAssemblyReferences">
+  <Error Condition="!Exists('$(ManagedPath)\Assembly-CSharp.dll')" Text="Installed game is required."/>
+  <Exec Command="dotnet run --project &quot;$(MSBuildProjectDirectory)\tests\ReferenceBuilder\ReferenceBuilder.csproj&quot; -c Release --property:WrathPath=&quot;$(WrathPath)&quot; -- &quot;$(ManagedPath)&quot; &quot;$(ReferenceDirectory)&quot;"/>
+ </Target>
+ <Target Name="StageMod" DependsOnTargets="Build"><MakeDir Directories="$(MSBuildProjectDirectory)\artifacts\Release\WayOfTheShield"/><Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildProjectDirectory)\artifacts\Release\WayOfTheShield"/></Target>
+</Project>

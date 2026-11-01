@@ -1,0 +1,26 @@
+CotW Wrath Prototype 0.14.52 术士血脉实际菜单修复测试说明
+2026-10-24；本轮无新增迁移项。只支持当前游戏及相关模组最新版本。
+
+用户反馈与诊断
+Bloodrager本次已报告正常；保留此前接受的Nature’s Command和Blood Intensity/Piercing效果。原生/非ECM术士一级缺Blood Havoc，ECM Orc/Protean仍停留原能力与Havoc二选一。两张截图的像素由父对话读取核实后转来：第一张Familiar/墓地之触/I/P但无Havoc；第二张BLOODLINE MUTATION含未名物质与血之毁灭，无Familiar/I/P。开发环境未直接读取截图像素，不从翻译名推断角色等级或资产身份。
+
+查明的实现缺口：之前只依赖提供者登记完成通知协调菜单，实际原生升级入口没有最终检查。刻意仅卸下CotW接收ECM完成通知的后置补丁，真实ECM/TTT/ToTF发布方法和旧0.14.51安装DLL即产生上述两类菜单；正常通知路径下旧包会通过。因此这是已复现的缺口，不把故障注入等同用户现场唯一原因，也不推定某外部mod丢失通知。新版若遇未知私有图变更/外部身份占用会保留原件并在日志输出Bloodline menu01452、真实progressionGUID和异常，便于继续核实。
+
+修法
+仅已审计的Sorcerer血承在实际LevelUpHelper.UpdateProgression前检查菜单。完整时不写；缺项时用原有严格收据、指纹、回滚登记途径，仅协调Sorcerer选择。若该角色已建立ProgressionData快照，用原生PostLoad刷新等级条目，保留Level、Archetypes和已选事实。Bloodrager及无关职业不走此入口；不遍历世界/单位/每帧。Havoc只用ECM真实实现，缺ECM或空占位不造能力。
+Familiar仅初始能力交换；Sorcerer实际1/3/9/15，Bloodrager实际1/4/8/12/16及原生缺位/前置保持；不补造Seeker缺失能力。I/P仍受原等级及真实前置限制，一级显示灰色属于正确限制。原GUID、序列化类型、效果与资源不变，不回溯替换角色已提交选择。
+
+托管验证与边界
+旧包与新版均使用实际发布DLL、当前游戏托管程序集和原生蓝图数据。八条路径包含Undead、Arcane、Black、Abyssal、ECM Orc/Protean、TTT Aberrant/Destined：真实父Items实例->SelectFeature.Check/Apply->UpdateProgression->自动产生的子菜单->原生FeatureSelectionViewState->Havoc选择授予一次及拒绝重复。含预建ProgressionData；有/无完成通知两种路径；同时对照Bloodrager图、重复无写、无ECM、错职业、未知私有图和外部同GUID身份。旧检查偏重已协调蓝图/孤立CanSelect及正常回调，未把丢失通知下的真实父到子路径和最终界面状态列为拒绝条件；本轮将这条路径独立加入构建。
+独立CLR中UI服务输入由受控Game/LevelUpController/Preview提供，推荐与前置/过滤/授予业务仍执行原生方法；同IL重发防止JIT内联，未替换CanSelect。外部同成员访问副本、引擎/配置端点与运行时矩阵逐一审计。完整游戏画面、升级提交和存档生命周期由以下游戏回归确认，具体最终记录见本版交付自检。
+
+测试者回归步骤
+1. 备份存档，用新包替换旧版，保留同一最新ECM/TTT/ToTF组合。冷启动两次，检查ModMenu及CotW日志，所有血脉模块正常，无Bloodline menu01452失败。不要同时启用独立旧CotW或同包旧目录。
+2. 新建普通Sorcerer，分别选Undead、Arcane、Black、Abyssal；一级初始能力交换应有原能力、Bloodline Familiar和ECM Blood Havoc，I/P虽在列但因等级灰色。选Havoc确认原一级能力不额外保留，实际只授予一次。Familiar、原能力分支也各选一次作对照。
+3. ECM Orc/Protean、TTT Aberrant/Destined重复第2步；检查不再只有原能力+Havoc两项。记录血承英文名称、职业/变体、实际等级、父子菜单名称与日志，避免只按译名辨认。
+4. Seeker与四Primal分别检查其真实存在的能力位，不能凭空出现已被变体移除的3/15级交换；三级Intensity/九级Piercing到达真实门槛后可选，未达门槛禁用；15级存在的能力仍可按原规则交换。奖励专长7/13/19级的真实子池保留I/P。
+5. 旧档从主菜单加载、升级到实际能力位；备份后洗点回一级重复原生/ECM血承，再存档回主菜单读档。已提交的历史选择不自动改写，使用洗点重建。两类菜单若仍异常请保留包含Bloodline menu01452的完整CotW日志及职业/等级/血承信息。
+6. 保护回归：Bloodrager普通/Primalist及凤凰/TTT主与第二血承原交换与成长保持；Nature开启后Mind Thrust可点植物、Color Spray范围及扣点保持；Intensity/Piercing付费和原效果保持。无ECM时不出现伪造Havoc；低等级及错职业仍不满足前置。
+
+交付与兼容
+Harmony编译固定游戏实际2.0.4.0及SHA；运行时2.3.6沿用既有API兼容检查。没有启动游戏、安装UMM或改动存档；此轮不新增职业/专长/效果。完整构建、最终安装包DLL复跑和原件校验记录均在交付自检中。按持久约定上传原Drive并原始下载核对，本轮继续禁止删除云端旧文件；本地历史全部保留。

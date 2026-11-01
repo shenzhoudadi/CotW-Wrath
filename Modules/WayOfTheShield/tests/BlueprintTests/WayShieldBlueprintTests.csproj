@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><TargetFramework>net472</TargetFramework><LangVersion>latest</LangVersion><OutputType>Exe</OutputType><StartupObject>BlueprintLauncher</StartupObject><UseGameHarmonyReference>true</UseGameHarmonyReference><UseExplicitGameHarmonyResolver>true</UseExplicitGameHarmonyResolver><ManagedPath>$(WrathPath)\Wrath_Data\Managed</ManagedPath></PropertyGroup>
+ <ItemGroup>
+  <ProjectReference Include="../../WayOfTheShield.csproj"><Private>false</Private></ProjectReference>
+  <Reference Include="Assembly-CSharp"><HintPath>../../obj/game-reference/Assembly-CSharp.dll</HintPath><Private>true</Private></Reference>
+  <Reference Include="Newtonsoft.Json"><HintPath>$(ManagedPath)/Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="UnityEngine.CoreModule"><HintPath>$(ManagedPath)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Owlcat.Runtime.Core"><HintPath>$(ManagedPath)/Owlcat.Runtime.Core.dll</HintPath><Private>false</Private></Reference>
+  <Reference Include="Owlcat.Runtime.Validation"><HintPath>$(ManagedPath)/Owlcat.Runtime.Validation.dll</HintPath><Private>false</Private></Reference>
+ </ItemGroup>
+</Project>

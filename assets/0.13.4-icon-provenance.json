@@ -1,0 +1,16 @@
+{
+  "cotwCommit": "1332fb0db844b7863f484ca978bea2349fe49769",
+  "icons": [
+    {
+      "token": "IrresistibleDance",
+      "source": "CallOfTheWild/Icons/AbilityIcons/IrresistibleDance.png",
+      "sha256": "E60801F5ECBE37C9EF12BD7F7A0B1C417C785C28148BCA264BB2FFC6EBC6E393",
+      "embeddedResource": "CotW.IrresistibleDance.png"
+    },
+    {
+      "token": "DebilitatingPortent",
+      "source": "Native Fatigued, same donor as pinned CotW",
+      "guid": "e6f2fc5d73d88064583cb828801212f4"
+    }
+  ]
+}

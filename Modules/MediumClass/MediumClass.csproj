@@ -1,0 +1,215 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference>
+    <!--
+            Pins C# language features. Runtime features are limited by the .NET framework version, so some
+			features (e.g. Default Interfaces) are not available.
+		-->
+    <LangVersion>9.0</LangVersion>
+    <!-- Latest .NET version supported by Wrath / Unity -->
+    <TargetFramework>net472</TargetFramework>
+    <!-- Needed to use publicized assembly -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    
+    <AssemblyName>MediumClass</AssemblyName>
+    <RootNamespace>MediumClass</RootNamespace>
+    <Version>0.4.3</Version>
+    <AssemblyVersion>0.4.3.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <!-- Machine-specific paths are intentionally kept outside version control. -->
+  <PropertyGroup>
+    <ManagedPath Condition="'$(ManagedPath)' == ''">$(WrathPath)\Wrath_Data\Managed</ManagedPath>
+    <ModMenuPath Condition="'$(ModMenuPath)' == ''">$(WrathPath)\Mods\ModMenu</ModMenuPath>
+    <TTTCorePath Condition="'$(TTTCorePath)' == ''">$(WrathPath)\Mods\TabletopTweaks-Core</TTTCorePath>
+    <UMMPath Condition="'$(UMMPath)' == ''">$(ManagedPath)\UnityModManager</UMMPath>
+    <PublicizedDir>$(MSBuildProjectDirectory)\obj\publicized</PublicizedDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <!-- ILRepack 2.0.13 resolves references from its working directory.
+         Local build output may contain reference DLLs; StageMod uses an explicit allowlist. -->
+    <Reference><Private>true</Private></Reference>
+  </ItemDefinitionGroup>
+
+  <ItemGroup>
+    <Compile Remove="lib\**" />
+    <Compile Remove="tests\**" />
+    <EmbeddedResource Remove="lib\**" />
+    <EmbeddedResource Remove="tests\**" />
+    <None Remove="lib\**" />
+    <!-- Prevent test-only .NET 9 DLLs from entering reference resolution for Unity. -->
+    <None Remove="tests\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Strings\Trickster.json" />
+    <None Remove="Strings\Archmage.json" />
+    <None Remove="Strings\Champion.json" />
+    <None Remove="Strings\Guardian.json" />
+    <None Remove="Strings\Marshal.json" />
+    <None Remove="Strings\Medium.json" />
+    <None Remove="Strings\Feats.json" />
+    <None Remove="Strings\Settings.json" />
+    <None Remove="Strings\Hierophant.json" />
+    <None Remove="Strings\Prowler.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Strings\Trickster.json" />
+    <EmbeddedResource Include="Strings\Archmage.json" />
+    <EmbeddedResource Include="Strings\Champion.json" />
+    <EmbeddedResource Include="Strings\Guardian.json" />
+    <EmbeddedResource Include="Strings\Marshal.json" />
+    <EmbeddedResource Include="Strings\Medium.json" />
+    <EmbeddedResource Include="Strings\Hierophant.json" />
+    <EmbeddedResource Include="Strings\Feats.json" />
+    <EmbeddedResource Include="Strings\Settings.json" />
+    <EmbeddedResource Include="Strings\Prowler.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AssemblyPublicizer" Version="1.0.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="ILRepack.MSBuild.Task" Version="2.0.13" PrivateAssets="all" />
+    <PackageReference Include="WW-Blueprint-Core" Version="2.8.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Main Wrath Assembly, Publicized -->
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(PublicizedDir)\Assembly-CSharp.dll</HintPath>
+    </Reference>
+
+    <!-- Wrath Assemblies -->
+    <Reference Include="Assembly-CSharp-firstpass.dll">
+      <HintPath>$(ManagedPath)\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="ModMenu, Version=2.0.14.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(ModMenuPath)\ModMenu.dll</HintPath>
+      <!-- Use the explicitly supplied Unity-hosted dependency despite its desktop framework label. -->
+      <SpecificVersion>true</SpecificVersion>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(ManagedPath)\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Owlcat.Runtime.Core">
+      <HintPath>$(ManagedPath)\Owlcat.Runtime.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Owlcat.Runtime.UI">
+      <HintPath>$(ManagedPath)\Owlcat.Runtime.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Owlcat.Runtime.Validation">
+      <HintPath>$(ManagedPath)\Owlcat.Runtime.Validation.dll</HintPath>
+    </Reference>
+    <Reference Include="Owlcat.Runtime.Visual">
+      <HintPath>$(ManagedPath)\Owlcat.Runtime.Visual.dll</HintPath>
+    </Reference>
+    <Reference Include="TabletopTweaks-Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(TTTCorePath)\TabletopTweaks-Core.dll</HintPath>
+      <SpecificVersion>true</SpecificVersion>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedPath)\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedPath)\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(ManagedPath)\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+
+    <!-- Harmony comes only from the shared Directory.Build.props; UMM remains separate. -->
+    <Reference Include="UnityModManager, Version=0.32.4.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(UMMPath)\UnityModManager.dll</HintPath>
+      <SpecificVersion>true</SpecificVersion>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Strings\Medium.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Champion.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Trickster.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Marshal.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Hierophant.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Guardian.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="mediumclass_assets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Archmage.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Strings\Feats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Info.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="ValidateGameReferences" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="'$(WrathPath)' == ''" Text="Set WrathPath in MediumClass.local.props (copy the example first)." />
+    <Error Condition="!Exists('$(ManagedPath)\Assembly-CSharp.dll')" Text="Target game's Assembly-CSharp.dll is missing from $(ManagedPath)." />
+    <Error Condition="'%(Reference.HintPath)' != '' and '%(Reference.Identity)' != 'Assembly-CSharp' and !Exists('%(Reference.HintPath)')"
+           Text="Required reference is missing: %(Reference.HintPath). Check the local path configuration and install the target dependencies." />
+  </Target>
+
+  <!-- Always consult the installed game's DLL before resolving references.
+       The pinned task handles content hashes; keep its _public output for its cache. -->
+  <Target Name="Publicize" BeforeTargets="ResolveAssemblyReferences" DependsOnTargets="ValidateGameReferences"
+          Condition="'$(DesignTimeBuild)' != 'true'">
+    <MakeDir Directories="$(PublicizedDir)" />
+    <Delete Files="$(PublicizedDir)\Assembly-CSharp_public.hash"
+            Condition="!Exists('$(PublicizedDir)\Assembly-CSharp_public.dll')" />
+    <PublicizeTask InputAssemblies="$(ManagedPath)\Assembly-CSharp.dll" OutputDir="$(PublicizedDir)" />
+    <Error Condition="!Exists('$(PublicizedDir)\Assembly-CSharp_public.dll')" Text="AssemblyPublicizer did not generate the expected reference DLL." />
+    <Copy SourceFiles="$(PublicizedDir)\Assembly-CSharp_public.dll"
+          DestinationFiles="$(PublicizedDir)\Assembly-CSharp.dll" SkipUnchangedFiles="true" />
+  </Target>
+
+  <!-- Keep the compiler output intact. Merge into a separate staging directory. -->
+  <Target Name="StageMod" DependsOnTargets="Build">
+    <PropertyGroup>
+      <ModStageDir>$(MSBuildProjectDirectory)\artifacts\$(Configuration)\MediumClass</ModStageDir>
+      <ModMergeDir>$(MSBuildProjectDirectory)\obj\mod-merge\$(Configuration)</ModMergeDir>
+    </PropertyGroup>
+    <RemoveDir Directories="$(ModStageDir)" />
+    <MakeDir Directories="$(ModStageDir)" />
+    <!-- ILRepack may emit symbols/configuration alongside the DLL. Keep those outside the package. -->
+    <RemoveDir Directories="$(ModMergeDir)" />
+    <MakeDir Directories="$(ModMergeDir)" />
+    <Error Condition="!Exists('$(TargetDir)BlueprintCore.dll')" Text="BlueprintCore.dll is missing from build output." />
+    <ILRepack Condition="'$(MSBuildRuntimeType)' != 'Core'"
+              OutputType="Dll" MainAssembly="$(TargetPath)"
+              OutputAssembly="$(ModMergeDir)\MediumClass.dll"
+              InputAssemblies="$(TargetPath);$(TargetDir)BlueprintCore.dll"
+              WorkingDirectory="$(TargetDir)" />
+    <Exec Condition="'$(MSBuildRuntimeType)' == 'Core'"
+          Command="&quot;$(NuGetPackageRoot)ilrepack.msbuild.task\2.0.13\tools\ilrepack.exe&quot; /target:library /out:&quot;$(ModMergeDir)\MediumClass.dll&quot; &quot;$(TargetPath)&quot; &quot;$(TargetDir)BlueprintCore.dll&quot;"
+          WorkingDirectory="$(TargetDir)" />
+    <Copy SourceFiles="$(ModMergeDir)\MediumClass.dll;$(MSBuildProjectDirectory)\Info.json;$(MSBuildProjectDirectory)\mediumclass_assets;$(MSBuildProjectDirectory)\LICENSE-CotW.txt"
+          DestinationFolder="$(ModStageDir)" />
+  </Target>
+
+  <!-- Explicit opt-in only. A normal Build/Release build neither deploys nor zips. -->
+  <Target Name="PackageMod"><Error Text="Use the parent CotW build.ps1. Medium is now a bundled module, not a standalone UMM package." /></Target>
+  <Target Name="DeployMod"><Error Text="Install the combined CotW package manually after testing. Standalone Medium deployment is disabled." /></Target>
+</Project>

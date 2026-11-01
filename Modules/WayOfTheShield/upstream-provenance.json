@@ -1,0 +1,217 @@
+{
+  "files": [
+    {
+      "path": "CanUse2hWeaponAs1h_Mechanic.cs",
+      "sha256": "815171738BBE93279267D24F2A2F5947F286232524678A308D937389EA9C8BCF"
+    },
+    {
+      "path": "MechanicsFeatureExtension.cs",
+      "sha256": "CA8C433C3EBA8109ADB223CBA82C3EDC0828B59ECE2AA65B70C8CDCFC31D493C"
+    },
+    {
+      "path": "Tweaks and Changes/ProficiencyPatches.cs",
+      "sha256": "67233EC7AC73CBC3E94877470E32EECD97F06A19C237A93A53C6E8FD6ADE7E5E"
+    },
+    {
+      "path": "Tweaks and Changes/TWFShieldTweak.cs",
+      "sha256": "FC6E723FD09EC52138390B66E6C53C388938F066A1AEC6556BA965197B1AAD95"
+    },
+    {
+      "path": "Tweaks and Changes/BoringBucklerTweaks.cs",
+      "sha256": "BE21CE020B1E7E47BA3F5F4E3E9D1D36F754CF5524C88D3A4149A68AC574C00D"
+    },
+    {
+      "path": "Tweaks and Changes/ShieldBashAbilityTweak.cs",
+      "sha256": "44296B3064FB09EF414A31E79CE3E0D649FD6B52359C6E7A6B4663291C04DA02"
+    },
+    {
+      "path": "NewFeatsAndAbilities/UnhinderingShield.cs",
+      "sha256": "7A4059DAA63DBA2CD5E0A6566528FDA422DF14D867D88926418141B61341128A"
+    },
+    {
+      "path": "NewFeatsAndAbilities/ShieldBrace.cs",
+      "sha256": "C5CB3C2D6AEE7456DF1B9B979821218D48F6F843B38E42021B0470F0F1FDB7D8"
+    },
+    {
+      "path": "NewFeatsAndAbilities/UpsettingShieldStyle.cs",
+      "sha256": "10E32B55EB1D56AC75E2AAFA93747D5241E2DC7B82D91CE71E6674B1E65DECFD"
+    },
+    {
+      "path": "NewFeatsAndAbilities/ShieldedDefense.cs",
+      "sha256": "011A3B15B94A3C86788DAAD0D7128EB495F853EA53E87DAF6F19BE8DBB679E9A"
+    },
+    {
+      "path": "NewFeatsAndAbilities/Mythic_ShieldedDefense.cs",
+      "sha256": "3407B87AE5DAB7C1C6128F54B4AEF6B7C625343D128F8F8242CA9D6C623ACA97"
+    },
+    {
+      "path": "NewFeatsAndAbilities/Mythic_BucklerParry.cs",
+      "sha256": "349747C63D5DD4F922D6FC993EC915CB68A3A05B71AEDA005CB24DC55D2A3801"
+    },
+    {
+      "path": "NewFeatsAndAbilities/OneHandedToggle.cs",
+      "sha256": "EAC6D0846874CDA04F2AC3D4405FD89141963CEC08053F38DF220C83A519C5BB"
+    },
+    {
+      "path": "NewArchetypes/SacredShield.cs",
+      "sha256": "B34FE6AB29B5D087F756E61B41B5AED07764CEB0F06B08AA88758752D6B93167"
+    },
+    {
+      "path": "NewFeatsAndAbilities/SacredShieldFeatures/BastionOfGoodFeature.cs",
+      "sha256": "67930879076122384428BB5F09B65A1B57E3E1EA55FEBAD247F70B05FE2E766F"
+    },
+    {
+      "path": "NewFeatsAndAbilities/SacredShieldFeatures/HolyShield.cs",
+      "sha256": "F13D2164AABE064113453B86E879890210941406A9FE51E5F99924C45234A3C5"
+    },
+    {
+      "path": "NewFeatsAndAbilities/SacredShieldFeatures/SacredShieldBond.cs",
+      "sha256": "F90BB9E9C488096ADF9411F6C23A64D3031336C9E0E7FA947914F7A2A82ECBA8"
+    },
+    {
+      "path": "NewComponents/CouchedSpears.cs",
+      "sha256": "E8A9AC63717A30439D66646574246E9D3EC0F971FFE8FF18B8B1CD87F4C60E55"
+    },
+    {
+      "path": "NewComponents/OffHandParry.cs",
+      "sha256": "542672399682CE2FF35F51921BA9FFE4B82841D0AC5DDE32D22A8CD68BF4AA72"
+    },
+    {
+      "path": "NewComponents/AdditionalParriesComponent.cs",
+      "sha256": "974E01507B559E532746B5857AA6D9DA8CC0AF65946290AD6E194773901BECB6"
+    },
+    {
+      "path": "NewComponents/UpsettingShieldComponent.cs",
+      "sha256": "067CC831A6DCF11856FD6D275F4941AD84795E7E17F4BCD5B6117CB3A46BAD38"
+    },
+    {
+      "path": "NewComponents/AddInitiatorShieldBashTrigger.cs",
+      "sha256": "9C93EBC2C8948575F16461D6F7CE4A9C2C54660BC11EC070F55EEAE971C0AE9E"
+    },
+    {
+      "path": "NewComponents/AoOOnFarMiss.cs",
+      "sha256": "7E9E0023FEAA6126FF14121EF7CFEB57CAFCD9277A4906622F08F9B479E8DDD6"
+    },
+    {
+      "path": "NewComponents/BuffSetRanksOnApply.cs",
+      "sha256": "6ED83779FD2A74769B58BF03AF35D9E595C86316C28D77A4F0AD513A6EDE8412"
+    },
+    {
+      "path": "NewComponents/ShieldedDefenseAcBonus.cs",
+      "sha256": "4E0976F591F4B52C0E143418B30A0BB05F0BAB7C9D0CC20F2E850832D0EE71F6"
+    },
+    {
+      "path": "NewComponents/ShieldedDefensePropertyGetter.cs",
+      "sha256": "16A66E47A07912DE3E0E261DE06CACE117254649C60D595B6698259B289A11B0"
+    },
+    {
+      "path": "NewComponents/RestrictionOtherActivatables.cs",
+      "sha256": "798C87BF06931BA798438D0D333E9C53013B8F8F70641FAAB72C75E3AC75CD5D"
+    },
+    {
+      "path": "NewComponents/RestrictionMeleeWeapon.cs",
+      "sha256": "35007F804A77DDA95E6BC152836838468EE83C4BFB60B09D5648D37E1191D884"
+    },
+    {
+      "path": "NewComponents/DirectlyControlledUnlessFactRestriction.cs",
+      "sha256": "70E454AE98208CED50F738E30AB898639770129039099AE633E49C87BFFAFEAC"
+    },
+    {
+      "path": "NewComponents/ContextActionRemoveBuffRanksCustom.cs",
+      "sha256": "CBFBE13E49CED46FB7290E5E092813980DC3D55BC60BB11E14316723FB0C366A"
+    },
+    {
+      "path": "NewComponents/BuffDynamicDescriptionComponent_Base.cs",
+      "sha256": "50B256362D602BD5CE9E0BCDBDC14474889AC0ADFE43EB6242A3F5B29A564AE3"
+    },
+    {
+      "path": "NewComponents/BuffDynamicDecriptionComponent_Charges.cs",
+      "sha256": "58103579B2BF7DA9CDF9C967F92FD8457D1629A92BEAF1F8830A9EA0FE408B51"
+    },
+    {
+      "path": "NewComponents/BuffDynamicDescriptionComponent_Parries.cs",
+      "sha256": "F12BC8752C893D769D7740278D56FB2A36EB95AD97F2A58AC834EE51DBECC2B3"
+    },
+    {
+      "path": "NewComponents/BuffDynamicDescriptionComponent_Caster.cs",
+      "sha256": "733F0717B65B28EF9D6D34141952697DDB6AC199E223F3950AEC91A9C9666585"
+    },
+    {
+      "path": "NewComponents/RemoveBuffIfMaintargetIsMissing.cs",
+      "sha256": "BCE87DF76AFF83EBE93D8B17F66FFB708081BEB5B6C4F84DB6C1EB37EC636A78"
+    },
+    {
+      "path": "NewComponents/HalveDamageIfHasBuffFromCaster.cs",
+      "sha256": "8FE76873C03DCF6713757641F9C984459AA4398FF426AD024A6E211AF9BD5C85"
+    },
+    {
+      "path": "NewComponents/AddRegerationFromTarget.cs",
+      "sha256": "61BCADA8A3986471C8E1F0A6B0A43158D2A0224435E11A4609B590EE0DC565AC"
+    },
+    {
+      "path": "NewComponents/AuraFeatureComponentLadder.cs",
+      "sha256": "546A0CD19E748E26107A1C8FDB76AC5059476083720E4079F674185F0FC27FF2"
+    },
+    {
+      "path": "NewComponents/TotalShieldBonusGetter.cs",
+      "sha256": "3E0B1F3FBFC3C0D59F33403300F83EBBC8B2A093E0F552ED20C963EFC8AED05C"
+    },
+    {
+      "path": "NewComponents/ContextActionShieldGeneralEnchantPool.cs",
+      "sha256": "1C4372ED299EB04831AAA0BAF6C6AF8CE4BC8946EDA8C20885AF55F95348E60E"
+    },
+    {
+      "path": "NewComponents/ContextActionEnchantShield.cs",
+      "sha256": "5E4867DD565D05DA249F72575568EDCDBC8CC3818AF7BFE1F97C7108741F5E84"
+    },
+    {
+      "path": "NewComponents/ArrowCatchingEnchantment.cs",
+      "sha256": "306627B46049FF1593E4AE8AF28C5018BBCC41B35BE9D129FF5852A9D1516BA0"
+    },
+    {
+      "path": "NewComponents/AddFactsFromEnchantment.cs",
+      "sha256": "D726C0A0C8082205E8FD3A782737EF3D3B49BAB1B0D0170B750AB60610BE9EA9"
+    },
+    {
+      "path": "NewComponents/AbilityTargetEquippedWithShield.cs",
+      "sha256": "D1869EE2CCEB4D21990B4CA27170B9FF9B58D6677B918B1DD490164B8006DC6F"
+    },
+    {
+      "path": "NewComponents/ContectConditionAbilityIsSimpleProjectile.cs",
+      "sha256": "04DE1DA5DE0DD9C26FC7476CA85A18557D3DA87408670DD9F757CE639BCA0925"
+    },
+    {
+      "path": "NewComponents/AbilityDeliverTurnTo.cs",
+      "sha256": "35AEDCD0324964327F43E1DFEC36C0E919DB75E0A10DEECD5307645D96957188"
+    }
+  ],
+  "icons": [
+    "BastionOfGood",
+    "Buckler",
+    "Heavy",
+    "HolyShield",
+    "HolyShield_ArrowCatching",
+    "HolyShield_Bashing",
+    "HolyShield_Determination",
+    "HolyShield_Rallying",
+    "Icon_OneHandedToggle",
+    "Mythic_BucklerParry",
+    "Mythic_ShieldedDefense",
+    "SacredArmorEnchantFortification25Buff",
+    "SacredArmorEnchantFortification50Buff",
+    "SacredArmorEnchantFortification75Choice",
+    "SacredArmorEnchantSpellResistance13Buff",
+    "SacredArmorEnchantSpellResistance15Buff",
+    "SacredArmorEnchantSpellResistance17Buff",
+    "SacredArmorEnchantSpellResistance19Buff",
+    "SacredShieldBond",
+    "ShieldBrace",
+    "UnhinderingShield",
+    "UpsettingBucklerStyle",
+    "UpsettingStrike",
+    "UpsettingVengeance"
+  ],
+  "upstream": "https://github.com/ScaredKurufinve/Way-of-the-shield",
+  "commit": "5c0490f058f2163e3edfc9b13f007e1e9534f87c",
+  "licenseFound": false
+}

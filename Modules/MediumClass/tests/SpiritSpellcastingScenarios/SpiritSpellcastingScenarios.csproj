@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference>
+    <OutputType>Exe</OutputType>
+    <TestFramework Condition="'$(TestFramework)' == ''">net472</TestFramework>
+    <TargetFramework>$(TestFramework)</TargetFramework><LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <Optimize>false</Optimize>
+    <ProductionPatchesPath Condition="'$(ProductionPatchesPath)' == ''">../../Medium/MediumSpiritSpellbookPatches.cs</ProductionPatchesPath>
+    <IncludeActionBarPatch Condition="'$(IncludeActionBarPatch)' == ''">true</IncludeActionBarPatch>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.1" />
+    <Compile Include="$(ProductionPatchesPath)" Link="Production/MediumSpiritSpellbookPatches.cs" />
+    <Compile Include="../../Medium/MediumSpiritActionBarPatch.cs" Link="Production/MediumSpiritActionBarPatch.cs" Condition="'$(IncludeActionBarPatch)' == 'true'" />
+    <Compile Include="../../Medium/NewUnitParts/UnitPartMediumPreparedSpells.cs" Link="Production/UnitPartMediumPreparedSpells.cs" />
+    <Compile Include="../../Medium/SpiritSpellcastingMath.cs" Link="Production/SpiritSpellcastingMath.cs" />
+  </ItemGroup>
+</Project>

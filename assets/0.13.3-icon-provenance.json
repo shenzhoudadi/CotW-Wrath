@@ -1,0 +1,11 @@
+{
+  "cotwCommit": "1332fb0db844b7863f484ca978bea2349fe49769",
+  "icons": [
+    {
+      "token": "Metamixing",
+      "source": "CallOfTheWild/Icons/AbilityIcons/Metamixing.png",
+      "sha256": "B3BAFE177C8E815EF6F3F1F342AEAEA036D9D8972E8E5E1C0329C1F4A0FB4108",
+      "embeddedResource": "CotW.Metamixing.png"
+    }
+  ]
+}

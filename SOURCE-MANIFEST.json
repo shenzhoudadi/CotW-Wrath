@@ -1,0 +1,4432 @@
+{
+  "snapshot": "0.14.62 delivered source archive",
+  "sourceArchiveSHA256": "D9304B15CE719EE94AF066CB529F5C292773BAF7164BA5600430046E69498E02",
+  "createdAtUtc": "2026-11-01T02:29:54.428948+00:00",
+  "files": [
+    {
+      "path": "0.10.0测试说明.txt",
+      "sha256": "DE4752438D4DF670FADE68D26BC1DC4CEB2891B28B29AA63CF36E0B20F7500CE"
+    },
+    {
+      "path": "0.10.1测试说明.txt",
+      "sha256": "8986F4DF97B20B13372F4660957D2F009A77222E1C6F523C2C0B3E0B258A102B"
+    },
+    {
+      "path": "0.11.0测试说明.txt",
+      "sha256": "1301E8679656EEDCE4906653951524A53C49737E789976B2B87391933B6F5CBA"
+    },
+    {
+      "path": "0.11.1测试说明.txt",
+      "sha256": "EDA15A306B80EB8B15E0F3AEE5F5F062E970742724851EF3323E679B4F3CAD40"
+    },
+    {
+      "path": "0.12.0测试说明.txt",
+      "sha256": "46A561B814DCFC01CFD25E700E57A1581943269CF81991A063C77DC670FA4268"
+    },
+    {
+      "path": "0.12.1测试说明.txt",
+      "sha256": "9C6826BA100386AD3C107904D65A631A7F9F3D7A9B6312B5A0144AB76948A575"
+    },
+    {
+      "path": "0.12.2测试说明.txt",
+      "sha256": "D8A0EBB94C851430BF8FE6D0A7DDEFBF8D5CB61C9010895808BBA8F4568C52AD"
+    },
+    {
+      "path": "0.13.0测试说明.txt",
+      "sha256": "E846E36D7EEEB97F7AA6AAEDD2B575C2824AFBBA74C53AA98CE9BDA9EC4B754E"
+    },
+    {
+      "path": "0.13.10测试说明.txt",
+      "sha256": "55E005753391A8A85B85C1938B5A6E123B0DD9FC44DB39BA0376C02B41C6E783"
+    },
+    {
+      "path": "0.13.11测试说明.txt",
+      "sha256": "3532C88310A259C1F66BB0FB0E8DD135D64E744DA972B46BC07BA197A648E95C"
+    },
+    {
+      "path": "0.13.12测试说明.txt",
+      "sha256": "02B34A6C75B7BD48B86B5DDDCE1B8ED28BBDF2E1C6534F05627DDBE28C40BD77"
+    },
+    {
+      "path": "0.13.13测试说明.txt",
+      "sha256": "54B96013B8DB3A7502E5E7DB58B266CD9C8DD83113291EED9208EBA6B70A034A"
+    },
+    {
+      "path": "0.13.14测试说明.txt",
+      "sha256": "D143EF01961E4B4CE94827F4A11CCA0CAD8685751DA6DE8972275BD25FCE6F66"
+    },
+    {
+      "path": "0.13.15测试说明.txt",
+      "sha256": "CCF54FF2B71C6A6E94351B480D79973382E29EF2AD792A5027A3B87D7978C176"
+    },
+    {
+      "path": "0.13.16测试说明.txt",
+      "sha256": "9C7CA644550535D47BDC44CC9E1EE97F9B80B1990D1A0509EE38D27A334A8DCD"
+    },
+    {
+      "path": "0.13.17汇总测试说明.txt",
+      "sha256": "3748E536B38938F7B9697521BB61CE1F7D6E0275E95F15414AFB644841BB55A5"
+    },
+    {
+      "path": "0.13.18-0.13.20测试说明.txt",
+      "sha256": "4727AAC8B26BA01F3245178E9E3224F4D6ABBA976CC1DC7463F1B9D89807149C"
+    },
+    {
+      "path": "0.13.18测试说明.txt",
+      "sha256": "E360D6F0F562CA37DFFA3CF8DFFE827DDA0CFE435BDCABE04FA214A632B35524"
+    },
+    {
+      "path": "0.13.19测试说明.txt",
+      "sha256": "13017D31499A7635432426300B9B2BACBF0D3AB2A0796B87368CF541E8ED61FC"
+    },
+    {
+      "path": "0.13.1测试说明.txt",
+      "sha256": "09E908ED8F82F9F68A9DD11A786FCC82DE884632C18928E39BFF21795AD4665A"
+    },
+    {
+      "path": "0.13.21-0.13.24测试说明.txt",
+      "sha256": "7597F4F361CD479FBC4A0A1F829547C2A0C2B92DF3FD55F23A9B2CE52381216A"
+    },
+    {
+      "path": "0.13.21测试说明.txt",
+      "sha256": "ADDAEC48088B14531C33B9CAE6611B4ADA20C4142C5ABA7567DFAC7E79979E7C"
+    },
+    {
+      "path": "0.13.22测试说明.txt",
+      "sha256": "CA9CC5D3A8A2448B508A207F3C420FA50773EB681E580B0452FE834B9D41312A"
+    },
+    {
+      "path": "0.13.23测试说明.txt",
+      "sha256": "2CFF52FC32A918E4502C9E42D71754311E3F2D5E17E70B06C2E25E5D34112DCB"
+    },
+    {
+      "path": "0.13.25修复测试说明.txt",
+      "sha256": "9C88F4FB48918BE0CE39D71505FFA71BA73DD9F5FFE2D8FBA9EBE41112C273B2"
+    },
+    {
+      "path": "0.13.26修复测试说明.txt",
+      "sha256": "1CD7283D77E8500C5C10379BF4E7F95BCB3617B9E9BCCB651F5BF2A0F559A548"
+    },
+    {
+      "path": "0.13.27修复测试说明.txt",
+      "sha256": "B066961A98990F7253974F6CD921ADB001A7735FAD71A77CFE3EA9FAEF02B8AD"
+    },
+    {
+      "path": "0.13.28-0.13.31汇总测试说明.txt",
+      "sha256": "35861DB20606E75B463B61639CF29A83F5B26298BAFA46FC3D5D23DCE7241CC3"
+    },
+    {
+      "path": "0.13.28测试说明.txt",
+      "sha256": "D939D89E636B060CAF1ADFA4B1DD12ED04ABFB0F745B712580F8E221FDDF8B08"
+    },
+    {
+      "path": "0.13.29测试说明.txt",
+      "sha256": "2117B762798530ED742648833A802CC68F4D9AFC1B905921F0FAC5119EF68427"
+    },
+    {
+      "path": "0.13.2测试说明.txt",
+      "sha256": "15EB5E1CC24AC94356FB24021F6C6CBC1E6FAA99F14F52C5C23DEF36DFAA48D1"
+    },
+    {
+      "path": "0.13.30测试说明.txt",
+      "sha256": "4F06CA3EFAF4B31789E9272F702149DB640760999650E3CF4AE38A3D25625B3E"
+    },
+    {
+      "path": "0.13.31测试说明.txt",
+      "sha256": "8E760E11C1900C65F2630A9271EE4098052BF6E6C3FAC9EF2F4C76A7D2487D60"
+    },
+    {
+      "path": "0.13.32剩余根法术清单-已按用户记录更新.txt",
+      "sha256": "17A0105EBC1022EAF7F91544266ACEEB886FB8F30C5AAA2A77A463AC034E4161"
+    },
+    {
+      "path": "0.13.32剩余根法术清单.txt",
+      "sha256": "17A0105EBC1022EAF7F91544266ACEEB886FB8F30C5AAA2A77A463AC034E4161"
+    },
+    {
+      "path": "0.13.32修复测试说明.txt",
+      "sha256": "475DA10B804B63C04179439CC9F2F64774F8B374FBE51AAEC8BF83337658A6AE"
+    },
+    {
+      "path": "0.13.32已交付根法术清单-已按用户记录更新.txt",
+      "sha256": "40D568E74F371511ACDB750CDD7B2FDB2BA219B002C2C2B51675D4923BA8ED95"
+    },
+    {
+      "path": "0.13.33法术迁移定稿与后续路线.txt",
+      "sha256": "917829185A0E4589305D1E4A58CD45704141FE681CF0AC64286158113AB66DEF"
+    },
+    {
+      "path": "0.13.33修复测试说明.txt",
+      "sha256": "BEE8BCB8E95AA1B57EE93436ADE0049BBA1F5F7669597F8232C0A9B9182EE6AB"
+    },
+    {
+      "path": "0.13.34修复测试说明.txt",
+      "sha256": "2104FD2A3E5B33604300DFCBA0F8DBE93EDD7EE0FAAD970821568002D4DB319C"
+    },
+    {
+      "path": "0.13.35修复测试说明.txt",
+      "sha256": "E546A857F2B94449EC059692A6DB2A117D3EC00EAB56980E43D15D84E8FB6BE0"
+    },
+    {
+      "path": "0.13.3测试说明.txt",
+      "sha256": "F824618980968FB38F624224421F5DEA237C8E11106772C6A1A8F06BC7EF597F"
+    },
+    {
+      "path": "0.13.4测试说明.txt",
+      "sha256": "DA281ACC6236CD3632380477074A79D1E6E18695BF958235DAFDD5E99FA28050"
+    },
+    {
+      "path": "0.13.5测试说明.txt",
+      "sha256": "E556F969676FF28BBA648125DD838D50BE7037E08786477FBA55A9F050B99DB7"
+    },
+    {
+      "path": "0.13.6测试说明.txt",
+      "sha256": "03E27E2A4FB8652EE527A3423FE67395FDDDD2D38943434893F5D5F255FF6828"
+    },
+    {
+      "path": "0.13.7测试说明.txt",
+      "sha256": "A3849EF54A02192E05FE717F5F3BE056916D615ABC900BEA2CE0113418EB6B12"
+    },
+    {
+      "path": "0.13.8测试说明.txt",
+      "sha256": "DDC5EF2AA87EEA68C56667CFD64B6F3E78CF911F1E81DFB8FE4965CA4A6423F9"
+    },
+    {
+      "path": "0.13.9测试说明.txt",
+      "sha256": "FF03D700A6B7459BB720EA9255D3F9A78EE69D5882E46EDA590F767BE1CD6EAA"
+    },
+    {
+      "path": "0.14.0专长与蓝色灵体测试说明.txt",
+      "sha256": "3D5E6B6858FAB56FA2038BAE35C196777F841902F2CA7F3D932A6369F50C6FF1"
+    },
+    {
+      "path": "0.14.10盾牌回归与野性变身专长测试说明.txt",
+      "sha256": "2D3BA7F5739C4117FECDA2C6A1AB70733BB252BE29667C11CED937E89F35CCBB"
+    },
+    {
+      "path": "0.14.11变形修复与协作专长测试说明.txt",
+      "sha256": "46F3C5984CD0D0EFF584470A7E399FFEE0F37239549B1BDBA02B2DDAA40A02A3"
+    },
+    {
+      "path": "0.14.12附魔与灵体协作修复测试说明.txt",
+      "sha256": "B952108C86C3A77C0B1C2418B7DB16542A9E5B9222D1712FBA669BCA62CDA48A"
+    },
+    {
+      "path": "0.14.13徒手灵体修复与新专长测试说明.txt",
+      "sha256": "7714DD3E915BBE6B024C085BF52AD1470103F5967F29C39BDABE9D9B7A6C0AFA"
+    },
+    {
+      "path": "0.14.14共享施法与诱敌修复测试说明.txt",
+      "sha256": "02DE43A3421BBDD06855C0591B1E272CA3C29B2B9B1A3D1CF9A2C5A125FC1F98"
+    },
+    {
+      "path": "0.14.15移动性能与远程反应修复测试说明.txt",
+      "sha256": "BD506AD2EB87DE12C7344B6C55A5F24D9C6858C02F4467CA8A3318173EA8587F"
+    },
+    {
+      "path": "0.14.16新专长第1批测试说明.txt",
+      "sha256": "293AE47D6E23D4206B7C2C2DE5EEA7B8700CA3051E3535936EFB2F5FD823D716"
+    },
+    {
+      "path": "0.14.17新专长第2批测试说明.txt",
+      "sha256": "CCD47445FDDF352037C0A45E283B43A91EAE272339481C5A107C529845D26D6C"
+    },
+    {
+      "path": "0.14.18升级与菜单紧急修复测试说明.txt",
+      "sha256": "EFC91E4F6E8D32063BD737599FDDC6AA1A13321735E563E756C6AAF4E7354BA4"
+    },
+    {
+      "path": "0.14.19反馈修复与新专长第3批测试说明.txt",
+      "sha256": "F2F012448958EAFFFA6010586E0BC33B7ADF2AD6B3895C0660C63AC55F061325"
+    },
+    {
+      "path": "0.14.1专长与目标动作修复测试说明.txt",
+      "sha256": "C9F0F6C19DCEF1F1BC02336D584D41BA80B051AC342E19619E5FB93F1139F192"
+    },
+    {
+      "path": "0.14.20兼容与参数显示修复测试说明.txt",
+      "sha256": "D49AA4AAD5C47C4CE6929F2ACC4717D78865E2A8B86817E44F2200564083FA15"
+    },
+    {
+      "path": "0.14.21-spell-links.json",
+      "sha256": "1F57F83E074357DC1B340F7F0298C2169CE7F73483C8D2D444711DF7045BE602"
+    },
+    {
+      "path": "0.14.21法术表修复与单专长测试说明.txt",
+      "sha256": "AD984FDD8DB4F571429D4EFC1621D54458AD9E53A20857AAD244D6A93089E9F6"
+    },
+    {
+      "path": "0.14.22启动兼容紧急修复测试说明.txt",
+      "sha256": "FEDD8F8666175F2BD99EE3F3407838AC5A00B83FAD8F8B37EB77767BAC8660E8"
+    },
+    {
+      "path": "0.14.23法术表结构兼容修复测试说明.txt",
+      "sha256": "B15554729D414BA808D8EE6FB4B3057AD4DD65068609A24A49732B587DA60F98"
+    },
+    {
+      "path": "0.14.24单专长测试说明.txt",
+      "sha256": "D1228955318D387A546F4BF634ECCBBC14F277FB3C2A6E7DDC97ABC9FA86B96D"
+    },
+    {
+      "path": "0.14.25进阶杀戮者天赋测试说明.txt",
+      "sha256": "76ADC4A44CFB45C9EAC9726E46F39D02053D7A20314ED3A4573BB9BE0F6C7646"
+    },
+    {
+      "path": "0.14.26前置增强与五项移植测试说明.txt",
+      "sha256": "A843D68A9751441BEDC7B9DF68C71618AC89C018790E8F28CFE0EADF9C2F08C4"
+    },
+    {
+      "path": "0.14.27嚎叫修复与五项真气能力测试说明.txt",
+      "sha256": "D81AE4C0FDA2636640C06881456AB6F95DCE642222DEBE615FBB8D126F98F519"
+    },
+    {
+      "path": "0.14.28嚎叫反馈与五项职业选项测试说明.txt",
+      "sha256": "F469CA53E5DB712B254B08A8C2783898EFF03F802281BC4C233418E795AF277F"
+    },
+    {
+      "path": "0.14.29嚎叫清理与五项移植测试说明.txt",
+      "sha256": "77DE4924911912F650F0A82EF11E5082C6C6B44EB4F65191A1AACF9E65DDA4AC"
+    },
+    {
+      "path": "0.14.2专长反馈修复测试说明.txt",
+      "sha256": "28587CF732614876B372D0E854695579A62DD95CC5D349307296D8DC0187EF4E"
+    },
+    {
+      "path": "0.14.3-0.14.5汇总测试说明.txt",
+      "sha256": "04C0329AEBE9ACA56AA93E02D57F7A5A28E969E1EC14A4E9717306EF0874C357"
+    },
+    {
+      "path": "0.14.30四项生命周期修正测试说明.txt",
+      "sha256": "D6B2D3AFF96091291BF9E2F217EEE6C9C3C4173A991C304796CA1929E0121EEB"
+    },
+    {
+      "path": "0.14.31五项移植测试说明.txt",
+      "sha256": "05FEA0679DC0AFED9A2808633D8B4AF7CFC7798CD31E06B811E843BC62A0D2E7"
+    },
+    {
+      "path": "0.14.32注册与资源修复测试说明.txt",
+      "sha256": "45FE81493F71B1BDE798E458C674F2B1BEBD277D9A9195006254A8B185880FF4"
+    },
+    {
+      "path": "0.14.33五项移植测试说明.txt",
+      "sha256": "A30825612C39B683F83DE8D880D2A0A2539955D3772CC990B352D608A4151138"
+    },
+    {
+      "path": "0.14.34五项移植测试说明.txt",
+      "sha256": "FA95902C3E925D1EE5EA8AFA1840A5A6ADD21CCCA60CD3F63864F52BDB22D035"
+    },
+    {
+      "path": "0.14.35五项移植测试说明.txt",
+      "sha256": "FD2445A805F4013615A57AB91E3A9D19783EB468D328E938271001FA4E84A4FC"
+    },
+    {
+      "path": "0.14.36选择入口与杰作可知修复测试说明.txt",
+      "sha256": "1FE7A920F7C6D44CCC4C7FCD7CD9AB6498891901288EA2B482020B6807C6F95F"
+    },
+    {
+      "path": "0.14.37两项职业选项移植测试说明.txt",
+      "sha256": "1AFA53AC5812073DEB563FE504179E593D097213C9379856A4ECA56DC9785572"
+    },
+    {
+      "path": "0.14.38时间凝滞与奥术发现修复测试说明.txt",
+      "sha256": "197666FD1A6F044C25129E288280693BA8A09C7C899EF81A4FD68FD6F57FA87F"
+    },
+    {
+      "path": "0.14.39伤害减免防御之力测试说明.txt",
+      "sha256": "DF5CB998B83B50D883D48CAD16ADC7B876E5F94C0D180DC5FF6E56ED30EA386D"
+    },
+    {
+      "path": "0.14.3训练与奥秘测试说明.txt",
+      "sha256": "2C05F12763FFB2FA167A89CC3EE521A53CAE0C71214495277542EE67CAEEC041"
+    },
+    {
+      "path": "0.14.40伤害减免与UMM兼容修复测试说明.txt",
+      "sha256": "47B8A60CFEC7F221D976BAF37BECD8C80DB8E01176D47BAB69DD367ABA4F0258"
+    },
+    {
+      "path": "0.14.41战鼓师测试说明.txt",
+      "sha256": "5C167F33C0CB0D2BB8C4BDC866F337811C7678E52CBA264C05EE94B56F078844"
+    },
+    {
+      "path": "0.14.42存档加载紧急修复测试说明.txt",
+      "sha256": "254A78B719EF6DAA0BC7F84D1B9870F148190E908E35C258654D381A55E22FFE"
+    },
+    {
+      "path": "0.14.42都市歌者修复测试说明.txt",
+      "sha256": "DD18867FACF8506DEF029743531B3D059645D840231B1BB2B7A50ACB43BD4222"
+    },
+    {
+      "path": "0.14.43启动注册修复与职业变体测试说明.txt",
+      "sha256": "1F7DD3CE13BB0EDF5EF6640889CF2DF624F3FE7A8C3C1CD130C7EF9E907D4A3D"
+    },
+    {
+      "path": "0.14.43属性图标与乡野女巫测试说明.txt",
+      "sha256": "2C6463164953AB0926042DDEF53AB52BEBB73E128940D9EDB9D4EF8335F172BB"
+    },
+    {
+      "path": "0.14.44三项职业变体测试说明.txt",
+      "sha256": "388D50B866345CD927AC025CE3B4E63753F7E2C1B7ADE0AF4EBDA28533BEFFCF"
+    },
+    {
+      "path": "0.14.45五项职业变体测试说明.txt",
+      "sha256": "D384D1E57CCC22D0DF04FB42F6DECF4486B19B4D6576BABAB4F15FCDCD93FC1D"
+    },
+    {
+      "path": "0.14.46血脉与Admixture测试说明.txt",
+      "sha256": "DFF7F5FA997288D98DD5D996516B23EAC56F901FA3F38E74E3EACB3DF2D6FEC7"
+    },
+    {
+      "path": "0.14.47施法修复与五项CotW内容测试说明.txt",
+      "sha256": "0B5E4FBFC9E01AA168DABAEEA8027713E8B07D5C44EF347DD3E6671CDC964C59"
+    },
+    {
+      "path": "0.14.48目标与血脉及视觉反馈修复测试说明.txt",
+      "sha256": "95054B6172F8C52EB60AA68C28EE168E6CA9E406A89A52E64C18ED5AC90694E3"
+    },
+    {
+      "path": "0.14.49血脉兼容与重复能力移除测试说明.txt",
+      "sha256": "2C503EEE03C3A92E9121A460F99BE4FBC0C35219FE61925115F14A5CCD9DD564"
+    },
+    {
+      "path": "0.14.4施法资源专长测试说明.txt",
+      "sha256": "987F1EC63497152BB8CDB35836284BA6ACF76A386056D831E4929BF185D130F6"
+    },
+    {
+      "path": "0.14.50植物目标与血脉选项修复测试说明.txt",
+      "sha256": "E530E7C5844283D712F8F27CD3295782CB445DEE13F558978D16FB1FDD793095"
+    },
+    {
+      "path": "0.14.51血脉入口与能力交换修复测试说明.txt",
+      "sha256": "D083CC4411768E235150DF782C3662BBC3FDADF01454DBEB0F18A193EE9DA303"
+    },
+    {
+      "path": "0.14.52术士血脉实际菜单修复测试说明.txt",
+      "sha256": "CB85D7D60795D840CE573D16A11A023968CA4457113EF1A3922F671A322B39A2"
+    },
+    {
+      "path": "0.14.53血脉变异启动兼容修复测试说明.txt",
+      "sha256": "B01A1AE3FAA869F498F9ABBE25201B08FC3503BD54205EB9D16324A190F428C8"
+    },
+    {
+      "path": "0.14.54心刃与盾法师及鞭飓风测试说明.txt",
+      "sha256": "307E776A7069CC7DB39C2E5E8789F869E479EAD29483F7916336C1B761E28FCC"
+    },
+    {
+      "path": "0.14.55心刃与盾法师反馈修复测试说明.txt",
+      "sha256": "DCF4026FA14754F705472B6DDD70BD319390BC039D280C3E7AAFE87A0E983D15"
+    },
+    {
+      "path": "0.14.56盾法师施法战斗调整测试说明.txt",
+      "sha256": "66904E39E78EFE6AAD8AC280410D1F06CCED0A6FC95EA7EF77AE999F9A26072E"
+    },
+    {
+      "path": "0.14.57两项心灵变体测试说明.txt",
+      "sha256": "19AF36E8F9702BBD74BEB10381F6B74672C1221B67D832891EF02D28888FA3A7"
+    },
+    {
+      "path": "0.14.58异能者本体补齐与突变修复测试说明.txt",
+      "sha256": "17E44A9D16961F81681F050AF59254F1C0464BED11E6AC834E6FBBA88C996B56"
+    },
+    {
+      "path": "0.14.59异能者登记与次数触及修复测试说明.txt",
+      "sha256": "B4772700E3F7A74C7DDE8EE609540489DADFEC139CF50D373EBAEFDC7C5BA8F4"
+    },
+    {
+      "path": "0.14.5信仰武器专长测试说明.txt",
+      "sha256": "0A834963F87E1038359D2B40056CF341C487A8372B25CBEB15C46CADDDE53A76"
+    },
+    {
+      "path": "0.14.60异能者反馈修复与QL文本测试说明.txt",
+      "sha256": "11DF62415B7DA7C621DF7744A56111400D5064710418DD00391ADB90653B35DD"
+    },
+    {
+      "path": "0.14.61异能者菜单与猎人变体测试说明.txt",
+      "sha256": "B928EE6C3109F9BA1B7AF01C234AC2F0D91C889B68A41B0483490AB80DC57F2D"
+    },
+    {
+      "path": "0.14.62PsychicFeedback-test-guide.txt",
+      "sha256": "BD9B57A78E1E2049EBD52F65BD2DC8F0F422E52E93B4F05AB725E49E31D75950"
+    },
+    {
+      "path": "0.14.6专长反馈修复测试说明.txt",
+      "sha256": "8272340C1F36AE7354C3ECEE50FCE3A02AA406317A1543BBE2F0AFBC3D0E98FF"
+    },
+    {
+      "path": "0.14.7战斗专长列表修复测试说明.txt",
+      "sha256": "5E60A78851FC0D95355AC98C259A40A9F6DC2A16C5332D0BE777E9952DB65682"
+    },
+    {
+      "path": "0.14.8属性选择与召唤武器修复测试说明.txt",
+      "sha256": "654577B1F9549E0E4C2EEA9D67A5B9FCE8E91273E2DDF915802639B5E4742471"
+    },
+    {
+      "path": "0.14.9盾牌反馈修复测试说明.txt",
+      "sha256": "0D7A3DD991FC912D970A989BF6FC8DECC56CA95A59C4D87C621D1761DCA0093F"
+    },
+    {
+      "path": "0.14.9盾牌整合测试说明.txt",
+      "sha256": "E01E558AF979F41810320159C2E4C09B2B19AE761D458099001B324FAB20A5A1"
+    },
+    {
+      "path": "0.2.1测试说明.txt",
+      "sha256": "53D00BCA7A6941B22E5FAFD4083809F5532FE04BD27CDE3B0716EB77D0BC1772"
+    },
+    {
+      "path": "0.3.0测试说明.txt",
+      "sha256": "B4B9F3A729B3EFE89E186ABEBCB668E5BBE6C4C63CB5EFB14484AEA9737FCE5E"
+    },
+    {
+      "path": "0.3.1测试说明.txt",
+      "sha256": "63E0AA0294A9BBF35DA8BBC65D3F97B9525076C933D6DCB781DCDD4F8D891AFC"
+    },
+    {
+      "path": "0.3.3测试说明.txt",
+      "sha256": "51C0C88C716FA5677B1F1D23401C418D152AAD9070FA90C3D2D1EC07AD72447A"
+    },
+    {
+      "path": "0.3.4测试说明.txt",
+      "sha256": "575F29F1F583681A064F499536A13E0756EF0292EA40C838D079392F7EF6178C"
+    },
+    {
+      "path": "0.4.0测试说明.txt",
+      "sha256": "5EE4E1F61987523D104E1EA9E196BC65CDE76FC607A5F834F82410DA29E74C5F"
+    },
+    {
+      "path": "0.4.1测试说明.txt",
+      "sha256": "BB1E0B2EF0B96374D883DB1C6B513877006DA10DE5AC2AD3C8559C90A212BE43"
+    },
+    {
+      "path": "0.5.0测试说明.txt",
+      "sha256": "4D3B0492BF205C98F67DFC692F5D01A8D5571EC48E2BB5235103C74F6378E6CC"
+    },
+    {
+      "path": "0.5.1测试说明.txt",
+      "sha256": "29654C1FBFAA2389C2F291B0B0D6CEA5A5F6CD29D9874BCBC1C01B92D11E315E"
+    },
+    {
+      "path": "0.6.0测试说明.txt",
+      "sha256": "1C67B63D10D65105E18A467DCD2F03EF1E2564FE602C904E14E844CE98C98E1E"
+    },
+    {
+      "path": "0.6.1启动修复测试说明.txt",
+      "sha256": "DD0AAE970E25EB364D51E53B05D9192438078F4E9F6E9E4DBD68602EDB511539"
+    },
+    {
+      "path": "0.6.2修复测试说明.txt",
+      "sha256": "3C7BF25CA6495B29AF15881A3494CB43741FA3093A1BC737E90E32E318A581D1"
+    },
+    {
+      "path": "0.6.3修复测试说明.txt",
+      "sha256": "03244D61376CAE1F64F4D813F0F35269C105BB930AF760F63D076D56F9096EB3"
+    },
+    {
+      "path": "0.6.4修复测试说明.txt",
+      "sha256": "B0B0061884C45068A8CA3EA513ADC651DF87D809C66676332CD6AA653E0128A3"
+    },
+    {
+      "path": "0.6.5修复测试说明.txt",
+      "sha256": "0CAD78505455787598FAC9679F1F944ADD9291905B5EDD8C8D552F081DAEF49B"
+    },
+    {
+      "path": "0.7.0-spell-links.json",
+      "sha256": "6E8A8DC529E855F8C2618A8F7E28BA180C63BA97BA0DAF2C2BF280CF847EF4CB"
+    },
+    {
+      "path": "0.7.0测试说明.txt",
+      "sha256": "7D438E06C83EFA51E09B865249A3F5FFE59B3C72A4FF0F723F536BD91F4E2025"
+    },
+    {
+      "path": "0.7.1修复测试说明.txt",
+      "sha256": "7764C6E0DEA0A5CB73D6564AA5AE5A858CFA6CAAE3BBCDB557D29FA1D2BDC351"
+    },
+    {
+      "path": "0.7.2合并测试说明.txt",
+      "sha256": "1CB49BF3A5A5718DD5E709D8DCDADFC5BA32066066D459112A88D967B62A4EFC"
+    },
+    {
+      "path": "0.8.0合并测试说明.txt",
+      "sha256": "82A3C9EF67A9C766AC753835C8ECDF31D2CE5ED179FE4544CB8577A4C0B1DEDC"
+    },
+    {
+      "path": "0.9.0测试说明.txt",
+      "sha256": "217E91F53C57DA63214FEC87541DBE899B3318FF84A90FEBBDD194239E8223D1"
+    },
+    {
+      "path": "0.9.1修复与诊断说明.txt",
+      "sha256": "EA5EA5CEDF15A2E40B5D77114F5FC394C14CCC57872674A61D04C7B2C8999E4D"
+    },
+    {
+      "path": "0.9.2测试说明.txt",
+      "sha256": "D2E330FDABF18005AF6F10D6E328D3A16D656317DCD9765ED4D98AF0E8F56750"
+    },
+    {
+      "path": "0.9.3测试说明.txt",
+      "sha256": "1976637E9AF2BA11C2D85519354FE4FC2C8A52C71BBD93F9D63B2CFBD35E0578"
+    },
+    {
+      "path": "0.9.4修复与诊断说明.txt",
+      "sha256": "576AF77DF66C6E78192311274FFD5A88D7A2A9E6C6785E7172EE28887A895306"
+    },
+    {
+      "path": "0.9.5修复测试说明.txt",
+      "sha256": "FF1DA4C3ECD928EDD79C1ED0AA96DF19162786629A1A4AB676A87C09B077B7ED"
+    },
+    {
+      "path": "百宝袋快速测试.txt",
+      "sha256": "BE7E962D68F967AF3C594396D236AF6D530695F84FFEC7191092E8F6F0CF2991"
+    },
+    {
+      "path": "测试者必读.txt",
+      "sha256": "A1BAC646C923B1CB8BE589A9112CE2B4E12906CFB1BA788AAEB35FF9B52B48BE"
+    },
+    {
+      "path": "交付自检流程.md",
+      "sha256": "DA1F36CA5C7DE970CE0193757C84EF7F3820D6CA3C47CA83E89AB8DB0EF4572D"
+    },
+    {
+      "path": "assets/0.13.0-icon-provenance.json",
+      "sha256": "C035B6DFB801066B4A569AD7075F22AA0D6EA471A91C356A7EC1308B3F597E8A"
+    },
+    {
+      "path": "assets/0.13.1-icon-provenance.json",
+      "sha256": "6C4619031E9DEC9A6FC5BE9E46CF42E5A9F8E3DCBA441A4B70C276725E25458B"
+    },
+    {
+      "path": "assets/0.13.2-icon-provenance.json",
+      "sha256": "DED8E461128FAB463C8A3DC44D06A06ED58FBDB24BFBEB31D555390E615A19A4"
+    },
+    {
+      "path": "assets/0.13.3-icon-provenance.json",
+      "sha256": "1813886F7C0FA596A95D8AAFBECA7EFBBB4E380D20F88E767F30802F33680DD5"
+    },
+    {
+      "path": "assets/0.13.4-icon-provenance.json",
+      "sha256": "740C92E9F61DAE33FC3B1719DA40398CB7D37DA154698B89210CD1C8B1D8074F"
+    },
+    {
+      "path": "assets/ArtfulDodge.png",
+      "sha256": "B435E525D3D22F260021A91955D012FB31F4D72358FC952ECFF58C83EC2BD0BF"
+    },
+    {
+      "path": "assets/AuraOfDoom.png",
+      "sha256": "8FAEEA1175C45E63F28D0EE85591D63A22FBF140438CDDEFDB654C82DD52202D"
+    },
+    {
+      "path": "assets/BloodArmor.png",
+      "sha256": "0B8BEE9BD9D47A502D9551CCB6AB7B9AB9C5B4FABC83BFE0A7CC6C4F470D7FB9"
+    },
+    {
+      "path": "assets/BondedMind.png",
+      "sha256": "37DE578D68385AADD11504F87620CEF90DA036545EA6D69BC05793B8CC5557C5"
+    },
+    {
+      "path": "assets/BowSpirit.png",
+      "sha256": "7C0E4C7C121D5246A24703AD8B64C41602532CC794ADC8A190C5DD193FE22302"
+    },
+    {
+      "path": "assets/BrokenWingGambit.png",
+      "sha256": "0EF2612BD042DFF503A0560E27A34172FB3000D23559887924EAEDF683D56871"
+    },
+    {
+      "path": "assets/ChannelCorruption.png",
+      "sha256": "4E0BF10A9D3C545C9CE95F3A88A1C5A0776493A799184BCA4C03D8F29DE357B2"
+    },
+    {
+      "path": "assets/ControlUndead.png",
+      "sha256": "364B1644C65121FF4527449D89C8AFC6631D1852C9FD8D1526336306DC7FA0AD"
+    },
+    {
+      "path": "assets/DivideMind.png",
+      "sha256": "660AF3BD0D3332F2727DCA2E71466E06A5BDE86F7F3BC61220C556E1B8023CA9"
+    },
+    {
+      "path": "assets/ElongatedFingers-LICENSE.txt",
+      "sha256": "0C2409CB58D82333B94047E585216BACC19FD9B6E1EAF331F6234E8D56C8A866"
+    },
+    {
+      "path": "assets/ElongatedFingers.png",
+      "sha256": "F8A8602ABD1E8DB640333C7CE391BD7A6FB0ED56C51040DAAAEAF72463B4DFA2"
+    },
+    {
+      "path": "assets/FeintingFlurry.png",
+      "sha256": "3EA606C8A9272F5257E165D7934BEAD940E3C6F99FE594B905C52D5A971D6814"
+    },
+    {
+      "path": "assets/FeralGrace.png",
+      "sha256": "4547BFC322A16FC56D8842E95DC90C4873135B42900A2A2BFD57AF56E739EB29"
+    },
+    {
+      "path": "assets/FlameArrow.png",
+      "sha256": "95FC78B41AF0B27E748DA8172F8F59BCEA83362FDDA667DF6F9EEA50FF255F21"
+    },
+    {
+      "path": "assets/Fly.png",
+      "sha256": "5B5683ABAE4AC8D1147CD746BAA3B0ED55FB0EF9663E60780AB75CA72E00926E"
+    },
+    {
+      "path": "assets/FogCloud.png",
+      "sha256": "0A3C036E596889ADAED3C53A43930E2EFB88626D3EE76621DC643EA33635A50C"
+    },
+    {
+      "path": "assets/FontOfSpiritMagic.png",
+      "sha256": "B63C12EA0702530A1D82F8F4C0043F3D40E7C4D8779839B9BF40814996FFCBDD"
+    },
+    {
+      "path": "assets/ForcefulStrike.png",
+      "sha256": "88457E719A7F7304F2E8582A25C12A9059AE8E98441A2366F5650EA8EA54782B"
+    },
+    {
+      "path": "assets/ForceSword.png",
+      "sha256": "ED85CC692F1584A2B2C6207C93E705F8AD08DA67EC61B90830374B6A75133C9B"
+    },
+    {
+      "path": "assets/GhostbaneDirge.png",
+      "sha256": "4FA0012615EB08A81112EE502755774C5FC08CA5243CE384F94BB1FBCF5314DF"
+    },
+    {
+      "path": "assets/HaltUndead.png",
+      "sha256": "0B46F6B0B896DF8EC5D742966EFA2F1823C31C978FBD203E417D20FF3C0C4B3B"
+    },
+    {
+      "path": "assets/HolyWaterJet.png",
+      "sha256": "D451C7BDD963ABF14FBA0FB72B024D0CBF902834D749959A2311FE4C907A513D"
+    },
+    {
+      "path": "assets/HowlingAgony.png",
+      "sha256": "7D581DF79DBCF7025B55D0C268FD416A57D31F15515052377C243DE55B177CB3"
+    },
+    {
+      "path": "assets/HWAnarchic.png",
+      "sha256": "4F47563C9105FE15B8510363B3374F27BE4394A8A902A3BA25BD5EA5BA95E060"
+    },
+    {
+      "path": "assets/HWCruel.png",
+      "sha256": "DB8BF379F2292A6650921E144CD1AEB7F41534B768FE7F6AB164C8F19655597D"
+    },
+    {
+      "path": "assets/HWUnholy.png",
+      "sha256": "C9F5081B3FC432A34EA592253A138C353F229A5946FBE2C9D2DC1947DB898C84"
+    },
+    {
+      "path": "assets/HWVicious.png",
+      "sha256": "CA2C3BC64C874062A1BEE069761D60F4CBFF01716A05B9F8EC6E72E1E88F43C0"
+    },
+    {
+      "path": "assets/IntensifiedSpell.png",
+      "sha256": "1D522811639A4177E3816F938AA2206E2508DAB83FD05E56945AC68E45300395"
+    },
+    {
+      "path": "assets/Invigorate.png",
+      "sha256": "1AF20E02FAAE1E6F27A63B071025B7F4D8AE692CDECA6EF2A1D09E2887288F94"
+    },
+    {
+      "path": "assets/IrresistibleDance.png",
+      "sha256": "E60801F5ECBE37C9EF12BD7F7A0B1C417C785C28148BCA264BB2FFC6EBC6E393"
+    },
+    {
+      "path": "assets/LinnormStyle.png",
+      "sha256": "E96B13AEE6AB7CC0313E92F0F0D36D53F0384465306487579176F5C22D076C66"
+    },
+    {
+      "path": "assets/LinnormVengeance.png",
+      "sha256": "2383F2126F8363FEC176032A7C579F74FFF94CEF283085A2460EACB95BE82D22"
+    },
+    {
+      "path": "assets/LinnormWrath.png",
+      "sha256": "1F5437F5CC098663CEF4C42A9D6284B3AB3D9A87637322F68DDCA00F829420FE"
+    },
+    {
+      "path": "assets/LocateWeakness.png",
+      "sha256": "F56F5ABDA1DCAA7CA291AAB5CDB4D39D7FF3E00E5054E0B7622100DB1F666218"
+    },
+    {
+      "path": "assets/MagesSword.png",
+      "sha256": "C839B7CA18CFEB24512C4B965E389534A4A3BBF96E2307B3A0F6980A83B7515F"
+    },
+    {
+      "path": "assets/Metamixing.png",
+      "sha256": "B3BAFE177C8E815EF6F3F1F342AEAEA036D9D8972E8E5E1C0329C1F4A0FB4108"
+    },
+    {
+      "path": "assets/OsyluthGuile.png",
+      "sha256": "BCDFE1AD9DBCEBA123BE1D444146C4B3C2FEA2E80BF267B7508E2225F9D38C43"
+    },
+    {
+      "path": "assets/PathOfGlory.png",
+      "sha256": "9A69948FC4920D5482DDE0A5DD090B48C4381A0349A541814A3872EC81519BE4"
+    },
+    {
+      "path": "assets/PiercingSpell.png",
+      "sha256": "D4B94B4BCEE1C720301602F198F268B43A2476712A0082018663619CE8AEBEAB"
+    },
+    {
+      "path": "assets/README.md",
+      "sha256": "E3DCD5FC8339FE6D0BC5D2D4C723B783F81EE628E4BD3C78C1951F7E1FC580DD"
+    },
+    {
+      "path": "assets/Rebuke.png",
+      "sha256": "CC4DF148C7B1E453AAEB9D9EF359E71B91E4053B0D0B29D4E672D4E08D9D5F0B"
+    },
+    {
+      "path": "assets/RighteousVigor.png",
+      "sha256": "FEC18B7B73B19D0770F51A5F1BA5A0C59087AE95C8998E5F1D03899A27A99391"
+    },
+    {
+      "path": "assets/SavageMaw.png",
+      "sha256": "50803E9BA8C7E6B16184D7CF5CBC22521B85ABA2453460E21F1738ED048BC4E5"
+    },
+    {
+      "path": "assets/ShareSpells.png",
+      "sha256": "4975D8D74F808D03EB17131871FC822AEA6164E93202643A4299AB5E66C6CDE6"
+    },
+    {
+      "path": "assets/Silence.png",
+      "sha256": "3738D929156450373A1CCC239C3550DA8782621CA4ECE916BFD9D6FF0B7844BA"
+    },
+    {
+      "path": "assets/SleetStorm.png",
+      "sha256": "A0E134D97CFD886BCA663FA51629FFD1A4033EBEF2A402F3955E4AE759982489"
+    },
+    {
+      "path": "assets/Slimy.png",
+      "sha256": "7C5F9E25E288ECFE26EA3C6303FEB51378DA59B54A8B1E6B738490657AEC1F05"
+    },
+    {
+      "path": "assets/SpiritCall.png",
+      "sha256": "A00F1F15A6689BFEF793779E7B0537538F3BECBA4E2CF78702AAC4C167B1A4B0"
+    },
+    {
+      "path": "assets/SpiritualAlly.png",
+      "sha256": "04DB213FECEFF9F264D2E9ADD9F0D5E1B256516D2A0870B3F7E7DBC38E9FA631"
+    },
+    {
+      "path": "assets/SpiritualWeapon.png",
+      "sha256": "B8D992387623895151E5BB0877D42CD4BDE617074720D625A89A8DC3CACBEB95"
+    },
+    {
+      "path": "assets/SpontaneousMetafocus.png",
+      "sha256": "DFAC4648A35E145B092333D859A3397379C6E885BCA245FE051A8601FCB5200D"
+    },
+    {
+      "path": "assets/StunningAssault.png",
+      "sha256": "4687AAF7EA530CADE774D674B33C0C7E79E14D655AC584E41F3D77A42301AC5B"
+    },
+    {
+      "path": "assets/SwordplayStyle.png",
+      "sha256": "93418D44CDE9A9F33968AE3F7FCD30BD90E896A7F87A14465CFCDEA52765E0E1"
+    },
+    {
+      "path": "assets/SwordplayUpset.png",
+      "sha256": "BDEA361394CAB2B8F7A1A9023EA45AC2B299E819B8F8006E97CC0F3B93F037DA"
+    },
+    {
+      "path": "assets/TemporalStasis.png",
+      "sha256": "6B62E07C5BA521C5009D2F3B96A412558F2BEA70269C6CAAC3CEB3FA1173E717"
+    },
+    {
+      "path": "assets/TopplingSpell.png",
+      "sha256": "787B43622F25C1BB1848057C211FC259B6458DA8F4B738102FFB48D11E5F9716"
+    },
+    {
+      "path": "assets/TwilightKnife.png",
+      "sha256": "DD7B4EAE60B8C73201F58813088BCB85D4EEB8296EDD42D0205CE3EBEA16DD1C"
+    },
+    {
+      "path": "assets/TwoWeaponFeintImproved.png",
+      "sha256": "7C85848D0E5F6BAB9A83778AFEF0EF1C5D93C071AE9F4D8AD6512068DFD5DF79"
+    },
+    {
+      "path": "assets/ViciousStomp.png",
+      "sha256": "1BCC31046A3958EFE3B779979C67F0AC627236E6BB43FDCA42C96DD7ED3B7346"
+    },
+    {
+      "path": "assets/WallOfNausea.png",
+      "sha256": "DA7F81EE930D89C00BC195456182EDFFAE631297809D9BF090E96B130D6CD8B1"
+    },
+    {
+      "path": "assets/WardingWeapon.png",
+      "sha256": "1C179FC40103A95F052534872C2E755994985EDFA29D58434AAFB8DE12285658"
+    },
+    {
+      "path": "assets/WhipHurricane.png",
+      "sha256": "53351C4ABB899C09EB5240079296E7EB3750D9586275E562E765E81A33B92D00"
+    },
+    {
+      "path": "assets/WoundedPawGambit.png",
+      "sha256": "21D684EDCE625E34F2CD85DFDD0A438C897B562C2FF18CDAE56C8C8DD085DBF9"
+    },
+    {
+      "path": "build.ps1",
+      "sha256": "E4222639F615791073423BDE80CF59D22FC1623643EC21AA0D9AD63C31EDAF41"
+    },
+    {
+      "path": "CallOfTheWild.Wrath.Prototype.csproj",
+      "sha256": "3C57C485CAA4F89C49A9B7DA743304C876136A978AF231D9450EB97989E70CCA"
+    },
+    {
+      "path": "Directory.Build.props",
+      "sha256": "53BCD017D0441BBDCF7A2A045509EA084EA564D155DE2FAA4B2B58EA98F3C2B8"
+    },
+    {
+      "path": "Directory.Build.targets",
+      "sha256": "76887F78C6AE54F998A36F2EE09D1348AD9B0C81839C6341AAA63BCF0CBB9516"
+    },
+    {
+      "path": "LICENSE-CotW.txt",
+      "sha256": "6AF8708E2B4C4CA0B5D43C919DB06EAB85650BB5A0E0A5C0E5E84FA18A3AB2E0"
+    },
+    {
+      "path": "Localization-QL使用说明.txt",
+      "sha256": "04A049C98EDEB8FCD09A6BB9E0C28B80E8C9F5AAAD44BDDF86B5F283447223D8"
+    },
+    {
+      "path": "Modules/MediumClass/0.3.5修改说明.md",
+      "sha256": "4E6B1C36CF170E885401BA57570A54FDA96595AC9013AF975E1FBEBE80440531"
+    },
+    {
+      "path": "Modules/MediumClass/0.3.6启动修复测试说明.txt",
+      "sha256": "DD0AAE970E25EB364D51E53B05D9192438078F4E9F6E9E4DBD68602EDB511539"
+    },
+    {
+      "path": "Modules/MediumClass/0.3.6修改说明.md",
+      "sha256": "C4A4EC5EE00637C32D83BE5B572F40D3EB8AB46D7151761D4F62DEFCECE6048D"
+    },
+    {
+      "path": "Modules/MediumClass/0.3.7修改说明.md",
+      "sha256": "6853502AB5682DA1DBCB0B35CADAD8EAE040CFA73B490731CC04655C06D1E5EA"
+    },
+    {
+      "path": "Modules/MediumClass/0.3.8修改说明.md",
+      "sha256": "57AAA3D3EFC815E2152CA3373E1EAEE112F9294F8D8EF7643828295CCBECA9C5"
+    },
+    {
+      "path": "Modules/MediumClass/0.4.0修改说明.md",
+      "sha256": "AF9F7FC5BD73662BCECD4BC6288A2DCB964595FD5CA3C87E0FB481C541343024"
+    },
+    {
+      "path": "Modules/MediumClass/0.4.1测试说明.txt",
+      "sha256": "737D62914C404ED631DE5E12248E9040B61E5E2B3DA144663DCF9CA7B71EF441"
+    },
+    {
+      "path": "Modules/MediumClass/0.6.2修复测试说明.txt",
+      "sha256": "3C7BF25CA6495B29AF15881A3494CB43741FA3093A1BC737E90E32E318A581D1"
+    },
+    {
+      "path": "Modules/MediumClass/0.6.3修复测试说明.txt",
+      "sha256": "03244D61376CAE1F64F4D813F0F35269C105BB930AF760F63D076D56F9096EB3"
+    },
+    {
+      "path": "Modules/MediumClass/0.7.2合并测试说明.txt",
+      "sha256": "1CB49BF3A5A5718DD5E709D8DCDADFC5BA32066066D459112A88D967B62A4EFC"
+    },
+    {
+      "path": "Modules/MediumClass/测试指引-0.3.4历史.md",
+      "sha256": "10601EF8E063BA1A380B01F73B81D5E8EDD4F840B38BE355E002D53394962323"
+    },
+    {
+      "path": "Modules/MediumClass/测试指引.md",
+      "sha256": "8D6446A3D60ADBE2B29FF19D7460634A8A03C8A8A010C9743177D7830F9E0359"
+    },
+    {
+      "path": "Modules/MediumClass/交付说明-0.4.1.md",
+      "sha256": "3C21AD8C8DBB294B132593FA33AFAF067542AA10B69C77A7CD6A144BC5455A7E"
+    },
+    {
+      "path": "Modules/MediumClass/修复说明.md",
+      "sha256": "C9410F15ED52881F8FE240F368057232D99D4D60791ADB049B36674CC022AEDC"
+    },
+    {
+      "path": "Modules/MediumClass/Directory.Build.props",
+      "sha256": "EE4F2BCF3B51EE6D742CB723DA9F026DC020804EA624DDBF2D1871AD68C180BF"
+    },
+    {
+      "path": "Modules/MediumClass/Features/MediumSpecific/BackgroundMedium.cs",
+      "sha256": "C7A0C74E9C7376B5BD33C56D4138939E96D95773DBFFCCA2C7EBC2AFB8E91C53"
+    },
+    {
+      "path": "Modules/MediumClass/Features/MediumSpecific/SpiritBinder.cs",
+      "sha256": "EFBE2526CB2BB227851A41344220056D8714F50A7E584DFE3108A0D8EF36D617"
+    },
+    {
+      "path": "Modules/MediumClass/Features/MediumSpecific/SpiritFocus.cs",
+      "sha256": "8A260BF1654AD94B7B6FA756551D6E76F6905090F1D75FAC1400548BC4272AF4"
+    },
+    {
+      "path": "Modules/MediumClass/Info.json",
+      "sha256": "2CED3B363A0BDB8AF5E5E0D8123B4DDBA3840B87780F391757701900F837FBE3"
+    },
+    {
+      "path": "Modules/MediumClass/LICENSE-CotW.txt",
+      "sha256": "6AF8708E2B4C4CA0B5D43C919DB06EAB85650BB5A0E0A5C0E5E84FA18A3AB2E0"
+    },
+    {
+      "path": "Modules/MediumClass/Main.cs",
+      "sha256": "7D5F36530F45B529993D8F24D674B4DC7B4F9F9D250744C6BD40957569938438"
+    },
+    {
+      "path": "Modules/MediumClass/maintenance/HANDOFF.zh-CN.md",
+      "sha256": "BAFE9D3AF60CB081ABB4E7E7CCA2FDD3E7D5F2D285DDAD21D60830955997874C"
+    },
+    {
+      "path": "Modules/MediumClass/maintenance/identifiers-baseline.json",
+      "sha256": "1E2F714601C14C5A940C242C6B15935346B920430517DCF8E07CE2099EA2912E"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/AstralBeacon.cs",
+      "sha256": "B802BD558F22C66EA98DDB6D0B71131DF6914C83A45F299D9EEBF04EB96B0BB6"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/ChannelSpirit.cs",
+      "sha256": "161C3281C0EB5EC876B62BC38FE4DD7B1F2BE559143AE6586B6CC1534F5F9978"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/HardenedSoul.cs",
+      "sha256": "FA3AE9C246C451CCB48158F527BB337592E265D48C4D92CAAC6784E0B2B99EB6"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Influence.cs",
+      "sha256": "D472EAEEF6BA627ECACBD3FDA8C1DF8F2DEB943F6CB637710644A7ABF60210B2"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/InfluenceMath.cs",
+      "sha256": "2A0F4B3DFCA2AE3DA6047D8440BE89C0774EEE912B2EEB2C92379385E4D53933"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/InfluencePenaltyMath.cs",
+      "sha256": "B78F2EF8DBCE828386AA6B75B7226C575450ACC22E8E046366F9F39EABFE90F7"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MarshalSpiritRules.cs",
+      "sha256": "6E86DA521D3367359AA039D3C0BCE51C68A289B3AD6511EA7B7FB6EF6364DDAF"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumChannelRestore.cs",
+      "sha256": "E5468A97FBB37078DA05B77F1D82E1F2463326DF70793879CEC1553640890646"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumClass.cs",
+      "sha256": "A69E9C70BDB22AF72DBABC309E537B6AEA21A7A9866D73C04BAD116F305A684F"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumDeathCurseMigration.cs",
+      "sha256": "2D8DB6F9725086C897EE3942E5A5244F1923F0421F69268E5BCEB1810DD7BD2A"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumDeathCurseModes.cs",
+      "sha256": "F99131C63F97F78D794A0B18C7981765E2F2BDF0A3965D5AD043EB1C362556AE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumDeathCurseRules.cs",
+      "sha256": "E903197B39C6A1F68AA71B90B36262551A1177DC6ED570260A5BC30C78F577F1"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumInfluenceRules.cs",
+      "sha256": "8279C852719DF9509325B131B993C82F2705C83329171E12EA09FBD8BF77D585"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumProficiencies.cs",
+      "sha256": "778D415A23637F86F5267EABBC8987DBCEC75A7F42921874C10E46B89F4948EC"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumProgression.cs",
+      "sha256": "8960869E1FE89C452EB1601C68499CFADCA0B60489CEE175A9C8A08617691D34"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumProgressionMigration.cs",
+      "sha256": "2A5AB243ECDBD8460142856BC4F2E338F44545F3439512D28C90D9AACAED0CFF"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumPsychicBlueprints.cs",
+      "sha256": "4B063A97219238E239073725EFFAB516C2FE57F349A13951F742EF0B6A0FFA83"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumPsychicCasting.cs",
+      "sha256": "D22B49BF43503474D80164E61D58662AD00F6A2ED02106A4AD6C0C9668DDD0AC"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpellbook.cs",
+      "sha256": "DF96704B3C0403BDAFE64BF67DC4A644378974EE1C420F6D294A581E2EE15497"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpellcasterFeat.cs",
+      "sha256": "3BE28C6235080D15DB893031B37885161154FAA31E52159DACE90DC9D1B72D91"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpiritAbilityRemovalPatch.cs",
+      "sha256": "D86B4F39A0AC009E7A3D9A303E5DE444A2422334174A3800DACC5B8879860550"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpiritActionBarPatch.cs",
+      "sha256": "3F8B56400CE1BBFF28765256E4F120155DD805F4EDA557099CFC8CDE65166110"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpiritPowerCleanup.cs",
+      "sha256": "5AFA42CBAF18B475D13473857FF298498B9ADA235535B07652A295EDCF87F7AA"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpiritShortcutPatches.cs",
+      "sha256": "12AAF33F21576B40436A45DD9D5F7358057687B7AEA439D7F1E8B056C8B08392"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MediumSpiritSpellbookPatches.cs",
+      "sha256": "382F4193ADE9027BB4CF251BF2EEE53BA6AE0AB1A31109693EC4D1A8998DA075"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MythicInfluence.cs",
+      "sha256": "455AEF7278A07803DDD4D0E6889424B9A47DBD82924430410FF0919FC13CB7F2"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MythicSpiritInfluence.cs",
+      "sha256": "8D5FDD7D5046E8876C24C3EFB85496A77A47D4B29D30AAF1ABF5629960FACE1F"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/MythicSpirits.cs",
+      "sha256": "1AB0CEE2ED457E9358EEF43467410877D789F89AAB48C067A31222DB69DF8555"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewActions/ContextActionApplySpirit.cs",
+      "sha256": "CF4C86D08AD8CC756FBCB656DB797B8A2F2A30248DFD5DAACC2FA065D057264C"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewActions/ContextActionDecisiveStrikeSwift.cs",
+      "sha256": "FF7CB189770D2E6B469F3D2723740988D5C11E9610D56A5A2EA454265724EF27"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewActions/ContextActionSpiritInfluence.cs",
+      "sha256": "7DD6311A999A97AB76D1DCDAB4CEDF47B5738801E1360F2F44F43F4FDA9190F9"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewActions/ContextActionToggleDeathCurse.cs",
+      "sha256": "2CACE21B802AE27818E274B4760E5D7D43E28E535E794F698692E05E9B17C6D2"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewActions/ContextActionTransferMagic.cs",
+      "sha256": "6889BDA988F31B4523BFB5E2EE4637FF9EF85BA415093F2F8E630DA58458BD73"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilityRequirementDeathCurseSlot.cs",
+      "sha256": "597CA944ACDD293063199052218C38EB5BE63D60DDAF92AA6D6401AD4F3E7A5B"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilityRequirementHasSpirit.cs",
+      "sha256": "B7A07F53E7B605839B2827EDBEE6F231ED94CBB9C24E9AEAF8EF5C5A529C3521"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilityRequirementNotMarshalsOrder.cs",
+      "sha256": "06C754CEED46E39017AAC6767BE3FD3F7009E3B1DCD6A445CAC27389B966C2EE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilityRequirementSpecificSpirit.cs",
+      "sha256": "89F8146769765E9E29CADD2C1C5B7FD5E4EFA07F08155ED5C436D022C608FAD5"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilityRequirementSpiritPowerRank.cs",
+      "sha256": "E87F6D115035A31953ACBA99FD95D048959FA283673FA33863DF0593CD1DFB02"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/AddSuddenAttack.cs",
+      "sha256": "A9A8625AADA0FD969EDCD0918C8A4831FB4C16988F7B35D8F1E2D2A8C649831A"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/AddSurpriseStrike.cs",
+      "sha256": "938F19DA170CDA7785E918CA55AE376A853935F5B697C41F6469A42446447860"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/AddTricksterSeance.cs",
+      "sha256": "7D7D5B831007156D8FDBA66D77449C59727FEF75FFE38EEE5ACCCDE692377C85"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/AddTrickstersEdge.cs",
+      "sha256": "CE16FD9DF60F940719A61111BF1C89E7D75FED318203CB459BF3A2A8F684EF7C"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/ArchmageSeanceDamageBonus.cs",
+      "sha256": "E8D87D728880D4C216EE813AE6FE8F40B19957580EDA056D2CFD9FAFB4F18362"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/ChampionFleetChargeLogic.cs",
+      "sha256": "E37218660AEA2B737C5C7C689E817E75585BAFD39A0A9DB37C6EFEC6A40D6272"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/DecisiveStrikeStandardComponent.cs",
+      "sha256": "FC008980DC574EC6E4F31048FD8DE9FF63EF6CFB2DEDC88DA6FD72BE93970445"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/ImpromptuSurpriseStrike.cs",
+      "sha256": "C7AC2B76CD9DDE8B6124363488DFC89DB900B36087422DF2D07F54EBE4C493AE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/LegendaryHierophantComponent.cs",
+      "sha256": "042CF38DE905C7B52D5401F2BC0BA6EFD24CA341D02F20E5538300A8FD127894"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumContextSharedSeanceComponent.cs",
+      "sha256": "471DEA1FD8016874BC815A8643EA0621EFA9F228BFCB082B2C8E37C902B8C9A5"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumContextSpiritBonusComponent.cs",
+      "sha256": "EB2912BCABFB5E2CAA528DBABBC8B5C11D82728AF147B889288F0BE8D5149AA6"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumContextSpiritInfluenceComponent.cs",
+      "sha256": "F445181A2409405E0F020DF43502D5FE4BA95856B7466083A9250BBB3928315D"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumDeathCurseComponent.cs",
+      "sha256": "3F02BC54D1E49F07112219AD4294B6B87E4197304DF07B0F952652251288EE1E"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumInfluencePenaltyComponent.cs",
+      "sha256": "A0DF5D88A74FD253C91A0A7B726AB2A605C478D2AC8A39CCC5C09B574A1AC141"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumSpiritComponent.cs",
+      "sha256": "1A3CD511C24FD84B7BB1A32D578108A913105243F92E00520695AC1B67DAE451"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumSpiritFocusComponent.cs",
+      "sha256": "88FAD128FFE329EAE904AB98B71DFDF35A85991A9948B54E456ED5A584A00467"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumSpiritInfluenceAllyComponent.cs",
+      "sha256": "90DCFDFFFC128B9B2B48B6D9C1F7B91DC574056BDC42F3E7632B35E431F9463B"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumSpiritInfluenceFeatureComponent.cs",
+      "sha256": "D76F02A159E82D1792CCD4DFCA1E1711DBF653620B96E69D27AD1013EB254A83"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumSpiritMasteryComponent.cs",
+      "sha256": "447BC4F9F1877D36E71C958DA1E87442D9F98E834DCEBBD58AFC26620806D206"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumSpiritSurgeComponent.cs",
+      "sha256": "4636872B995B8B704855690A2C670CC921DF914476DF930359BEF8503BDD2128"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumTranceOfThreeComponent.cs",
+      "sha256": "F89E01691860AA7070551B24D07A62C3E39B0B3B26DBAB63827935A6248FB0E5"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MediumWeakerSpiritComponent.cs",
+      "sha256": "B9D9F26C696735F75AB97892BDDC996932375C10BBA23CCA452EA5D4B9C119E3"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/MergeMediumSpellbookComponent.cs",
+      "sha256": "4B270D07C52BC4299AB5B36C22BFE1767675C6FF56FE960191633AC99C588433"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AbilitySpecific/WildArcanaComponent.cs",
+      "sha256": "860C0F4ECB71536618DEDD0544BF5D0ACA953706D268F35D987622CD9D76A2C3"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/AddResourcelessSpell.cs",
+      "sha256": "E433975291D8EDA6140382D9C672AB20753B391D12C5DBC4FB191A3958185DEC"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewComponents/ApplySpirits.cs",
+      "sha256": "081CE796FF1F09070009A00C430454F9820F447E8F3F9E1E9EEF1825CC08963B"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewUnitParts/UnitPartArchmage.cs",
+      "sha256": "BAE74C5B6EE54088ED8DBDED337B4A8EC4CD0C03482EFE512688194AF46B3E15"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewUnitParts/UnitPartHierophant.cs",
+      "sha256": "A14730EC7BBF32847CCE68BF7A872F3D2B8A96CBDC099B80BAFAB999D47503EE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewUnitParts/UnitPartMedium.cs",
+      "sha256": "EE498D1AFCC02BE7C7EEA6C85901E1A1E0D8B8875E508E8E6EB7A63654B55A73"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewUnitParts/UnitPartMediumInfluence.cs",
+      "sha256": "A8B937C0BC2EDAB86B6EF12D113F13635F92AFDFA8265BBFE6F9B4E9A283C550"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/NewUnitParts/UnitPartMediumPreparedSpells.cs",
+      "sha256": "DDB0C56258EB3EBE858542170C0D3F6F159D8929C085B14D55FF6CB7AE285595"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Propitation.cs",
+      "sha256": "9A70331579708E183E6FE04AFE40568A67F519E1E14DBDAADCEA43A7DA7944CC"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/PsychicUiPatches.cs",
+      "sha256": "3757A387D05EC98E415AD468AACE8EBD644002085D75F22B5378091923C42CAB"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/RobinHoodRules.cs",
+      "sha256": "9F9D5012BE2F57145BD651A0A83C4379CBED1F15C47F8E60B6318EE0CAA30FFE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SharedSeance.cs",
+      "sha256": "D8344D9A3F6D892282325FB0697FDE0ACCEF822BCF60D9056827DC2C408A30FE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritBonus.cs",
+      "sha256": "7431996ABEC73850F7B2183DF409AE3A1056F6F83E3CC83F4AD73143A40FA650"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritMastery.cs",
+      "sha256": "093574E752F988D6F738697CF9164208DE875646F5DB747B8C953B518459D082"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritPower.cs",
+      "sha256": "EB051159D47E4492EAC61FD93E41AF6B00D8E8CA16867C5C08BE7AB7385420BC"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Adriel/Adriel.cs",
+      "sha256": "1E0575AF181EC36548536E50A17C0975740B96E050FDE809F723C17443580A8E"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Adriel/Challenge.cs",
+      "sha256": "FB1E674035BD902EE38B704BC1C8994732257E0D5AFA6874046CADCE8F851AF9"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Adriel/DeathCurse.cs",
+      "sha256": "5A4863F269614F9FA896B6D7C778FA173F59D30BFFCBA6161A18F6F0E403B460"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Archmage/ArcaneSurge.cs",
+      "sha256": "1368CCD5BDC224AC46A3644675E1FB735740E5CFD51067AE96EC10F9ADB4561E"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Archmage/Archmage.cs",
+      "sha256": "FB04FAFC6B044D3FF732F12114A0B001F656638E2CDD656FE71E9283695E5EF8"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Archmage/LegendaryArchmage.cs",
+      "sha256": "C43B67A50D0259C4BA3CF3AF0AC182B0343C72F279C607F515D465BCAAF847C5"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Archmage/SeanceBoon.cs",
+      "sha256": "FDBFDFB5A5754B8C7F77EEBD78BA862874F8768E822D89E29316D0F970DABD04"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Archmage/WildArcana.cs",
+      "sha256": "9FF5802518A0EDF969CCA36CD4C1CED73D3ECB1B93201E521C537EB018189DDD"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Champion/Champion.cs",
+      "sha256": "669AE8A98ECAC20E2D895D2A88A1B2B59BDA5A5DA18A43D4614C36F5E3E0568A"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Champion/ChampionLesser.cs",
+      "sha256": "A1C2AF68E8D7128D8C3E213CBD8D20D449E6836B0629C62798FF7C9390386CD1"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Champion/FleetCharge.cs",
+      "sha256": "9E19E46791EE82A728E1C5D641C20EC8BE27E4DD8CAF3EC29C2119039B6D1E14"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Champion/LegendaryChampion.cs",
+      "sha256": "EC798A62875264DC414A90883AE94047E2B3B3A5A0C9DBD1BC81056F82382CDC"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Champion/SeanceBoon.cs",
+      "sha256": "2C4D5F9D5F5ED4532B93E01B84C902C4A39D3600A49AFFBC25154CF5840282C9"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Champion/SuddenAttack.cs",
+      "sha256": "659F06F65EC7A79089C134F43DD79E4F9E376C6CAA88E544B52D1908D4AECF3E"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Guardian/AbsorbBlow.cs",
+      "sha256": "9F840EE4D6D85750E320A5F13478A8AED708219FB143FCD1A6267C728EE70D86"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Guardian/Guardian.cs",
+      "sha256": "BAC745CC06DFE6F5D7A41DCD7BCD1A7B035B295CEAD71A578863B15C361817D9"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Guardian/GuardianLesser.cs",
+      "sha256": "18FEA43F26F686F401173A790D7A2F214AD91B5C642C4B25E4EA8649FD4A4812"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Guardian/GuardianSmite.cs",
+      "sha256": "E6884F22AC85122D304F84E71AC27379CD1F971326A2BBC0BC048E71B5CEB853"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Guardian/LegendaryGuardian.cs",
+      "sha256": "205D06EFA570DC5A80F2EBCCC793ECFE4B5F43BBAFB0F48565D6BE9540D6AF12"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Guardian/SeanceBoon.cs",
+      "sha256": "963DB224A6E12C80E96F6160209661571FAEA9C1D541F2D8C929D26A3EC2D059"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Hierophant/EnergyFont.cs",
+      "sha256": "7CCEF48030C50E84CD897EBD3348AF0F931CBD54BC9D4621E3BA2DE0B00646E9"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Hierophant/Hierophant.cs",
+      "sha256": "DFD889520FBF4DDEB77F358F3B7F2F74E5A9B276D369F708FFFF9404DE8094E1"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Hierophant/LegendaryHierophant.cs",
+      "sha256": "F25700E3F72AA19E0BB9446754C6D8D5499E9812A2812834A453D008373CA1D9"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Hierophant/OverflowingGrace.cs",
+      "sha256": "294FCB70A26D7DA3F38D81A403667EBC14997B893A72367A0F21C4FC1A715B34"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Hierophant/SeanceBoon.cs",
+      "sha256": "66564E913CBF448132B4FEBB5FEF7AAEEF722DA571035C4E7EAF6E08CCE889A6"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Marshal/DecisiveStrike.cs",
+      "sha256": "A3840AC2E1C67E5644685E39320CCA5AAF418ED984BDC8B6A06B2DF4FC4FF69D"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Marshal/InspiringCall.cs",
+      "sha256": "C6431369F78C04A61FA07C6B2410D2173C2B1858B0072687F3FA2114EFF331EB"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Marshal/LegendaryMarshal.cs",
+      "sha256": "FA0B7C8B29AFF35B3A07523BD1B5A8FCCC116F2FEA699B50DBCA971A6AAA8E44"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Marshal/Marshal.cs",
+      "sha256": "2CA292B883C6DA3A0A2CC6732A2C551BF4A095A7407F4A9B25CBFF5A8D574DFA"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Marshal/MarshalsOrders.cs",
+      "sha256": "4FC33AAE519D3E42F482EFB78A322C57A36B95AD817F235847BDE086B9995EED"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Marshal/SeanceBoon.cs",
+      "sha256": "4C30ADF71BE97126315A7B4A6DC8244D8BF17E4EE75E532A449CEC497D238574"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/RobinHood/RobinHood.cs",
+      "sha256": "AD44C5B5E6044C84CDEBBA7F975987545DAB260952C72F7627E47DC28521F77C"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/SpiritHelper.cs",
+      "sha256": "0C1F6C306D5289E9CF113C49CCA75D864F10AAA1C11FD9FE0FEFDC8E3A91BB19"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Trickster/LegendaryTrickster.cs",
+      "sha256": "3FD44A79AF2369C01BC6739598B3C70EDD8CCF24BDD672847B5301F46F26FA0F"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Trickster/SeanceBoon.cs",
+      "sha256": "60FDBD9E31F9A8B7A570D3FA7D618169688F353F22D97279E41A60ED8DBCCCBE"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Trickster/SurpriseStrike.cs",
+      "sha256": "F9D4A8BAD76D67C6DEAC5A3CD721F82CEE15754DF5AAC158709AAFB6667B84A7"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Trickster/TransferMagic.cs",
+      "sha256": "6F35E48437F2D0DF6EC7F8F77945F0F065BD6B9137BD4F2FBFA440FF6CE02A8D"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Trickster/Trickster.cs",
+      "sha256": "21FC7EF082D903B87F192906F6557A78352FD6BD9D18070E769D9A9BE4D8AEBB"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/Spirits/Trickster/TrickstersEdge.cs",
+      "sha256": "0790D083E9A3654C7204DBAB2977CE32D823C8C564FD95477185E8FD336DFE21"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritSpellcastingMath.cs",
+      "sha256": "714E74A9477F33ED82C47F542170EB497A20F5341154D1D11D404AE6404F1171"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritSurge.cs",
+      "sha256": "A5271AC5D9317BD8F14BAAB02284AB88BD2BA31D27ADF6E725A56341C773B165"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritSurgeMath.cs",
+      "sha256": "5FAA50870D220AEE329B6A290F4BAF9A8D00C0EDF912496D63B97CE99BD6A718"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/SpiritSurgeReport.cs",
+      "sha256": "6D4C474C46280DFBE38584B8AF5C397F0181D578778543FEC82C89583BF1C936"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/TranceOfThree.cs",
+      "sha256": "75BE237BA7CC2CAAB23C0C9032F9654787372268294BFDD439399EDBD1441E23"
+    },
+    {
+      "path": "Modules/MediumClass/Medium/WeakerSpiritChannel.cs",
+      "sha256": "58261F3CB68AA58461DB6C0E619131CB4DBBEEEDE725CA1751A993D98BF57E76"
+    },
+    {
+      "path": "Modules/MediumClass/mediumclass_assets",
+      "sha256": "BCF4703D53675CAFD54866DBA90C66B7AB5B8AE3264547EC354C9E467BA9AE1D"
+    },
+    {
+      "path": "Modules/MediumClass/mediumclass_assets.manifest",
+      "sha256": "AF84D66BB1AD93B11A9663BDC488D33F571AA3A1DF82528CC42B02B18C1AC324"
+    },
+    {
+      "path": "Modules/MediumClass/MediumClass.csproj",
+      "sha256": "7A3A276AAF53F9191F48D2CC44BA0600407F587549C8717E73BAAD4E43CF52F2"
+    },
+    {
+      "path": "Modules/MediumClass/MediumClass.local.props.example",
+      "sha256": "1868D93E92BEB80C723309D21418D78BA359B8F518448ECCD551BFC38E70B1E9"
+    },
+    {
+      "path": "Modules/MediumClass/MediumClass.sln",
+      "sha256": "D574FCDE3F10138A78A54D1265FDC8019148A1915863752EC4BCB7443D751936"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerArchetypeBuilder.cs",
+      "sha256": "6B399882BF74D46680A59B1B4E134009B6388051EF8F4F695AB616E255F5246E"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerBlueprints.cs",
+      "sha256": "326C3DE45EF9B29353FB5B5192558265293D00A90DDCE83146046FF82E513C39"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerBuild.cs",
+      "sha256": "B666E5471365C2FF8C2F3B3C4403CBF504F3EB33DB3EFF5C7D3EB15EDAC9FD2D"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerContent.cs",
+      "sha256": "3C0D8282BCEB50E82065175E2E6D81ED970915C6D01774FAE2543CCF56C6EAED"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerForms.cs",
+      "sha256": "29183CD82580092E81F7DCA88CD752886B1B2D9CEF27E60CECCD677383651F0F"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerGuids.cs",
+      "sha256": "DAE6F3C898254310151CC8B35C09F415182B50AE32355176C2834C4B978784B0"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerProgressionPolicy.cs",
+      "sha256": "B72875A8B2437B20D421A7A6AA564C30840C3294FC56E65FC6616A5C2929D8FD"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerProgressions.cs",
+      "sha256": "BA4F1EA93426B0506258315430977A3FD3527480AA37CE0C4F0E0C393204D403"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerSpiritChannel.cs",
+      "sha256": "070930C19E07A04B786AF313CF9C96CDA11B3E9E1F0ADC790D67C12B50E870DC"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerSpiritRules.cs",
+      "sha256": "56B35AB835A93A52D807E1F17F237AED85B06FD42F273AB13B9203365524DF06"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerSpiritScaling.cs",
+      "sha256": "3E11F64E604EA72DC29181E98CA76ADC75AA37DBCA54591BA274D9504AC80023"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerSpiritTiers.cs",
+      "sha256": "EDE6C073A50013B2775145897F22D06A3BCB07F856B0612614B308EB2F7F4C2C"
+    },
+    {
+      "path": "Modules/MediumClass/Prowler/ProwlerStrings.cs",
+      "sha256": "3EA3833027298292CCCB7EA4A7DC3079FCF3B9EFFC18032F077864F67811A8A2"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/Build.ps1",
+      "sha256": "9CBFE2D0AC4784CA5A7EDED08A1081D56C6000DA49D3180E778636D91E288DCA"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/check_source.py",
+      "sha256": "6A835EFAE186C8027E7C3FC019A70171FEC6CF99F29E69B63DE08861ADDFAC28"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/Collect-BuildReferences.cmd",
+      "sha256": "5964B97146496CD4429D85304B41DDE9AF21485095CD18FB9C690C4DA0BAB339"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/Collect-BuildReferences.ps1",
+      "sha256": "916BF948476065A2F5595432C3B77F78594098825C84A9FF81D4ECFEADE1BA8F"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/linux-build-and-stage.sh",
+      "sha256": "04A8642F645AFA6CD19FF49CCC6AB7E8BC273DCF53618DF35275BF22C3A7A25B"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/requirements-checks.txt",
+      "sha256": "D5DEDC0254C8966C90BCDCC6CDD5D0EF4C5A567FAA9EE7E85E89627D4BDA7945"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/run_linux_tests.sh",
+      "sha256": "B324F34B8A2A623A23F81D968FCD158FC64460682EAB49180796FA6180FBCEBA"
+    },
+    {
+      "path": "Modules/MediumClass/scripts/run_negative_controls.sh",
+      "sha256": "D9FF3D058904C22AF08231B560F7969CFA9923D17767B7B8754B7055E58C6B11"
+    },
+    {
+      "path": "Modules/MediumClass/Spiritualist/Phantom.cs",
+      "sha256": "AF52DD8EDBDED9ED1C811293A96E952BDE0DF515A1CF6D15B869202F2BF15FC0"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Archmage.json",
+      "sha256": "D65BBBC4EAB6E46DAC91543C03376EC75602A69FAF6B383ACBCCAD1888B517D9"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Champion.json",
+      "sha256": "5BD1AF395824DA8BBCA7F5A989381F6361544A9E3F4C5CA938460540DA801AEF"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Feats.json",
+      "sha256": "0AA43EFC7EE01C5B3B0F66CA538EC6B4FEE41622648D9349587D18F70E502BF9"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Guardian.json",
+      "sha256": "FF810BBB1C602A13B06FC42CB54DF7D57D50CBF6F3C05A0B6EE81D71F1BAB969"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Hierophant.json",
+      "sha256": "758AA5FC09E5627B7D000363AF4A5EFBD5BCC2A0AE437D333C97657F30350A77"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Marshal.json",
+      "sha256": "330524C2515B61B0D97658A8A19FC018E9E26E40F2BA12F66A399A8517AC6943"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Medium.json",
+      "sha256": "67A87B4A4BC4437E3B4C7A79ECEDCFA55A8CEB3B37F7C70F1F84E7969514E1C5"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Prowler.json",
+      "sha256": "65FCF78BCA1AE78B324890B2AEEFCEAD4A284279FE2924D3E5BD87E05D8DD4F6"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Settings.json",
+      "sha256": "478E111A84808132FBDAFF2A5D810E0EC2B522A6B0E526C1F2AD62748C8FF301"
+    },
+    {
+      "path": "Modules/MediumClass/Strings/Trickster.json",
+      "sha256": "04C4F4E19C1F37DBC92C842D3F13752154CD8BF6D9D4DA7018226F79698498B3"
+    },
+    {
+      "path": "Modules/MediumClass/tests/ArchmageDamage/ArchmageDamage.csproj",
+      "sha256": "CA1EBDB0C4B45727DA04C4729BFD890716D15797886CBEBF95F9126972F8E028"
+    },
+    {
+      "path": "Modules/MediumClass/tests/ArchmageDamage/GameApiModel.cs",
+      "sha256": "CDFBCC26A40775FA40F1151553A5A8E122A27961672DCCEB21A0369D3F469FD7"
+    },
+    {
+      "path": "Modules/MediumClass/tests/ArchmageDamage/Program.cs",
+      "sha256": "49502D46923D0DAFAAE5F239706A977876806AFAB3A80CF6CF8E172AD772A653"
+    },
+    {
+      "path": "Modules/MediumClass/tests/ArchmageDamage/README.md",
+      "sha256": "7CE606A2D6F8D7D5C463953BC1C617AD67FA317A31A74CC334DED7058A091FF1"
+    },
+    {
+      "path": "Modules/MediumClass/tests/CombatLog/CombatLog.csproj",
+      "sha256": "89A06298807E6BCC88922D085DA046853F3F8EFCD742E475E88F7A42C6C80F9D"
+    },
+    {
+      "path": "Modules/MediumClass/tests/CombatLog/GameApiModel.cs",
+      "sha256": "D51428EE4970421AC2B075BCFBBB0DFC4604B6DC5D7C82532F400BBA7029457B"
+    },
+    {
+      "path": "Modules/MediumClass/tests/CombatLog/Program.cs",
+      "sha256": "1E44E2082ADEF72D21497E97E4736ADFD4A2F265363DCE3314116838E1EE91B7"
+    },
+    {
+      "path": "Modules/MediumClass/tests/CombatLog/README.md",
+      "sha256": "AF8C9A43714C6F878C653EB8C746AC515880B890C40D8CB6FBEF375120740612"
+    },
+    {
+      "path": "Modules/MediumClass/tests/FleetCharge/FleetCharge.csproj",
+      "sha256": "127A1737A2832D3FFAAA70466CA1A68909747B7C4B9B6CE9944B9766D45D0286"
+    },
+    {
+      "path": "Modules/MediumClass/tests/FleetCharge/Program.cs",
+      "sha256": "9DAEA08BE1A3066B46B9C73C8D98C266DB8C161CD49868E36E8B56D8AE918D96"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HardenedSoul/GameApiModel.cs",
+      "sha256": "76AA9A1A9128BB0E610074184DDC1AFB3829CF1D146C8CD78C45E2B78306E63D"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HardenedSoul/HardenedSoul.csproj",
+      "sha256": "9269D8C82AFD58A37241AD50CD70419A6F06CB2929F8F5754F26AB8D34A380C5"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HardenedSoul/Program.cs",
+      "sha256": "F73A0B6B809F67C458A446CA0AD1F9DCA87D75D79F34C9DCC4EE247C383C1F58"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HardenedSoul/README.md",
+      "sha256": "067EEA31F988A07D74E13A8EC1590243BCDC14B4EA2905CB91AFB62419B9959B"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HarmonyCompatibility/Coexist01440Audit.cs",
+      "sha256": "06259698E946988B828DF9FB210326BABE090A2253F8E97D0DEE5E3538DA2769"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HarmonyCompatibility/HarmonyCompatCheck.csproj",
+      "sha256": "7526008F0EEB2DA692A1F7CC109E39FEC238E91385BB801DBD5651EDF77739AF"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HarmonyCompatibility/Program.cs",
+      "sha256": "7426C0B4967BD114917EFF1A8E0870BB5C7DAD61B1E610E534816829FABC6FA0"
+    },
+    {
+      "path": "Modules/MediumClass/tests/HarmonyCompatibility/README.md",
+      "sha256": "C3CF99DE8163679F8233F8FA88CEA5F053747319227E2525E1CD7D1FC0061FA5"
+    },
+    {
+      "path": "Modules/MediumClass/tests/InfluenceScenarios/GameApiModel.cs",
+      "sha256": "6DCBC25AA6FFD703873A9491F76933C6B8777CDFC35DA1E0AA67018DF69CF3FC"
+    },
+    {
+      "path": "Modules/MediumClass/tests/InfluenceScenarios/GuidsModel.cs",
+      "sha256": "053A772963F47FC171BC9CA2A78BB5A9D28C5A8588A8B70FCCB0674B17CECF39"
+    },
+    {
+      "path": "Modules/MediumClass/tests/InfluenceScenarios/InfluenceScenarios.csproj",
+      "sha256": "6916F9ED6E554C74BECD8B1760B567B56C5814C7C10416B8F3FFB6011982B574"
+    },
+    {
+      "path": "Modules/MediumClass/tests/InfluenceScenarios/Program.cs",
+      "sha256": "0E3F405597F2302090404E74E6673D6771FB3E168DF23CA72A36CD93FF422DFD"
+    },
+    {
+      "path": "Modules/MediumClass/tests/InfluenceScenarios/README.md",
+      "sha256": "E4B02CAFD6B1B6CBD31AA4CF164EFE6034B5335491E9A57C10B8B42A24DC7167"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MediumProgressionLevels/GameApiModel.cs",
+      "sha256": "B730857CA4D719F9865E4DB5E0A6B890D8A3F519B585AFC51844EEBAA829BE2C"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MediumProgressionLevels/MediumProgressionLevels.csproj",
+      "sha256": "1688D7DC844C59C8806BD1B4A68127132EA6B1BA66B84B0987AD89C2186BEB38"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MediumProgressionLevels/Program.cs",
+      "sha256": "5DA7283FB2CC59BF961693AEB60D095A64F3F7C5D90F4D2FEFAFE38A9F9EE211"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MediumProgressionLevels/README.md",
+      "sha256": "9E7FE142687E34C7DE55752B68C342D0A6CDADF3457746E84DB40C69FB64015E"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MythicRegistration/GameApiModel.cs",
+      "sha256": "CF4B91321504EDB7194CF136CBD2691D4B93A48B2C32907B032B8AFC2A39DCE6"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MythicRegistration/MythicRegistration.csproj",
+      "sha256": "BB0DC3E29B5EADF87E8977540B0F5D2DEDC331AA657F79510EEB728E03F7DC5A"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MythicRegistration/Program.cs",
+      "sha256": "946338E0E72E6342881D0C9D9F38FB699F33D1DA22C42C392231FEF3085F44A6"
+    },
+    {
+      "path": "Modules/MediumClass/tests/MythicRegistration/README.md",
+      "sha256": "E5ABE31B5495191592D5B483A7706EF4FD7EE8C9F28AD5639D9873A177CB039E"
+    },
+    {
+      "path": "Modules/MediumClass/tests/PsychicCasting/Program.cs",
+      "sha256": "018C85F55119AC37E0F6C69596682833C2C0199EC3B82A3D170970566952E6C3"
+    },
+    {
+      "path": "Modules/MediumClass/tests/PsychicCasting/PsychicCasting.csproj",
+      "sha256": "B703CE71D5BCBF9C7E50A74DD6B84EE50BF8D571CDB0E7024B2D6D16E338CD32"
+    },
+    {
+      "path": "Modules/MediumClass/tests/PsychicCasting/README.md",
+      "sha256": "64BBFB4899B0526F360FCB01E3605829C4A51D470533A3BBBACE075E2D896ACE"
+    },
+    {
+      "path": "Modules/MediumClass/tests/RobinHood/Program.cs",
+      "sha256": "E39C00BB888AAEA02AAEF57D5C96E94675EA38BD54E87A9CA8C923A69C53C0AF"
+    },
+    {
+      "path": "Modules/MediumClass/tests/RobinHood/RobinHood.csproj",
+      "sha256": "127A1737A2832D3FFAAA70466CA1A68909747B7C4B9B6CE9944B9766D45D0286"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/ActionBarRefreshChecks.cs",
+      "sha256": "1A3765F42EC9D972C1278CB038384B10E3BBE3139F59CD9E464245B665E34540"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/FrameworkCompatibility.cs",
+      "sha256": "02AF9DAC241316FA42E5DAD1E630EE84DBA569E1ACA1DF31977BA8A90B254F9C"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/GameApiModel.cs",
+      "sha256": "6A89CA13FAD63F5D961535D7A3CCC529C5EB8F19445300D12A0E1EEF372F6D55"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/LegendaryConversionChecks.cs",
+      "sha256": "354CD07D36FA7B492D86C6F29746A7D5536B6F1C0E924CB668FF56EDE0B23C12"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/Program.cs",
+      "sha256": "69F342F7118F99A30A546D3049FD2A60F544B451EDE7A1F2913C1464EC9451E6"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/README.md",
+      "sha256": "8DC0D5589D12DD7F7D36017180E3F06DECDD77277E1F13805FBD0F5939237790"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritActionBar/SpiritActionBar.csproj",
+      "sha256": "0E1DBDADE92BC9113C7ADE15142B8DA30DA0EAB8F6923CEF6A75B023CB5D06FD"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritBinderArchetype/GuidsSupport.cs",
+      "sha256": "F980C881C19F38C590094822BB0EEA3E5F03488B610ADCB08C27A7BAC18E2F34"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritBinderArchetype/Program.cs",
+      "sha256": "B7B4BADC6C054F9CCE32E5AD6801D4A6F63E7127077EA9A876E4A91506BBE88F"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritBinderArchetype/README.md",
+      "sha256": "0DB57772726B7C6DD64FEDB16CA3B571806F2BEBAADE01DA4C250A66DB445E7A"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritBinderArchetype/SpiritBinderArchetype.csproj",
+      "sha256": "CD763F2223113C94141C63501C26C2CB0D89C78140598788487A6067C857079B"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritChannelLifecycle/GameApiModel.cs",
+      "sha256": "E15F0255A17494781F8C035A4D3810703B489E41D808ABB1369571CCC4349346"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritChannelLifecycle/Program.cs",
+      "sha256": "A73B3D50D246A79F95D1943A506E0DE6710B84B4091995585AF208C146D1A8B3"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritChannelLifecycle/README.md",
+      "sha256": "775849DF3AD9A7A21FD44259811537AC2EA35D29C958A394C5BCB94A3C3EA291"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritChannelLifecycle/SpiritChannelLifecycle.csproj",
+      "sha256": "08564D9CB45CE3CF05665C37B6E7AEC28B32998D0BFF43D3F90C74FE67081C85"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritInfluenceScenarios/DeathCurseLimitChecks.cs",
+      "sha256": "FAC486C08B75439CC59F5EBDA57336BB381184A3F78C104E15FF3CA442ACB26E"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritInfluenceScenarios/GameApiModel.cs",
+      "sha256": "ADA89D16FD67CFDF4CE63D752442CF7E3D9D7FEE9CA1883DF7EAE3CB46C01A8D"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritInfluenceScenarios/GuidsSupport.cs",
+      "sha256": "A919D249DD2A4C4A25F5B03874C627800857AF46BE53863BE3A0C0B7C74EAA22"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritInfluenceScenarios/Program.cs",
+      "sha256": "AA038D6CE7E94D1F2A09726DD167DD70F7F99D980D1BA65481DCE65D2844DC33"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritInfluenceScenarios/README.md",
+      "sha256": "C5141868A44B36A6DB126EAC3624C388BF5C9D77B7D13DD261AEEF3B21AB6EBC"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritInfluenceScenarios/SpiritInfluenceScenarios.csproj",
+      "sha256": "8D6974235A686DEC041B3176782E4605352491728D303FF0B19D7F587102A0E9"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSaveRestore/GameApiModel.cs",
+      "sha256": "B931D53065D9D08552C624909A23A9D4D0151C4239EF9510B072D15510ADD8B6"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSaveRestore/Program.cs",
+      "sha256": "E3EA9E835D6F1ABA296F0B255567D1C34D4F7055925395D331CC36F94D55E2BB"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSaveRestore/README.md",
+      "sha256": "A916B08EDE102C842287B89F0DA39AABC3BA0700CD9D98CDE78F9EBB133B2F27"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSaveRestore/SpiritSaveRestore.csproj",
+      "sha256": "DAE095F028D42268B50FB244AB42EA2312D75705653BCF85DA29430E6C2684E8"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcasting/Program.cs",
+      "sha256": "3210D225A41929BBDC4BCCC7D2A0E1B86620D81924219A8B258E1346FA7B7241"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcasting/README.md",
+      "sha256": "F19F6ED24601CD1597C4711694E9B3139B21352A97A874FD36057D4408209347"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcasting/SpiritSpellcasting.Tests.csproj",
+      "sha256": "8BEE79EE93E4475B7DD8448090F52065646ED8B2F08C42AA1441E2FC634B374F"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingCompatibility/Program.cs",
+      "sha256": "29C5A682EF0FAFCBCFBD21385B9E589E7C25578241516C5737EC9DAB90E059C6"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingCompatibility/README.md",
+      "sha256": "8FED1F79832A20F1A30D24D07D91FFE938C0CD461489CEBAE5FF53D89A430EAC"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingCompatibility/SpiritSpellcastingCompatibility.csproj",
+      "sha256": "A4AF331F38E3457654CDB7BC50B25C496515C1BC04F93EB77BBA5B079AB82851"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingScenarios/ActionBarRefreshScenarios.cs",
+      "sha256": "2BA674CBF4CC6357ACA3B918B8A0AA12712D663A4C5F8B40C35631E73065008E"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingScenarios/GameApiModel.cs",
+      "sha256": "AA17BE4E615D0DFBC1D71A5E6A30274E295297A2AB8FAAB5E07A4AB3540A4F1E"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingScenarios/LoadSlotPreservationScenarios.cs",
+      "sha256": "19C971158A4D4D6D3011467715DA935CFBCC736741EC839166AEA734790C22A0"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingScenarios/Program.cs",
+      "sha256": "3AC38AEC4C103DF43FE51BEA868726446097E4C1DB579B82CF25B9AE47C14945"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingScenarios/README.md",
+      "sha256": "7D0790A8FD1CA36E08BF995E986AF974E4CA1939AEC72DE068367574E2AA1911"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSpellcastingScenarios/SpiritSpellcastingScenarios.csproj",
+      "sha256": "5EE8F00E79A832A948831A54ABB5FF567DBB59A6E09952DA6B3E9A53A6366A68"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSurgeScenarios/GameApiModel.cs",
+      "sha256": "B0F6402A9B4C4114DD6C12FDE903E35F0DDA61F90484D025467F037441CA87F5"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSurgeScenarios/Program.cs",
+      "sha256": "AA4C01AD64D9A0002BDA3BDF13B9AAAE27C87C88103D9233E3FA1A224F23CBB5"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSurgeScenarios/README.md",
+      "sha256": "C4963F9C2B4874ECA78D380B385075FA271B21B3E6FCB883C0B8AEF365A4B1BA"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SpiritSurgeScenarios/SpiritSurgeScenarios.csproj",
+      "sha256": "2459C4C52D16D1C42AAAAB7FBADB7C56125C8F5178A98FC2BEBAF658A0D20EFB"
+    },
+    {
+      "path": "Modules/MediumClass/tests/Startup/StartupTests.cs",
+      "sha256": "3321FC1EF1BEC65E681D43BF9EC96ED55C135FFBC9CF2284A493769F37FE3ABA"
+    },
+    {
+      "path": "Modules/MediumClass/tests/Startup/StartupTests.csproj",
+      "sha256": "8885EC1D1269E198C644439A938BAF4BFD74072E6A6E187CED3D35D6C7CAAECE"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SuddenAttack/ApiDoubles.cs",
+      "sha256": "0665805C652CBDB0B343727B35C70EBA4C479D8A61406B2B712B643250CB1022"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SuddenAttack/FleetContracts.cs",
+      "sha256": "F75E91D25818C28FA48A1400B3D181434D9DE0402B8E6F6805A56978F73D1430"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SuddenAttack/NativeAttackPool.cs",
+      "sha256": "5D2D37D3183160ADE9052339BF195B9F8B62ECBFA83ECDF43ABE92838386B479"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SuddenAttack/Program.cs",
+      "sha256": "2509BB09E31414B0FCCC48B8BAC486D5B4DC35EF2749580FED152DE0895879CD"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SuddenAttack/README.md",
+      "sha256": "6FFC889D4D32521C5EC983BE527417B2ADB46B8CEDB289CC02E381AD94077098"
+    },
+    {
+      "path": "Modules/MediumClass/tests/SuddenAttack/SuddenAttack.csproj",
+      "sha256": "C25B02DCB86FD1D284626441EE758CFF7582E3C875D83F48A21D0102929F5159"
+    },
+    {
+      "path": "Modules/MediumClass/Utilities/CombatLog.cs",
+      "sha256": "3AA033076BD3BEDABA59EC84A83E03D03A2CA486622F13144832C6A9D49B1D10"
+    },
+    {
+      "path": "Modules/MediumClass/Utilities/Guids.cs",
+      "sha256": "9ADFC3F25B8070DE2061BC3C9EAEFABE66B58A453426E86EE1C1B9C4EFDEC13B"
+    },
+    {
+      "path": "Modules/MediumClass/Utilities/IBlueprintCacheInitHandler.cs",
+      "sha256": "F41B927243DD013FF76C3FC2D2A79DFA6D52BCA44E261C950F16FD9AA9CB82E3"
+    },
+    {
+      "path": "Modules/MediumClass/Utilities/LocalizationText.cs",
+      "sha256": "DE2D3988800F84C49B9689D94DE823D35C4E050D987E56C589A97BC31A36089B"
+    },
+    {
+      "path": "Modules/MediumClass/Utilities/Logging.cs",
+      "sha256": "AD282C207A37F7DF8241B233F9D2662AE732371086FC53317B8D5007D53FF506"
+    },
+    {
+      "path": "Modules/MediumClass/Utilities/Settings.cs",
+      "sha256": "94CF2F04A3E4F461F18EB3048769A6634D6F8C96CB1EE78CBCFFC6C561B15ABC"
+    },
+    {
+      "path": "Modules/MediumClass/Windows复核.md",
+      "sha256": "F22661BBEFE6D9B8D9D230D822E9B6EEC34E17FF2B6EAF96624583680AE913E9"
+    },
+    {
+      "path": "Modules/WayOfTheShield/BlueprintBuildResults01444.cs",
+      "sha256": "FFA27F09D7AD51590EFAB95EDC0E4C99281DAE8898192F71298EA2F44A93CF8D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/CanUse2hWeaponAs1h_Mechanic.cs",
+      "sha256": "D8E2A9B1BEDF7A00563D3FCFAFD37F07563199250D56035AC6DEB620341AC661"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/BastionOfGood.png",
+      "sha256": "F17955A298B41E64762201A06A58D2E8B0419F3DCBDD516785EF0F5DD94814A7"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/Buckler.png",
+      "sha256": "83ED6DC499760E0D6E65EFCD7C8C04AC135ABC396BD12B9DC78E3F9958F46A1E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/Heavy.png",
+      "sha256": "4EA46B9D75F9144405AA4FB67FAAE801B2EC12155DB65AD3DEAE740E8EEEADDC"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/HolyShield_ArrowCatching.png",
+      "sha256": "0E20F47BE6349C71DD80E0788FC1A6EF42170DC12D8AE2676676CEDB37A81ED5"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/HolyShield_Bashing.png",
+      "sha256": "F29D8D8B274446C7099F511D0AF535CC6720FE65EB52A9802444036E49CC0999"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/HolyShield_Determination.png",
+      "sha256": "57C5AF721F06C32688942FE29186FFE406317D7DB91AEB54F9DDBA2B5ADE9C89"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/HolyShield_Rallying.png",
+      "sha256": "8AABF44151BD02890F13E8C1A12C9727C0CCC21233374D900E56CF1124F32D0E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/HolyShield.png",
+      "sha256": "0D71CCF6517C84DDE40E4730552E1756815322EFE46F462A2479AB49B05896F9"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/Icon_OneHandedToggle.png",
+      "sha256": "C44C2D464D80F9EC033DCA1B655EEAFAFD10D3F71858B69EFA4A940B4E6D7BCC"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/Mythic_BucklerParry.png",
+      "sha256": "AB263646B58134356A01DC5B65FD461F982B0247B66B81008F6D85A68E07930D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/Mythic_ShieldedDefense.png",
+      "sha256": "E69064B77548B043B44523BC51A0B13D7166D45B71F0883FC5F20CE18EC73884"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantFortification25Buff.png",
+      "sha256": "1FC27BD121F81DFAB82E1947295A1E59BC20467F4AE5C89A5E06921F6311523E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantFortification50Buff.png",
+      "sha256": "F448661914DCE09CDAC8D6A199C22F96A0BA5DBCC32F96B5DE45C4A8B1832D8A"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantFortification75Choice.png",
+      "sha256": "EB2433D2C611A522A1CE87F20436C78F9ED7AD86AA1826410D5F5D3088BB95EA"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantSpellResistance13Buff.png",
+      "sha256": "A169B78B02916EF63429F99ACE57B6691C6C0C8803D7B54BBF208A2548A1F0A6"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantSpellResistance15Buff.png",
+      "sha256": "901D53101E6BA0A44F6B94562147818F5915D489FBAA323F71801DF84F2043E7"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantSpellResistance17Buff.png",
+      "sha256": "4A7482B5687B2F4B8A6FAAD67B764FB65E9A613D532A79A007D8D8E011301284"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredArmorEnchantSpellResistance19Buff.png",
+      "sha256": "C6D2DA336AB5226543742B4122FAC55B266B11F87404E59AB7954FCEE2CC0E96"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/SacredShieldBond.png",
+      "sha256": "DCCE946AA64A87290E1A753D949CE7845F7D96D6B5C4135612788A2972D5AFF6"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/ShieldBrace.png",
+      "sha256": "254FDF7C9CB00EFCBC51A0096696E28537D6A9AF41DA36FFE2C989A9D6D8033D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/UnhinderingShield.png",
+      "sha256": "9EDB245DA7E443166831D82DC6C03B0F8BAD85F2DB2AD1D71F12D6557C113DC5"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/UpsettingBucklerStyle.png",
+      "sha256": "9FE48282C7BB10C1634450FEB4C0FF8B255E3EA7FDD95F43D6F706C6CAF94054"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/UpsettingStrike.png",
+      "sha256": "CB4DD274C3856F564C01F6861ACBFAB3E8E41A77F783AA2FEDE250A80F3B74DA"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Icons/UpsettingVengeance.png",
+      "sha256": "54C618753E6C5B1D9812EADE6ECA67C96384A5BB62BCED91AADE3C0A2314E085"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Localization/enGB.json",
+      "sha256": "FBAEB935D93D5C2C0229F3E1A942D41386B10A71CE7D4BC9C8E30C0721987BC0"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Main.cs",
+      "sha256": "964A96795A5448724023D65DFD935B7B4C5CEF8F678CBEE5EFA4EC44A28752E4"
+    },
+    {
+      "path": "Modules/WayOfTheShield/MechanicsFeatureExtension.cs",
+      "sha256": "DEEC97508BBB95795D58883D3C6B0E11997E5919C865C4DEC855860C5147EC02"
+    },
+    {
+      "path": "Modules/WayOfTheShield/MountedPowerAttack.cs",
+      "sha256": "39B35B62CEDB5582C144A213E6E334586DE00EDF8EA1EA554CB3D124B9C85191"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewArchetypes/SacredShield.cs",
+      "sha256": "8F0DC8FC11803CFC278998A8F9675A911F627D5C6A5464ED9C249D14FACE254A"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AbilityDeliverTurnTo.cs",
+      "sha256": "35AEDCD0324964327F43E1DFEC36C0E919DB75E0A10DEECD5307645D96957188"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AbilityTargetEquippedWithShield.cs",
+      "sha256": "A52096BF0BCE7B6259A2BF36363FEE47329125D6F68871612087C10777D3E562"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AddFactsFromEnchantment.cs",
+      "sha256": "2C8DD63505656D91725582DCFF71F615F0249CD3919072A364D0ABB29D3FC687"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AddInitiatorShieldBashTrigger.cs",
+      "sha256": "DA535DDC0A7FAED71EB6D4834F5A30D042AC17814367F2861EF79D24243C9393"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AdditionalParriesComponent.cs",
+      "sha256": "EA0E8111A53BC0764FD857C58137CE97D4F61817DDDEFF351BAEDD2E3100186C"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AddRegerationFromTarget.cs",
+      "sha256": "81681FCE5EFAC95279212173D47E847341334226F9A8C9982FF2DF0B95F09B55"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AoOOnFarMiss.cs",
+      "sha256": "6D2BC8F82A6CDE6A50F050FB6040A1A541448836E800C45C6A4987126B99A3A0"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ArrowCatchingEnchantment.cs",
+      "sha256": "2647D615F350732D2D358920F39511EAE8DC6D2CE28884A048744B639C879662"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/AuraFeatureComponentLadder.cs",
+      "sha256": "7F74A959068B3118FC8ED557059A71E28662699DE948FF8D425906ED01D8A7D8"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/BuffDynamicDecriptionComponent_Charges.cs",
+      "sha256": "58103579B2BF7DA9CDF9C967F92FD8457D1629A92BEAF1F8830A9EA0FE408B51"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/BuffDynamicDescriptionComponent_Base.cs",
+      "sha256": "EB59CD91BC87263EE41996F655095A6EEBB5DF210F488DBB1DF3A43A1EF64F1A"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/BuffDynamicDescriptionComponent_Caster.cs",
+      "sha256": "733F0717B65B28EF9D6D34141952697DDB6AC199E223F3950AEC91A9C9666585"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/BuffDynamicDescriptionComponent_Parries.cs",
+      "sha256": "F12BC8752C893D769D7740278D56FB2A36EB95AD97F2A58AC834EE51DBECC2B3"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/BuffSetRanksOnApply.cs",
+      "sha256": "A2E50014AF10D14FAF93F58B324553A012606A857E646E741931FB80BA19D490"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ContectConditionAbilityIsSimpleProjectile.cs",
+      "sha256": "2062A4AB70C39A50692D45BCED1B7E7C45B8E6439F4B2138705F7598542D622D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ContextActionEnchantShield.cs",
+      "sha256": "08411212BA6EA2BCE4FC8A554AF4844A46B7D91991F7947D38FCDC03535D1D7C"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ContextActionRemoveBuffRanksCustom.cs",
+      "sha256": "8DD4E3761A0CB8FEA2181137F219E6055C10D11C87614789D554EF0F72E161DC"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ContextActionShieldGeneralEnchantPool.cs",
+      "sha256": "DB36E023B8EF418349D2E4736A4AE50F6F65E816706328F19D49B0BF65DDC676"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/CouchedSpears.cs",
+      "sha256": "F1CE9B7BB6BD28DCDAF3EED02090B418A31A68332FAE55A38BF33195551AB3D2"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/DirectlyControlledUnlessFactRestriction.cs",
+      "sha256": "EBC128A3FD92F95AE220258AC7039D61AB557ED267C10EB063F5842FDD81D0FD"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/HalveDamageIfHasBuffFromCaster.cs",
+      "sha256": "AC31BEE1182E10F7ABCD13E4AEB4CA43C9F6B04B66A730C419B948D10E1BEE4C"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/OffHandParry.cs",
+      "sha256": "28081054C15962E45347707B30CD3A67C20A8DAA6DAD3B96E7FFC7C966EBBEF3"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/RemoveBuffIfMaintargetIsMissing.cs",
+      "sha256": "FFCD42FC202FBB48661769BC95C203C820D6F981ED109F240174BE81AC088F5B"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/RestrictionMeleeWeapon.cs",
+      "sha256": "BF366AA976F7C7AE27ABEB8B87226C76FBF00B095BD7DC2C9889860E82977C2D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/RestrictionOtherActivatables.cs",
+      "sha256": "41DA5A98DE006E6A6278DB7855F23F8F114240422262844FB8619A468A9235E7"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ShieldedDefenseAcBonus.cs",
+      "sha256": "2D65616D2F95074B3E3CB5CD3D10DA98D2A82A85AC3352C0A1A49982F2E2A4B2"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ShieldedDefensePropertyGetter.cs",
+      "sha256": "C489FCAE8D7EAFA63D2B7F0EFB9771A9F16A6052302D2A6DD91157FDB070688B"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/ShieldedDefenseState.cs",
+      "sha256": "E6693659C838CC42368DD44F3556EFFB84577ACC54B622546BB439988C30410E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/TotalShieldBonusGetter.cs",
+      "sha256": "67513A94E318BA3932425FE6FF50EC8C33176A16395A442AAEEDA8CAFD184585"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewComponents/UpsettingShieldComponent.cs",
+      "sha256": "CD69ADD0875DBF81C11D2444F8E458BBD1449CFC256AE3F3925118374BAF0C19"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/LightShieldParry.cs",
+      "sha256": "057B6E4863853986F3D75E0642ED41F22E6E119665118C1FC354FDADB7E33E64"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/Mythic_BucklerParry.cs",
+      "sha256": "16CC12EF58E8663EB0B64511A2401B157CF88112B7D7621B85F3C9DFB28BD0C7"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/Mythic_ShieldedDefense.cs",
+      "sha256": "56E869E36AB24D6E103756C829502B6C8CEB0483BF07991791CBFCC7EF505BA5"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/OneHandedToggle.cs",
+      "sha256": "79979621AB1A2316B03EAEF21983B185B86BFE42358E28A151D4FA78FF6CAB63"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/SacredShieldFeatures/BastionOfGoodFeature.cs",
+      "sha256": "34D4A5E7E559300ECC19DD2EA94CFB09C410A139D6F8D3098A6C435E49A82673"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/SacredShieldFeatures/HolyShield.cs",
+      "sha256": "5A9E748056629B91FB32E43A564AFA8261A8ACD59882583D5F8A47542F2DA430"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/SacredShieldFeatures/SacredShieldBond.cs",
+      "sha256": "F89D37DAF18BC22FED6C7AF44EA1BD2C3A3330991BC2EF370EC65F3148B58271"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/ShieldBrace.cs",
+      "sha256": "5A077238252C78F14E4CD9D0482C717C38CBC74E57119D7A9E3981BBB7896B6E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/ShieldedDefense.cs",
+      "sha256": "FA6A9A5ADA5E641987842863090850F65E2C6FE9E749B3925729843F18829A63"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/UnhinderingShield.cs",
+      "sha256": "E3632C106676F365B83FB62FC0454549F4A24B9B31AB5AF31F5EA5BFE7D2B2CC"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NewFeatsAndAbilities/UpsettingShieldStyle.cs",
+      "sha256": "81DC99203DC2DEC8DAC367919996949680E2F30C7808E64D0742DA9C6B4F54A6"
+    },
+    {
+      "path": "Modules/WayOfTheShield/NOTICE-WayOfTheShield.txt",
+      "sha256": "D32BA254A662E4253D3A9391DCBC189BCAC3F4F5A3ED1F4FB8CE59ACB5C2E1DB"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Settings.cs",
+      "sha256": "5FC654F885AD7A057CDE4EFBB4496301E2A0EF1DF1F0B6AE12476C115E057827"
+    },
+    {
+      "path": "Modules/WayOfTheShield/ShieldAcState.cs",
+      "sha256": "BD663DC93510F006E52119D9A39C5EB1A0C7B22F23EBD2800F3C465591E0C569"
+    },
+    {
+      "path": "Modules/WayOfTheShield/ShieldRuntimePatches.cs",
+      "sha256": "19C21C14362C963BFD5391DE5492072152F4EBE6F610AD28DFE1CC04116797FD"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/BlueprintTests/Program.cs",
+      "sha256": "9B674C6C4781343CA19B6BE6E2CD684556A1BF8E8D87D4CCEC0FB27735B5FF0C"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/BlueprintTests/README.md",
+      "sha256": "5E3CF2E1C8F07C59045FAAACC2733E417841C5A5CC2878985B5887F18ED55E9A"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/BlueprintTests/RetryFaultCases01444.json",
+      "sha256": "2F8FFEC74A34B4EECFA74899E6D8B9BEDAE20E1AB751741DB94A7182B083530F"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/BlueprintTests/StartupRetry01444.cs",
+      "sha256": "01D3478CB752A628A3792ECBCF57D9CBDFD0F4F5AA2C0D56C7294DCC74026B98"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/BlueprintTests/WayShieldBlueprintTests.csproj",
+      "sha256": "3D60082D0761FB567B4A56C90C6AE4F7FD3C230033FE69D3F9B958205DE08A27"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/EquipmentTests/EquipmentTests.csproj",
+      "sha256": "019DC2253D9E1E34489C466F8A5C6A24B048ABE8615583D04CDFE1FFD3808C62"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/EquipmentTests/Program.cs",
+      "sha256": "67C61EA757935E64E68B5881A264642A8644D344D5F5ED6B6185DACBDCC6EE91"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/EquipmentTests/README.md",
+      "sha256": "3C4B49E25931A692466FEEA2EDC056E99B5AFEC6D4950B9E2A336360A2C56CE0"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/Extract-Native.py",
+      "sha256": "97CDB6D86159CFA8B84A23217A1E6585AF0556DD36BDB815959D7351C599D369"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/FeatTests/FeatTests.csproj",
+      "sha256": "59ABAE4015BD27FEAB8FF3FF68E4D01172A98E1A6D5B31EDA058252A733E9346"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/FeatTests/Feedback.cs",
+      "sha256": "1343E931548304BFFE0E4FE9294291A2B411DCDAAE1FC3BE72BF65CE4E8FA30E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/FeatTests/Feedback01410.cs",
+      "sha256": "50E823D96C357D4AD8524AB91C07170C7AC51083737A23139831B440E47F21B5"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/FeatTests/FeedbackBoundaries.cs",
+      "sha256": "859EEEA80618710D961F1D0A7068FAEA9D4C4D66FCCFE45316DD91BD1C325A10"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/FeatTests/Program.cs",
+      "sha256": "D71F8AF22088CA75981FE4F3DCCC039768A57169A1172C4AD30C1954EC059D33"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/ReferenceBuilder/Program.cs",
+      "sha256": "1FE261C11F24B8A0310ED5BBF7F53C17D4F0C5A6122DE5EFF1B47D496FF92203"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/ReferenceBuilder/ReferenceBuilder.csproj",
+      "sha256": "EB9EFFC7FB989F0B2D85984569F14F5C9B641B2DB46D9F74A510B15CA13EF0AC"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/SacredTests/Program.cs",
+      "sha256": "2160B02B17AA6DDC5E024357718EE748A3AE723C92DFE16F17F3631386DB875D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/tests/SacredTests/SacredTests.csproj",
+      "sha256": "27DCE8C7C1C4C29BFC64B87A111DF0BE01CDC74AA5238A9CF41E44BEC028D13D"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Tweaks and Changes/BoringBucklerTweaks.cs",
+      "sha256": "9EF6846DA07AC534FDA4DB7796C7665044897DE19E664C1DC4A1B6599D20FA09"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Tweaks and Changes/ProficiencyPatches.cs",
+      "sha256": "9DA6E5CB7BE7AEFCDA65CD3A67203E626449DDCFAC0AA5708053D558E3A2457E"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Tweaks and Changes/ShieldBashAbilityTweak.cs",
+      "sha256": "F2A939F19A08EFED330F1D5FB6F38528D4BE263A6CB16A3D57BC343E32906EB3"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Tweaks and Changes/TWFShieldTweak.cs",
+      "sha256": "1B37F3B888EDABCD5C0BD98A64BB2C975E1E5E738114E9CB183E74BF8044255A"
+    },
+    {
+      "path": "Modules/WayOfTheShield/upstream-provenance.json",
+      "sha256": "5F8F2565FFA2C2F2BEE6CBC50E4961802520B58B2764834A82ADE376683798F6"
+    },
+    {
+      "path": "Modules/WayOfTheShield/Utilities.cs",
+      "sha256": "9FA09480F00F15DE0E10E7E49715ABB03F18B2A4515136BFE1E0E3AF3B4A5E15"
+    },
+    {
+      "path": "Modules/WayOfTheShield/WayOfTheShield.csproj",
+      "sha256": "A95E16A088E5759D64D836507B8079BEE3A19092541339344A5EFB5330B01F31"
+    },
+    {
+      "path": "package/Localization-QL/CallOfTheWildWrathPrototypeLocalized.json",
+      "sha256": "B1BE3D6CE085947282CCE27C9118DB27BDB9198AD5D297C49509DE5A2649A017"
+    },
+    {
+      "path": "package/Localization/enGB.json",
+      "sha256": "DF64D5A944B7439588F746CD60464CFB6E1506E37306B468B2125C9D4AAE92E9"
+    },
+    {
+      "path": "package/Localization/zhCN.json",
+      "sha256": "DF64D5A944B7439588F746CD60464CFB6E1506E37306B468B2125C9D4AAE92E9"
+    },
+    {
+      "path": "package/OwlcatModificationManifest.json",
+      "sha256": "E28825B5A332E1584E34CB8FB96B571262D22B8CA5EF859F3C67452A2D3D9C53"
+    },
+    {
+      "path": "package/OwlcatModificationSettings.json",
+      "sha256": "2BB4CD717F7A1F346DA7DF83E38A6A16F296043FD91C70042AFA8DC0D2B796C8"
+    },
+    {
+      "path": "Publish-Release.ps1",
+      "sha256": "C9B38B4245BEE33411E8A8FA797D0617352C25675DED751552A730CAF886E26B"
+    },
+    {
+      "path": "README.zh-CN.md",
+      "sha256": "2D25A7C0F67B4CC7B33BFABF0FDCF7D15FB282EA685E093AEA54A2D5D77736B0"
+    },
+    {
+      "path": "Shared/HarmonyRuntimeCompatibility.cs",
+      "sha256": "11EC09AFE43D051810CFAEF1F00F9DD0C28ADCBB37069CF8D63983805288BDCD"
+    },
+    {
+      "path": "src/Admixture01446.cs",
+      "sha256": "02E5F3896EC1B8BA3933F047A1C7F9F471ACA438B3D5673D9E006564862A59C5"
+    },
+    {
+      "path": "src/AdmixtureDescriptors01447.cs",
+      "sha256": "18BB40CFC4033C921D8FC719097EB5D8E80698087A38B770A2A6812245F78161"
+    },
+    {
+      "path": "src/AngerInquisition01431.cs",
+      "sha256": "31095173BDEA08919890867BF3713318B37C32D9BE157D73E7D4415537957268"
+    },
+    {
+      "path": "src/AntimagicRage01434.cs",
+      "sha256": "DBCDA3C21CF61E7E7BF8AAD58BB1785CE5C1AD6CF82769ADDF78ED6C70453A32"
+    },
+    {
+      "path": "src/ArcaneBatch01446.cs",
+      "sha256": "E0DFAAC9FB83DFCD2EE8623FDD0A51B2A142A76C98F62DE556C5BE96624FE50F"
+    },
+    {
+      "path": "src/ArcaneRuntime01446.cs",
+      "sha256": "6F88629A08B1141717EAE27FBB88AB8CFB5850A3B45E5837240718DAACA62E7E"
+    },
+    {
+      "path": "src/ArcaneText01446.cs",
+      "sha256": "9CF5D3DD2DE3C631E2A18F9FD68A8B7838461CF189460EB3FFBE92F52FA5ABC5"
+    },
+    {
+      "path": "src/ArchetypeBatch01444.cs",
+      "sha256": "B8F629DC31F7EC19F3F569763070089887764BC9E8F73BBB2099FCE14EB4A843"
+    },
+    {
+      "path": "src/ArchetypeBatch01445.cs",
+      "sha256": "375DEFEBD4CFADF3E8915623CFC659141BC3F00FF4C1CA53EF04248FFF2973AF"
+    },
+    {
+      "path": "src/AuraRadiusVisual01458.cs",
+      "sha256": "15E6E3F0439F4F6137F7B50D988815A26D0ABF34B2D0C680AF294356F1593DBC"
+    },
+    {
+      "path": "src/BardMasterpieces01435.cs",
+      "sha256": "0A9D5061F823FD56200D204C2D5EA4C538CE6581A380DB99F1A2B7D3092117B4"
+    },
+    {
+      "path": "src/BloodlineAnchors01446.cs",
+      "sha256": "5CA48C213B86B99F667F6EBF5F740B43D6615E60F516E708A6759F5D24632A2D"
+    },
+    {
+      "path": "src/BloodlineCompatibility01447.cs",
+      "sha256": "BE3BDA01D83CA0BDF7230B42C4470E11D13A15B4C228692BE15EE9B41223C781"
+    },
+    {
+      "path": "src/BloodlineExternal01450.cs",
+      "sha256": "6F4BCB0456B69EA21B6C3F8DB1FD9C6F96420660D7EFCA57320E2F3C7EDDF107"
+    },
+    {
+      "path": "src/BloodlineMenu01452.cs",
+      "sha256": "D9ADF1C1B8B23543583B8776A68CBF33CF397B7F449340BD00C240CCFD2B790C"
+    },
+    {
+      "path": "src/BloodlineMutations01446.cs",
+      "sha256": "E3C213CBE668C7D614E8061376568AE9096CDB9029DFCBD97DDA0D339BA1908E"
+    },
+    {
+      "path": "src/BloodlineProvider01453.cs",
+      "sha256": "02B9A50538C45DE7BEF73D6176940DCBED5CC893806B91BDBE6C65FD95BF53BE"
+    },
+    {
+      "path": "src/BloodlineSlotAnchors01451.cs",
+      "sha256": "A965702F2F0BDCAD7E6C51143E55D77E0B01F0AF86BCB1067044C9387EC55EDA"
+    },
+    {
+      "path": "src/BloodlineSlots01451.cs",
+      "sha256": "76E0D9EEA57991E8E10D56215A2AD705FACDA8138E4873C1A39813AD63871596"
+    },
+    {
+      "path": "src/BloodlineVariants01447.cs",
+      "sha256": "917F8AAB88B2D678AEB63B003442AFB441DF05AB209806F36834E83F55E51DA7"
+    },
+    {
+      "path": "src/BlueprintRegistration.cs",
+      "sha256": "FDB0570C22FBCCBAE517DD04412295A5B8085A1F7744521D0F2FD715B31AF88D"
+    },
+    {
+      "path": "src/BondedSpellSharing.cs",
+      "sha256": "6637D678617A3E6167043B3B38C7FDC68A250608CAF94CB7125C52C19C626B8B"
+    },
+    {
+      "path": "src/ChannelCorruptionPreview.cs",
+      "sha256": "FD4EBBAEF91003D794694F5A0882C3C20AFBD1C05B992C2397FC1F1367C9171F"
+    },
+    {
+      "path": "src/ChosenDeityAlignments.cs",
+      "sha256": "B7F842F600673EC6999634EECF152809F8902756C470A28288449570DB76D4DA"
+    },
+    {
+      "path": "src/ChosenPropertyToggles.cs",
+      "sha256": "06F979EB573B057BCB26B405A6005DFB1B5D3E9F352B30042A31404808D80C25"
+    },
+    {
+      "path": "src/ChosenWeaponFeats.cs",
+      "sha256": "8C3395AE131D897F14CF5E09D15EBD80A634F62DC0C5781805DF3BAE830D809F"
+    },
+    {
+      "path": "src/CombatFeatPoolRepair.cs",
+      "sha256": "C7127FCB8583D64001E8B7F8471BF7269535A8891D1FD76127FCE10D040E4CBC"
+    },
+    {
+      "path": "src/CompanionSpellSharing.cs",
+      "sha256": "072F29F8CF2BE6BE155768438C724B5BF9D293E920CAC6687BF2A19CDA0C6A52"
+    },
+    {
+      "path": "src/ContentIdentity.cs",
+      "sha256": "2E894C0146D8E299DB94865AEAEBB28D7CD8EEAA8B9CB3D9BDAACD39349ED82A"
+    },
+    {
+      "path": "src/CooperationCatalog.cs",
+      "sha256": "DD45339399D511F4E2C022938DCDC4DBB7CCC2E8E44FB07BB47B155A5A51F608"
+    },
+    {
+      "path": "src/CooperationFeats.cs",
+      "sha256": "401AB2C34FFEA8FF842B60CBE4758C724B2677578D6EDAAABDC36BE0758D052D"
+    },
+    {
+      "path": "src/CooperationIcons.cs",
+      "sha256": "D8C238F109DD1C42B9325F73D900FA8B288A5D149579C42A572F0E34CC0E41E6"
+    },
+    {
+      "path": "src/CooperationRuntime.cs",
+      "sha256": "05FD77D9BDA1AA965487889027B12993EAF45D9123E89A631892CB5B61A49814"
+    },
+    {
+      "path": "src/CourtBard01445.cs",
+      "sha256": "CB24D01F41E95667A4E62300B856AFBD8BA305352A458414F01F7EE9C6EFCC15"
+    },
+    {
+      "path": "src/DevastatingStrikeFeat.cs",
+      "sha256": "D1A2CDEB58E21A166C8B0D0684DD9BEDD24B6B7391A9AE24299A56A9A5FF2396"
+    },
+    {
+      "path": "src/DrillSergeant01445.cs",
+      "sha256": "2E0D33BB2CCDF4D65A9A28A03087055D26BCBE9B0A48338DC89404D805DE66D7"
+    },
+    {
+      "path": "src/EnhancementSchool01429.cs",
+      "sha256": "44D2E8AF10FC2FF9717A28CB146D5CC3A51605CA245C67EE91B21BD69DA838A4"
+    },
+    {
+      "path": "src/ExemplarInspireCourage.cs",
+      "sha256": "AC725B01AFA7705888994AA868E156E3E5025A5966931C58F1C290C85B5AD775"
+    },
+    {
+      "path": "src/ExemplarPerformanceResource.cs",
+      "sha256": "F92AE8672DC1992C36FB15A63E1C6AEE62B73E6C0E427C83CB7524F6ED4E918E"
+    },
+    {
+      "path": "src/ExtendedBaneComponent.cs",
+      "sha256": "6BA93C0C6CCC880EEDAE349F361E21E816D02FCDBAB49C273D920CF3A132BEAA"
+    },
+    {
+      "path": "src/ExtraInvestigatorTalent.cs",
+      "sha256": "72AE39778D515C36E051A49F573C982BB9AF5B7602249DCF2644AA26C1D95543"
+    },
+    {
+      "path": "src/FeralGraceFeat.cs",
+      "sha256": "1792A45BD434D34E1A32FA92E8DC68FE80EACB4EA97B4ADB52EACA35FEB6009E"
+    },
+    {
+      "path": "src/FeralHunter01461.cs",
+      "sha256": "F7AB44EF1759B4A413EF462D26BB5D7EBB917CD8135632A310728EB0F158AE1A"
+    },
+    {
+      "path": "src/FeralHunterRuntime01461.cs",
+      "sha256": "6B72417DC45098A473A653A7551D2D26BD26F19A240667D1D40D5CC9F816A3B8"
+    },
+    {
+      "path": "src/FeralWildshapePrerequisites01461.cs",
+      "sha256": "41C1C4B017631267650FEB024208E0C6C5D1925D7AD5ED685BB19076CA5D18F1"
+    },
+    {
+      "path": "src/FerociousBeast01431.cs",
+      "sha256": "E3671573916B89B7226857FFC20A1583A1D6EEE92D223B6ED4D9D0560475F2E6"
+    },
+    {
+      "path": "src/FlameJet01429.cs",
+      "sha256": "E778D79EBE0824E29FFBCC22DCAB286DD0D8EEF120FFE436E97A413C4E2B0744"
+    },
+    {
+      "path": "src/GraveWarden01445.cs",
+      "sha256": "5CE69FE482493B80C3D7D5CF618171807430349A8212C0F27A5F6DD4CC2E6BA0"
+    },
+    {
+      "path": "src/HedgeWitch01443.cs",
+      "sha256": "1E53E6519298735C228222376F39403C85EFF7661DD11FB0892499A3A26EF695"
+    },
+    {
+      "path": "src/HowlCastFeedback.cs",
+      "sha256": "1B1F0138031C55BE6B422E2A4AE735481671CC60684D97A97628E610EA384C97"
+    },
+    {
+      "path": "src/ImprovedTwoWeaponFeint.cs",
+      "sha256": "F6ED51A9549C512DF3630AFBF3DD6361DB58606D5C05650A0A5A6EF71EB04C9A"
+    },
+    {
+      "path": "src/IncreasedDamageReduction01439.cs",
+      "sha256": "F1327B0A089DA44C8F3B8C88790FF92EB77EEA08DCBC5864B6438458F0CB1AF6"
+    },
+    {
+      "path": "src/InfectiousCharms01447.cs",
+      "sha256": "134C97606EF934AF060C38B460C0D5ADB76D1FD28EE623CA1753F1508188E5DF"
+    },
+    {
+      "path": "src/Inquisitions01426.cs",
+      "sha256": "4BADB63811481275C915045202389773F4957E1ED96A0D5C2771365B500BF28F"
+    },
+    {
+      "path": "src/Inquisitions01428.cs",
+      "sha256": "CEB68E502BEE76AD38A11692D06058454AF3D36B8F27DA850F9621443F9197F0"
+    },
+    {
+      "path": "src/Invoker01437.cs",
+      "sha256": "B2F1D7588BEFD7DF877A0F93C80BA0629C8124333CC4B6D5520FDCF0084C3226"
+    },
+    {
+      "path": "src/KineticInvocation01433.cs",
+      "sha256": "7A28E30509B22409426519D813302A7D9E2DE7D9E0DB9A5733BA5A5E042F1ADF"
+    },
+    {
+      "path": "src/KineticUtility01433.cs",
+      "sha256": "8FE9456FBF3AABFC56F238031CB19B662FCC14836C50BE227D94BF36F0ED3B66"
+    },
+    {
+      "path": "src/LinnormFeats.cs",
+      "sha256": "DDB6B134291428E9C85E2E4A4A8134D759A9D96BDA67CB0A427620C31FF0DD93"
+    },
+    {
+      "path": "src/LinnormRuntime.cs",
+      "sha256": "7A8E64C278B1DFFE4D6D38DDA0B5F20873B85C6A0E54A429B09CA6152970773E"
+    },
+    {
+      "path": "src/MagaambyanTelepath01447.cs",
+      "sha256": "AA03850A79658B10DA3B34EED18E667D6E6BC5E646A23CCFC4DD8289C9C46BFC"
+    },
+    {
+      "path": "src/MagusBatch01454.cs",
+      "sha256": "440D984BA3BDB6B55766EDC963688F85247DE905B300E9E68525D88AFFF55401"
+    },
+    {
+      "path": "src/MagusEnchantments01454.cs",
+      "sha256": "B5C7116C31696271F91AFC14970F4F400D1224B9E53F4FF7D68AABF772DF49D9"
+    },
+    {
+      "path": "src/MagusFeedback01455.cs",
+      "sha256": "7E8CF0B0227E5B51E99695E9BC331E557FB14D05F7C072736948C1220A9A9C9A"
+    },
+    {
+      "path": "src/MagusHands01454.cs",
+      "sha256": "EDCD28EE1DB6EFFBB47770049B1122EC60C9A2363CFD9936A10075147BE06A21"
+    },
+    {
+      "path": "src/MediumIntegration.cs",
+      "sha256": "DD2D181CA2F236B0A9382A1D49F601C84B71F38ECC3D0D071B1004434CF6CC4C"
+    },
+    {
+      "path": "src/Migration01426.cs",
+      "sha256": "AD411BDDF74BD6BC6A0D518863CCBB9D7F0C6F5B53829D29C0BA88741D44B2B9"
+    },
+    {
+      "path": "src/MimicCatalogue01461.cs",
+      "sha256": "E646753E8B4F229392830B38163A7C0B7C400D9525F5FFEBC0B806B6BF1439A6"
+    },
+    {
+      "path": "src/Mindblade01454.cs",
+      "sha256": "05E08BF0E0A50054FA8ACEF7CC96FD94B8D04F49DA526AAFD645EDC48C1F0368"
+    },
+    {
+      "path": "src/MindbladeRuntime01454.cs",
+      "sha256": "26C2E223E15D1F139673F490BB98C9D24DF86C5002AE5E2ED86FB6A1FD88C860"
+    },
+    {
+      "path": "src/MindbladeSpellAnchors01454.cs",
+      "sha256": "2BD389A36179A43B6D926C6C2F4F0317A05013C9406908E6A0516CD5D73B0752"
+    },
+    {
+      "path": "src/MindbladeTexts01454.cs",
+      "sha256": "B858647605AB44DA985423FF8633B14B74CA6E6069BFE40E2DDB2C5DC53E315B"
+    },
+    {
+      "path": "src/ModEntry.cs",
+      "sha256": "4BD0592D6DFB6014A4F6037D0EC12BD0E2C7CCCB3069440A3FC9157C0E19C5C1"
+    },
+    {
+      "path": "src/ModMenuIntegration.cs",
+      "sha256": "1BD65E9E0535D087FA71BFEE8E8A9B9CC4EF354C13BA71A75A4D2C745E8649ED"
+    },
+    {
+      "path": "src/ModuleCatalog.cs",
+      "sha256": "3EEC552C84F422B9786E73B1E462EA385F399299A1C5CF81C8C7D070A811FE16"
+    },
+    {
+      "path": "src/MonkKiPowers01427.cs",
+      "sha256": "062B655020D61448934E1BE2856DA6BDD612F55FEA9F4C1DB3A0A22403FF05A6"
+    },
+    {
+      "path": "src/MutationMind01457.cs",
+      "sha256": "38DA35A20753CB98DD661004144E68CB600CE0C3DB79F841E5A50BA30783D48B"
+    },
+    {
+      "path": "src/MutationReach01458.cs",
+      "sha256": "A15D09D162326134BC1151A36ECA4117AF0A3C1A9D2519631431F82CBC53B0B0"
+    },
+    {
+      "path": "src/NatureBondedMagus01445.cs",
+      "sha256": "740B2A7C194CBF12C14BD4A8074BE615382A220A86215636604090768396FCF1"
+    },
+    {
+      "path": "src/NatureDiagnostics01449.cs",
+      "sha256": "438A057E3EB8F25417F82E770CEDC7E5716E04762F9A93E68ECA0B893DFA94C7"
+    },
+    {
+      "path": "src/NatureTargeting01448.cs",
+      "sha256": "1465817E31B668EF7EED12DC83C48C27BF357AC3219B1A45D0A1BDE12C1B86D5"
+    },
+    {
+      "path": "src/Overseer01447.cs",
+      "sha256": "C82701EBA0D3C0E4389984D5F0BC02763D4C82DE48FA71F1AD9F52EDC403A38D"
+    },
+    {
+      "path": "src/Phantasm01447.cs",
+      "sha256": "485C63A405EC5AE5A5D54330F3650555BA55CA1B2C296FE85BA7FFB836A4BF5D"
+    },
+    {
+      "path": "src/PhysicalMutationToggle01458.cs",
+      "sha256": "EF505F4BE155836A10955105DCDAA1FE720870BB0E21C9D90EACE16C640FC099"
+    },
+    {
+      "path": "src/PrimalSorcerer01444.cs",
+      "sha256": "C969B158FE0641E63886DC92B0E4A53509736E3D2452F0E3713CEEBDCCAA16C8"
+    },
+    {
+      "path": "src/PrimalSummonResistance01444.cs",
+      "sha256": "E53C5CB219FB25765C64B9CEA78AEA9181D3B89708E2A7E81E8239B4B92EDB45"
+    },
+    {
+      "path": "src/ProviderResourceFeats.cs",
+      "sha256": "97FB1411C4B61C5866600BE7207773257B28E07A195EB2B3231E1FB21548F31F"
+    },
+    {
+      "path": "src/PsychedeliaCognatogens01458.cs",
+      "sha256": "EC510D6ACD49A9BCBAFAA50CE25C8A7FFDC7B5834142FD751E7672C41A745057"
+    },
+    {
+      "path": "src/PsychicAdvancedRuntime01458.cs",
+      "sha256": "7FECDC71FB35F517F51960463327BA8810B1EFA3F518E7F64DA4C2AAE556DE32"
+    },
+    {
+      "path": "src/PsychicAfflictionSpells.cs",
+      "sha256": "6D48E211625E6EC3107462B67E06AC458A28B007EFE154C0D2F6150831F4FEDD"
+    },
+    {
+      "path": "src/PsychicAmplificationComponent.cs",
+      "sha256": "5488BC23736E868A83EEAEB8BE6B81D4AD9F14AAEE9F670B73E22D80DF97EDD8"
+    },
+    {
+      "path": "src/PsychicAmplificationMenu.cs",
+      "sha256": "4B6D090DE6CD367D8AFC752C5315A65C1ABA871AB8446AB6841DE1500E16E37E"
+    },
+    {
+      "path": "src/PsychicAmplificationRuntime.cs",
+      "sha256": "DFE8F672269A0A36B302A5D77948588DF17BBF69B86337DEF5A4992A2625315B"
+    },
+    {
+      "path": "src/PsychicAmplifications.cs",
+      "sha256": "8FBF85E6A6193FB2F08582F21E6737913A7C64501CB823DB814E18357F817BC2"
+    },
+    {
+      "path": "src/PsychicArchetypeRules01457.cs",
+      "sha256": "2BE72887CF8B8BCE775347772C071311CA11452F2689E4424EF847062A775941"
+    },
+    {
+      "path": "src/PsychicAreaSpells.cs",
+      "sha256": "E67F2C41011B3BCA274B5422A9F013705170FFFD055A202FAF2712F0286DA482"
+    },
+    {
+      "path": "src/PsychicAspectSpells.cs",
+      "sha256": "E5938F05F6C59DE4548EE2374E85A430EECD1C442D3B7202156A6FA8C11448E9"
+    },
+    {
+      "path": "src/PsychicAssets.cs",
+      "sha256": "8F5BB7C698EB9C845E9EE9386D38DDBA3240719209338C38A13E0C752AB1295E"
+    },
+    {
+      "path": "src/PsychicBattleSpells.cs",
+      "sha256": "DCC39E3832980B110DCA8AFA4209426D7F3C83C6D7AC3A359209220B5FE8C014"
+    },
+    {
+      "path": "src/PsychicBladeTutor.cs",
+      "sha256": "4B03F2AB9CCE6A3B9E9B2B8585951B67885B72949AD18A261C00E75938CE5032"
+    },
+    {
+      "path": "src/PsychicBloodSpells.cs",
+      "sha256": "BF917630A7BE08C1E0345A5DCBD66B3F4B376507CDFE1AA29F33C40C67507805"
+    },
+    {
+      "path": "src/PsychicBloodyClaws.cs",
+      "sha256": "2A8D13A6C718AACF754A383FF3C06BA34B350FC82C35E9C45FD932B2BA018CAE"
+    },
+    {
+      "path": "src/PsychicBoundWeapons.cs",
+      "sha256": "D48C2498808C340EBB9ABBE7710A1971801DB2A55235F242A901C30C84D87A5B"
+    },
+    {
+      "path": "src/PsychicBurstSpells.cs",
+      "sha256": "BBD608817178EC27FB89593BC02B8AB65F64A462894BC65A6BE47F3CFA580D22"
+    },
+    {
+      "path": "src/PsychicCasting.cs",
+      "sha256": "B0ACD8F39768D4ECF3CD7A7C82AA088C02FC6F74C37D136CABD67BC24135091C"
+    },
+    {
+      "path": "src/PsychicCataclysmSpells.cs",
+      "sha256": "A08A5893EF9EA7EBABC367C6A77B3B94531CD1D53B2AC631527CF1207FB07721"
+    },
+    {
+      "path": "src/PsychicChannelVigor.cs",
+      "sha256": "496D5BA664B707E9BDD2C1C42EB590B66EB85C17D93DAAAA543A09DD01A73D08"
+    },
+    {
+      "path": "src/PsychicClass.cs",
+      "sha256": "47C42E3177EE44A0DBE04E2F4660A5CA347432EC03A5B94C193C21AAB4C459F9"
+    },
+    {
+      "path": "src/PsychicClassCompletion01458.cs",
+      "sha256": "4D91611DEF6764ED384B4BC5AAF8CB64AB62CCC7BBB941F919833300EE2505D2"
+    },
+    {
+      "path": "src/PsychicComfortSpells.cs",
+      "sha256": "E049F45F3CA9E6FD43A46141631418534021826DB3C09E669DD8886412FF5F4F"
+    },
+    {
+      "path": "src/PsychicCommonSpellLists.cs",
+      "sha256": "F111FD200298CBD2D17696A36FBFA4A371690A141C969183A97291F2F9C4781F"
+    },
+    {
+      "path": "src/PsychicCompletionAmplifications01458.cs",
+      "sha256": "9AC030D229F2697596082B42F60BD63C32D2A064CFFAFA4B820F65B9BC2C7CBD"
+    },
+    {
+      "path": "src/PsychicCompulsionSpells.cs",
+      "sha256": "34AA5CD7CE3C608B3FCB5F6C47A2DD8A440CF957AF0D5BAD1E7ACB686F09B0BE"
+    },
+    {
+      "path": "src/PsychicConduitSpells.cs",
+      "sha256": "204BB52FD911964C5D3A045123024F7C1157FC469B4530C53AE1A0DADE5562E3"
+    },
+    {
+      "path": "src/PsychicCrushSpells.cs",
+      "sha256": "D0C07F616020AB106E4695E69E3009A5F643C95CA6E923EE02272B5BBE7EA7DF"
+    },
+    {
+      "path": "src/PsychicCurseSpells.cs",
+      "sha256": "700B9C75F26C3458D5182DDAC727692294FF3E93B9AEF463BB4499B6B453AE78"
+    },
+    {
+      "path": "src/PsychicDisciplineBridge01458.cs",
+      "sha256": "C5676D707C22D12B092CCEEB58DDBF56A4BE437624CF6AE413DF4C6AA72B8B28"
+    },
+    {
+      "path": "src/PsychicDisciplineRuntime01458.cs",
+      "sha256": "BAEF51CBAA5C264D4FB650CBF54084532F65420376B184E10C7EA862193657CB"
+    },
+    {
+      "path": "src/PsychicDisciplines.cs",
+      "sha256": "7A3703F2528E8577341135765071428D95A510182FDE9DC2295E483219FD5E38"
+    },
+    {
+      "path": "src/PsychicEidolonHealing.cs",
+      "sha256": "7E76C198F0C1DBB7A6F2D1D0EDC35D6702E76AFBE4B7BB81786ECC88EC7C1D3D"
+    },
+    {
+      "path": "src/PsychicEtherMiss.cs",
+      "sha256": "784B3002522104D53DE0ED3F109BB97640B139637925A606D31A09419A847998"
+    },
+    {
+      "path": "src/PsychicExpansion.cs",
+      "sha256": "F1CD11AEF2191179D0900EA040C74C2A431E47E009660B33AD0AA01136D69A6A"
+    },
+    {
+      "path": "src/PsychicFaith.cs",
+      "sha256": "3C49BF70F7D129CFE57319B7DC6D534306233F1E7273FB111CBE6E7B08882C11"
+    },
+    {
+      "path": "src/PsychicFaithMechanics.cs",
+      "sha256": "4017F71026ED6A9EE4ED6414A914C51326CE3D202D0A06DD3FE8A07787D674D6"
+    },
+    {
+      "path": "src/PsychicFieryShuriken.cs",
+      "sha256": "210C3B9C154B165FF4B044188912223F9643C42C311C9CA5FAF6C4EAA8A699FD"
+    },
+    {
+      "path": "src/PsychicFireSeeds.cs",
+      "sha256": "3F23E5855809A37E77122454E17E01E462B8A2CD7AA9D5E02A823F6D60A086DC"
+    },
+    {
+      "path": "src/PsychicFlameArrowDamage.cs",
+      "sha256": "C8548C63AC7CA107C96E0351BFE60FEBA3916108A60AFBF1C6B25069A7AD118A"
+    },
+    {
+      "path": "src/PsychicFlightGroundPatch.cs",
+      "sha256": "D053DFAD0A36E7FD673AB6EE9F4EACC068D402915077967EE316114732301DCF"
+    },
+    {
+      "path": "src/PsychicFluidForm.cs",
+      "sha256": "521C07A35235280AB9C8D07832A3F50F274891E9F3545BCDD2C7F8064C800627"
+    },
+    {
+      "path": "src/PsychicForceSpells.cs",
+      "sha256": "2AB41DDFC7E2390314FDEF8F8D89813D4E217C490BAA84B8CB75330FFAEF1578"
+    },
+    {
+      "path": "src/PsychicForceSword.cs",
+      "sha256": "7CCAA9D8C736992682AA30936F3593761BA90454B9FD829005697F0B23CE268F"
+    },
+    {
+      "path": "src/PsychicFurtherOptions.cs",
+      "sha256": "9B3F1AE16BD1D6AB74A5A7902F71EA7F2C11A0FD822A173092C6DC7034006A58"
+    },
+    {
+      "path": "src/PsychicGhostbaneDirge.cs",
+      "sha256": "27F2CC5A8E3AEA9594DD6BDB38E6C750ACE0C6135C211D2BB41F72A559440094"
+    },
+    {
+      "path": "src/PsychicGlobeSpells.cs",
+      "sha256": "ED68ED756AE93AE06D1F4504AC5845A174819B6BE4495A2E0A6B44E8D637C1C4"
+    },
+    {
+      "path": "src/PsychicGreedWeapon.cs",
+      "sha256": "E39D9D831D3A8278DE74B12B2C4F6B2CE8DCEB580724B9C644681996F2CD781B"
+    },
+    {
+      "path": "src/PsychicHexVulnerability.cs",
+      "sha256": "5FF0E9BAA689BA1ECA503B5CDFC43C886F224EAB107ABB2C38AA85042A454A1E"
+    },
+    {
+      "path": "src/PsychicInsightMechanics.cs",
+      "sha256": "E67EC38E382BB45D02BCA7DFBC6C442EDC86C3D50E469DBFBF703ADD859D8E14"
+    },
+    {
+      "path": "src/PsychicInsightSpells.cs",
+      "sha256": "A7289E25A91008FADD294578D6CDE6B9DB83517062C336DB3F567DF7797C7542"
+    },
+    {
+      "path": "src/PsychicInvigorateCharge.cs",
+      "sha256": "A7F8EEA31D82C23DD51695C6D0D5853F51AACFD2A81C815AE85A12739061BEB3"
+    },
+    {
+      "path": "src/PsychicLearningDiagnostics.cs",
+      "sha256": "FC728F044E5ECA62760FB46622E3A9DBDC92C0F69C92651589EEEA32B826CAC8"
+    },
+    {
+      "path": "src/PsychicLinkedSpellEffects.cs",
+      "sha256": "77E975C965BA4B6DE9627A6A1A4FD24DF27308F922BBCD6EF6EEC373407191F4"
+    },
+    {
+      "path": "src/PsychicLinkedWard.cs",
+      "sha256": "B24893C341C9EA207B0CF6919F7AFAA8767B424870BF73371E99DDD5B4A19E68"
+    },
+    {
+      "path": "src/PsychicMagicalShape.cs",
+      "sha256": "9CA212E493538ECA186E32225AB8CA36E89ACACC480D3083AA232FBAB68C3E33"
+    },
+    {
+      "path": "src/PsychicMajor01460.cs",
+      "sha256": "A6F541C98C6D44779E212CCFB5ABF368E10A58C34177037BC824073B50CFB7B1"
+    },
+    {
+      "path": "src/PsychicMarauder01457.cs",
+      "sha256": "DA583BDB9C42EE78A998C621898CCD910DD3D7E754A282CDF6AFC0ACC1FC4331"
+    },
+    {
+      "path": "src/PsychicMawCleanup.cs",
+      "sha256": "0107C6EF061DE896325F1CFF6A0A0D0E7ABF21D0D153E0E04B8B976C347E1DDB"
+    },
+    {
+      "path": "src/PsychicOrbSpells.cs",
+      "sha256": "7779441A6B876189AED90650CCCF7258FE6EBBCD4C7A147B963F8E82F8F8DDA6"
+    },
+    {
+      "path": "src/PsychicOriginalIcons.cs",
+      "sha256": "D83F6D4EF52967BF312D95201F4FF5759B90B3C4A3C04EBD5FF0424D09E63B79"
+    },
+    {
+      "path": "src/PsychicOriginalTexts01457.cs",
+      "sha256": "6BE35A9972B2F5B927CB683752BAC0E99A1DCCC2C58DE22888AB336107CEA68F"
+    },
+    {
+      "path": "src/PsychicPageantry.cs",
+      "sha256": "CCEABD174058F3BE003C17FE64C3C9F2D3A384CEB9D448CF7211C4F3B8442755"
+    },
+    {
+      "path": "src/PsychicPageantryMechanics.cs",
+      "sha256": "886EC583960777195B840B8A8619CF32F8EC779E65E9B0DE5DEB26EAAC5B6625"
+    },
+    {
+      "path": "src/PsychicPresentation.cs",
+      "sha256": "8BD7F6B1CB54AA9D8899E195D6207562484D29D9C471CE46A5D4AEEF4E9A7710"
+    },
+    {
+      "path": "src/PsychicRemainingDisciplines01458.cs",
+      "sha256": "396F35AD925850FB40732B9ADA00B08521B1A2BA30F8B4D7059B6F050B0D533C"
+    },
+    {
+      "path": "src/PsychicRepairComponents.cs",
+      "sha256": "8B12548083DE8D910D12FBFBC224C1D0E56FF2933A9F70DCF8373B89A0C9E2F9"
+    },
+    {
+      "path": "src/PsychicRestorativeSpells.cs",
+      "sha256": "786380B5ED1E43179250011A9933D7337A89BC5929F0AEB6935D753AF714C814"
+    },
+    {
+      "path": "src/PsychicSecondWind.cs",
+      "sha256": "CF349ED4F431614F3DC046DB7F0715970682479738C089480E062C91598E5B6B"
+    },
+    {
+      "path": "src/PsychicShapeSpells.cs",
+      "sha256": "EF471C7F3FA949D56E09C2B53534DBAB2BBB6F9D595C37BCB4A40FCB8329579A"
+    },
+    {
+      "path": "src/PsychicSharedSpellCatalog.cs",
+      "sha256": "896A3DAB23BB48883F54C9DA5BF62FCFB9BC00B7B1FF15814BB1A8596C37E2F9"
+    },
+    {
+      "path": "src/PsychicSilence.cs",
+      "sha256": "6271C11C3842A3A57C83A082EA9A88F2494B88F16B52E3D4B8EE18BE6A511B02"
+    },
+    {
+      "path": "src/PsychicSpellCatalog.cs",
+      "sha256": "6620D88C989EC182B4CB4B57BA53A957F717C233084D080561FA8A07F693BA53"
+    },
+    {
+      "path": "src/PsychicSpellIntegration.cs",
+      "sha256": "88998E38992FA45D6A39A5D27E91D2086E98F349C6A07A16BEF738C876CED093"
+    },
+    {
+      "path": "src/PsychicSpells.cs",
+      "sha256": "2048B64F866A5FA3CB7A630D971EF69F87DF20A168506A98F572E963EFD40864"
+    },
+    {
+      "path": "src/PsychicSpiritSpells.cs",
+      "sha256": "C7DAAD5BE6B0F90D89077E1D124BEA25C0932DBCC5FE606CA8E5D2CADD51CEE2"
+    },
+    {
+      "path": "src/PsychicSpiritWeapons.cs",
+      "sha256": "0D4DFC8C221346997BD9B123E85BF854931CD4AFC1894373CAEE41A55E42570C"
+    },
+    {
+      "path": "src/PsychicStorageSpells.cs",
+      "sha256": "8A07F02557C53ED9A6E2AC5490A5B63A124384512A74BD87C03C709EE5FB02E3"
+    },
+    {
+      "path": "src/PsychicSupportSpells.cs",
+      "sha256": "0B2DB143F29DC916D4DBD9BFFD190B63BCAB1D448C504C8348D6FA03A7CF8659"
+    },
+    {
+      "path": "src/PsychicSurge01460.cs",
+      "sha256": "FD1F3C3BE507874CFBA572351044ACCAB60AB0CDAEFD6F73B5DF8E0B46735DB1"
+    },
+    {
+      "path": "src/PsychicSurgeryCleanse.cs",
+      "sha256": "F6221784983A506F4AC64788A1F54528815FD7C0084908100B6918BF5C947350"
+    },
+    {
+      "path": "src/PsychicTacticalSpells.cs",
+      "sha256": "D5F72AFD4A4151AB640891AB85172198806B7D21DC53173ADC6D11A41E5C2E24"
+    },
+    {
+      "path": "src/PsychicTemporalStasis.cs",
+      "sha256": "EECDF2EA9BF0B0F5B8DE9DFC269958E5A2BE61FC10DAD41E647050160406B625"
+    },
+    {
+      "path": "src/PsychicTexts01458.cs",
+      "sha256": "68A92433F11FF005564446AEF5EAB2EA9C100D805C307C2105B8FE602B80802E"
+    },
+    {
+      "path": "src/PsychicTravelSpells.cs",
+      "sha256": "16EB7CA55CE80285B295EBB82641F09E79AA6C215E3E5505A444EB1E664EE8CF"
+    },
+    {
+      "path": "src/PsychicUiPatches.cs",
+      "sha256": "DAA6B0CBC9A7A19B0C7D6F9E525FD85063195CC50599F6D6616183402387D517"
+    },
+    {
+      "path": "src/PsychicUndeadSpells.cs",
+      "sha256": "FE962CF6C3F4C8593662BC69E1FC6D1B1C75776D71AD8B124F5D5F1725D9229A"
+    },
+    {
+      "path": "src/PsychicUndercasting.cs",
+      "sha256": "91777EB910B6134BD1D2E85CAC5BBAA52E2A77B401E1FEE2AB665251B318964C"
+    },
+    {
+      "path": "src/PsychicUtilitySpells.cs",
+      "sha256": "E023D6A395FF4C64CFBC25486D5620F5B7B5556C8E10F3918CCDD3AD5610651D"
+    },
+    {
+      "path": "src/PsychicVigorHasteStats.cs",
+      "sha256": "723CA7FADE1D44F90CF23E7A1D653BF90DF36144178D535F46D8296E2550E385"
+    },
+    {
+      "path": "src/PsychicVoidOrb.cs",
+      "sha256": "E45C62469DA0E2AAA436D89C3FC76CB41950C1C06134FE3A8BA781219CA73B43"
+    },
+    {
+      "path": "src/PsychicWardingSpells.cs",
+      "sha256": "41C4259177220BA54B16ADB67C2844892EB475B1EDBFFEBCB703B56A8271CA21"
+    },
+    {
+      "path": "src/PsychicWeaponSpells.cs",
+      "sha256": "B926E44ADCC05A8C030D460E5CE93481C2356E4BF18D8DB5BBB4AFCE8032C660"
+    },
+    {
+      "path": "src/PsychicWeatherSpells.cs",
+      "sha256": "096EFF17C33221775163925680742E1D9A02F4F26CD1AA655617132C281DCBE2"
+    },
+    {
+      "path": "src/PsychicWilling01460.cs",
+      "sha256": "BBDC333C46B8C4ED9B2737C5950948B86C638F921841A42E8FD68C623B4C8D3A"
+    },
+    {
+      "path": "src/PsychicWoundMenu01460.cs",
+      "sha256": "E9E4E28A2C051C229CC87AF6EDA3F0FBCD520675C9DF28B34877458C73956D51"
+    },
+    {
+      "path": "src/PsychicWoundMenu01461.cs",
+      "sha256": "3D84AE5423B1C52514F4DA1813D42DFD3DCFE7050FA6994A36EC91DD6A92197C"
+    },
+    {
+      "path": "src/PurifyingFlames01428.cs",
+      "sha256": "305E08C5C1731C4C11DCF80C640DAEFB631E5AE0AACD2994D82CD1E0A6C7C1B4"
+    },
+    {
+      "path": "src/QlTexts01460.cs",
+      "sha256": "D7189E811AE4B454A18089970AE6BE871AB05D9BE121F357766B4A966C4882DA"
+    },
+    {
+      "path": "src/RagePowerMigration01434.cs",
+      "sha256": "AE05AB065AD734C1AE5B9727F04773094DCD9FBC8C4E3229ED05DA0643F7BD09"
+    },
+    {
+      "path": "src/RagePowers.cs",
+      "sha256": "2052D2C993FC9630EE0B70571FB4B8276A7C60B155178805A0558B5603725524"
+    },
+    {
+      "path": "src/Rake01444.cs",
+      "sha256": "E5FE91AD6609096216D258560C6791A4715DDF71508D1AD68814E1D9B51EF751"
+    },
+    {
+      "path": "src/ReapingStalker.cs",
+      "sha256": "44F3CB8FEE84FEDA77BF9CA3339D7330BADB0CD744D0ACD5B2A07461E27B7669"
+    },
+    {
+      "path": "src/ReapingStalkerPrerequisites.cs",
+      "sha256": "37128D621C187B3862FD57735490D7EF43B02F00573EC166474081FAB12401BF"
+    },
+    {
+      "path": "src/RegistrationRetry01444.cs",
+      "sha256": "C897D4A98E49DB58D1F15AD5EAD65E678BAF61010B55D4A077D6B2039E01196F"
+    },
+    {
+      "path": "src/RogueFeatTalent.cs",
+      "sha256": "51C3F5FF41BE427A7EC9B38FDB60DC4349B2EC593A5C5AA673A4785E3CF322F9"
+    },
+    {
+      "path": "src/RogueSwashbuckler01443.cs",
+      "sha256": "0BB47288F7EB2B65BC8F45032071DF2F2B9D4B10CDB8B91AAEB5505E490E812F"
+    },
+    {
+      "path": "src/SageCounselor01445.cs",
+      "sha256": "8FD90887A1CD1A5A2E8315F4CD1CE1BFE1F5D0D51FBDF3E2CB17CB70E327B952"
+    },
+    {
+      "path": "src/ScalesAndSkin.cs",
+      "sha256": "4AED4E549256E42440D6DE6F4869F635E21BCCD78195F68DECA73E43B72E4455"
+    },
+    {
+      "path": "src/ShieldedMage.cs",
+      "sha256": "14F1946C94DF2FB88DF8192F2D644169EC37BEF86DBD686343AD949ED307918F"
+    },
+    {
+      "path": "src/Skirnir01454.cs",
+      "sha256": "ED88BC5A91C8401797A2C2DE49D2E62CFDD8772F38C70DBBDDE2D4C1C6F602A7"
+    },
+    {
+      "path": "src/SkirnirRuntime01454.cs",
+      "sha256": "6399CD151E4646422E2470DE67886BB8F1A1A53B06A65E8E7E88F8D5D27AA94C"
+    },
+    {
+      "path": "src/SkirnirTexts01454.cs",
+      "sha256": "3BC8006FF122926526763B72B4DE9927476F85C0071439A6E185AA959EC40085"
+    },
+    {
+      "path": "src/SpellAndSwordCasting.cs",
+      "sha256": "E4AA64BA00360A3DBF89BFA48A373CCC5C7742A33C37DDB16B9ECCE615D67DC1"
+    },
+    {
+      "path": "src/SpellAndSwordFeats.cs",
+      "sha256": "9BB01F71AE8F9351AB9039B87B31AAC3D9F75C36EA3036EDCFB7B62C1710BC8C"
+    },
+    {
+      "path": "src/SpellBatch01447.cs",
+      "sha256": "D13D419B4CE6E578EBADF25EB1A156B73261E51C52452F2D06A890DD9D47F2B6"
+    },
+    {
+      "path": "src/SpellListCompatibility.cs",
+      "sha256": "38BA548D1930E04AE920119B30602CFE2A5FD863AC5FB285DCBDD5A328575E4B"
+    },
+    {
+      "path": "src/SpellResourceFeats.cs",
+      "sha256": "AE0E8A68C6123C0EA96ED3ADC0EFD70D6FD93993C549E15F942E8C8ED8C231B2"
+    },
+    {
+      "path": "src/SpellResourceNativePatches.cs",
+      "sha256": "5B9C14A5750DE2A42ABBA455C43025B338F74D24B118F5D624D0C8DDA93EDD66"
+    },
+    {
+      "path": "src/SpellSpecialist01447.cs",
+      "sha256": "D6B78C0F8C38033CB41EB9A52BE8E62F98B15A218D94A170A1012A5B06FBA3FF"
+    },
+    {
+      "path": "src/SpiritualGuardian01433.cs",
+      "sha256": "0362BAF49182907F4A6FA89981015E3FFAB435166E7EA7B0ABCD32A85D8EC56D"
+    },
+    {
+      "path": "src/SpiritWeaponAnimatedVisual.cs",
+      "sha256": "A980767BB3CA980165CDEA66E9230202372282D1389599A82A8C716C7F73D50C"
+    },
+    {
+      "path": "src/SpiritWeaponBlueVisual.cs",
+      "sha256": "A09F2710B8A8FCD2D2799508148E5F2F399623312B73CC77DB61FE1708057F14"
+    },
+    {
+      "path": "src/SpiritWeaponForms.cs",
+      "sha256": "A834AC30C3B04EDB264736F9959AA46802F4259CBA18BCDBD40CB788DEDDB574"
+    },
+    {
+      "path": "src/SteadfastPersonalityComponent.cs",
+      "sha256": "5A09677BDA6E26F2D93878FFA8A35615435FEE3A6A3823AD80F6C4E1E5808826"
+    },
+    {
+      "path": "src/SteadfastRules.cs",
+      "sha256": "1E48C5BA3A49ECB4A396DF39CEF98B6F75A5C384E4F9C8A9D74B961998C12788"
+    },
+    {
+      "path": "src/Sunsinger01443.cs",
+      "sha256": "C5DACAD29057F3A117D540CB1C99A44120E18D3404DE747FF34B43C5996423EE"
+    },
+    {
+      "path": "src/SuperstitionRage01434.cs",
+      "sha256": "153F03A940BA79E9F65E9FB6170C55487B0063564334994D4FC468F2E2BDDF3F"
+    },
+    {
+      "path": "src/SwarmScatterPatch.cs",
+      "sha256": "E0A9FBE790F4790F383E6B236F8CA46DC157ACB848D182AE255EFD52353FFCBE"
+    },
+    {
+      "path": "src/SwordplayRuntime.cs",
+      "sha256": "62ABBE1679CDE7C52A811772138A18A4AD4CD0680DC50EF28982E7C5FF652B95"
+    },
+    {
+      "path": "src/SynapticDelay01460.cs",
+      "sha256": "1C813801F05972B093B473E3022B9247DD00820FD8C4ED5E1575969D6FBBC43E"
+    },
+    {
+      "path": "src/T09CombatFeats.cs",
+      "sha256": "DDC2C7ADA35E7554AF607276F6317CBF3BDFB4062506BCE1B35F69A1B648BAA9"
+    },
+    {
+      "path": "src/T11TrainingOptions.cs",
+      "sha256": "187B0498F364F6099C7DB57D2A768AE84F6CCE5BED6FB9240C3818CDC97FA3F3"
+    },
+    {
+      "path": "src/TeamworkCatalog.cs",
+      "sha256": "D30FCF7B7B98B1FBF2D0CAF6B38386D615B4ECD540E26ED6DC6D0A6E3A924B57"
+    },
+    {
+      "path": "src/TeamworkFeats.cs",
+      "sha256": "95ED6A53100F5440DCD12386926078A65A10FEC4A216D43907D64471CB82033C"
+    },
+    {
+      "path": "src/TeamworkRangedReaction.cs",
+      "sha256": "0800611237EB0455E0C06A9C212890F39A805636C8026BEC0388686ECA6E3221"
+    },
+    {
+      "path": "src/TeamworkRuntime.cs",
+      "sha256": "25EF792996D711C4E33DDCDF70787CF01AC2F77C424F554067E902E03E72E2C7"
+    },
+    {
+      "path": "src/TerrifyingHowl.cs",
+      "sha256": "A1752AB54EAC5361B81FB592871B2B173A74355FCC23C836ADCB94430C22146D"
+    },
+    {
+      "path": "src/TerrorWeaver01444.cs",
+      "sha256": "FA056FA9BE289DF38A99790B5225BFFABBE96607256FE2C438FFC4E0B20950DA"
+    },
+    {
+      "path": "src/TimeStop01438.cs",
+      "sha256": "9230C72A076E56DE43B2B7346CAE900F17FB5F5D79F3CC4EB3AA466051C61359"
+    },
+    {
+      "path": "src/TimeStopEngine01438.cs",
+      "sha256": "DA55BCC1991C95BE9E68926801128F85FDF2B034E2716921377D417E9431FB02"
+    },
+    {
+      "path": "src/TimeStopTimers01438.cs",
+      "sha256": "3A94039EA0A5B369D72A9DEC12A031488E733C1A709E0A95D10F232210CE8128"
+    },
+    {
+      "path": "src/TimeStutter01437.cs",
+      "sha256": "E2656128FB88C17F5BD9854B8715DBE9AA4E0F031A9760CD5143AF648357A379"
+    },
+    {
+      "path": "src/TomeClaws01449.cs",
+      "sha256": "80901BDE4DA02822C5BDA37CA1C4444BEC4FA8714080FE2D5DF4DE5237BFF17B"
+    },
+    {
+      "path": "src/TotemBonded01461.cs",
+      "sha256": "20B43FDED57ED592A16ED6E6961C01BA171DB967BD89389B93BCDD46FB4B60A8"
+    },
+    {
+      "path": "src/TotemBondedRuntime01461.cs",
+      "sha256": "68F566BD1A811FE1666127F10971378D2C4D79F7F788E09B2BFBF24F5818F732"
+    },
+    {
+      "path": "src/TrainingSkillPresentation.cs",
+      "sha256": "F60EE0D4C4A056680615A3615CDFFD45A9BBB6F2CB3668209BA4DFBBAB77B780"
+    },
+    {
+      "path": "src/UrbanSkald01443.cs",
+      "sha256": "6D1999884CAD07D13895DF0B6195962FF85875A30595BDC648EDE0932B680833"
+    },
+    {
+      "path": "src/Visuals01448.cs",
+      "sha256": "FB4AD16B4E5B9D16998194E9EAE80395A87F1F5EB53CAE96319CDD5236C2FA20"
+    },
+    {
+      "path": "src/WarDrummer01441.cs",
+      "sha256": "6879B06BCD1390A8A1B2F34FF50323F76E1556A94A30C034EC7BC458D4448249"
+    },
+    {
+      "path": "src/WayOfTheShieldIntegration.cs",
+      "sha256": "86C8C483FBA1F258C8AB0C6928459BC20BB365F3DBB62B34B26AEA644AAFB8CD"
+    },
+    {
+      "path": "src/WeaponShiftTransfer.cs",
+      "sha256": "E86F5FAB78F5F6CDA9BF0B4224D50968DD430EDC4AA8867385F34571A471D968"
+    },
+    {
+      "path": "src/WhipHurricane01454.cs",
+      "sha256": "0134231F3C65E54CA07AA89DFF4371443FB57137D30C64DBD6479725E0A746CF"
+    },
+    {
+      "path": "src/WildShapeCatalog.cs",
+      "sha256": "F1F8308A7FC559DD94DB9503791AD1BFF8A9653ACA0DDBA07FC3089873F32CAE"
+    },
+    {
+      "path": "src/WildShapeCompatibility.cs",
+      "sha256": "CF151AA830D322A06EFF8E92B11169A10E710E1EE549862EAC088D01ADD8B5E6"
+    },
+    {
+      "path": "src/WildShapeFeats.cs",
+      "sha256": "A74F75691734293930B93C16DE562AA497FFF6043CEA4815F9EFE5635F75F2A5"
+    },
+    {
+      "path": "src/WillOfTheDead01458.cs",
+      "sha256": "A2E32A7E1B582DD037E1F98043B4F61CF5883894D4938EE02EFA7AAB275A78B9"
+    },
+    {
+      "path": "src/WizardDiscoveries01435.cs",
+      "sha256": "C25C76751E7100D0C080F123AD7238B5F02F09783D63204B8615CE56376C7D2B"
+    },
+    {
+      "path": "src/WizardSubschools01428.cs",
+      "sha256": "F4522BFD220F9D849A2CEC967A760FC441288D179B354EA4F51105CEE056042F"
+    },
+    {
+      "path": "src/WizardSubschools01431.cs",
+      "sha256": "C8D081BEAC16088E46238EB476C2D2B47FAD006A2ED4C10D405D0FD3C1D98699"
+    },
+    {
+      "path": "tests/Ally01413Tests.cs",
+      "sha256": "AABD6F9225CD0F330100B695D6CFCE8083B4D6960056C7924C05DE36DE82E8FC"
+    },
+    {
+      "path": "tests/AngerInquisition01431Tests.cs",
+      "sha256": "2D0DCC81D4BECB8FB57C3438E6C45DFFF6C511CDD87D0B12908F095B8E5933D1"
+    },
+    {
+      "path": "tests/AntimagicRage01434Tests.cs",
+      "sha256": "5720B833510B4B0C9F4B1F1F9BD95562EE37D733D09196AE263A06408BED4C77"
+    },
+    {
+      "path": "tests/Arcane01446Tests.cs",
+      "sha256": "9AB11E175EEF6757DF85DA29243C4943E609CE60DBA1ACAFC535EC6194BB1958"
+    },
+    {
+      "path": "tests/ArcaneComposition01450Tests.cs",
+      "sha256": "71DAE93674FBB8EDD40030A55C21223ACE4779F75F627910DA990052AFABA455"
+    },
+    {
+      "path": "tests/ArchetypeRepair01444Tests.cs",
+      "sha256": "271CF206C3224DD7AF89C386CE923BA750EAC1D54D03334CDC9B8979DAB283B3"
+    },
+    {
+      "path": "tests/Archetypes01444Tests.cs",
+      "sha256": "8A4A60F87CA1934B60FC0E753875B0A02A3B15DA872BF96C9199832BC508724C"
+    },
+    {
+      "path": "tests/Archetypes01445Tests.cs",
+      "sha256": "7E21A1366869E87D5BA8498470A4B3A3557087CF7229E7FC2B6152B5B5E7A31A"
+    },
+    {
+      "path": "tests/AuraOfDoomCasting01444Tests.cs",
+      "sha256": "4192457449CAE46B93619FA882536AC0B2E32D2D23EE2897B283CC303ABFC1A8"
+    },
+    {
+      "path": "tests/BardMasterpieces01435Tests.cs",
+      "sha256": "B216AF97F4E8698545F6B2DBEE55119F224FAD328C6210BD9B7C664BADBFDD05"
+    },
+    {
+      "path": "tests/BloodlineAccessAdapter01449/BloodlineAccessAdapter01449.csproj",
+      "sha256": "40D7C757DAA85D1DE7EF22AFFB10288D166D165F019BA091335DF72BAF225961"
+    },
+    {
+      "path": "tests/BloodlineAccessAdapter01449/Program.cs",
+      "sha256": "E92DE1C79F41DCA0E409C673C231FE8AC6F1D8225EF61F56CC8F48CBFE4FCD66"
+    },
+    {
+      "path": "tests/BloodlineMatrix01451Tests.cs",
+      "sha256": "C8FD5B34266AA682CF760A646829E3278B4021A9E63DFA3FF93BE22592A1EE02"
+    },
+    {
+      "path": "tests/BlueprintTests.cs",
+      "sha256": "E31D9CD03AFC5E6E70344C913BB48B0680B117B37FFA0BC6C3797A0800E2C3F9"
+    },
+    {
+      "path": "tests/BlueprintTests.csproj",
+      "sha256": "DC0A052CCCB9FC90B4C09E2F412941258F35AF7165382D9F8E2AF0C625DD6982"
+    },
+    {
+      "path": "tests/Check-SelectionContracts.py",
+      "sha256": "6263D997C8265420AD0274AB38B49ACFA185400087EDE22801B055863C7520DE"
+    },
+    {
+      "path": "tests/ChosenWeaponFeatTests.cs",
+      "sha256": "B9072D7C894C5E276577F948988B8AB41B359F04DB7DFFF24C5846DEF7928FB5"
+    },
+    {
+      "path": "tests/CombatFeatPoolTests.cs",
+      "sha256": "A92FE5938D8293C8B924D1998C91D4266543E5711E13921F92EC4DFDEF6E0DE9"
+    },
+    {
+      "path": "tests/CompanionSharing01414Tests.cs",
+      "sha256": "C9A4EB07B86AEEF36784F99D509E20635564EC812D5C72A160C578FD86FD188C"
+    },
+    {
+      "path": "tests/Compatibility01420Tests.cs",
+      "sha256": "F06202D052F1C2905A410F35E9D70B49FB4BC33917EAD56C840C2779B1256CCC"
+    },
+    {
+      "path": "tests/CooperationFeatTests.cs",
+      "sha256": "629A084D2400AB7561E2F823E0A9989E03B2C60E30830F4E6D1282BF2461F643"
+    },
+    {
+      "path": "tests/CooperationIcon01414Tests.cs",
+      "sha256": "59FF27B0F5EE80D475857D69FD78478050CE034BB1F3A875FC201E93EF2C6C1B"
+    },
+    {
+      "path": "tests/CourtBardLevel9Tests.cs",
+      "sha256": "C8E2B99FDF28EFC54A077EE5880A3F59533B4C8FDD6AE283EA6FAECAD87C7292"
+    },
+    {
+      "path": "tests/DevastatingStrikeTests.cs",
+      "sha256": "335C7523C68FA6494C0BDB3660A343443093BCE4DA302A99533F035B04ACD4B6"
+    },
+    {
+      "path": "tests/DiscoveryAccess01438Tests.cs",
+      "sha256": "56998137F6A0F8C07F83DC7EDA1A10CD495C842DDE24FDBFE3DC1971B38A358D"
+    },
+    {
+      "path": "tests/EnhancementLifecycle01430Tests.cs",
+      "sha256": "90E0DB6ACF4E58D9E993BB8048FCB892ABEFB2066931AC4A2C94852CB711D71F"
+    },
+    {
+      "path": "tests/ExemplarTests.cs",
+      "sha256": "1575AB43B2F2266E87A41B72EA89729858050E6D62544726D34FF178A82B24FE"
+    },
+    {
+      "path": "tests/ExemplarTests.csproj",
+      "sha256": "617B67557E25C1E937672ECA5C2D7C7759576F670A3A7C2ACDADE5222CB75F03"
+    },
+    {
+      "path": "tests/export_rage_native.py",
+      "sha256": "CE4704DC3E2574E51B84FBAC1DDA77B1097C064ADF38F298C2ADE693235E06A5"
+    },
+    {
+      "path": "tests/ExternalBloodline01450Tests.cs",
+      "sha256": "F74B68DC985714EA1F75D2AA7A35324F2F4416685167614253DCB4C34BF05B89"
+    },
+    {
+      "path": "tests/ExternalMutationMatrix01451Tests.cs",
+      "sha256": "D12EA27DACE618E7DBFE70BA6244471E88622DC18FCFA4C3957F69F782EDB275"
+    },
+    {
+      "path": "tests/Extract-BloodlineCompatibility01449.py",
+      "sha256": "E065D40644900E03B5DDEFF92FFFDB089F5DE11B830EA767E69E55DCDF849939"
+    },
+    {
+      "path": "tests/Extract-BloodlineCompatibility01450.py",
+      "sha256": "CA8129210561D22CD774E8E97CAAF662A6A13DF3142E75CEEB128E9366AB1E37"
+    },
+    {
+      "path": "tests/Extract-PsychicCompletion01458.py",
+      "sha256": "D7F83D7C0AAB43FF245E991988C6330A77024C3FA861DB7EB77CBFD79911C842"
+    },
+    {
+      "path": "tests/Extract-PsychicNative.py",
+      "sha256": "FF0939130BB7DA87E62D551A3EC0F82EBDF8FD4BDF030E7225C00D6A740C703C"
+    },
+    {
+      "path": "tests/Feat01424Tests.cs",
+      "sha256": "D823C8D9664A02B6E95750588DE35683FAFD974026094291A4E01C1528BED636"
+    },
+    {
+      "path": "tests/Feedback01412Tests.cs",
+      "sha256": "C44ED91A926C74559BB2D70388ED64161ADF7BE925AB71221D7379AEE1C91766"
+    },
+    {
+      "path": "tests/Feedback01415Tests.cs",
+      "sha256": "8A1D0921F554FEB454693A77937E9FA4E3EAC204A32749F45BCB02C03ECE02FF"
+    },
+    {
+      "path": "tests/Feedback01419Tests.cs",
+      "sha256": "3E41B9187C811092477018208A5B84542663BB7E639245BE6F9408844183735C"
+    },
+    {
+      "path": "tests/Feedback01421Tests.cs",
+      "sha256": "77240593A7AE6B44CA74EC0F19EC4CB31F9CBA1817EC17F942C0CD09301CAE77"
+    },
+    {
+      "path": "tests/Feedback01422CloneTests.cs",
+      "sha256": "4B5FFA62EA3C0B7B247344EC1C0358F58F6195A5BBCB223C049DBBE35E6583E4"
+    },
+    {
+      "path": "tests/Feedback01422StartupTests.cs",
+      "sha256": "3E665FC360D3826E135F6677007FF7505241C555143F7DA0A55C5DD615E57136"
+    },
+    {
+      "path": "tests/Feedback01423MediumTests.cs",
+      "sha256": "19FB672A5ACC7495EC54C7FC95B4586B76FE65576F0A3D50CF1434DC90C24240"
+    },
+    {
+      "path": "tests/Feedback01423Tests.cs",
+      "sha256": "D1A887FC5CDF28DE63A36B19FF0A681B1221DB6FA32B8C2337417E05B52E67DA"
+    },
+    {
+      "path": "tests/Feedback01448Tests.cs",
+      "sha256": "2B805B1D2327A3252F7E4516CE89A1D8E2A2C8C96FD7AA6522190985C481CC8E"
+    },
+    {
+      "path": "tests/Feedback01449Tests.cs",
+      "sha256": "00A87FF598AE7DA5C560974FDE6F746641E38ACFAF0A5CE3984CB6A5280CE315"
+    },
+    {
+      "path": "tests/Feedback01450Tests.cs",
+      "sha256": "5EADB46629B1F1214225A1212C6602975CC1BE75D7973D6A95EABCD1ABE49A87"
+    },
+    {
+      "path": "tests/Feedback01451Tests.cs",
+      "sha256": "7A25D79D3583A58FDDD7D514EE1F1EF1203AFBEB22C3BE8FA02A8B6DA18CBF78"
+    },
+    {
+      "path": "tests/Feedback01452Tests.cs",
+      "sha256": "510CBBA6E762CCCAE9648EB26AF0905CD56989EE9185171B77468A995136BBC9"
+    },
+    {
+      "path": "tests/Feedback01453Tests.cs",
+      "sha256": "5D84C8D0163AF8179F888BDED6E4348F92BAC9AB11A1735C7249067E0B0C99F6"
+    },
+    {
+      "path": "tests/FeralGraceTests.cs",
+      "sha256": "39B9646C0B688094A5B36339F356A0E003587AC9998CA8D3F20D23BEB89FC118"
+    },
+    {
+      "path": "tests/FerociousBeast01431Tests.cs",
+      "sha256": "A7FCCFEAAC052E4E15E11F636E1847E01C9579E659BD0F27889C4C863D2DBBA9"
+    },
+    {
+      "path": "tests/FlameJetLifecycle01430Tests.cs",
+      "sha256": "83A5E7465887842ADCAC88AD5C40FE08AC50FEBBB1AF1C3334F0E860429D9E6D"
+    },
+    {
+      "path": "tests/Gambit01414Tests.cs",
+      "sha256": "E6383A977088CD766646341C529EB07C78B504E84D960FFFDF5F6F14A048F452"
+    },
+    {
+      "path": "tests/HarmonyTests.cs",
+      "sha256": "DD83CDE54F745D364FAAA2EBBDB4B5A389236544F893CFB575BC5F809B4A52FC"
+    },
+    {
+      "path": "tests/HarmonyTests.csproj",
+      "sha256": "1EE88776AED8849A38EC2C3846236AAA9101AA5C642F4A8EE5AF8700899BA0D7"
+    },
+    {
+      "path": "tests/HedgeWitch01443Tests.cs",
+      "sha256": "040A4F06D85018B28D5D3C24B4463C3FCB3703F98A854C123811324C8FD59B2B"
+    },
+    {
+      "path": "tests/Howl01427Tests.cs",
+      "sha256": "D44D01CD03A515D00864E17C5668632589C719ABAAD7BBE2BAB989435A661DA1"
+    },
+    {
+      "path": "tests/Howl01428Tests.cs",
+      "sha256": "61EE9C697456AD3D21A534A6A07B5AD2160DE052F3BED3EF2A8466B324166552"
+    },
+    {
+      "path": "tests/HunterBatch01461Tests.cs",
+      "sha256": "379872886A7CD3F8121F7DF548700E61A01E6CF013BFE444519DE54F1637AED0"
+    },
+    {
+      "path": "tests/HunterEffects01461Tests.cs",
+      "sha256": "C0D5B47754600986CB13ACA31B134988D6D1426D5CB0F00BC28DF56B445D8986"
+    },
+    {
+      "path": "tests/HunterLifecycle01461Tests.cs",
+      "sha256": "9C80278B2966BAA52900AF933CFD19B63D7DC81004CD4B9BBE24E32388A9996D"
+    },
+    {
+      "path": "tests/HunterPublication01461Tests.cs",
+      "sha256": "97E83977E834B0924815BE2C139197A4EBC075D17D7C1ED20A32AB6E73139ABD"
+    },
+    {
+      "path": "tests/IncreasedDamageReduction01439Tests.cs",
+      "sha256": "56BCA82748CC332213095BC9BE3311E18F2ABC2DAD0BF59BE96B7C2BE0794210"
+    },
+    {
+      "path": "tests/Inquisitions01428Tests.cs",
+      "sha256": "CD0EE7BBE1EF77332F35ADA15348A86048D36C0C812C1C359DA8AA5DC5CF6B05"
+    },
+    {
+      "path": "tests/IntegratedStartupTests.cs",
+      "sha256": "CA364E2D39D1F132BE5B527ACD459194745F7E152F5D4FDD3EB573321842423E"
+    },
+    {
+      "path": "tests/IntegratedStartupTests.csproj",
+      "sha256": "C65D0301B3917792844BFD1E0774307542ECCFCFCAEC9F49AEAB0909BB006E46"
+    },
+    {
+      "path": "tests/Invoker01437Tests.cs",
+      "sha256": "979CE4B795CF557C3AB40FCD1B73B6062C582546B23860C13D290882622F7A07"
+    },
+    {
+      "path": "tests/Ki01427Tests.cs",
+      "sha256": "891FEEE88C154CCFF73DB726981D7D92FDB5F5D6A77965D150197346C14DA2CA"
+    },
+    {
+      "path": "tests/KineticInvocation01433Tests.cs",
+      "sha256": "4543C2FF81BA3F224CF841B96250746A83F4042C558AE551E024608FC9FDA12C"
+    },
+    {
+      "path": "tests/KineticUtility01433Tests.cs",
+      "sha256": "67C0AB9B7FA5FADB9C8111BCD11F21E5B3A29C269C47E5EB8A252C870E08432A"
+    },
+    {
+      "path": "tests/Linnorm01416Tests.cs",
+      "sha256": "ACDF524A61A5A83EB5755E8ED35FE3D3429DCC57A363A2AB5CC866C8A432C0E3"
+    },
+    {
+      "path": "tests/Localization01444.json",
+      "sha256": "819D60977A184A35A752059D137CD13AA302ACD7696AA08178FF71AA12F19E41"
+    },
+    {
+      "path": "tests/MagusBatch01454Tests.cs",
+      "sha256": "001C93E18DB37CC862289DFD4757E33C340CAA13A3B16925025494F8D1E5ECB9"
+    },
+    {
+      "path": "tests/MagusEdges01454Tests.cs",
+      "sha256": "A4CB848CE6CE85999221BE0F0F4EE2635C8F67FC238EFBB405904A98BBCA9E4F"
+    },
+    {
+      "path": "tests/MagusFeedback01455Tests.cs",
+      "sha256": "B5CD45EAC9B0B6A49B6458C3CF3A828F9CE953679C8FAC456655290B6E2022E4"
+    },
+    {
+      "path": "tests/MagusMechanics01454Tests.cs",
+      "sha256": "97FD044F45D6C9D6B3C2FA55248AA3865C1CA638F2A42229403987A6075737E8"
+    },
+    {
+      "path": "tests/MagusPublication01454Tests.cs",
+      "sha256": "375025347EC197A422FA2FA5759B351F465E51DF4CD19AA359FC507A73A2A87A"
+    },
+    {
+      "path": "tests/MagusShieldCombat01454Tests.cs",
+      "sha256": "03D07C926DEDA20B3D4A5BD2E1CD55D6D703D3A9CA56158BF2CBA7E2FEFC3E49"
+    },
+    {
+      "path": "tests/MagusWhip01454Tests.cs",
+      "sha256": "2DB18BF5D9744D6EB7F6721687FAE20BF4F624C5EA82D2BF9980DE7303E01989"
+    },
+    {
+      "path": "tests/Migration01426Tests.cs",
+      "sha256": "65A35D642C441C013D6B1A7C8DD140EFFC4215D6827D8FD8060DD02B28CE946B"
+    },
+    {
+      "path": "tests/Migration01429Tests.cs",
+      "sha256": "420C946B858351C2613BD0C8B6DF6689C49FE228ABD073BA4F321983AD7C13D2"
+    },
+    {
+      "path": "tests/Migration01434CallerTests.cs",
+      "sha256": "6DF050951DE2E8B3F125565C039D9B8C0BA8C7D1D88D60E9039B496F251DB0B4"
+    },
+    {
+      "path": "tests/Migration01435CallerTests.cs",
+      "sha256": "0BD339DFE1236734EDA0B918BA29CEB8331B25DFD5E8FE1C41629ECFDD2C7CDC"
+    },
+    {
+      "path": "tests/Migration01437CallerTests.cs",
+      "sha256": "1F3871562019493B634201783683D4147B2B0926771959D000B96B9E161D904A"
+    },
+    {
+      "path": "tests/Migration01443CallerTests.cs",
+      "sha256": "5A27D3936AF6B087DBDB9ABC5C7854729C3E9C1A9A623D0323EC5B2979091608"
+    },
+    {
+      "path": "tests/ModMenuTests.cs",
+      "sha256": "FED84B86C71BC5EE63235ECB9A80FB73D90F8946803350CC24689AD846C53D56"
+    },
+    {
+      "path": "tests/ModMenuTests.csproj",
+      "sha256": "B716920462834D2E9C90026ABC69AAA2E3C3639DC04E4CE08FC881C92333DD1A"
+    },
+    {
+      "path": "tests/MutationBodies01457Tests.cs",
+      "sha256": "37DD89D713C2C793B8AE62079E0114AC66A5F103EB6B3453A62DFC169847CCD4"
+    },
+    {
+      "path": "tests/MutationPolicy01458Tests.cs",
+      "sha256": "EE68F89161D97C1032EE3A0040858CF67D0F697CC37DDE44354CE180727754A9"
+    },
+    {
+      "path": "tests/NativeValueFieldBridge01454.cs",
+      "sha256": "501581047BCD47C50B91AED9DC17ECDE90475255949FBC36D5FC9FCB88CF6931"
+    },
+    {
+      "path": "tests/PerformanceTests.cs",
+      "sha256": "BFA5624D135E24F339EAAE030E8D9A72E64A92C7079E86392CC29AC9D2A9D537"
+    },
+    {
+      "path": "tests/PerformanceTests.csproj",
+      "sha256": "59EB44E2CB4DBB1FC5B46944A9D98B4B6F2B4E2F8C90EBAF3D1E07B8D7EBA7D7"
+    },
+    {
+      "path": "tests/PhysicalMutationFx01462Tests.cs",
+      "sha256": "1E9CB794A95CA777F670887ED6686C7AF83732368B99797F69C2B3705E99CEE9"
+    },
+    {
+      "path": "tests/Pin-LegacyNativeInput01458.py",
+      "sha256": "46CD01254CFD7057405B0CB34DEC762EA94D334F3B4D9350483C29DA0573BDEE"
+    },
+    {
+      "path": "tests/Prepare-MediumListBoundary.ps1",
+      "sha256": "65CBBE2C227FDD8B6144173E89AD3CB30119D7F70AAFE477C68D58DE98930D65"
+    },
+    {
+      "path": "tests/Prepare-StartupAssetBundle.ps1",
+      "sha256": "A501688042E52AA746DC3100354087EB447D78B8B170B53CEFAB59FCABF251B0"
+    },
+    {
+      "path": "tests/Prepare-StartupVisibility.ps1",
+      "sha256": "8F8B6A8E639394E44D53780F09DDBC7058120B4B052FFBCAB4E54FDE49D2DD61"
+    },
+    {
+      "path": "tests/Prepare-UnitySceneEndpoints01458.ps1",
+      "sha256": "FAE707D4BC44D7409A0BC988E120DC9FC303A2656CE74E519C7899730D1FC2D5"
+    },
+    {
+      "path": "tests/Prerequisites01426Tests.cs",
+      "sha256": "4AA2D7ACD6FCA60D3B36AAA04155BF5C444C4CA301A52EDC925A4DE270434D67"
+    },
+    {
+      "path": "tests/Program.cs",
+      "sha256": "4F2D208ACD4658E8E842286C132D4D101D4C53DABA7B057EB6D4D32268AD0517"
+    },
+    {
+      "path": "tests/Provider01419Tests.cs",
+      "sha256": "728327F9F9888B1C6215A9619A3C28DD2B8FECF39E7C655EC2BA75785B15DC9A"
+    },
+    {
+      "path": "tests/Psychic025Tests.cs",
+      "sha256": "53467D52D2C16FDC5A63AEBFAE8A4AB5E36A8A7D03F1D86423CA620E226DCAE5"
+    },
+    {
+      "path": "tests/Psychic026Tests.cs",
+      "sha256": "0228E6DA5079B6E55D9A69AD997B42AB520B0649C163DD15DB28E05BD32719C9"
+    },
+    {
+      "path": "tests/Psychic027Tests.cs",
+      "sha256": "E1894A3E86AECA31A4CC6A010FD6E690DA4544C41F9F0ED2FFBA9CF107B8E5A3"
+    },
+    {
+      "path": "tests/Psychic028Tests.cs",
+      "sha256": "DFC0B17A6E1CE3CEBFF4E79CF4696D23E992A18973CB655FC5F81F87BA6536FE"
+    },
+    {
+      "path": "tests/Psychic029Tests.cs",
+      "sha256": "84255CFD363B86DF1A96957AA51FBCA582066CA2DE4ED6FE46046F5770103546"
+    },
+    {
+      "path": "tests/Psychic030Tests.cs",
+      "sha256": "64E35AD5DEA82D30B2E82CA390CE762163FE4D34A051FC3005D9CAF7B53A398E"
+    },
+    {
+      "path": "tests/Psychic031Tests.cs",
+      "sha256": "CE515CA98C7681718338EF9969BF04EF45F49A58917495D5449C191A96B96CE6"
+    },
+    {
+      "path": "tests/Psychic032Tests.cs",
+      "sha256": "D03A5CA968FA17F255DFF29A3C570581F9C86BAA51DF121FE75183A54A384769"
+    },
+    {
+      "path": "tests/Psychic033Tests.cs",
+      "sha256": "F8002DB375038A2F8BA955743906CEB6397D934D96BE22C317C84F96E4CCE3E8"
+    },
+    {
+      "path": "tests/Psychic034Tests.cs",
+      "sha256": "4986F88FB94D8C6AA00AB2BE5C9529A1E75475595141A1E8569A7C220C092341"
+    },
+    {
+      "path": "tests/Psychic035Tests.cs",
+      "sha256": "99862952FFF28C2E31A8BFBB965D9ED14419072E046B7FCEB847E5158BC6241E"
+    },
+    {
+      "path": "tests/Psychic070Tests.cs",
+      "sha256": "DE89D58BFBE4AA7A1B69245CDA7E3123E2996778F958AEC162DAA97860CD37C0"
+    },
+    {
+      "path": "tests/Psychic090Tests.cs",
+      "sha256": "571365CC9ECE26EFCDA5E725396677DD2E40BBC3FBA9638D3309E99E1A5DB7CD"
+    },
+    {
+      "path": "tests/Psychic092Tests.cs",
+      "sha256": "AC0178600A1A77F8BCCBE0ECD32526137A0C5D413BC5E1A7FEBFB1AA4C3EB74E"
+    },
+    {
+      "path": "tests/Psychic093Tests.cs",
+      "sha256": "A51A0FFD1D2E1D23138719A3B86516C1321AEA3572C9AA1778CF0688C23FE417"
+    },
+    {
+      "path": "tests/Psychic095Tests.cs",
+      "sha256": "2F6482AFFF66B5A864FA7756B85F1157C11318843BE74B69FB2C739105FCB9F2"
+    },
+    {
+      "path": "tests/PsychicAfflictionTests.cs",
+      "sha256": "DC4E4F02E78D52992F87DC1B22962D5751F2FC7AB14ECBC6BC1442D5E9D9CAAE"
+    },
+    {
+      "path": "tests/PsychicAmplifications01458Tests.cs",
+      "sha256": "D28ACE680AE1E3AC4EE663F8F25570B07F36509D80E64D5601AF106513990FC0"
+    },
+    {
+      "path": "tests/PsychicArchetypeFaults01457Tests.cs",
+      "sha256": "CAC0D6337ECE3000312A35D8354AD237B114C2116E3A181B45721FA92CF16C84"
+    },
+    {
+      "path": "tests/PsychicArchetypeMechanics01457Tests.cs",
+      "sha256": "6D163B580A98C27B9DA07F69C77FFF020268D8173F1E670DFAC0CAB73834379E"
+    },
+    {
+      "path": "tests/PsychicArchetypes01457Tests.cs",
+      "sha256": "26B95692B06BB98D99468B73ED642AD5C627A919B2C2F1CBFB03FF3F69B8A7DA"
+    },
+    {
+      "path": "tests/PsychicAreaTests.cs",
+      "sha256": "3740CACCA3FEFF124B8677D7FD41110F35F849CB9D33C21F90580728AFF7FD2F"
+    },
+    {
+      "path": "tests/PsychicAspectTests.cs",
+      "sha256": "0CEA488BF48EC59A682D5A605AF95BDCBE3ED596680BA37A8A0808C4F6BA3E9F"
+    },
+    {
+      "path": "tests/PsychicAura01460Tests.cs",
+      "sha256": "11522226F185C4A5883AEA786247432E9E801F2698E4A4D3AE4216A64FC38EE0"
+    },
+    {
+      "path": "tests/PsychicAuraVisual01458Tests.cs",
+      "sha256": "156362A6569B54E53AB6ECC9B04342B1A70D5EFE1028BAEE01B169D7ADF7593C"
+    },
+    {
+      "path": "tests/PsychicBattleSpellTests.cs",
+      "sha256": "B7A2D4F7AE19632360D3B6A35CAC50D493FF785A4FEBAB823613B8F529A56FD0"
+    },
+    {
+      "path": "tests/PsychicBladeTutorTests.cs",
+      "sha256": "19B92A368D81E545740A2B50C2B356E1389B3078A3E7C9C5860F134A5883F4FF"
+    },
+    {
+      "path": "tests/PsychicBloodTests.cs",
+      "sha256": "07C9BCDD54DE5BBB0069FB8210A85C0B68912699E59681C050667B9D6A754F5B"
+    },
+    {
+      "path": "tests/PsychicBloodyClawsTests.cs",
+      "sha256": "3EB78A414C6EC65CDE1F459BA941123886C4DFBA28571214757F47BBAFA43B12"
+    },
+    {
+      "path": "tests/PsychicCataclysmTests.cs",
+      "sha256": "41B91A88E46B4F190FA73EE2B2996D0E8AE757489FDCAB854349641140DFF400"
+    },
+    {
+      "path": "tests/PsychicChannelVigorTests.cs",
+      "sha256": "E1182C49381576EA4D00221AD76A3C6E93199117EA8FA1F7B71A4C9FB90B7718"
+    },
+    {
+      "path": "tests/PsychicComfortTests.cs",
+      "sha256": "DB8C38742375543A52501EC07B38D44D79C2DF51677FE19B867F5E60C4A00CD0"
+    },
+    {
+      "path": "tests/PsychicCompulsionTests.cs",
+      "sha256": "0F5505E125431F141BE76417005A04BD2E1749BE77B753DF452E61E5CC9FAFA7"
+    },
+    {
+      "path": "tests/PsychicConduitTests.cs",
+      "sha256": "8E927E4CD957161D103B759DCE46465A46607EB789FA0A52B3C2898D9BCD9501"
+    },
+    {
+      "path": "tests/PsychicCrushTests.cs",
+      "sha256": "D8EF43C6B9050A222B7C56550D55AD9FF669A367E5B658372A948781762F0A79"
+    },
+    {
+      "path": "tests/PsychicCurseTests.cs",
+      "sha256": "2B30ADE19E6AC2E37CC85DBD484AFA34C667F8AC576989743BB3EF3F519261CB"
+    },
+    {
+      "path": "tests/PsychicDisciplineEffects01458Tests.cs",
+      "sha256": "887CFBB14FBA031D47941A127A54A39B05AAD01D49348F8F8FD7AF9F74E410CF"
+    },
+    {
+      "path": "tests/PsychicDisciplines01458Tests.cs",
+      "sha256": "37C4D7DF4E47F5F700B71CB01AEBDB18DF6C02DFC2840F742A41AC4F0DDBF412"
+    },
+    {
+      "path": "tests/PsychicEffects01460Tests.cs",
+      "sha256": "E4D12416FFF358B416DB362F15678D73C45AB21C854ECE26AD1C81915367A1D6"
+    },
+    {
+      "path": "tests/PsychicExpansionTests.cs",
+      "sha256": "A41E8556E54E8727EA3D3EC0409E3F20FF635BACF80DA045711EDF827708737A"
+    },
+    {
+      "path": "tests/PsychicFaithTests.cs",
+      "sha256": "7DC95C5C5C601F3D544E2900EB540D2FDAD4F8EA8148BD43BB50724F9BEFC778"
+    },
+    {
+      "path": "tests/PsychicFeedback01458Tests.cs",
+      "sha256": "93C0447EB6D6A8BAFF1B23F9D7CCABCF85DAB0750C6F57E315D18B93EE3AE269"
+    },
+    {
+      "path": "tests/PsychicFeedback01459Tests.cs",
+      "sha256": "F190D1CC487BE5D4FEF190DBCF0A522333A0E2E60EA5697DCFE203134482B06D"
+    },
+    {
+      "path": "tests/PsychicFeedback01460Tests.cs",
+      "sha256": "7EDBEA052F01161081770BD5AF8482F8420B074E802CB207D7E35CF5AAB3387C"
+    },
+    {
+      "path": "tests/PsychicFeedback01461Tests.cs",
+      "sha256": "300BD09D42889BF845D2C568AD32DC0F0DBDD6F358B7E7F25BA6EE3E7E3D00A5"
+    },
+    {
+      "path": "tests/PsychicFeedback01462Tests.cs",
+      "sha256": "93063235BCB994ADA172F102606FF047063820A9941AC16F1002082D5D1D5F8A"
+    },
+    {
+      "path": "tests/PsychicFluidFormTests.cs",
+      "sha256": "30B29CAAE361232414C8AFA46D142ABFD39B97AEF1DE0A46FB3B2E5B7FD47C62"
+    },
+    {
+      "path": "tests/PsychicForceTests.cs",
+      "sha256": "B9FDFDA6D879A4972B1444DFA47907E9D0FFFD8826B23F0A5958FFE9D383A1BF"
+    },
+    {
+      "path": "tests/PsychicGhostbaneTests.cs",
+      "sha256": "4A10929DDC9F77AB27CABC60F079325A39F60F90EC41035B073A382241608534"
+    },
+    {
+      "path": "tests/PsychicGlobeTests.cs",
+      "sha256": "4CF9D5AB1A80E511682C2AB7D865DCCA81AE8DD7CDEF1585E044E291438E66DD"
+    },
+    {
+      "path": "tests/PsychicInsightTests.cs",
+      "sha256": "CE8B67D195A7FB5763856C2E0162626B68CA6E91E1CAAD8EEDD53C2FEFF81446"
+    },
+    {
+      "path": "tests/PsychicLocalization01460Tests.cs",
+      "sha256": "D9EE84A4B9DEE829878AD0D8DB1A5D84C3FD1376472F140C4994C895B5C082E6"
+    },
+    {
+      "path": "tests/PsychicMarauderEffects01457Tests.cs",
+      "sha256": "ABDD29F0A3BB9F58BC95A25AD000EA2D7FABB16FC785A088EABF1C456F7BDE56"
+    },
+    {
+      "path": "tests/PsychicMawCleanupTests.cs",
+      "sha256": "47BE39A770C2D9E0C2464CAE5F9370A323C316F4497C2194AE9F274875C57571"
+    },
+    {
+      "path": "tests/PsychicMenuTests.cs",
+      "sha256": "187FF127C5DF1D973C0B904B42C5F8AF651948C541C2C2DD3B6967A447DE2363"
+    },
+    {
+      "path": "tests/PsychicMimicCatalogue01461Tests.cs",
+      "sha256": "9BAD37B008EA5B8521220CEAC7F890409719E1876D0105F10159286F0ED4A8B1"
+    },
+    {
+      "path": "tests/PsychicOrbTests.cs",
+      "sha256": "E76A8EE06462AE78346571A5AFEE4FF71256623572F539E5CDF5D46BE33C4071"
+    },
+    {
+      "path": "tests/PsychicPageantryTests.cs",
+      "sha256": "FDB9F837251A5E3AC44BE0A330AEFE6856F8889C4AC749D630323B253C47044A"
+    },
+    {
+      "path": "tests/PsychicPatchCoverage01458Tests.cs",
+      "sha256": "A779BE29F0F6CD698701A4109FD8CD4A629EB547EA0D3F011E4C7062861933E5"
+    },
+    {
+      "path": "tests/PsychicPresentationTests.cs",
+      "sha256": "9A828D382B31F9A847B2E8A447509D3020DC8917B0F45F8D2F4B2150A095390E"
+    },
+    {
+      "path": "tests/PsychicRegistration01458Tests.cs",
+      "sha256": "1D7B017009D8D71702600E677A230B5EEB24DA2FB1AF483811061818FE1516AE"
+    },
+    {
+      "path": "tests/PsychicRuleTestBoundary.cs",
+      "sha256": "C6CB8A6891CFB5815D6BE0A65482E3DE5D968CEAF739006F62FFDF339C1BD8E8"
+    },
+    {
+      "path": "tests/PsychicSecondWindTests.cs",
+      "sha256": "1FA3706E7EE40E211F2042525BA3E2DDE879B86217E40EEB7F636BC1FCE6E37D"
+    },
+    {
+      "path": "tests/PsychicSerialization01460Tests.cs",
+      "sha256": "8B7EA393AA7E87B98BE0225D1F27658F8F781D53CA8FB20911A187A348C67B52"
+    },
+    {
+      "path": "tests/PsychicShapeTests.cs",
+      "sha256": "BED10CD3D83153E75A8AEBBEEF877E5E1A39C145312AB1E3EC696E9C751FB109"
+    },
+    {
+      "path": "tests/PsychicSpace01458Tests.cs",
+      "sha256": "F39ED3461383F288907FDEC1A158F6FF0803260598DAFB573243E1EDFBE6F860"
+    },
+    {
+      "path": "tests/PsychicSpiritTests.cs",
+      "sha256": "8966C3ECBD13E48734218597E12ABA519E1C28A46DA5EF5CEDFFDFB3876ECA7D"
+    },
+    {
+      "path": "tests/PsychicSupportTests.cs",
+      "sha256": "9349D59142382E7BA46A9B4B327C36FA650D9297D7B40B0F96DDC663BDA9EEF3"
+    },
+    {
+      "path": "tests/PsychicSurge01460Tests.cs",
+      "sha256": "DD8CC61F3AABFF97C08A457D6CAF212BA6AC0B43E8DAF48739BE359B2E1545AC"
+    },
+    {
+      "path": "tests/PsychicSynaptic01460Tests.cs",
+      "sha256": "1196E45A809C2FFF37465F0C10C37FA31B567876C8803B90E6E6190F7F808636"
+    },
+    {
+      "path": "tests/PsychicTacticalTests.cs",
+      "sha256": "ED0ACF421EAB04363957300036F8707EFF842F93D0A77CB5E91AD937D0E6BE03"
+    },
+    {
+      "path": "tests/PsychicTests.cs",
+      "sha256": "4A73E30A6781CC0C42564C2584731CCC2B7CA9954BF57457EC4C0D4616964A23"
+    },
+    {
+      "path": "tests/PsychicTests.csproj",
+      "sha256": "B8833FF4E2306B9E70D0829AB9F146448DB493092E751948F550186517FC5C00"
+    },
+    {
+      "path": "tests/PsychicToggleTests.cs",
+      "sha256": "355A0F77440109A0131E9C7354D6B4EFCFD31E27EBC8FFCE8E7767F08C5B210B"
+    },
+    {
+      "path": "tests/PsychicTravelTests.cs",
+      "sha256": "A6FF2E51F565DE648BA65C04FCE2107D958BDF9F5C68CF18D3BCB8DC59CC4735"
+    },
+    {
+      "path": "tests/PsychicUndeadTests.cs",
+      "sha256": "4B86FAC5284FC5BD09D565E0B70385E9F5EC8DD1AB1DFE28489976461717DC94"
+    },
+    {
+      "path": "tests/PsychicWardingTests.cs",
+      "sha256": "43940393A2480D92AE17F5AB22D9CE3FF207D04084FC123DA74A776E3B05C9FC"
+    },
+    {
+      "path": "tests/PsychicWeaponSpellTests.cs",
+      "sha256": "D98770F18CC1BCCEDC7F63404A2B2E01F956525F29CC0848DEC6E6CC3B845483"
+    },
+    {
+      "path": "tests/PsychicWeatherTests.cs",
+      "sha256": "FA21481D301F74D6AC484D2073711F1C16FB130D515940666C2B4397B43291C2"
+    },
+    {
+      "path": "tests/PurifyingFlames01428Tests.cs",
+      "sha256": "72C409104296AFB3A0D4633256AD56C60B607661E43049FE058AFFE74F2E8D1C"
+    },
+    {
+      "path": "tests/RageTests.cs",
+      "sha256": "F990ADDD89FFF026FAF45A0D0D323721FB885D75229CFE6ACB5782F0110C47BB"
+    },
+    {
+      "path": "tests/RageTests.csproj",
+      "sha256": "028CFB579C40B4163CBA990B8DB41CAA79DE78FA78BB707C04C755D35A68A1D1"
+    },
+    {
+      "path": "tests/RegistrationDependencies01444.json",
+      "sha256": "C7D6C53A8E3A33640D4D0E33E85C9D615D310F6C35D0C6BA73859916FE779BD2"
+    },
+    {
+      "path": "tests/RegistrationFeatKi01432Tests.cs",
+      "sha256": "0CBA853DF629F1D78A7757F28B1019DB10C590034AA4147F210C7A24BE06587D"
+    },
+    {
+      "path": "tests/RegistrationOrder01444Tests.cs",
+      "sha256": "42AFD2EBD357D16B5CDAC1F2A4B4BE580BE7C43933222C50050AF2E7EC71CA39"
+    },
+    {
+      "path": "tests/RegistrationRemoval01432Tests.cs",
+      "sha256": "E6F3F50821F5F4F293CF513DB96C83B956CA859BC11343FAF14B8F68E5191D84"
+    },
+    {
+      "path": "tests/RegistrationWarmup01443Tests.cs",
+      "sha256": "DF4C54102287FE0DD95408E00DFC9866BBB00D85636144845532CDC47D715C54"
+    },
+    {
+      "path": "tests/Repair01436CallerTests.cs",
+      "sha256": "100227B7C670E10A8A6063EBE4F561912DAA3A2695227EFF302E2C04D8DD2E63"
+    },
+    {
+      "path": "tests/Repair01438CallerTests.cs",
+      "sha256": "D6423BC7088F0B739DA4BE46C00778A67258D401D67C8930F4476C2BFAD9995A"
+    },
+    {
+      "path": "tests/Repair01445Tests.cs",
+      "sha256": "386E166B65CDCA65C22A297589FA37CF3C3D610AD2A4E906C7F4F47DE94C45D5"
+    },
+    {
+      "path": "tests/Repair01447Tests.cs",
+      "sha256": "18D57AA219DE21D94E817178BEBC6165544CFDB57915F79FCFC491E7431F7652"
+    },
+    {
+      "path": "tests/RequiredHarmonyRuntime.cs",
+      "sha256": "9EF501359310A00762DCFAEC617235C6544831D44B3E7C2CF19086D928477A00"
+    },
+    {
+      "path": "tests/ResourceTests.cs",
+      "sha256": "3A73913A045EED2D34CDA2E31F08457B8926BD90BD1049773411AB910E281A53"
+    },
+    {
+      "path": "tests/ResourceTests.csproj",
+      "sha256": "78477BF51605BF634FBB0FA1F63A780921376A09365CD0400B7FF1AF7C56FB20"
+    },
+    {
+      "path": "tests/RogueSwashbuckler01443Tests.cs",
+      "sha256": "7BF41FC64FB8159114D3B17E48EE9BF3C1AE74B6E6F2A7BFB62E33E8446F70D0"
+    },
+    {
+      "path": "tests/RulesTests.csproj",
+      "sha256": "67686B8DEB6EAEEE07899AF3B3196120D5DB08ACBF6F5D2E6E4C5F838C027034"
+    },
+    {
+      "path": "tests/Run-MediumRegressions.ps1",
+      "sha256": "6A2E21A13F2A7B877AFDB90CDBDFF0AD5D6C740804B8BF2EE69C4370F5DC5ED9"
+    },
+    {
+      "path": "tests/SaveLoadTimers01442Tests.cs",
+      "sha256": "0BAE36C2BD233945EEA16B9CA4A4A122A1AF06145DB29B7EA48B2D3E2BC90A76"
+    },
+    {
+      "path": "tests/ShieldTests.cs",
+      "sha256": "EB760E054D839E3908A505F7BE442A0E4B840FA129625C69F1C09E4C27B348C2"
+    },
+    {
+      "path": "tests/ShieldTests.csproj",
+      "sha256": "97BB4BA065D944052F18F4B5E6D444C159B1ECD720F0B36DC48DFFDBCBD50D0A"
+    },
+    {
+      "path": "tests/Skirnir01456Tests.cs",
+      "sha256": "8757ED810D84FC27F57DEF536E83146AE57E030990E327AA005ECF3EE8A5DB83"
+    },
+    {
+      "path": "tests/SpellAndSword01417Tests.cs",
+      "sha256": "DC53047675941145838B734A8C2129158D98E548FFF7FE94D92B3569389E3DEF"
+    },
+    {
+      "path": "tests/SpellBatch01447Tests.cs",
+      "sha256": "CA7262395A2CEDDDF73B4C09CD95CF45C2000F9F614282454E51A00B459A694F"
+    },
+    {
+      "path": "tests/SpellResourceFeatTests.cs",
+      "sha256": "8D928ABA8593EE955D8880F454FB36213587E8701F211EBA0347E252BEB76C59"
+    },
+    {
+      "path": "tests/Spirit0148Tests.cs",
+      "sha256": "81B77B5242B618148914473D60573331A9FF6B667EF866F154277FD6028A0629"
+    },
+    {
+      "path": "tests/SpiritualGuardian01433Tests.cs",
+      "sha256": "7E47A5A0ECC94CA49AA37674EB7EAF1D54B2DC33613CAFE5BF7E671169F1A61B"
+    },
+    {
+      "path": "tests/Startup01422Launcher.cs",
+      "sha256": "0F815BCA0D3B74A6C587C420AC1923D636AA9D8309453DF7AF5F2BEA79CCE8BF"
+    },
+    {
+      "path": "tests/Startup01422Tests.csproj",
+      "sha256": "74EF5AA49D6B843F0BD660F2899BE66FE7AE0C9DBC24F9E9D32E234B484819D2"
+    },
+    {
+      "path": "tests/StartupArcane01446Tests.cs",
+      "sha256": "483443C379C549B5E697B66DF4CA0F9FC94BEE8AF45BC180B2669D3CCF0187C0"
+    },
+    {
+      "path": "tests/StartupArchetypes01445Tests.cs",
+      "sha256": "12785747ABC72F82FCEBA3C38438A958D47F4175533ABD3556A0E2238F27D9C6"
+    },
+    {
+      "path": "tests/StartupBlueprintCoreCoverage.cs",
+      "sha256": "DD674388A3CBB3B045140F3760209A1F67B1D6A953287E62B21D6AD16366446F"
+    },
+    {
+      "path": "tests/StartupRetry01444Tests.cs",
+      "sha256": "5D22F2EEFD8EEE60F5AC31804576ACA5B0C81E7BAADC0E276919B59F2246F43E"
+    },
+    {
+      "path": "tests/StartupSpellBatch01447Tests.cs",
+      "sha256": "40DB611A270477B5DD7279798CF2399207F9E427A957D3B936FE0863C6C1CAB9"
+    },
+    {
+      "path": "tests/StartupTests.cs",
+      "sha256": "9ED6F2166B98FC71BF79328137ADC4AD03BCF8E27FD23A63B5D91B487D24D5BF"
+    },
+    {
+      "path": "tests/StartupTests.csproj",
+      "sha256": "C32717A8AF5E4B66D89ECFCC4F602452CEEB007B7B2001DBA07DA8B541F68495"
+    },
+    {
+      "path": "tests/Sunsinger01443Tests.cs",
+      "sha256": "F33DF2D9E648D1E9922E2670CBCA2DE860DBD5D6202E1B7D9A02CD486DD14ADD"
+    },
+    {
+      "path": "tests/SuperstitionRage01434Tests.cs",
+      "sha256": "488F41DB8EC8F651D27394B22278DAB3486DCEB3587C1D12A2CDF2E1EE62D52A"
+    },
+    {
+      "path": "tests/T09FeatTests.cs",
+      "sha256": "A144983DFC4E7640874C4DE7AE228801810383ECAF90FA99D5F7D45E778972BB"
+    },
+    {
+      "path": "tests/T11TrainingTests.cs",
+      "sha256": "CE0A70AE2CB42B526454B9EF2C7EA6DFD142BBD47C03318AC1D233D7FC147F1E"
+    },
+    {
+      "path": "tests/Talent01425Tests.cs",
+      "sha256": "71D6FB1089F91007CDD3C93CD930F9FF4A435E6402FC4CC58262E50A90124957"
+    },
+    {
+      "path": "tests/TeamworkFeatTests.cs",
+      "sha256": "7E3EDA72C4871A2350E8AC7EAA453E13DAF1D1265E79307F246392FB598C9F4E"
+    },
+    {
+      "path": "tests/TeamworkReactionTestBoundary.cs",
+      "sha256": "FC42B285174B58134169158C36F704B9BE1B75170C74F7B854597859944872CD"
+    },
+    {
+      "path": "tests/Test-Feedback01450.ps1",
+      "sha256": "F045C060236E7CE57501B6771F9114FD1047DE0520E0B0EBFD545253127BA791"
+    },
+    {
+      "path": "tests/Test-Feedback01451.ps1",
+      "sha256": "0E16FC4BFB18A08222037C468BB6ABBA7717F946B36829C66166EFE9F27430D5"
+    },
+    {
+      "path": "tests/Test-Feedback01452.ps1",
+      "sha256": "86594300898E6A2D6F6804A124B284778EF4ADEF96D104D13526FEAFD10B9BF9"
+    },
+    {
+      "path": "tests/Test-Feedback01453.ps1",
+      "sha256": "15C376BB35204DF927EFD78CE71327A2E00D810200BB7CABE61D531B3F4C9705"
+    },
+    {
+      "path": "tests/Test-HarmonyReferencePin.ps1",
+      "sha256": "9433E4F45EFCEDE776418ED2A8FEDCFC08D28D95A8F6535510D4FFD6BE80EAEC"
+    },
+    {
+      "path": "tests/Test-Magus01454.py",
+      "sha256": "8A046BCF0C893C9AEFB3764D2A017794080DE1AC481485459EC0D1486BE41BF0"
+    },
+    {
+      "path": "tests/Test-MagusFeedback01455.py",
+      "sha256": "8D325EB208E67E8C490E3900E893158DE1125A832BD1C57AE1B6508FF22E9221"
+    },
+    {
+      "path": "tests/Test-PackageRejections.ps1",
+      "sha256": "FE0B2746770611D59069B0743A72125C6D248B9AFE9E92D810D0DC37A4781CB5"
+    },
+    {
+      "path": "tests/Test-PsychicArchetypes01457.py",
+      "sha256": "2B648F27340E6A2429B5969B6DB0979FD3079D43508F8D1414D9B8EE81EDD2FD"
+    },
+    {
+      "path": "tests/Test-PsychicCompletion01458.py",
+      "sha256": "0A64597ECB5844BD534E20F161C802ADEF2AD2BDBB2695BBF111DC3A36FE71B8"
+    },
+    {
+      "path": "tests/Test-PsychicFeedback01459.py",
+      "sha256": "DBB54DF6D8E939EE9CB5A7FE06F4E9F346853F27E5748B4E30F0E57AF94B6C05"
+    },
+    {
+      "path": "tests/Test-PsychicFeedback01460.py",
+      "sha256": "4F5EA6D71357F010974F304893AED98AA8260DA92BA8267B1F04832F463C7DB0"
+    },
+    {
+      "path": "tests/Test-PsychicFeedback01461.py",
+      "sha256": "8B17E3E6330D00C9D98AC1FCE9B8B7F696DFD9835E3BBF6AEFBD298B4B0F12AD"
+    },
+    {
+      "path": "tests/Test-PsychicFeedback01462.py",
+      "sha256": "F3F0EDDBF161E1D6AF58B5E3FC44CBC6CCDE4382866CE3D18537AA663122639B"
+    },
+    {
+      "path": "tests/Test-Skirnir01456.py",
+      "sha256": "D64AC6C739F5357395DC60B653FA838FA0D7FCC4B781396EFD493E950BA26413"
+    },
+    {
+      "path": "tests/Test-StartupRegressions.ps1",
+      "sha256": "5E0670BC1C8714C90B126CC83C6AC760C28C2A0F4248B0A6224CA3CEAAAEBE02"
+    },
+    {
+      "path": "tests/TimeStopDismiss01440Tests.cs",
+      "sha256": "0E94525993A6152B3E5734D88F8609A096EFFE672B532DF41701560FD9C7F9FA"
+    },
+    {
+      "path": "tests/TimeStopLifecycle01438Tests.cs",
+      "sha256": "138949278A1509A072DA3C1711589646B4FE9C15928C37D3014B9037EE7A85F9"
+    },
+    {
+      "path": "tests/TimeStopSpell01438Tests.cs",
+      "sha256": "42E967B029FA4AFED21F8658DBEEC8489A06042A1A6CB22D814040E3CEC6B2F2"
+    },
+    {
+      "path": "tests/TimeStopSpellbook01438Tests.cs",
+      "sha256": "17E6C9EBCEBB2EE2D0FFFED0F889B24D463469CFA11481B85C06B0A935C89937"
+    },
+    {
+      "path": "tests/TimeStopTimers01438Tests.cs",
+      "sha256": "EE1C36A46BA79A84CA166BB301692171AC2D4CA0B67F8E2D5F50D6B8E4F89F21"
+    },
+    {
+      "path": "tests/TimeStutter01437Tests.cs",
+      "sha256": "92A7AEA81BF8915C496C0F8C4D985FF65922AB61BBA9C967BA7E57AC8CEB5733"
+    },
+    {
+      "path": "tests/TrainingFeedbackTests.cs",
+      "sha256": "04E69E01AAC0EED9B6763CE0AE10BC78D46D5C6EE37F7414B5617967B7FA1A3B"
+    },
+    {
+      "path": "tests/UrbanSkald01443Tests.cs",
+      "sha256": "89889180D2B963C655C63DB1A3A4BB430F4EF36D5C1C692E9E2D8C477FFC5483"
+    },
+    {
+      "path": "tests/Urgent01418Tests.cs",
+      "sha256": "F4BBC4E517CF346380758215219B1790FA9F8F2EC86E790D08A7FBFDE48128B3"
+    },
+    {
+      "path": "tests/Verify-Package.ps1",
+      "sha256": "96BFC45CF07D8F6E04A1BA37260909D7FB0764E3C107FB0A18758B7666A8B3EB"
+    },
+    {
+      "path": "tests/Verify-Release01440.ps1",
+      "sha256": "1891EBA72B83747C3E44297644BD784E9F48D5586E0D03E17CE66753FF0D8625"
+    },
+    {
+      "path": "tests/WarDrummer01441Tests.cs",
+      "sha256": "0AE4F4FDBDD29FE3D6D76C1CAD58891E5B886E7CF1172A316C65CC7FB987304E"
+    },
+    {
+      "path": "tests/WarDrummerWarmup01443Tests.cs",
+      "sha256": "E681F4B0A86BF7D7045E145DC7FA1084E5E4EC21582C722A5747870032B97560"
+    },
+    {
+      "path": "tests/WildShapeFeatTests.cs",
+      "sha256": "115F676B779E64981A169DF9167A466D54B3EE9582BAAC82E2B04367BC8D10EC"
+    },
+    {
+      "path": "tests/WizardDiscoveries01435Tests.cs",
+      "sha256": "C753AF2EA3CAFE52EE51243193B0FC8362A5B401A3A88F2C4462B34D33208757"
+    },
+    {
+      "path": "tests/WizardSubschools01428Tests.cs",
+      "sha256": "CEC9C52EA606335CD7EB3CA34658A04C4077AB231733F43B1AA540C391B8C8E4"
+    },
+    {
+      "path": "tests/WizardSubschools01431Tests.cs",
+      "sha256": "15970A81F2358FC3ED82D3F03E71A5DBE772A603D97F8B0F6CAEE8E7587908F2"
+    }
+  ],
+  "excluded": [
+    "0.13.32清单更新依据与疑问.txt",
+    "tests/__pycache__/Pin-LegacyNativeInput01458.cpython-312.pyc"
+  ],
+  "fullReleaseFixturesIncluded": false
+}

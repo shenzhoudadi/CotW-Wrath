@@ -1,0 +1,42 @@
+0.3.4：Exemplar 的 Inspire Courage 等级计算补差
+
+本版做了什么
+现有 BrawlerClassWrath 的公开源码把拳斗士等级原样加入 Inspire Courage 的等级计算。原 CotW 与该变体说明则要求按拳斗士等级减 2 计算，纯 Exemplar 应在 7、13、19 级提高加值，而不是提前在 5、11、17 级提高。
+本版只修正这一个等级贡献。保留原生“取合格职业中的最高等级”规则、其他职业贡献和 RankBonus，不改变表演轮数、其他歌曲、职业进展或拳斗士连打。没有新职业或新专长；没有新增汉化。
+
+版本基线
+2026-09-27 查到 Nexus 主文件为 1.10（2024-03-20），GitHub Releases latest 仍是 1.0.9。按用户要求以最新公开版本为目标，用 GitHub 最新源码 ee9bd6161297989e46a8e19224fb50425a76fe65 核对；未取得 Nexus 1.10 成品 DLL，未声称二进制逐字一致。
+Nexus：https://www.nexusmods.com/pathfinderwrathoftherighteous/mods/207?tab=files
+本模块在运行时检查 Exemplar、职业归属及共享歌曲等级组件。结构不匹配会单独显示 Failed 并记录原因，不强行修改其他模组的不同实现。
+
+安装与确认
+完整退出游戏，按 README 升级本原型至 0.3.4。保留已测 0.3.3 包、旧目录和升级前存档。此包不包含 BrawlerClassWrath，也没有替换其文件。
+启动后：设置 → Mods → Call of the Wild - Wrath Prototype 应显示 Version 0.3.4。
+新增一行 Exemplar Inspire Courage scaling。安装标准 BrawlerClassWrath 且检测到预期结构时为 Registered；没有 Exemplar 模块时为 Not detected；Failed 则先提交日志，不将其算作生效。
+日志应出现 Registered: Exemplar Inspire Courage scaling。这里只证明修正已启用，不等于实际加值已测试。
+
+最快测试：5 级与 7 级，各看一次加值
+1. 使用一次性测试档，准备纯拳斗士 Exemplar 变体角色。已有原职业模组时，可用百宝袋增加经验，再走正常升级流程达到目标等级；不要只往角色身上强行添加 Inspire Courage 效果 Buff。
+2. 先做 5 级 Exemplar，不兼职吟游诗人或 Sensei，不使用其他提高表演等级的能力/装备；让队里其他角色关闭同类表演，避免相同类型加值被覆盖。
+3. 开启该角色自己的 Inspire Courage，使一位队友进入范围。查看队友 Buff 说明及攻击加值明细：来自 Inspire Courage 的攻击、武器伤害加值应为 +1。需要时找低威胁敌人做一次攻击并展开日志；比较表演加值项，不比较随机骰点或伤害总数。
+4. 关闭表演并等旧效果结束，再升到 7 级、重新开启。同一项应为 +2。
+5. 0.3.3 的同条件基准档可能在 5 级已给 +2；若有对照环境可截图比较，但不要为对照覆盖正式进度。
+
+边界补测（有条件再做）
+- 纯 Exemplar：3—6 级 +1，7—12 级 +2，13—18 级 +3，19—20 级 +4。
+- 11 级应 +2、13 级 +3；17 级应 +3、19 级 +4。
+- 纯吟游诗人 5 级或纯 Sensei 5 级仍应 +2。
+- Exemplar 5 / 吟游诗人 5：应保留吟游诗人的 +2；Exemplar 5 / 吟游诗人 4：应为 +1，两个职业等级不相加。
+- 重复关开表演，不应每次再减 2 或不断降低。保存、完整退出、重载后，关闭旧表演并重新开启，结果应相同。
+
+继续保留的基础职业验收
+在正常升级时从拳斗士额外战斗专长列表选择 Improved Combat Expertise；BAB 至少 +8，先有 Combat Expertise。普通角色须智力 13；拳斗士的 Brawler’s Cunning 可让低智力角色满足智力 13 的战斗专长要求。百宝袋强加不能证明选取条件正确。保存重载后核对职业与专长仍在。
+
+反馈请给
+- BrawlerClassWrath 实际安装版本、本原型版本、其他规则模组。
+- Exemplar 等级及兼职、表演开启前后 Inspire Courage 的加值截图。
+- 新菜单行状态及相关日志；哪些边界测试/升级读档已做，哪些未做。
+取日志方法见《测试者必读.txt》。重点搜索 Exemplar Inspire Courage scaling、Registration failed。
+
+验证范围
+本机使用真实游戏 GetBaseValue 与 ApplyProgression，运行生产 Harmony 修正和人为构造的职业/施法者对象进行边界验证；覆盖纯职业、兼职、Sensei 限定、等级额外加值、重复调用、结构拒绝、其他组件隔离及取消补丁。不是游戏内光环传播、伤害、升级或存档测试。本次没有安装或启动游戏。

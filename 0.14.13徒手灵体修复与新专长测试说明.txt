@@ -1,0 +1,60 @@
+CotW 0.14.13 徒手灵体修复与新专长测试说明
+版本：CotW 0.14.13 / Medium 0.4.3 / Way of the Shield 4.0.13
+固定游戏实际Managed/0Harmony.dll：2.0.4.0，SHA256 DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5。
+沿用既有配置和最新游戏/mod适配约定。更新时完全退出游戏，覆盖旧CotW目录后重启；不要并存两个CotW安装。旧存档、英文名称、已有GUID/TypeId保持。
+本轮先完成Spiritual Ally修复和独立检查，再新增5个专长；子开关不另计数量。开工已对照HANDOFF、TODO、交付清单、测试说明、验证记录和当前外部mod源码。已实现Extended Bane、用户外部完成Hurtful以及CharacterOptionsPlus已有Dazing Assault没有重复移植。Companion Share Spells、Eidolon Share Spells、Improved Spell Sharing分别是宠物共享/持续时间分配机制，与本轮Bonded Mind→Share Spells配套不同。
+
+一、先回归Spiritual Ally徒手形态
+1. 用信奉Irori的角色施放Spiritual Ally→所信奉神祇的偏好武器。检查召唤物拥有原版Improved Unarmed Strike，使用徒手攻击；场景仍是半透明蓝色人形灵体、正常攻击动画。
+2. 在战斗中让能被近战威胁的敌人进入灵体徒手触及范围，再让其移动离开，或让其执行会引发借机的动作。预期按原版借机次数、感知、隐蔽及触及规则进行徒手借机攻击。非威胁距离、原版阻止借机的效果及次数耗尽不会绕过限制。
+3. 让另一名角色与徒手Ally共同满足原版夹击条件，检查夹击；再测试秩序长剑/混乱战斧/善良战锤等已支持形态。预期原持械伤害、重击、威胁、借机、夹击与蓝色模型不变。远程神祇偏好武器仍按原版远程规则，不获得近战威胁。
+4. 保留召唤物时保存并载入，再检查徒手攻击与借机资格；重新召唤也应具备该专长。普通队员武器、Spiritual Weapon、Mage’s Sword、Twilight Knife和Arcane Eye不因本修复获得额外徒手专长。
+
+二、本批新专长
+通用检查：普通专长列表可选下面5个，团队专长列表含前4个；额外战斗专长列表含Broken Wing Gambit、Wounded Paw Gambit、Stunning Assault。Bonded Mind和Share Spells不属于战斗专长。已有进阶武训/甲训、Weapon of the Chosen系列与已交付专长列表保持。重复打开选择项或载入不会产生重复条目。
+
+1. Bonded Mind
+前置：无；团队专长。让施法者A与盟友B永久学习，另备没有该专长的盟友C。
+预期：A/B建立Share Spells所需的永久心灵联系，不增加AB/AC/DC或技能数值。桌面规则的可见范围内非语言沟通，在本作单玩家队伍中不另造对话/聊天按钮，也不授予心灵感应伤害或读心能力；实际可检验的配套用途见下一项。
+用Tactician临时共享专长或Solo Tactics代替B的永久学习，不能满足Share Spells的永久联系要求。永久学习后保存/载入保持身份。
+
+2. Share Spells（配套Bonded Mind；名称采用规则原文复数）
+前置：永久Bonded Mind、施法者等级至少1，以及动物伙伴/受支持的Making Friends eidolon/魔宠/phantom共享施法能力。原版所选魔宠和动物伙伴的已学特性也能判定，不要求魔宠在场景中显形或伙伴始终召在身边；可选联动mod提供的原版共享机制标记同样识别。只有坐骑装备、临时召唤生物或无施法能力，不算完整前置。
+a. 用有动物伙伴的德鲁伊/游侠施法者，或选了魔宠的法师/女巫/相关奥术者，永久学习两项配套专长。未具备伙伴/魔宠共享能力的纯施法者不得仅靠Bonded Mind选取Share Spells；尚无施法等级也不得选取。
+b. 开启持久开关Share Spells: Bonded Ally，用法术书的个人范围法术（例如Shield、Mirror Image、Expeditious Retreat等中实际范围为Personal的条目）选择B。预期个人法术以接触范围对B施放，增益落在B；A维持原法术位、动作类型、施法等级、DC及持续时间。施法距离由原版接触接近/施法命令处理，远处目标不会直接隔空获得效果。
+c. 检查Shield与Mirror Image，再对照自身施法；关闭开关后恢复原本个人目标行为。C、敌人、尸体及仅临时取得Bonded Mind的对象不能作为共享目标；原法术自身额外目标限制仍有效。正常Touch/Close法术不受该开关改变。
+d. 检查药水/卷轴/物品能力、炼金提取物及原本强制归于施法者的能力，保持各自原有目标规则。此专长共享法术书的个人法术，不改蓝图范围，不改召唤物/区域控制权或代替已有的宠物/炼金共享功能。
+e. 保存/载入后开关与已学专长保持；洗掉Share Spells后开关效果清理。初次法术投递中的ToCaster增益改给选定盟友；持续Buff的子上下文仍保留原施法者，避免后续消耗/清理错误转移。角色/形态额外限制、原有互斥Buff和独立控制器继续由原法术处理。
+
+3. Broken Wing Gambit
+前置：Persuasion实际技能级数5（桌面Bluff映射）；战斗/团队专长。
+a. A与近战盟友B都学习本项，B准备近战武器并有剩余借机次数。A开启Broken Wing Gambit: Offer Gambit，近战命中敌人E。
+b. 检查E下一次对A的武器攻击：AB与武器伤害均+2，检定来源为Broken Wing Gambit；E攻击其他角色没有这项+2。重复命中不会把同一A/E加值叠至+4。
+c. E对A的一次实际武器攻击，无论命中或落空，消耗这次诱敌效果，并向符合威胁/触及条件的B提交原版借机攻击。后续攻击不重复消费已结束的诱敌。反应在原版该次攻击完成的事件点提交，不额外暂停战斗弹确认框。普通借机次数、武器范围、意识/可攻击状态及原版命令限制保留。
+d. 回合制：A在自身回合提供诱敌，A当前回合结束仍保留，直到A下一个回合结束才到期；中间E接受诱敌则提前结束。即时制期限6秒。检查别的单位回合结束不提前清除。借机攻击本身不再提供新的诱敌，预览检定和远程命中也不提供。
+e. 关闭Offer Gambit后不再产生新诱敌；已经给敌人的短期利益按其原期限/接受条件结束，不可靠关闭开关立刻收回。诱敌期间保存/载入保留敌人身份和到期状态。洗掉本专长清理它的诱敌记录。
+
+4. Wounded Paw Gambit
+前置：Broken Wing Gambit、Persuasion级数5；战斗/团队专长。
+a. A保留Broken Wing设置；B学习两项、主手装备弓/弩等远程武器，并开启Wounded Paw Gambit: Prefer Ranged Reaction，保持距E不超过30尺（9.144米）。
+b. E接受A诱敌时，B发动一次正常远程武器反击，并实际消耗可用迅捷动作池（本引擎用同一池实现即时动作）。该次开口只给B一种反应，不同时再给Broken Wing借机攻击；多个合格盟友各自检查动作/次数。
+c. B迅捷动作已经消耗或已排队、目标超30尺/不能攻击、B不能行动等情况不进行远程反击，也不白扣动作。关闭Prefer Ranged Reaction后不自动花费迅捷；仍能按原版近战威胁条件获得Broken Wing的借机反应。装备弓的B不能凭此获得近战威胁。
+d. 一轮内连续多次诱敌，迅捷未刷新前只可花费一次；其他迅捷法术在同池已消耗时也不可释放。生成的远程反击不会再提供/触发Gambit链。保存/载入、开关关闭与洗点后状态一致。
+e. Solo Tactics只对已有诱敌事件豁免伙伴资格，不给无该专长盟友创造Offer Gambit开关，仍需由具备诱敌能力的角色提供开口；本人的专长、原版触及/动作、30尺和武器条件不被豁免；Bonded Mind/Share Spells的永久联系不被Solo Tactics豁免。
+
+5. Stunning Assault
+前置：Strength13、Power Attack、BAB16；战斗专长。
+a. BAB15或力量不足/未学Power Attack时不能选；满足后出现单个Stunning Assault自由动作能力。在攻击前激活，不能像持久开关那样中途关闭惩罚。
+b. 当回合所有近战攻击AB与CMB均-5，远程AB不受该项影响。近战命中逐次进行Fortitude：DC=10+当前BAB，BAB16时DC26，BAB20时DC30。DC不另外加力量、神话等级或武器增强。
+c. 失败施加原版Stunned一轮；成功不眩晕。连续命中可分别要求豁免；落空/预览/远程命中不要求。原版眩晕免疫依旧阻止眩晕，不能用该专长绕过。
+d. 自己下个回合开始时-5状态结束；即时制六秒结束。期间保存/载入保持剩余效果，洗掉专长清理状态；被施加的眩晕按自身一轮到期，不随攻击者任意开关解除。
+
+三、保留内容回归与规则出处
+用原0.14.12说明快速核对Improved Weapon Shift的CotW附魔转移和Swarm Scatter即时聚散；本轮未修改这些生产组件。Spiritual Ally其他近战形态的持械模型/攻击/夹击用第一节对照，盾牌、已验收专长以及法术存储链保持。
+规则：Archives of Nethys（Paizo授权规则站）
+https://aonprd.com/FeatDisplay.aspx?ItemName=Bonded+Mind
+https://aonprd.com/FeatDisplay.aspx?ItemName=Share+Spells
+https://aonprd.com/FeatDisplay.aspx?ItemName=Broken+Wing+Gambit
+https://aonprd.com/FeatDisplay.aspx?ItemName=Wounded+Paw+Gambit
+https://aonprd.com/FeatDisplay.aspx?ItemName=Stunning+Assault
+本作Bluff→Persuasion；即时动作→迅捷池；桌面每轮/回合→对应原版回合事件或即时制六秒；非语言沟通不增设单玩家聊天。法术书施法与目标附加限制按原版引擎执行。

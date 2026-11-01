@@ -1,0 +1,18 @@
+{
+  "cotwCommit": "1332fb0db844b7863f484ca978bea2349fe49769",
+  "icons": [
+    {
+      "token": "WardingWeapon",
+      "source": "CallOfTheWild/Icons/AbilityIcons/WardingWeapon.png",
+      "sha256": "1C179FC40103A95F052534872C2E755994985EDFA29D58434AAFB8DE12285658",
+      "embeddedResource": "CotW.WardingWeapon.png"
+    },
+    {
+      "token": "DazeMass",
+      "nativeBlueprint": "55f14bc84d7c85446b07a1b5dd6b2b4c",
+      "nativeSpriteGuid": "60fe3c2dbd23eae45843f2334f960ec5",
+      "source": "CotW createDazeMass -> Daze.Icon; native Wrath blueprint same GUID",
+      "embedded": false
+    }
+  ]
+}

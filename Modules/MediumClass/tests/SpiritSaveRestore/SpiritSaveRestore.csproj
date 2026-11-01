@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference><OutputType>Exe</OutputType><TargetFramework>net9.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>disable</Nullable></PropertyGroup>
+  <!-- Use the game Harmony embedded Cecil for this linked-attribute audit. -->
+  <ItemGroup>
+    <Compile Include="../../Medium/MediumSpiritPowerCleanup.cs" Link="Production/MediumSpiritPowerCleanup.cs" />
+    <Compile Include="../../Medium/MarshalSpiritRules.cs" Link="Production/MarshalSpiritRules.cs" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <Compile Include="../../Medium/NewUnitParts/UnitPartMedium.cs" Link="Production/UnitPartMedium.cs" />
+    <Compile Include="../../Medium/MediumChannelRestore.cs" Link="Production/MediumChannelRestore.cs" />
+    <Compile Include="../../Medium/MediumDeathCurseMigration.cs" Link="Production/MediumDeathCurseMigration.cs" />
+    <Compile Include="../../Medium/MediumDeathCurseRules.cs" Link="Production/MediumDeathCurseRules.cs" />
+    <Compile Include="../../Utilities/LocalizationText.cs" Link="Production/LocalizationText.cs" />
+    <Compile Include="../../Medium/NewComponents/ApplySpirits.cs" Link="Production/ApplySpirits.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumSpiritComponent.cs" Link="Production/MediumSpiritComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumSpiritMasteryComponent.cs" Link="Production/MediumSpiritMasteryComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumWeakerSpiritComponent.cs" Link="Production/MediumWeakerSpiritComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumSpiritFocusComponent.cs" Link="Production/MediumSpiritFocusComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumContextSharedSeanceComponent.cs" Link="Production/MediumContextSharedSeanceComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumContextSpiritBonusComponent.cs" Link="Production/MediumContextSpiritBonusComponent.cs" />
+    <Compile Include="../../Medium/NewComponents/AbilitySpecific/MediumInfluencePenaltyComponent.cs" Link="Production/MediumInfluencePenaltyComponent.cs" />
+    <Compile Include="../../Medium/InfluencePenaltyMath.cs" Link="Production/InfluencePenaltyMath.cs" />
+    <Compile Include="../../Medium/InfluenceMath.cs" Link="Production/InfluenceMath.cs" />
+    <Compile Include="../../Utilities/Guids.cs" Link="Production/Guids.cs" />
+  </ItemGroup>
+</Project>
