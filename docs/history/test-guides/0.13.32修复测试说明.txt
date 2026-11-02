@@ -34,4 +34,4 @@ Battlemind Link 不再使用游戏实际 Harmony 2.0.4 不支持的 __runOrigina
 
 六、异常反馈
 请附模块状态截图、实际版本、具体法术/降灵和复现顺序，及 Player.log 与 CallOfTheWildWrathPrototype_Log.txt。可在日志中搜索 Harmony runtime 确认实际加载的是 0Harmony 2.0.4.0。
-本版剩余根法术见随包的 0.13.32剩余根法术清单.txt；Ghostbane Dirge 两档继续搁置。
+本版剩余根法术见 docs/history/spells/0.13.32剩余根法术清单.txt；Ghostbane Dirge 两档继续搁置。
