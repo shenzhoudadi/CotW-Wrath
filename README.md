@@ -2,7 +2,7 @@
 
 Pathfinder: Wrath of the Righteous 的 Call of the Wild 内容移植项目。当前源码快照对应已交付的 **0.14.65**：包含 0.14.64 的 Amnesiac 以及本版 Urban Bloodrager 修复。
 
-项目中的游戏玩法文本保持原语言；`README.zh-CN.md` 与各版本测试说明记录历史工作。0.14.65 的回归步骤见 [测试说明](0.14.65UrbanBloodrager-feedback-test-guide.txt)。完整托管门禁、最终安装包 DLL 双运行时与 Mono 检查和独立只读复查通过；游戏表现由测试者观察。
+项目中的游戏玩法文本保持原语言；`README.zh-CN.md` 记录概要，历史版本测试说明在 `docs/history/test-guides/`。0.14.65 的回归步骤见 [测试说明](0.14.65UrbanBloodrager-feedback-test-guide.txt)。完整托管门禁、最终安装包 DLL 双运行时与 Mono 检查和独立只读复查通过；游戏表现由测试者观察。
 
 ## 下载
 

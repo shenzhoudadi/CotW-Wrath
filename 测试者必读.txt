@@ -1,4 +1,6 @@
-0.14.48：本轮仅修Nature’s Command植物目标/已付费标记、血脉底层引用及Familiar/Seeker/Primal入口、Court Bard/Phantasm与Terror Weaver视觉路径。用户确认的机制保持；新增迁移项0。请先读0.14.48目标与血脉及视觉反馈修复测试说明.txt，结果与哈希见交付自检。Harmony编译2.0.4.0，现有2.3.6运行时API兼容方式保持。
+0.14.65（内置 Medium 0.4.3）：Urban Bloodrager 反馈修复。请先读 0.14.65UrbanBloodrager-feedback-test-guide.txt；0.14.62–0.14.64 专项见同名 *-test-guide.txt。更早版本逐步说明在仓库 docs/history/test-guides/，不随安装包打包。
+
+0.14.48：本轮仅修Nature’s Command植物目标/已付费标记、血脉底层引用及Familiar/Seeker/Primal入口、Court Bard/Phantasm与Terror Weaver视觉路径。用户确认的机制保持；新增迁移项0。历史说明见 docs/history/test-guides/0.14.48目标与血脉及视觉反馈修复测试说明.txt。Harmony编译2.0.4.0，现有2.3.6运行时API兼容方式保持。
 
 0.14.40：COTW-0584 四项复查修复；常驻 0/2/4，混合包原生共享减伤边界、真实外部 DLL 静态共存及 UMM 0.32.4 兼容见 0.14.40伤害减免与UMM兼容修复测试说明.txt。
 0.14.39：只调整原生 Increased Damage Reduction（COTW-0584）。未选为 0，选一次 2/-，选两次 4/-，最多两次。坚定防御者 6 级与原有石之领主 12 级前提保留。不改职业减伤、野蛮人减伤或防御姿态，无新蓝图。详见0.14.39伤害减免防御之力测试说明.txt。
@@ -93,7 +95,7 @@ Spiritual Weapon、Spiritual Ally、Mage's Sword、Twilight Knife共用持续蓝
 当前Harmony编译、独立自检和回归固定游戏 Managed/0Harmony.dll 2.0.4.0与严格SHA；不提供替代DLL。以下旧版本说明是历史记录，以本段为准。
 
 0.13.32：纯加载兼容修复版（内置 Medium 0.4.3）
-修复 Battlemind Link 使用 __runOriginal 导致的 Psychic / Medium 连锁加载失败；功能与稳定身份保留，不新增法术。当前入口为 0.13.32修复测试说明.txt，剩余内容见 0.13.32剩余根法术清单.txt。
+修复 Battlemind Link 使用 __runOriginal 导致的 Psychic / Medium 连锁加载失败；功能与稳定身份保留，不新增法术。历史入口与剩余根清单见 docs/history/spells/。
 兼容目标以实际游戏加载为准：本次为 Managed/0Harmony.dll 2.0.4.0。构建、独立自检与 Medium 回归强制核验该运行时版本及哈希；下方历史段落中的 Harmony2.4.2/旧轮次安排不再作为现行要求。流程见交付自检流程.md。
 
 以下为历史版本说明。

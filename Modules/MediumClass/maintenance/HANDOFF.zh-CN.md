@@ -1,6 +1,6 @@
 # 最新交付：0.3.6启动修复
 
-2026-09-30收到0.3.5卡启动加载日志。Main入口排除两个Psychic UI补丁，AfterBlueprintCacheInit核对Root/UI/Colors后安装。所有GUID/TypeId及0.3.5统帅/能力清理修复保留。旧包初始化失败已独立复现，三版Harmony两种顺序新检查通过；Unity/Mono游戏验收仍待反馈。记录以0.3.6校验为准，以下0.3.5的哈希与计数为历史证据。
+文首各版本「补丁目标个数」等数字为当时发版记录，可能已过时。现行 CotW 生产 Harmony 目标数以 `tests/HarmonyTests.cs` 枚举及 `HarmonyTests.exe` 输出为准；启动/UI 后装顺序以 `IntegratedStartupTests`、两份 `StartupTests` 与 Medium 16 套回归为准（当前约为 BlueprintCore 五类 + 早期约 48 / UI 后约 50 个 Psychic 相关目标，合计随版本递增，不再在此处固定写死 44 或 57）。
 
 # MediumClass 0.3.5 接手说明
 
