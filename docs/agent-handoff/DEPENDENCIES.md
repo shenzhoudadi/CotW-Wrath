@@ -1,15 +1,11 @@
-# 依赖与验证边界
+# 当前依赖
 
-项目目标框架为 .NET Framework 4.7.2，主要开发环境为 Windows。源码根是公开仓库根；原开发工作区将它放在 outputs/CallOfTheWild.Wrath.Prototype，部分脚本按这个历史布局定位外部 work 目录。
+目标为Windows / .NET Framework4.7.2。仓库根就是源码根；原本地目录为 `outputs/CallOfTheWild.Wrath.Prototype`。
 
-已有引用指纹见 [BUILD-REFERENCES.json](BUILD-REFERENCES.json)，用于核对本地依赖；它不包含这些程序集的字节。
+默认编译需要合法本地游戏的 `Wrath_Data/Managed`、.NET SDK与模块所需引用。Harmony沿用游戏2.0.4.0及项目既有指纹合同，不以NuGet新版替换。Medium的ModMenu、UMM、TTTCore路径在 `Modules/MediumClass/MediumClass.local.props` 配置（参考example）；文件不提交。项目和模块csproj/props中的实际路径为准。
 
-项目通过 WOTR_GAME_PATH 或 MSBuild 的 WrathPath 找本地游戏目录，引用 Wrath_Data/Managed 的 Assembly-CSharp、UnityEngine、Owlcat 和相关程序集。编译 Harmony 必须是游戏提供的 0Harmony 2.0.4.0，并符合仓库哈希检查；不要以 NuGet 新版替代。Medium 和 WayOfTheShield 使用既有集成构建合同。其他外部依赖的实际位置以 csproj、Directory.Build.props、模块项目和 build.ps1 为准。
+当前构建仍按源码上两级定位 `work`。独立clone请先核对输出布局，或沿用 `outputs/CallOfTheWild.Wrath.Prototype` 布局；只准备当前必要引用，无须完整旧work。已记录的参考指纹在 `BUILD-REFERENCES.json`，按所需引用查，不默认遍历审计所有历史依赖。
 
-当前Medium编译仍需ModMenu、UMM和TTTCore引用；Brawler、外部适配与原生蓝图等夹具仅在对应可选诊断需要时取得。仓库不分发游戏程序集、游戏蓝图包、其他模组预编译 DLL、本地工作目录或私人日志。默认编译/出包无需整套历史work目录；先取得合法本地游戏与当前模块所需引用，并核验项目实际路径。可选旧诊断不保证环境完整。
+`-CheckStartup`、`-CheckRules` 和 `-Focus amnesiac066` 为显式诊断；Amnesiac旧宿主/蓝图/外部模组夹具不随仓库分发，旧环境不承诺完整。当前有用的测试源码保留，缺失时按具体问题补最小夹具，不恢复全历史环境或把其缺失当作普通出包失败。
 
-普通编译入口为 CallOfTheWild.Wrath.Prototype.csproj；默认出包入口为 build.ps1，仅编译、打包并核对包内必要文件/DLL。启动、规则及Amnesiac专项仅在明确选择后运行。已交付内容作为可用基线，不再默认逐版本历史或递归认证链；旧指纹/旧夹具缺失不阻断默认构建。实际测试范围及未测项如实记录，分发包DLL仍对应当前构建对象。原完整脚本build.full-legacy.ps1仅供回看，不保证旧环境仍可重跑。
-
-本地工作证据的不可移植路径在公开 inventory.json 中以 $WORKSPACE、$WOTR_GAME_PATH、$USER_PROFILE 占位；这些是来源标识，不表示相关文件已上传。内部 GUID 和公共来源链接保留，用于避免重复迁移和找回提供方证据。
-
-提供方源码存在、旧 DLL 能反编译或找到 GUID，不等于当前已安装、启用、成功注册或规则等价。可选提供方缺失、晚加载、冲突和失败回滚应保持既有合同；Starseeker、HA Investigator 和 Antipaladin 的具体 HOLD 见 TODO/REMAINING。
+游戏程序集、其他模组预编译DLL、蓝图包和私人日志不提交公开仓库或进入安装包。旧指南与索引中的历史路径仅作来源记录，可能已删除，不表示必须重新取得或逐一复验。

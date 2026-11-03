@@ -12,6 +12,8 @@ param(
     [ValidateSet('none', 'amnesiac066')][string]$Focus = 'none'
 )
 $ErrorActionPreference = 'Stop'
+$releaseClock = [Diagnostics.Stopwatch]::StartNew()
+$diagnosticTimings = [ordered]@{}
 $projectRoot = $PSScriptRoot
 $workspaceRoot = [IO.Path]::GetFullPath((Join-Path $projectRoot '../..'))
 $manifest = Get-Content -LiteralPath (Join-Path $projectRoot 'package/OwlcatModificationManifest.json') -Raw | ConvertFrom-Json
@@ -35,7 +37,8 @@ if ($TestManagedPath) {
     if ((Get-FileHash (Join-Path $TestManagedPath '0Harmony.dll')).Hash -ne (Get-FileHash $HarmonyReferencePath).Hash) { throw 'Test runtime Harmony differs from selected target.' }
     $managed = $TestManagedPath
 }
-# Default: compile and check current behavior; legacy full history is not run.
+# Default: compile and package; diagnostics run only when explicitly selected.
+$compileClock = [Diagnostics.Stopwatch]::StartNew()
 $mediumRoot = Join-Path $projectRoot 'Modules/MediumClass'
 foreach ($relative in @('artifacts/Release/MediumClass', 'obj/mod-merge/Release')) {
     $stageTarget = [IO.Path]::GetFullPath((Join-Path $mediumRoot $relative))
@@ -52,13 +55,14 @@ $wayAssembly = Join-Path $wayRoot 'artifacts/Release/WayOfTheShield/Way of the s
 $buildArgs = @('-c', 'Release', "-p:WrathPath=$WrathPath", "-p:HarmonyReferencePath=$HarmonyReferencePath", '--nologo')
 & dotnet build (Join-Path $projectRoot 'CallOfTheWild.Wrath.Prototype.csproj') @buildArgs
 if ($LASTEXITCODE -ne 0) { throw 'Prototype build failed.' }
+$compileSeconds = [Math]::Round($compileClock.Elapsed.TotalSeconds, 3)
 $assemblyPath = Join-Path $workspaceRoot 'work/prototype-build/CallOfTheWild.Wrath.Prototype/bin/Release/net472/CallOfTheWild.Wrath.Prototype.dll'
 
 # Package language files are fixed inputs. Runtime English fallback supplies new01445 text.
 
-# Build outside the bot-watched delivery directory. Publishing is a separate final
-# step after the source ZIP, post-build regressions and certificate are complete.
+# Publishing is separate from compiling and checking this package.
 # Preserve native-loader-required EMPTY directories and never package game DLLs.
+$packageClock = [Diagnostics.Stopwatch]::StartNew()
 $builtVersion = [Reflection.AssemblyName]::GetAssemblyName($assemblyPath).Version
 if ([Version]$manifest.Version -ne [Version]::new($builtVersion.Major, $builtVersion.Minor, $builtVersion.Build)) {
     throw 'Manifest version differs from the built DLL; refusing to write any delivery archive.'
@@ -140,32 +144,43 @@ try {
     if ((Get-FileHash -LiteralPath $assetReadback).Hash -cne (Get-FileHash -LiteralPath (Join-Path $mediumStage 'mediumclass_assets')).Hash) { throw 'Packaged Medium asset bundle differs from build.' }
 } finally { $zip.Dispose() }
 $packagedMain = Join-Path $readback 'CallOfTheWild.Wrath.Prototype.dll'
+$packageSeconds = [Math]::Round($packageClock.Elapsed.TotalSeconds, 3)
 $packagedMedium = Join-Path $readback 'MediumClass.dll'
 $startupRecord = $null
 if ($CheckStartup) {
+    $checkClock = [Diagnostics.Stopwatch]::StartNew()
     $startupDirectory = Join-Path $stagingDirectory 'startup'
     & (Join-Path $projectRoot 'tests/Test-StartupRegressions.ps1') -WrathPath $WrathPath -MainAssemblyPath $packagedMain -MediumAssemblyPath $packagedMedium -OutputDirectory $startupDirectory
     $startup = Get-Content -LiteralPath (Join-Path $startupDirectory 'results.json') -Raw | ConvertFrom-Json
     if ($startup.passedCases -ne 16 -or $startup.blueprintCorePatchesInstalled -ne 5) { throw 'Startup checks failed.' }
     $startupRecord = Join-Path $startupDirectory 'results.json'
+    $diagnosticTimings['startupSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
 }
 if ($CheckRules) {
+    $checkClock = [Diagnostics.Stopwatch]::StartNew()
     & dotnet run --project (Join-Path $projectRoot 'tests/RulesTests.csproj') -c Release "-p:WrathPath=$WrathPath" --nologo
     if ($LASTEXITCODE -ne 0) { throw 'Core rules verification failed.' }
+    $diagnosticTimings['rulesSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
 }
 $feedbackRecord = $null
 $combatRecord = $null
 if ($Focus -eq 'amnesiac066') {
+    $checkClock = [Diagnostics.Stopwatch]::StartNew()
     & python (Join-Path $projectRoot 'tests/Extract-PsychicCompletion01458.py') $WrathPath (Join-Path $workspaceRoot 'work/prototype-build/psychic-completion01458-native.json')
     if ($LASTEXITCODE -ne 0) { throw 'Current Amnesiac native input extraction failed.' }
+    $diagnosticTimings['nativeExtractionSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
+    $checkClock.Restart()
     $feedback = Join-Path $stagingDirectory 'amnesiac-feedback'
     & python (Join-Path $projectRoot 'tests/Run-AmnesiacFeedback066.py') $packagedMain $WrathPath $feedback
     if ($LASTEXITCODE -ne 0) { throw 'Current Amnesiac feedback checks failed.' }
     $feedbackRecord = Join-Path $feedback 'result.json'
+    $diagnosticTimings['amnesiacFeedbackSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
+    $checkClock.Restart()
     $combat = Join-Path $stagingDirectory 'amnesiac-combat'
     & python (Join-Path $workspaceRoot 'work/amnesiac-combat-proposal/repeatable-v2/run_combat.py') --candidate $packagedMain --output $combat --game $WrathPath
     if ($LASTEXITCODE -ne 0) { throw 'Current Amnesiac combat checks failed.' }
     $combatRecord = Join-Path $combat 'receipt.json'
+    $diagnosticTimings['amnesiacCombatSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
 }
 $record = [ordered]@{
     checkedAt = (Get-Date -Format o)
@@ -179,6 +194,14 @@ $record = [ordered]@{
     amnesiacFeedback = $feedbackRecord
     amnesiacCombat = $combatRecord
     scope = 'Compile and package checks plus explicitly selected diagnostics; no historical full regression or player game test.'
+    timings = [ordered]@{
+        compileSeconds = $compileSeconds
+        packageChecksSeconds = $packageSeconds
+        incrementalChecksExecuted = ($diagnosticTimings.Count -gt 0)
+        incrementalChecksSeconds = $(if ($diagnosticTimings.Count -gt 0) { [Math]::Round(($diagnosticTimings.Values | Measure-Object -Sum).Sum, 3) } else { $null })
+        checks = $diagnosticTimings
+        totalSeconds = [Math]::Round($releaseClock.Elapsed.TotalSeconds, 3)
+    }
     deliveryReady = $false
     gameLaunched = $false
     ummLaunched = $false
