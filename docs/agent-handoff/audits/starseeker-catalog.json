@@ -1,0 +1,2080 @@
+{
+  "scope": "historical source and current local archive audit, NOT a runtime registration or current-HEAD audit",
+  "decision": "HOLD",
+  "reasons": [
+    "Some original symbols have not yet been mapped to a runtime-verified root.",
+    "Optional provider availability and late-loading have not been verified.",
+    "Full temporary-knowledge and constellation behavior has not been tested."
+  ],
+  "source": "$WORKSPACE\\work\\batch01464\\source-read\\Classes\\Psychic.cs",
+  "sourceSha256": "068C3D8CFEA3FBDE93ABD7F2B4C329CB18AECE9760305C57B88D8B5733886348",
+  "nativeIndex": "$WORKSPACE\\work\\release01465\\native-archive-index.json",
+  "nativeIndexSha256": "D4EE120A79AC09B16EB74EE98CCC47C1F3264DDE80B7566104C22A2094FDF763",
+  "nativeArchive": "$WOTR_GAME_PATH\\blueprints.zip",
+  "nativeArchiveSha256": "BE61C9B723EF06558DA8D7CFC7F0C7EA869F60BA9952EBBBBD116CF681863EA5",
+  "priorSourceSearch": "$WORKSPACE\\work\\batch01464\\dependency-audit-initial064.json",
+  "priorSourceSearchSha256": "CAB1A4A45174366ACDC0540FDC1487EE9463D0D02B566DE7EFA6D9A55853A970",
+  "priorSearchMatches": [
+    {
+      "repo": "Holic75/KingmakerRebalance",
+      "path": "$WORKSPACE\\work\\batch01447\\sources\\Holic75__KingmakerRebalance\\tree\\CallOfTheWild\\Classes\\Psychic.cs",
+      "sha256": "068C3D8CFEA3FBDE93ABD7F2B4C329CB18AECE9760305C57B88D8B5733886348",
+      "lines": [
+        {
+          "line": 192,
+          "text": "createEsotericStarseeker();"
+        },
+        {
+          "line": 1120,
+          "text": "static void createEsotericStarseeker()"
+        },
+        {
+          "line": 1122,
+          "text": "createEsotericStarseekerWrittenInTheStars();"
+        },
+        {
+          "line": 1126,
+          "text": "a.LocalizedName = Helpers.CreateString($\"{a.name}.Name\", \"Esoteric Starseeker\");"
+        },
+        {
+          "line": 1127,
+          "text": "a.LocalizedDescription = Helpers.CreateString($\"{a.name}.Description\", \"The celestial bodies travel through the sky in fixed patterns, and knowledgeable astrologers rely on these stellar constants to make accurate predictions, but the constellations can also be a source of power. An esoteric starseeker is a psychic who focuses her studies on uncovering the secrets of the sky and the constellations of the Cosmic Caravan, able to read the stars as well as she can read minds.\");"
+        },
+        {
+          "line": 1143,
+          "text": "static void createEsotericStarseekerWrittenInTheStars()"
+        },
+        {
+          "line": 1150,
+          "text": "\"An esoteric starseeker can attune herself to a constellation of the Cosmic Caravan, gaining knowledge of new spells from it. She gains one bonus constellation spell for each spell level she can cast. At 11th level, she can attune herself to two constellations, choosing between the spells offered by both constellations when she prepares her constellation spells.\""
+        },
+        {
+          "line": 1315,
+          "text": "written_in_stars.SetDescription(written_in_stars.Description + \"Esoteric Starseeker does not gain discipline spells.\");"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "native_identity_verified": 69,
+    "symbol_requires_real_root_proof": 21
+  },
+  "entries": [
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"4d9bf81b7939b304185d58a09960f589\"), //faerie fire",
+      "kind": "original_library_guid",
+      "guid": "4d9bf81b7939b304185d58a09960f589",
+      "nativeArchivePath": "Spells/Level1/FaerieFire.jbp",
+      "nativeArchiveAssetId": "4d9bf81b7939b304185d58a09960f589",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"ce7dad2b25acf85429b6c9550787b2d9\"), //glitterdust",
+      "kind": "original_library_guid",
+      "guid": "ce7dad2b25acf85429b6c9550787b2d9",
+      "nativeArchivePath": "Spells/Level2/Glitterdust.jbp",
+      "nativeArchiveAssetId": "ce7dad2b25acf85429b6c9550787b2d9",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"bf0accce250381a44b857d4af6c8e10d\"), //searing light",
+      "kind": "original_library_guid",
+      "guid": "bf0accce250381a44b857d4af6c8e10d",
+      "nativeArchivePath": "Spells/Level3/SearingLight.jbp",
+      "nativeArchiveAssetId": "bf0accce250381a44b857d4af6c8e10d",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"4b8265132f9c8174f87ce7fa6d0fe47b\"), //rainbow pattern",
+      "kind": "original_library_guid",
+      "guid": "4b8265132f9c8174f87ce7fa6d0fe47b",
+      "nativeArchivePath": "Spells/Level4/RainbowPattern.jbp",
+      "nativeArchiveAssetId": "4b8265132f9c8174f87ce7fa6d0fe47b",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"4cf3d0fae3239ec478f51e86f49161cb\"), //true seeing",
+      "kind": "original_library_guid",
+      "guid": "4cf3d0fae3239ec478f51e86f49161cb",
+      "nativeArchivePath": "Spells/Level6/TrueSeeingCast.jbp",
+      "nativeArchiveAssetId": "4cf3d0fae3239ec478f51e86f49161cb",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f8cea58227f59c64399044a82c9735c4\"), //chains of light",
+      "kind": "original_library_guid",
+      "guid": "f8cea58227f59c64399044a82c9735c4",
+      "nativeArchivePath": "Spells/Level4/ChainsOfLight.jbp",
+      "nativeArchiveAssetId": "f8cea58227f59c64399044a82c9735c4",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"b22fd434bdb60fb4ba1068206402c4cf\"), //prismatic spray",
+      "kind": "original_library_guid",
+      "guid": "b22fd434bdb60fb4ba1068206402c4cf",
+      "nativeArchivePath": "Spells/Level7/PrismaticSpray.jbp",
+      "nativeArchiveAssetId": "b22fd434bdb60fb4ba1068206402c4cf",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"e96424f70ff884947b06f41a765b7658\"), //sunburst",
+      "kind": "original_library_guid",
+      "guid": "e96424f70ff884947b06f41a765b7658",
+      "nativeArchivePath": "Spells/Level8/Sunburst.jbp",
+      "nativeArchiveAssetId": "e96424f70ff884947b06f41a765b7658",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "lantern_bearer",
+      "spellLevel": 9,
+      "originalExpression": "NewSpells.meteor_swarm",
+      "kind": "original_symbol",
+      "symbol": "meteor_swarm",
+      "projectCandidateMentions": [],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"88367310478c10b47903463c5d0152b0\"), //hypnotism",
+      "kind": "original_library_guid",
+      "guid": "88367310478c10b47903463c5d0152b0",
+      "nativeArchivePath": "Spells/Level2/Hypnotism.jbp",
+      "nativeArchiveAssetId": "88367310478c10b47903463c5d0152b0",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"c7104f7526c4c524f91474614054547e\"), //hold person",
+      "kind": "original_library_guid",
+      "guid": "c7104f7526c4c524f91474614054547e",
+      "nativeArchivePath": "Spells/Level3/HoldPerson.jbp",
+      "nativeArchiveAssetId": "c7104f7526c4c524f91474614054547e",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 3,
+      "originalExpression": "NewSpells.synesthesia",
+      "kind": "original_symbol",
+      "symbol": "synesthesia",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 96,
+          "text": "new[]{\"3\",\"NewSpells.synesthesia.AssetGuid\",\"\",\"55c8366f5298b04e4ba678f49bc46005\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ModEntry.cs",
+          "line": 74,
+          "text": "type.DeclaringType == typeof(PsychicStoragePatch) || type.DeclaringType == typeof(PsychicLinkedWardPatches) || type == typeof(PsychicHexCooldownPatch) || type == typeof(PsychicHexTargetRestrictionsPatch) || type == typeof(PsychicFlightGroundPatch) || type == typeof(PsychicEtherMissPatch) || type == typeof(PsychicWindTravelPatch) || type == typeof(PsychicWallBlindnessDurationPatch) || type == typeo"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 59,
+          "text": "var senses=f.Buff(\"SynesthesiaBuff\",\"Synesthesia\",sensesText,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 60,
+          "text": "new AddStatBonus {name=\"SynesthesiaAC\",Stat=StatType.AC,Value=-4,Descriptor=ModifierDescriptor.UntypedStackable},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 61,
+          "text": "new AddStatBonus {name=\"SynesthesiaReflex\",Stat=StatType.SaveReflex,Value=-4,Descriptor=ModifierDescriptor.UntypedStackable},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 62,
+          "text": "new BuffAllSkillsBonus {name=\"SynesthesiaSkills\",Value=-4,Multiplier=1,Descriptor=ModifierDescriptor.UntypedStackable},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 63,
+          "text": "new AddCondition {name=\"SynesthesiaHalfSpeed\",Condition=UnitCondition.Slowed},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 64,
+          "text": "new AddCondition {name=\"SynesthesiaConcentration\",Condition=UnitCondition.SpellCastingIsDifficult},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 65,
+          "text": "new SpellDescriptorComponent {name=\"SynesthesiaMind\",Descriptor=SpellDescriptor.MindAffecting});"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 69,
+          "text": "yield return Debuff(f,\"Synesthesia\",\"Synesthesia\",sensesText,senses,3,SpellSchool.Illusion,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 71,
+          "text": "yield return Debuff(f,\"SynesthesiaMass\",\"Synesthesia, Mass\",sensesText,senses,7,SpellSchool.Illusion,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 147,
+          "text": "// the caster's active Synesthesia buff; other abilities use native behavior."
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 149,
+          "text": "internal static class PsychicSynesthesiaConcealmentPatch"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 151,
+          "text": "private static readonly BlueprintGuid BuffId=Id(\"SynesthesiaBuff\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 78,
+          "text": "if(token.StartsWith(\"PainStrike\") || token.StartsWith(\"Synesthesia\") || token.StartsWith(\"SynapseOverload\") || token.StartsWith(\"TelekineticStorm\") || token.StartsWith(\"PsychicCrush\"))continue;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRemainingDisciplines01458.cs",
+          "line": 153,
+          "text": "return Discipline(f,cls,\"Psychedelia\",cognatogen,warped,aura,\"40ec382849b60504d88946df46a10f2d\",\"fd4d9fd7f87575d47aafe2a64a6e2d8d\",Id(\"Synesthesia\").ToString(),\"cf6c901fb7acc904e85c63b342e9c949\",\"12fb4a4c22549c74d949e2916a2f0b6a\",\"15a04c40f84545949abeedef7279751a\",\"1e2d1489781b10a45a3b70192bba9be3\",\"740d943e42b60f64a8de74926ba6ddf7\",Id(\"DivideMind\").ToString());"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"7792da00c85b9e042a0fdfc2b66ec9a8\"), //break enchantment",
+      "kind": "original_library_guid",
+      "guid": "7792da00c85b9e042a0fdfc2b66ec9a8",
+      "nativeArchivePath": "Spells/Level5/BreakEnchantment.jbp",
+      "nativeArchiveAssetId": "7792da00c85b9e042a0fdfc2b66ec9a8",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"a0fc99f0933d01643b2b8fe570caa4c5\"), //raise dead",
+      "kind": "original_library_guid",
+      "guid": "a0fc99f0933d01643b2b8fe570caa4c5",
+      "nativeArchivePath": "Spells/Level5/RaiseDead.jbp",
+      "nativeArchiveAssetId": "a0fc99f0933d01643b2b8fe570caa4c5",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"15a04c40f84545949abeedef7279751a\"), //joyful rapture",
+      "kind": "original_library_guid",
+      "guid": "15a04c40f84545949abeedef7279751a",
+      "nativeArchivePath": "Spells/Level7/JoyfulRapture.jbp",
+      "nativeArchiveAssetId": "15a04c40f84545949abeedef7279751a",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 7,
+      "originalExpression": "NewSpells.synesthesia_mass",
+      "kind": "original_symbol",
+      "symbol": "synesthesia_mass",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 71,
+          "text": "yield return Debuff(f,\"SynesthesiaMass\",\"Synesthesia, Mass\",sensesText,senses,7,SpellSchool.Illusion,"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f958ef62eea5050418fb92dfa944c631\"), //power word stun",
+      "kind": "original_library_guid",
+      "guid": "f958ef62eea5050418fb92dfa944c631",
+      "nativeArchivePath": "Spells/Level8/PowerWordStun.jbp",
+      "nativeArchiveAssetId": "f958ef62eea5050418fb92dfa944c631",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "newlyweds",
+      "spellLevel": 9,
+      "originalExpression": "library.Get<BlueprintAbility>(\"41cf93453b027b94886901dbfc680cb9\"), //overwhelming presence",
+      "kind": "original_library_guid",
+      "guid": "41cf93453b027b94886901dbfc680cb9",
+      "nativeArchivePath": "Spells/Level6/OverwhelmingPresence.jbp",
+      "nativeArchiveAssetId": "41cf93453b027b94886901dbfc680cb9",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"90e59f4a4ada87243b7b3535a06d0638\"), //bless",
+      "kind": "original_library_guid",
+      "guid": "90e59f4a4ada87243b7b3535a06d0638",
+      "nativeArchivePath": "Spells/Level1/Bless.jbp",
+      "nativeArchiveAssetId": "90e59f4a4ada87243b7b3535a06d0638",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 2,
+      "originalExpression": "NewSpells.hypnotic_pattern",
+      "kind": "original_symbol",
+      "symbol": "hypnotic_pattern",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 54,
+          "text": "new[]{\"2\",\"NewSpells.hypnotic_pattern.AssetGuid\",\"\",\"\",\"\"},"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"5ab0d42fb68c9e34abae4921822b9d63\"), //heroism",
+      "kind": "original_library_guid",
+      "guid": "5ab0d42fb68c9e34abae4921822b9d63",
+      "nativeArchivePath": "Spells/Level3/Heroism.jbp",
+      "nativeArchiveAssetId": "5ab0d42fb68c9e34abae4921822b9d63",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"0087fc2d64b6095478bc7b8d7d512caf\"), //freedom of movement",
+      "kind": "original_library_guid",
+      "guid": "0087fc2d64b6095478bc7b8d7d512caf",
+      "nativeArchivePath": "Spells/Level4/FreedomOfMovementCast.jbp",
+      "nativeArchiveAssetId": "0087fc2d64b6095478bc7b8d7d512caf",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"d38aaf487e29c3d43a3bffa4a4a55f8f\"), //song of discord",
+      "kind": "original_library_guid",
+      "guid": "d38aaf487e29c3d43a3bffa4a4a55f8f",
+      "nativeArchivePath": "Spells/Level5/SongOfDiscord.jbp",
+      "nativeArchiveAssetId": "d38aaf487e29c3d43a3bffa4a4a55f8f",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"7f71a70d822af94458dc1a235507e972\"), //cloak of dreams",
+      "kind": "original_library_guid",
+      "guid": "7f71a70d822af94458dc1a235507e972",
+      "nativeArchivePath": "Spells/Level6/CloakofDreams.jbp",
+      "nativeArchiveAssetId": "7f71a70d822af94458dc1a235507e972",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"1e2d1489781b10a45a3b70192bba9be3\"), //waves of ecstasy",
+      "kind": "original_library_guid",
+      "guid": "1e2d1489781b10a45a3b70192bba9be3",
+      "nativeArchivePath": "Spells/Level7/WavesOfEctasy.jbp",
+      "nativeArchiveAssetId": "1e2d1489781b10a45a3b70192bba9be3",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 8,
+      "originalExpression": "NewSpells.irresistible_dance",
+      "kind": "original_symbol",
+      "symbol": "irresistible_dance",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BardMasterpieces01435.cs",
+          "line": 301,
+          "text": "buff.Stacking=StackingType.Replace;buff.FxOnStart=new PrefabLink{AssetId=\"91ef30ab58fa0d3449d4d2ccc20cb0f8\"};Set(buff,\"m_Icon\",PsychicOriginalIcons.Load(\"IrresistibleDance\"));return buff;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\Overseer01447.cs",
+          "line": 22,
+          "text": "internal const string MagicText=\"The overseer adds the following spells to the list of spells she can cast using spirit magic: hypnotism (1st), hideous laughter (2nd), hold person (3rd), crushing despair (4th), feeblemind (5th), serenity (6th), power word blind (7th), irresistible dance (8th), and dominate monster (9th). This ability replaces the spirit magic spells gained from the shaman’s spirit"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\Overseer01447.cs",
+          "line": 32,
+          "text": "var spells=NativeSpells.Select((id,i)=>i==7?cache.Load(Id(\"IrresistibleDance\")) as BlueprintAbility:f.Native<BlueprintAbility>(id)).ToArray();if(spells.Any(s=>s==null))throw new InvalidOperationException(\"01447 Overseer requires the existing Irresistible Dance spell.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 110,
+          "text": "Add(f,\"IrresistibleDance\",8,\"ba0401fdeb4062f40a7aa95b6f07fe89\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 111,
+          "text": "Add(f,\"IrresistibleDance\",6,\"25a5013493bdcf74bb2424532214d0c8\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCompulsionSpells.cs",
+          "line": 50,
+          "text": "var dance=f.Buff(\"IrresistibleDanceBuff\",\"Irresistible Dance\",danceText,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCompulsionSpells.cs",
+          "line": 56,
+          "text": "Set(dance,\"m_Icon\",PsychicOriginalIcons.Load(\"IrresistibleDance\"));SetEnum(dance,\"m_Flags\",\"Harmful\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCompulsionSpells.cs",
+          "line": 60,
+          "text": "var touch=f.Clone(f.Native<BlueprintAbility>(\"3c17035ec4717674cae2e841a190e757\"),\"IrresistibleDanceTouch\",\"Irresistible Dance\",danceText);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCompulsionSpells.cs",
+          "line": 66,
+          "text": "var cast=f.Clone(f.Native<BlueprintAbility>(\"ab395d2335d3f384e99dddee8562978f\"),\"IrresistibleDance\",\"Irresistible Dance\",danceText);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 71,
+          "text": "if(token.StartsWith(\"DebilitatingPortent\") || token.StartsWith(\"IrresistibleDance\"))continue;"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "daughter",
+      "spellLevel": 9,
+      "originalExpression": "library.Get<BlueprintAbility>(\"43740dab07286fe4aa00a6ee104ce7c1\"), //heroic invocation",
+      "kind": "original_library_guid",
+      "guid": "43740dab07286fe4aa00a6ee104ce7c1",
+      "nativeArchivePath": "Spells/Level9/HeroicInvocation.jbp",
+      "nativeArchiveAssetId": "43740dab07286fe4aa00a6ee104ce7c1",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 1,
+      "originalExpression": "NewSpells.burst_of_adrenaline",
+      "kind": "original_symbol",
+      "symbol": "burst_of_adrenaline",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 11,
+          "text": "new[]{\"1\",\"NewSpells.burst_of_adrenaline.AssetGuid\",\"\",\"b0a50deb87a2b4e7bf38d9aff5c9ffcc\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ModuleCatalog.cs",
+          "line": 34,
+          "text": "new ModuleDefinition(PsychicExpansion.ModuleName, \"Adds 19 migrated Psychic spells, including Burst of Adrenaline and Burst of Insight, three undercast families and the complete Ferocity discipline with level 1/5/13 powers, nine bonus spells and Wisdom phrenic resources.\", \"Not registered\"),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MonkKiPowers01427.cs",
+          "line": 37,
+          "text": "internal static readonly string[] Tokens = { \"BurstOfAdrenaline\", \"BurstOfInsight\", \"CloakOfWinds\", \"AkashicForm\", \"FrightfulAspect\" };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MonkKiPowers01427.cs",
+          "line": 38,
+          "text": "static readonly string[] Titles = { \"Burst of Adrenaline\", \"Burst of Insight\", \"Cloak of Winds\", \"Akashic Form\", \"Frightful Aspect\" };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicBurstSpells.cs",
+          "line": 24,
+          "text": "(spell.AssetGuid == Id(\"BurstOfAdrenaline\") || spell.AssetGuid == Id(\"BurstOfInsight\") ||"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicBurstSpells.cs",
+          "line": 25,
+          "text": "spell.Parent != null && (spell.Parent.AssetGuid == Id(\"BurstOfAdrenaline\") || spell.Parent.AssetGuid == Id(\"BurstOfInsight\")));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicBurstSpells.cs",
+          "line": 27,
+          "text": "internal static string KnownState(Spellbook book) => string.Join(\"; \", new[] { \"BurstOfAdrenaline\", \"BurstOfInsight\" }.Select(token => {"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicBurstSpells.cs",
+          "line": 55,
+          "text": "string token=insight?\"BurstOfInsight\":\"BurstOfAdrenaline\",title=insight?\"Burst of Insight\":\"Burst of Adrenaline\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicLearningDiagnostics.cs",
+          "line": 23,
+          "text": "var ids=Watched.Concat(new[]{PsychicAssets.Id(\"BurstOfAdrenaline\").ToString(),PsychicAssets.Id(\"BurstOfInsight\").ToString(),spell?.AssetGuid.ToString()}).Where(s=>s!=null).Distinct();"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"4709274b2080b6444a3c11c6ebbe2404\"), //find traps",
+      "kind": "original_library_guid",
+      "guid": "4709274b2080b6444a3c11c6ebbe2404",
+      "nativeArchivePath": "Spells/Level2/FindTraps.jbp",
+      "nativeArchiveAssetId": "4709274b2080b6444a3c11c6ebbe2404",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"2d4263d80f5136b4296d6eb43a221d7d\"), //magic vestement",
+      "kind": "original_library_guid",
+      "guid": "2d4263d80f5136b4296d6eb43a221d7d",
+      "nativeArchivePath": "Spells/Level3/MagicalVestment.jbp",
+      "nativeArchiveAssetId": "2d4263d80f5136b4296d6eb43a221d7d",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f09453607e683784c8fca646eec49162\"), //shout",
+      "kind": "original_library_guid",
+      "guid": "f09453607e683784c8fca646eec49162",
+      "nativeArchivePath": "Spells/Level4/Shout.jbp",
+      "nativeArchiveAssetId": "f09453607e683784c8fca646eec49162",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"20b548bf09bb3ea4bafea78dcb4f3db6\"), //echolocation",
+      "kind": "original_library_guid",
+      "guid": "20b548bf09bb3ea4bafea78dcb4f3db6",
+      "nativeArchivePath": "Spells/Level4/Echolocation.jbp",
+      "nativeArchiveAssetId": "20b548bf09bb3ea4bafea78dcb4f3db6",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"36c8971e91f1745418cc3ffdfac17b74\"), //blade  barrier",
+      "kind": "original_library_guid",
+      "guid": "36c8971e91f1745418cc3ffdfac17b74",
+      "nativeArchivePath": "Spells/Level6/BladeBarrier.jbp",
+      "nativeArchiveAssetId": "36c8971e91f1745418cc3ffdfac17b74",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"da1b292d91ba37948893cdbe9ea89e28\"), //legendary proprtions",
+      "kind": "original_library_guid",
+      "guid": "da1b292d91ba37948893cdbe9ea89e28",
+      "nativeArchivePath": "Spells/Level7/LegendaryProportions.jbp",
+      "nativeArchiveAssetId": "da1b292d91ba37948893cdbe9ea89e28",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"e788b02f8d21014488067bdd3ba7b325\"), //frightful aspect",
+      "kind": "original_library_guid",
+      "guid": "e788b02f8d21014488067bdd3ba7b325",
+      "nativeArchivePath": "Spells/Level8/FrightfulAspect.jbp",
+      "nativeArchiveAssetId": "e788b02f8d21014488067bdd3ba7b325",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "rider",
+      "spellLevel": 9,
+      "originalExpression": "library.Get<BlueprintAbility>(\"1f01a098d737ec6419aedc4e7ad61fdd\"), //foresight",
+      "kind": "original_library_guid",
+      "guid": "1f01a098d737ec6419aedc4e7ad61fdd",
+      "nativeArchivePath": "Spells/Level9/Foresight.jbp",
+      "nativeArchiveAssetId": "1f01a098d737ec6419aedc4e7ad61fdd",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 1,
+      "originalExpression": "NewSpells.command",
+      "kind": "original_symbol",
+      "symbol": "command",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\Amnesiac01464.cs",
+          "line": 15,
+          "text": "using Kingmaker.UnitLogic.Commands.Base;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\Amnesiac01464.cs",
+          "line": 103,
+          "text": "var ability=f.Ability(token,\"Recall: \"+spell.Name,spell.Description+\"\\n\\n\"+RecallText,AbilityType.Extraordinary,UnitCommand.CommandType.Swift,AbilityRange.Personal,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\Amnesiac01464.cs",
+          "line": 140,
+          "text": "state.Menus=Enumerable.Range(1,9).Select(i=>{var m=f.Ability(MenuToken(i),\"Spell Recollection \"+i,RecallText,AbilityType.Extraordinary,UnitCommand.CommandType.Swift,AbilityRange.Personal,new AbilityVariants(),new AmnesiaRecallGate01464{Circle=i,Cooldown=Ref<BlueprintBuffReference>(state.Cooldown)});SpellBatch01447.Icon(m,icon);return m;}).ToArray();"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 24,
+          "text": "using Kingmaker.UnitLogic.Commands;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 25,
+          "text": "using Kingmaker.UnitLogic.Commands.Base;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 73,
+          "text": "Set(option,\"m_Buff\",Ref<BlueprintBuffReference>(retort)); Set(option,\"m_ActivateWithUnitCommand\",UnitCommand.CommandType.Free); Icon(option,rageSource);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 115,
+          "text": "if(!Buff.IsActive||!Buff.IsTurnedOn||Buff.IsSuppressed||evt.Target!=Owner||evt.AttackRoll?.IsHit!=true||evt.AttackRoll.IsFake||evt.Weapon?.Blueprint.IsMelee!=true||evt.Initiator?.Commands?.Free is AngerRetortCommand01431||!AngerRetortCommand01431.Legal(Owner,evt.Initiator)) return;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 117,
+          "text": "var command=new AngerRetortCommand01431(evt.Initiator,Context,Owner.GetThreatHand().Weapon.UniqueId,Ref<BlueprintBuffReference>(Buff.Blueprint));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 118,
+          "text": "command.Init(Owner); Owner.Resources.Spend(resource,1); Owner.Commands.Queue.AddFirst(command);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 121,
+          "text": "// The existing paid-reaction scheduler recognizes this exact command too."
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 125,
+          "text": "public sealed class AngerRetortCommand01431 : UnitCommand"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 132,
+          "text": "public AngerRetortCommand01431(JsonConstructorMark mark):base(mark) { }"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 133,
+          "text": "internal AngerRetortCommand01431(UnitEntityData target,MechanicsContext context,string weapon,BlueprintBuffReference consent):base(CommandType.Free,target) {"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 142,
+          "text": "public override bool IsOneFrameCommand=>false;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\AngerInquisition01431.cs",
+          "line": 147,
+          "text": "public override bool CanStart { get { if(!base.CanStart||Executor==null)return false; return !Executor.Commands.Raw.Any(c=>c!=this&&c?.IsRunning==true&&c.IsAnimating); } }"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BardMasterpieces01435.cs",
+          "line": 37,
+          "text": "using Kingmaker.UnitLogic.Commands.Base;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BardMasterpieces01435.cs",
+          "line": 175,
+          "text": "var marker=f.Ability(MarkerTokens[index],title+\" (Masterpiece)\",\"Spend one Bard spell known of level \"+MarkerLevels[index]+\" to learn this masterpiece instead of a spell. You must meet its normal class-level requirements and have PrestigePlus's Bardic Masterpieces. Use the performance in the abilities tab; this choice cannot be cast or converted into a spell. Removing this known choice revokes onl"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BardMasterpieces01435.cs",
+          "line": 182,
+          "text": "if (bp is BlueprintActivatableAbility a) result += \"/\"+a.Group+\"/\"+a.ActivationType+\"/\"+Get(a,\"m_ActivateWithUnitCommand\")+\"/\"+(Get(a,\"m_Buff\") as BlueprintBuffReference)?.Guid;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BardMasterpieces01435.cs",
+          "line": 255,
+          "text": "var toggle=f.Add(new BlueprintActivatableAbility { Group=ActivatableAbilityGroup.BardicPerformance,ActivationType=kind==1?AbilityActivationType.Immediately:AbilityActivationType.WithUnitCommand,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BardMasterpieces01435.cs",
+          "line": 257,
+          "text": "Set(toggle,\"m_Buff\",Ref<BlueprintBuffReference>(host));Set(toggle,\"m_ActivateWithUnitCommand\",kind==1?UnitCommand.CommandType.Free:UnitCommand.CommandType.Standard);Set(toggle,\"m_Icon\",Get(host,\"m_Icon\"));return toggle;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BloodlineMutations01446.cs",
+          "line": 16,
+          "text": "using Kingmaker.UnitLogic.Commands.Base;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BloodlineMutations01446.cs",
+          "line": 36,
+          "text": "Set(t,\"m_ActivateWithUnitCommand\",UnitCommand.CommandType.Free);Set(t,\"m_Buff\",Ref<BlueprintBuffReference>(buff));ArcaneBatch01446.Icon(t,icon);ArcaneBatch01446.Icon(buff,icon);return t;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ChosenWeaponFeats.cs",
+          "line": 29,
+          "text": "using Kingmaker.UnitLogic.Commands.Base;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ChosenWeaponFeats.cs",
+          "line": 67,
+          "text": "var ability=f.Ability(\"WeaponOfChosenAbility\",\"Weapon of the Chosen\",basic,AbilityType.Supernatural,UnitCommand.CommandType.Swift,AbilityRange.Personal,new ChosenWeaponRestriction(),new ChosenWeaponArm());ability.NotOffensive=true;ability.LocalizedDuration=Text(\"WeaponOfChosenAbility\",\"duration\",\"1 round; Improved: until your next turn\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ChosenWeaponFeats.cs",
+          "line": 71,
+          "text": "var a=f.Ability(\"Chosen\"+Choices[i]+\"PreferenceAbility\",\"Improved Weapon of the Chosen: \"+(i==4?\"Cold Iron and Silver\":Choices[i]),improved,AbilityType.Supernatural,UnitCommand.CommandType.Free,AbilityRange.Personal,new ChosenWeaponRestriction{Choice=i},Run(actions.ToArray()));a.NotOffensive=true;variants.Add(a);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ChosenWeaponFeats.cs",
+          "line": 73,
+          "text": "var v=new AbilityVariants();Set(v,\"m_Variants\",variants.Select(Ref<BlueprintAbilityReference>).ToArray());var parent=f.Ability(\"ChosenPreferenceAbility\",\"Improved Weapon of the Chosen: Choose Property\",improved,AbilityType.Supernatural,UnitCommand.CommandType.Free,AbilityRange.Personal,v);parent.NotOffensive=true;foreach(var a in variants)Set(a,\"m_Parent\",Ref<BlueprintAbilityReference>(parent));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ChosenWeaponFeats.cs",
+          "line": 159,
+          "text": "if(roll==null||roll.IsCriticalRoll||roll.IsFake||a==null||a.Initiator!=Owner||roll.Weapon!=a.Weapon||!ChosenWeaponFeats.Favored(Owner,a.Weapon)||a.IsRend||a.IsFullAttack||a.IsCharge||a.IsAttackOfOpportunity||a.ExtraAttack||a.AttackNumber!=0||a.AttackBonusPenalty!=0||!FellingSmashTrigger.IsAttackAction(Owner.Commands?.Standard,a))return;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\CooperationFeats.cs",
+          "line": 18,
+          "text": "using Kingmaker.UnitLogic.Commands.Base;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\CooperationFeats.cs",
+          "line": 69,
+          "text": "var stunAbility=f.Ability(\"StunningAssaultAbility\",\"Stunning Assault\",stun,AbilityType.Extraordinary,UnitCommand.CommandType.Free,AbilityRange.Personal,Run(arm));stunAbility.NotOffensive=true;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\CooperationRuntime.cs",
+          "line": 20,
+          "text": "using Kingmaker.UnitLogic.Commands;"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 2,
+      "originalExpression": "NewSpells.force_sword",
+      "kind": "original_symbol",
+      "symbol": "force_sword",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 47,
+          "text": "new[]{\"2\",\"NewSpells.force_sword.AssetGuid\",\"\",\"f9ce1e9088de0d502a98bcce636b0615\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicBoundWeapons.cs",
+          "line": 52,
+          "text": "public bool IsTargetRestrictionPassed(UnitEntityData caster,TargetWrapper target)=>caster!=null&&PsychicForceSword.HandFree(caster.Body.PrimaryHand)&&PsychicForceSword.HandFree(caster.Body.SecondaryHand);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 130,
+          "text": "Add(f,\"ForceSword\",2,\"ba0401fdeb4062f40a7aa95b6f07fe89\",\"4d72e1e7bd6bc4f4caaea7aa43a14639\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicExpansion.cs",
+          "line": 27,
+          "text": "entries.Add(PsychicRestorativeSpells.ForceSword(f));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFaith.cs",
+          "line": 50,
+          "text": "var spells=new[]{f.Native<BlueprintAbility>(\"90e59f4a4ada87243b7b3535a06d0638\"),f.Find<BlueprintAbility>(\"ForceSword\"),f.Native<BlueprintAbility>(\"2d4263d80f5136b4296d6eb43a221d7d\"),f.Native<BlueprintAbility>(\"f2115ac1148256b4ba20788f7e966830\"),f.Native<BlueprintAbility>(\"1bc83efec9f8c4b42a46162d72cbf494\"),f.Find<BlueprintAbility>(\"PsychicSurgery\"),f.Native<BlueprintAbility>(\"fafd77c6bfa85c04ba31f"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFaith.cs",
+          "line": 51,
+          "text": "var names=new[]{\"Bless\",\"Force Sword\",\"Magic Vestment\",\"Restoration\",\"Burst of Glory\",\"Psychic Surgery\",\"Greater Restoration\",\"Summon Monster VIII\",\"Mass Heal\"};"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSword.cs",
+          "line": 16,
+          "text": "public sealed class PsychicForceSwordData"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSword.cs",
+          "line": 24,
+          "text": "public sealed class PsychicForceSword : UnitFactComponentDelegate<PsychicForceSwordData>"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSword.cs",
+          "line": 61,
+          "text": "public sealed class PsychicForceSwordTarget : BlueprintComponent,IAbilityTargetRestriction"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSword.cs",
+          "line": 63,
+          "text": "public bool IsTargetRestrictionPassed(UnitEntityData caster,TargetWrapper target)=>target?.Unit!=null && PsychicForceSword.HandFree(target.Unit.Body?.PrimaryHand);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 79,
+          "text": "if(token.StartsWith(\"Pageantry\") || token.StartsWith(\"Silence\") || token.StartsWith(\"Faith\") || token.StartsWith(\"BurstOf\") || token.StartsWith(\"CountlessEyes\") || token.StartsWith(\"ForceSword\") || token.StartsWith(\"PsychicSurgery\")) continue; // Builders supply their icons, labels and native visual components."
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 30,
+          "text": "using(var stream=typeof(PsychicRestorativeSpells).Assembly.GetManifestResourceStream(\"CotW.ForceSword.png\")) {"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 31,
+          "text": "if(stream==null) throw new InvalidOperationException(\"Missing embedded CotW Force Sword icon.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 35,
+          "text": "if(!ImageConversion.LoadImage(texture,bytes.ToArray())) throw new InvalidOperationException(\"Invalid Force Sword icon.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 41,
+          "text": "internal static PsychicSpells.Entry ForceSword(PsychicAssets f)"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 45,
+          "text": "var fx=f.Clone(f.Native<BlueprintWeaponEnchantment>(\"1d64abd0002b98043b199c0e3109d3ee\"),\"ForceSwordVisualEnchantment\",\"Force Sword\",text);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 50,
+          "text": "var weapon=f.Clone(f.Native<BlueprintItemWeapon>(\"6fd0a849531617844b195f452661b2cd\"),\"ForceSwordWeapon\"+(i+1),\"Force Sword +\"+(i+1),text);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 51,
+          "text": "Set(weapon,\"m_DisplayNameText\",Text(\"ForceSwordWeapon\"+(i+1),\"name\",\"Force Sword +\"+(i+1)));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 52,
+          "text": "Set(weapon,\"m_DescriptionText\",Text(\"ForceSwordWeapon\"+(i+1),\"description\",text));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 61,
+          "text": "var buff=f.Buff(\"ForceSwordBuff\",\"Force Sword\",text,new PsychicForceSword {name=\"CotWTemporaryForceSword\",Weapons=weapons});"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 63,
+          "text": "var rank=new ContextRankConfig {name=\"ForceSwordDuration\"};SetEnum(rank,\"m_BaseValueType\",\"CasterLevel\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 65,
+          "text": "var spell=f.Clone(f.Native<BlueprintAbility>(\"03a9630394d10164a9410882d31572f0\"),\"ForceSword\",\"Force Sword\",text);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 67,
+          "text": "new SpellComponent {name=\"ForceSwordEvocation\",School=SpellSchool.Evocation},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 68,
+          "text": "new SpellDescriptorComponent {name=\"ForceSwordDescriptor\",Descriptor=SpellDescriptor.Force},rank,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 69,
+          "text": "new PsychicForceSwordTarget {name=\"ForceSwordEmptyPrimaryHand\"},Run(apply)}).ToArray();"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 73,
+          "text": "spell.LocalizedDuration=Text(\"ForceSword\",\"duration\",\"1 minute per caster level\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRestorativeSpells.cs",
+          "line": 74,
+          "text": "return new PsychicSpells.Entry {Token=\"ForceSword\",Level=2,Ability=spell};"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"92681f181b507b34ea87018e8f7a528a\"), //dispel magic",
+      "kind": "original_library_guid",
+      "guid": "92681f181b507b34ea87018e8f7a528a",
+      "nativeArchivePath": "Spells/Level3/DispelMagic.jbp",
+      "nativeArchiveAssetId": "92681f181b507b34ea87018e8f7a528a",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"76a629d019275b94184a1a8733cac45e\"), //protection from energy comminal",
+      "kind": "original_library_guid",
+      "guid": "76a629d019275b94184a1a8733cac45e",
+      "nativeArchivePath": "Spells/Level4/ProtectionFromEnergyCommunal.jbp",
+      "nativeArchiveAssetId": "76a629d019275b94184a1a8733cac45e",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 5,
+      "originalExpression": "NewSpells.burst_of_force",
+      "kind": "original_symbol",
+      "symbol": "burst_of_force",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 133,
+          "text": "new[]{\"5\",\"NewSpells.burst_of_force.AssetGuid\",\"\",\"8266f8809fc2de62bbd5ab64abe4b683\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 133,
+          "text": "Add(f,\"BurstOfForce\",5,\"ba0401fdeb4062f40a7aa95b6f07fe89\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSpells.cs",
+          "line": 38,
+          "text": "string token=storm?\"TelekineticStorm\":\"BurstOfForce\",title=storm?\"Telekinetic Storm\":\"Burst of Force\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSpells.cs",
+          "line": 49,
+          "text": "new GameAction[]{new ContextActionSavingThrow {name=\"BurstOfForceReflex\",Type=SavingThrowType.Reflex,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicForceSpells.cs",
+          "line": 50,
+          "text": "Actions=Actions(Saved(Array.Empty<GameAction>(),new GameAction[]{new ContextActionKnockdownTarget {name=\"BurstOfForceProne\"}}))}};"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRemainingDisciplines01458.cs",
+          "line": 168,
+          "text": "return Discipline(f,cls,\"Abomination\",first,morph,safeguard,\"450af0402422b0b4980d9c2175869612\",\"14ec7a4e52e90fa47a4c8d63c69fd5c1\",\"8eead52509987034ea9025d60cc05985\",\"cf6c901fb7acc904e85c63b342e9c949\",Id(\"BurstOfForce\").ToString(),Id(\"MentalBarrier5\").ToString(),\"2b044152b3620c841badb090e01ed9de\",Id(\"OrbOfTheVoid\").ToString(),Id(\"TelekineticStorm\").ToString());"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f0f761b808dc4b149b08eaf44b99f633\"), //dispel magic greater",
+      "kind": "original_library_guid",
+      "guid": "f0f761b808dc4b149b08eaf44b99f633",
+      "nativeArchivePath": "Spells/Level6/DispelMagicGreater.jbp",
+      "nativeArchiveAssetId": "f0f761b808dc4b149b08eaf44b99f633",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 7,
+      "originalExpression": "NewSpells.fly_mass",
+      "kind": "original_symbol",
+      "symbol": "fly_mass",
+      "projectCandidateMentions": [],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"a5c56f0f699daec44b7aedd8b273b08a\"), //brilliant inspiration",
+      "kind": "original_library_guid",
+      "guid": "a5c56f0f699daec44b7aedd8b273b08a",
+      "nativeArchivePath": "Spells/Level6/BrilliantInspiration.jbp",
+      "nativeArchiveAssetId": "a5c56f0f699daec44b7aedd8b273b08a",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "patriarch",
+      "spellLevel": 9,
+      "originalExpression": "library.Get<BlueprintAbility>(\"52b5df2a97df18242aec67610616ded0\"), //foresight",
+      "kind": "original_library_guid",
+      "guid": "52b5df2a97df18242aec67610616ded0",
+      "nativeArchivePath": "Spells/Level9/SummonMonsterIXBase.jbp",
+      "nativeArchiveAssetId": "52b5df2a97df18242aec67610616ded0",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"4f8181e7a7f1d904fbaea64220e83379\"), //expeditious retreat",
+      "kind": "original_library_guid",
+      "guid": "4f8181e7a7f1d904fbaea64220e83379",
+      "nativeArchivePath": "Spells/Level1/ExpeditiousRetreat.jbp",
+      "nativeArchiveAssetId": "4f8181e7a7f1d904fbaea64220e83379",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"464a7193519429f48b4d190acb753cf0\"), //grace",
+      "kind": "original_library_guid",
+      "guid": "464a7193519429f48b4d190acb753cf0",
+      "nativeArchivePath": "Spells/Level2/Grace.jbp",
+      "nativeArchiveAssetId": "464a7193519429f48b4d190acb753cf0",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"486eaff58293f6441a5c2759c4872f98\"), //haste",
+      "kind": "original_library_guid",
+      "guid": "486eaff58293f6441a5c2759c4872f98",
+      "nativeArchivePath": "Spells/Level3/Haste.jbp",
+      "nativeArchiveAssetId": "486eaff58293f6441a5c2759c4872f98",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"4a648b57935a59547b7a2ee86fb4f26a\"), //dimension door",
+      "kind": "original_library_guid",
+      "guid": "4a648b57935a59547b7a2ee86fb4f26a",
+      "nativeArchivePath": "Spells/Level4/DimensionDoorBase.jbp",
+      "nativeArchiveAssetId": "4a648b57935a59547b7a2ee86fb4f26a",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"41e8a952da7a5c247b3ec1c2dbb73018\"), //hold monster",
+      "kind": "original_library_guid",
+      "guid": "41e8a952da7a5c247b3ec1c2dbb73018",
+      "nativeArchivePath": "Spells/Level5/HoldMonster.jbp",
+      "nativeArchiveAssetId": "41e8a952da7a5c247b3ec1c2dbb73018",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 6,
+      "originalExpression": "NewSpells.fluid_form",
+      "kind": "original_symbol",
+      "symbol": "fluid_form",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\KineticInvocation01433.cs",
+          "line": 42,
+          "text": "internal static readonly string[] Tokens = { \"CloakOfWinds\", \"WindWalk\", \"SlowingMud\", \"BlessingOfTheSalamander\", \"Invigorate\", \"FluidForm\", \"SleetStorm\" };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\KineticInvocation01433.cs",
+          "line": 43,
+          "text": "internal static readonly string[] Titles = { \"Cloak of Winds\", \"Wind Walk\", \"Slowing Mud\", \"Blessing of the Salamander\", \"Invigorate\", \"Fluid Form\", \"Sleet Storm\" };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\KineticInvocation01433.cs",
+          "line": 52,
+          "text": "\"Use the existing Fluid Form transformation, retaining its movement, reach, damage reduction and duration.\","
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\KineticInvocation01433.cs",
+          "line": 56,
+          "text": "const string Text = \"For each kineticist element you possess, you may choose the associated spell as a utility wild talent at its listed level. This feat does not grant those talents automatically. Air: Cloak of Winds (3), Wind Walk (6). Earth: Slowing Mud (4). Fire: Blessing of the Salamander (5, self only), Invigorate (1). Water: Fluid Form (6), Sleet Storm (3). Each costs 1 burn. Caster level i"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 170,
+          "text": "new[]{\"6\",\"NewSpells.fluid_form.AssetGuid\",\"\",\"cee712a5129a14e1973f89e542671288\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 107,
+          "text": "Add(f,\"FluidForm\",6,\"ba0401fdeb4062f40a7aa95b6f07fe89\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 108,
+          "text": "Add(f,\"FluidForm\",4,\"f60d0cd93edc65c42ad31e34a905fb2f\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicExpansion.cs",
+          "line": 38,
+          "text": "entries.AddRange(PsychicFluidForm.Build(f));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 19,
+          "text": "internal static class PsychicFluidForm"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 24,
+          "text": "var buff=f.Buff(\"FluidFormBuff\",\"Fluid Form\",text,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 25,
+          "text": "new AddDamageResistancePhysical {name=\"FluidFormResistance\",Value=10,BypassedByForm=true,Form=PhysicalDamageForm.Slashing},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 27,
+          "text": "new AddStatBonus {name=\"FluidFormReach\",Stat=StatType.Reach,Value=10,Descriptor=ModifierDescriptor.Enhancement},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 32,
+          "text": "var rank=new ContextRankConfig {name=\"FluidFormDuration\"};SetEnum(rank,\"m_BaseValueType\",\"CasterLevel\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 33,
+          "text": "var spell=f.Ability(\"FluidForm\",\"Fluid Form\",text,AbilityType.Spell,UnitCommand.CommandType.Standard,AbilityRange.Personal,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 34,
+          "text": "new SpellComponent {name=\"FluidFormSchool\",School=SpellSchool.Transmutation},rank,Run(apply),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 35,
+          "text": "new AbilitySpawnFx {name=\"FluidFormVisual\",PrefabLink=new PrefabLink {AssetId=\"44295e9774b2864488f4a3790b8b0bcf\"},Time=AbilitySpawnFxTime.OnApplyEffect,Anchor=AbilitySpawnFxAnchor.SelectedTarget,PositionAnchor=AbilitySpawnFxAnchor.None,OrientationAnchor=AbilitySpawnFxAnchor.None});"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 37,
+          "text": "spell.LocalizedDuration=Text(\"FluidForm\",\"duration\",\"1 minute per caster level\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicFluidForm.cs",
+          "line": 38,
+          "text": "spell.LocalizedSavingThrow=Text(\"FluidForm\",\"savingThrow\",\"\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 70,
+          "text": "if(token.StartsWith(\"FluidForm\")||token.StartsWith(\"SecondWind\"))continue;"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 7,
+      "originalExpression": "NewSpells.particulate_form",
+      "kind": "original_symbol",
+      "symbol": "particulate_form",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicSharedSpellCatalog.cs",
+          "line": 27,
+          "text": "new PsychicSpellLink(\"99e39437184a46b994da740ce399f591\", \"ParticulateFormAbility\", \"ExpandedContent\", SpellSchool.Transmutation, true, 7, 5, -1),"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 8,
+      "originalExpression": "NewSpells.temporal_stasis",
+      "kind": "original_symbol",
+      "symbol": "temporal_stasis",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicAfflictionSpells.cs",
+          "line": 108,
+          "text": "using(var stream=typeof(PsychicAfflictionSpells).Assembly.GetManifestResourceStream(\"CotW.TemporalStasis.png\")) {"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 92,
+          "text": "Add(f,\"TemporalStasis\",8,\"ba0401fdeb4062f40a7aa95b6f07fe89\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicExpansion.cs",
+          "line": 59,
+          "text": "PsychicFieryShuriken.Build(f);PsychicVoidOrb.Build(f);PsychicHexVulnerability.Build(f);PsychicSpiritWeapons.Build(f);PsychicStorageSpells.Build(f);PsychicBoundWeapons.Build(f);entries.Add(new PsychicSpells.Entry{Ability=f.Find<BlueprintAbility>(\"Contingency\"),Level=6}); entries.Add(new PsychicSpells.Entry {Ability=f.Find<BlueprintAbility>(\"MagesSword\"),Level=7}); entries.Add(new PsychicSpells.Entr"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 68,
+          "text": "if(PsychicStorageSpells.Tokens.Concat(PsychicBoundWeapons.Tokens).Any(t=>token.StartsWith(t))||PsychicSpiritWeapons.Tokens.Any(t=>token.StartsWith(t))||PsychicLinkedWard.Tokens.Any(t=>token.StartsWith(t))||token.StartsWith(\"FieryShuriken\")||token.StartsWith(\"OrbOfTheVoid\")||token.StartsWith(\"HexVulnerability\")||token.StartsWith(\"FireSeeds\")||token.StartsWith(\"TemporalStasis\")||PsychicSpiritSpells."
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicTemporalStasis.cs",
+          "line": 27,
+          "text": "internal static class PsychicTemporalStasis {"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicTemporalStasis.cs",
+          "line": 30,
+          "text": "var b=f.Clone(f.Native<BlueprintBuff>(\"8fff364a212d4b4894b5e222f3696cdd\"),\"TemporalStasisBuff\",\"Temporal Stasis\",text);Set(b,\"m_Icon\",PsychicOriginalIcons.Load(\"TemporalStasis\"));SetEnum(b,\"m_Flags\",\"Harmful\");b.Stacking=StackingType.Replace;b.IsClassFeature=false;b.ComponentsArray=b.ComponentsArray.Where(c=>!(c is AddCondition a&&a.Condition==UnitCondition.Paralyzed)).Concat(new[]{(BlueprintCompo"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicTemporalStasis.cs",
+          "line": 33,
+          "text": "var touch=f.Clone(f.Native<BlueprintAbility>(\"3c17035ec4717674cae2e841a190e757\"),\"TemporalStasisTouch\",\"Temporal Stasis\",text);touch.ComponentsArray=new BlueprintComponent[]{delivery,new SpellComponent {School=SpellSchool.Transmutation},rank,Save(SavingThrowType.Fortitude,new ContextActionConditionalSaved {Succeed=Actions(),Failed=Actions(apply)}),new AbilitySpawnFx {PrefabLink=b.FxOnStart,Time=Ab"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicTemporalStasis.cs",
+          "line": 34,
+          "text": "var root=f.Clone(f.Native<BlueprintAbility>(\"ab395d2335d3f384e99dddee8562978f\"),\"TemporalStasis\",\"Temporal Stasis\",text);var sticky=new AbilityEffectStickyTouch();Set(sticky,\"m_TouchDeliveryAbility\",Ref<BlueprintAbilityReference>(touch));root.ComponentsArray=new BlueprintComponent[]{sticky,new SpellComponent {School=SpellSchool.Transmutation}};"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "wagon",
+      "spellLevel": 9,
+      "originalExpression": "NewSpells.time_stop",
+      "kind": "original_symbol",
+      "symbol": "time_stop",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BlueprintRegistration.cs",
+          "line": 119,
+          "text": "RegisterModule(TimeStop01438.ModuleName, () => TimeStop01438.Register(cache), report);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BlueprintRegistration.cs",
+          "line": 185,
+          "text": "if (cache.Load(PsychicAssets.Id(TimeStop01438.RootToken)) != null)"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\BlueprintRegistration.cs",
+          "line": 186,
+          "text": "RegisterModule(TimeStop01438.ModuleName, () => TimeStop01438.RegisterOptional(cache), report);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ModuleCatalog.cs",
+          "line": 80,
+          "text": "new ModuleDefinition(TimeStutter01437.ModuleName, \"Arcane Discovery submenu: Wizard 10 or Arcanist 20. Uses the native Time Stop effect for one round and an independent daily resource.\", \"Not registered\"),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ModuleCatalog.cs",
+          "line": 82,
+          "text": "new ModuleDefinition(TimeStop01438.ModuleName, \"Personal 9th-level wizard/sorcerer/arcanist and Psychic spell: 1d4+1 rounds. Shares the repaired native freeze lifecycle, with no discovery or daily-resource requirement.\", \"Not registered\"),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PhysicalMutationToggle01458.cs",
+          "line": 45,
+          "text": "if(controller==null||!controller.IsAttached||!controller.IsActive||!controller.IsTurnedOn||controller.IsSuppressed||!PhysicalMutationToggle01458.Maintaining(Owner,controller)||Buff.EndTime>now||TimeStopTimers01438.IsPaused(Buff))return;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PhysicalMutationToggle01458.cs",
+          "line": 59,
+          "text": "if(effect!=null&&effect.EndTime<=now&&!TimeStopTimers01438.IsPaused(effect)){effect.Remove();effect=null;}"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PhysicalMutationToggle01458.cs",
+          "line": 105,
+          "text": "static void Prefix(Buff __0,TimeSpan __1){if(__0?.Blueprint.AssetGuid!=PhysicalMutationToggle01458.Main||TimeStopTimers01438.IsPaused(__0))return;var duration=PhysicalMutationToggle01458.Duration(__0,out var scope);using(scope)duration?.Renew(__1);}"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 25,
+          "text": "internal static class TimeStop01438"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 27,
+          "text": "internal const string ModuleName = \"Spell: Time Stop\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 28,
+          "text": "internal const string RootToken = \"TimeStopSpell01438\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 29,
+          "text": "internal const string HostToken = \"TimeStopHost01438\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 30,
+          "text": "internal const string AreaToken = \"TimeStopArea01438\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 31,
+          "text": "internal const string EffectToken = \"TimeStopEffect01438\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 32,
+          "text": "internal const string DismissToken = \"TimeStopDismiss01440\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 40,
+          "text": "\"While this spell is active, use Time Stop: End as a free action to resume time early.\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 59,
+          "text": "else throw new InvalidOperationException(\"Unexpected Time Stop graph type.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 67,
+          "text": "?? throw new InvalidOperationException(\"Time Stop requires the native wizard spell list.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 70,
+          "text": "throw new InvalidOperationException(\"Time Stop found a foreign private Psychic list identity.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 74,
+          "text": "throw new InvalidOperationException(\"Time Stop requires an existing level-9 row without reshaping the spell list: \" + list.AssetGuid);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 82,
+          "text": "throw new InvalidOperationException(\"Time Stop published spell-list metadata has foreign component ownership.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 85,
+          "text": "throw new InvalidOperationException(\"Time Stop published spell-list metadata component type changed: \" + component.GetType().FullName);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 90,
+          "text": "throw new InvalidOperationException(\"Time Stop published spell-list metadata has a missing or replaced list identity; \" + detail);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 93,
+          "text": "throw new InvalidOperationException(\"Time Stop published own spell-list metadata changed; \" + detail);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 103,
+          "text": "throw new InvalidOperationException(\"Time Stop external spell-list metadata has no valid indexed row; \" + detail);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 107,
+          "text": "throw new InvalidOperationException(\"Time Stop external spell-list metadata is not uniquely reciprocal; \" + detail);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 110,
+          "text": "throw new InvalidOperationException(\"Time Stop published spell-list metadata has duplicate or foreign component ownership.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 112,
+          "text": "throw new InvalidOperationException(\"Time Stop has duplicate own references in a published level-9 row; external row contents are preserved.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 123,
+          "text": "var component = new SpellListComponent { name = \"TimeStopList\" + list.AssetGuid, SpellLevel = 9 };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\TimeStop01438.cs",
+          "line": 156,
+          "text": "throw new InvalidOperationException(\"Time Stop published graph changed: \" + state.Assets[i].name);"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"7bdb6a9fb6b37614e96f155748ae50c6\"), //aspect of the falcon",
+      "kind": "original_library_guid",
+      "guid": "7bdb6a9fb6b37614e96f155748ae50c6",
+      "nativeArchivePath": "Spells/Level1/AspectOfTheFalcon.jbp",
+      "nativeArchiveAssetId": "7bdb6a9fb6b37614e96f155748ae50c6",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"a4ad1b8fa11e7c347a608c004efce9d5\"), //aspect of the bear",
+      "kind": "original_library_guid",
+      "guid": "a4ad1b8fa11e7c347a608c004efce9d5",
+      "nativeArchivePath": "Spells/Level2/AspectOfTheBear.jbp",
+      "nativeArchiveAssetId": "a4ad1b8fa11e7c347a608c004efce9d5",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"97b991256e43bb140b263c326f690ce2\"), //rage",
+      "kind": "original_library_guid",
+      "guid": "97b991256e43bb140b263c326f690ce2",
+      "nativeArchivePath": "Spells/Level3/Rage.jbp",
+      "nativeArchiveAssetId": "97b991256e43bb140b263c326f690ce2",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"7ed74a3ec8c458d4fb50b192fd7be6ef\"), //summon monster IV",
+      "kind": "original_library_guid",
+      "guid": "7ed74a3ec8c458d4fb50b192fd7be6ef",
+      "nativeArchivePath": "Spells/Level4/SummonMonsterIVBase.jbp",
+      "nativeArchiveAssetId": "7ed74a3ec8c458d4fb50b192fd7be6ef",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"630c8b85d9f07a64f917d79cb5905741\"), //summon monster V",
+      "kind": "original_library_guid",
+      "guid": "630c8b85d9f07a64f917d79cb5905741",
+      "nativeArchivePath": "Spells/Level5/SummonMonsterVBase.jbp",
+      "nativeArchiveAssetId": "630c8b85d9f07a64f917d79cb5905741",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f6bcea6db14f0814d99b54856e918b92\"), //mass bear endurance",
+      "kind": "original_library_guid",
+      "guid": "f6bcea6db14f0814d99b54856e918b92",
+      "nativeArchivePath": "Spells/Level6/BearsEnduranceMass.jbp",
+      "nativeArchiveAssetId": "f6bcea6db14f0814d99b54856e918b92",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"ab167fd8203c1314bac6568932f1752f\"), //summon monster VII",
+      "kind": "original_library_guid",
+      "guid": "ab167fd8203c1314bac6568932f1752f",
+      "nativeArchivePath": "Spells/Level7/SummonMonsterVIIBase.jbp",
+      "nativeArchiveAssetId": "ab167fd8203c1314bac6568932f1752f",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"d3ac756a229830243a72e84f3ab050d0\"), //summon monster VIII",
+      "kind": "original_library_guid",
+      "guid": "d3ac756a229830243a72e84f3ab050d0",
+      "nativeArchivePath": "Spells/Level8/SummonMonsterVIIIBase.jbp",
+      "nativeArchiveAssetId": "d3ac756a229830243a72e84f3ab050d0",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "pack",
+      "spellLevel": 9,
+      "originalExpression": "Wildshape.shapechange",
+      "kind": "original_symbol",
+      "symbol": "shapechange",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\WhipHurricane01454.cs",
+          "line": 48,
+          "text": "var originalModifier=originalWhip.GetComponents<AddKineticistBurnModifier>().ToArray();if(originalModifier.Length!=1||originalModifier[0].BurnType!=KineticistBurnType.Infusion||originalModifier[0].Value!=1)throw new InvalidOperationException(\"01454 configured Kinetic Whip cost shape changed.\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\WhipHurricane01454.cs",
+          "line": 69,
+          "text": "var auto=metas.Select(b=>{var a=b.GetComponents<AutoMetamagic>().ToArray();if(a.Length!=1)throw new InvalidOperationException(\"01454 native metakinesis effect shape changed.\");return a[0];}).ToArray();"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\WhipHurricane01454.cs",
+          "line": 70,
+          "text": "var burn=metas.Select(b=>{var a=b.GetComponents<AddKineticistBurnModifier>().ToArray();if(a.Length!=1||a[0].BurnType!=KineticistBurnType.Metakinesis)throw new InvalidOperationException(\"01454 native metakinesis cost shape changed.\");return a[0];}).ToArray();"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"9e1ad5d6f87d19e4d8883d63a6e35568\"), //mage armor",
+      "kind": "original_library_guid",
+      "guid": "9e1ad5d6f87d19e4d8883d63a6e35568",
+      "nativeArchivePath": "Spells/Level1/MageArmor.jbp",
+      "nativeArchiveAssetId": "9e1ad5d6f87d19e4d8883d63a6e35568",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"03a9630394d10164a9410882d31572f0\"), //aid",
+      "kind": "original_library_guid",
+      "guid": "03a9630394d10164a9410882d31572f0",
+      "nativeArchivePath": "Spells/Level2/Aid.jbp",
+      "nativeArchiveAssetId": "03a9630394d10164a9410882d31572f0",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 3,
+      "originalExpression": "NewSpells.invisibility_purge",
+      "kind": "original_symbol",
+      "symbol": "invisibility_purge",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicSharedSpellCatalog.cs",
+          "line": 42,
+          "text": "new PsychicSpellLink(\"c3647ce7d6da49faa6e86830841e56e1\", \"InvisibilityPurge\", \"CharacterOptionsPlus\", SpellSchool.Evocation, true, -1, -1, 3),"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"c66e86905f7606c4eaa5c774f0357b2b\"), //stone skin",
+      "kind": "original_library_guid",
+      "guid": "c66e86905f7606c4eaa5c774f0357b2b",
+      "nativeArchivePath": "Spells/Level4/Stoneskin.jbp",
+      "nativeArchiveAssetId": "c66e86905f7606c4eaa5c774f0357b2b",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"0a5ddfbcfb3989543ac7c936fc256889\"), //spell resistance",
+      "kind": "original_library_guid",
+      "guid": "0a5ddfbcfb3989543ac7c936fc256889",
+      "nativeArchivePath": "Spells/Level5/SpellResistance.jbp",
+      "nativeArchiveAssetId": "0a5ddfbcfb3989543ac7c936fc256889",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 6,
+      "originalExpression": "NewSpells.contingency",
+      "kind": "original_symbol",
+      "symbol": "contingency",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 165,
+          "text": "new[]{\"6\",\"NewSpells.contingency.AssetGuid\",\"\",\"b39dd2d96af348236b0117f57e5e445d\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 84,
+          "text": "Add(f,\"SpiritBoundBlade\",4,\"c0c40e42f07ff104fa85492da464ac69\");Add(f,\"Contingency\",6,\"ba0401fdeb4062f40a7aa95b6f07fe89\");Add(f,\"Spite\",4,\"e17df9977b879b64e8a8cbb4b3569f19\");Add(f,\"DelayedConsumption\",5,\"f60d0cd93edc65c42ad31e34a905fb2f\");Add(f,\"EmblemOfGreed\",6,\"ba0401fdeb4062f40a7aa95b6f07fe89\",\"8443ce803d2d31347897a3d85cc32f53\",\"57c894665b7895c499b3dce058c284b3\",\"4d72e1e7bd6bc4f4caaea7aa43a14639"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicExpansion.cs",
+          "line": 59,
+          "text": "PsychicFieryShuriken.Build(f);PsychicVoidOrb.Build(f);PsychicHexVulnerability.Build(f);PsychicSpiritWeapons.Build(f);PsychicStorageSpells.Build(f);PsychicBoundWeapons.Build(f);entries.Add(new PsychicSpells.Entry{Ability=f.Find<BlueprintAbility>(\"Contingency\"),Level=6}); entries.Add(new PsychicSpells.Entry {Ability=f.Find<BlueprintAbility>(\"MagesSword\"),Level=7}); entries.Add(new PsychicSpells.Entr"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicStorageSpells.cs",
+          "line": 32,
+          "text": "internal static readonly string[] Tokens={\"Contingency\",\"Spite\",\"DelayedConsumption\",\"EmblemOfGreed\"};"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicStorageSpells.cs",
+          "line": 34,
+          "text": "string[] names={\"Contingency\",\"Spite\",\"Delayed Consumption\"};"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"df2a0ba6b6dcecf429cbb80a56fee5cf\"), //mind blank",
+      "kind": "original_library_guid",
+      "guid": "df2a0ba6b6dcecf429cbb80a56fee5cf",
+      "nativeArchivePath": "Spells/Level8/MindBlank.jbp",
+      "nativeArchiveAssetId": "df2a0ba6b6dcecf429cbb80a56fee5cf",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"7ef49f184922063499b8f1346fb7f521\"), //sea mantle",
+      "kind": "original_library_guid",
+      "guid": "7ef49f184922063499b8f1346fb7f521",
+      "nativeArchivePath": "Spells/Level8/Seamantle.jbp",
+      "nativeArchiveAssetId": "7ef49f184922063499b8f1346fb7f521",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "mother",
+      "spellLevel": 9,
+      "originalExpression": "NewSpells.akashic_form",
+      "kind": "original_symbol",
+      "symbol": "akashic_form",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ModuleCatalog.cs",
+          "line": 59,
+          "text": "new ModuleDefinition(MonkKiPowers01427.ModuleName, \"Monk/Scaled Fist ki powers and Sensei advice. Cloak of Winds requires TTT; Akashic Form requires PrestigePlus.\", \"Not registered\"),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MonkKiPowers01427.cs",
+          "line": 37,
+          "text": "internal static readonly string[] Tokens = { \"BurstOfAdrenaline\", \"BurstOfInsight\", \"CloakOfWinds\", \"AkashicForm\", \"FrightfulAspect\" };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MonkKiPowers01427.cs",
+          "line": 38,
+          "text": "static readonly string[] Titles = { \"Burst of Adrenaline\", \"Burst of Insight\", \"Cloak of Winds\", \"Akashic Form\", \"Frightful Aspect\" };"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MonkKiPowers01427.cs",
+          "line": 115,
+          "text": "string expected = i < 2 ? \"CotWWrathPsychic\" + Tokens[i] : i == 2 ? \"CloakOfWindsAbility\" : i == 3 ? \"NewSpell.UseAkashicForm\" : \"FrightfulAspect\";"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MonkKiPowers01427.cs",
+          "line": 144,
+          "text": "(index == 2 ? \"Requires TabletopTweaks-Base's Cloak of Winds. \" : index == 3 ? \"Requires PrestigePlus's Akashic Form; its out-of-combat restriction remains. \" : \"\") +"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicSharedSpellCatalog.cs",
+          "line": 34,
+          "text": "new PsychicSpellLink(\"58bcb999b3ad46c289dc68cba9c50bd0\", \"NewSpell.UseAkashicForm\", \"PrestigePlus\", SpellSchool.Necromancy, false, 9, -1, -1),"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f001c73999fb5a543a199f890108d936\"), //vanish",
+      "kind": "original_library_guid",
+      "guid": "f001c73999fb5a543a199f890108d936",
+      "nativeArchivePath": "Spells/Level1/Vanish.jbp",
+      "nativeArchiveAssetId": "f001c73999fb5a543a199f890108d936",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 2,
+      "originalExpression": "library.Get<BlueprintAbility>(\"89940cde01689fb46946b2f8cd7b66b7\"), //invisibility",
+      "kind": "original_library_guid",
+      "guid": "89940cde01689fb46946b2f8cd7b66b7",
+      "nativeArchivePath": "Spells/Level2/Invisibility.jbp",
+      "nativeArchiveAssetId": "89940cde01689fb46946b2f8cd7b66b7",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 3,
+      "originalExpression": "library.Get<BlueprintAbility>(\"903092f6488f9ce45a80943923576ab3\"), //displacement",
+      "kind": "original_library_guid",
+      "guid": "903092f6488f9ce45a80943923576ab3",
+      "nativeArchivePath": "Spells/Level3/Displacement.jbp",
+      "nativeArchiveAssetId": "903092f6488f9ce45a80943923576ab3",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"ecaa0def35b38f949bd1976a6c9539e0\"), //improved invisibility",
+      "kind": "original_library_guid",
+      "guid": "ecaa0def35b38f949bd1976a6c9539e0",
+      "nativeArchivePath": "Spells/Level4/InvisibilityGreater.jbp",
+      "nativeArchiveAssetId": "ecaa0def35b38f949bd1976a6c9539e0",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"12fb4a4c22549c74d949e2916a2f0b6a\"), //phantasmal web",
+      "kind": "original_library_guid",
+      "guid": "12fb4a4c22549c74d949e2916a2f0b6a",
+      "nativeArchivePath": "Spells/Level5/PhantasmalWeb.jbp",
+      "nativeArchiveAssetId": "12fb4a4c22549c74d949e2916a2f0b6a",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"1f2e6019ece86d64baa5effa15e81ecc\"), //phantasmal putrefaction",
+      "kind": "original_library_guid",
+      "guid": "1f2e6019ece86d64baa5effa15e81ecc",
+      "nativeArchivePath": "Spells/Level6/PhantasmalPutrefaction.jbp",
+      "nativeArchiveAssetId": "1f2e6019ece86d64baa5effa15e81ecc",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"98310a099009bbd4dbdf66bcef58b4cd\"), //invisibility mass",
+      "kind": "original_library_guid",
+      "guid": "98310a099009bbd4dbdf66bcef58b4cd",
+      "nativeArchivePath": "Spells/Level7/InvisibilityMass.jbp",
+      "nativeArchiveAssetId": "98310a099009bbd4dbdf66bcef58b4cd",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"0e67fa8f011662c43934d486acc50253\"), //prediciton of failure",
+      "kind": "original_library_guid",
+      "guid": "0e67fa8f011662c43934d486acc50253",
+      "nativeArchivePath": "Spells/Level8/PredictionOfFailure.jbp",
+      "nativeArchiveAssetId": "0e67fa8f011662c43934d486acc50253",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "stranger",
+      "spellLevel": 9,
+      "originalExpression": "NewSpells.divide_mind",
+      "kind": "original_symbol",
+      "symbol": "divide_mind",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\ModEntry.cs",
+          "line": 74,
+          "text": "type.DeclaringType == typeof(PsychicStoragePatch) || type.DeclaringType == typeof(PsychicLinkedWardPatches) || type == typeof(PsychicHexCooldownPatch) || type == typeof(PsychicHexTargetRestrictionsPatch) || type == typeof(PsychicFlightGroundPatch) || type == typeof(PsychicEtherMissPatch) || type == typeof(PsychicWindTravelPatch) || type == typeof(PsychicWallBlindnessDurationPatch) || type == typeo"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 24,
+          "text": "public sealed class PsychicDivideMindMetamagic : AutoMetamagic,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 31,
+          "text": "if(evt.Blueprint is BlueprintAbility ability && PsychicDivideMindPatch.Eligible(ability,evt.AbilityData))"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 38,
+          "text": "internal static class PsychicDivideMindActionPatch"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 40,
+          "text": "private static readonly BlueprintGuid Mind=PsychicAssets.Id(\"DivideMindBuff\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 46,
+          "text": "if(PsychicDivideMindPatch.Eligible(__instance.Blueprint,__instance))__result=UnitCommand.CommandType.Swift;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 51,
+          "text": "internal static class PsychicDivideMindPatch"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightMechanics.cs",
+          "line": 56,
+          "text": "if(!(c is PsychicDivideMindMetamagic))return true;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 24,
+          "text": "var will=new ModifyD20 {name=\"DivideMindWill\",Rule=RuleType.SavingThrow,RollsAmount=1,TakeBest=true,ActionsToTrigger=Actions(),ActionsToTriggerBeforeRoll=Actions()};"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 26,
+          "text": "var skills=new ModifyD20 {name=\"DivideMindIntelligence\",Rule=RuleType.SkillCheck,RollsAmount=1,TakeBest=true,SpecificSkill=true,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 28,
+          "text": "var mind=f.Buff(\"DivideMindBuff\",\"Divide Mind\",mindText,will,skills,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 29,
+          "text": "new PsychicDivideMindMetamagic {name=\"DivideMindSecondaryCasting\",Metamagic=Metamagic.Quicken,MaxSpellLevel=5,Abilities=new List<BlueprintAbilityReference>()});"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 30,
+          "text": "Set(mind,\"m_Icon\",PsychicOriginalIcons.Load(\"DivideMind\") /* previous Wrath donor: f.Native<BlueprintAbility>(\"ae4d3ad6a8fda1542acf2e9bbc13d113\").Icon */);"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 31,
+          "text": "var divide=f.Ability(\"DivideMind\",\"Divide Mind\",mindText,AbilityType.Spell,UnitCommand.CommandType.Standard,AbilityRange.Personal,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 32,
+          "text": "new SpellComponent {name=\"DivideMindSchool\",School=SpellSchool.Enchantment},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 33,
+          "text": "new SpellDescriptorComponent {name=\"DivideMindDescriptor\",Descriptor=SpellDescriptor.MindAffecting},Run(Apply(mind,1,DurationRate.Minutes)),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 34,
+          "text": "new AbilitySpawnFx {name=\"DivideMindVisual\",PrefabLink=new PrefabLink {AssetId=\"c388856d0e8855f429a83ccba67944ba\"},Time=AbilitySpawnFxTime.OnApplyEffect,Anchor=AbilitySpawnFxAnchor.Caster,PositionAnchor=AbilitySpawnFxAnchor.None,OrientationAnchor=AbilitySpawnFxAnchor.None});"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 36,
+          "text": "divide.LocalizedDuration=Text(\"DivideMind\",\"duration\",\"1 minute\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicInsightSpells.cs",
+          "line": 37,
+          "text": "yield return new PsychicSpells.Entry {Token=\"DivideMind\",Level=9,Ability=divide};"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 77,
+          "text": "if(token.StartsWith(\"DivideMind\") || token.StartsWith(\"LocateWeakness\"))continue;"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicRemainingDisciplines01458.cs",
+          "line": 153,
+          "text": "return Discipline(f,cls,\"Psychedelia\",cognatogen,warped,aura,\"40ec382849b60504d88946df46a10f2d\",\"fd4d9fd7f87575d47aafe2a64a6e2d8d\",Id(\"Synesthesia\").ToString(),\"cf6c901fb7acc904e85c63b342e9c949\",\"12fb4a4c22549c74d949e2916a2f0b6a\",\"15a04c40f84545949abeedef7279751a\",\"1e2d1489781b10a45a3b70192bba9be3\",\"740d943e42b60f64a8de74926ba6ddf7\",Id(\"DivideMind\").ToString());"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 1,
+      "originalExpression": "library.Get<BlueprintAbility>(\"fbdd8c455ac4cde4a9a3e18c84af9485\"), //doom",
+      "kind": "original_library_guid",
+      "guid": "fbdd8c455ac4cde4a9a3e18c84af9485",
+      "nativeArchivePath": "Spells/Level1/Doom.jbp",
+      "nativeArchiveAssetId": "fbdd8c455ac4cde4a9a3e18c84af9485",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 2,
+      "originalExpression": "NewSpells.howling_agony",
+      "kind": "original_symbol",
+      "symbol": "howling_agony",
+      "projectCandidateMentions": [
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\MindbladeSpellAnchors01454.cs",
+          "line": 53,
+          "text": "new[]{\"2\",\"NewSpells.howling_agony.AssetGuid\",\"\",\"981a4173d895e71184d9a7f557a9e1d4\",\"\"},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 54,
+          "text": "var agony=f.Buff(\"HowlingAgonyBuff\",\"Howling Agony\",agonyText,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 55,
+          "text": "new AddStatBonus {name=\"HowlingAgonyAC\",Stat=StatType.AC,Value=-2,Descriptor=ModifierDescriptor.UntypedStackable},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 56,
+          "text": "new AddStatBonus {name=\"HowlingAgonyAttack\",Stat=StatType.AdditionalAttackBonus,Value=-2,Descriptor=ModifierDescriptor.UntypedStackable},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 57,
+          "text": "new AddStatBonus {name=\"HowlingAgonyReflex\",Stat=StatType.SaveReflex,Value=-2,Descriptor=ModifierDescriptor.UntypedStackable},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 58,
+          "text": "new AddCondition {name=\"HowlingAgonyConcentration\",Condition=UnitCondition.SpellCastingIsDifficult},"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 59,
+          "text": "new WeaponAttackTypeDamageBonus {name=\"HowlingAgonyMeleeDamage\",Type=WeaponRangeType.Melee,AttackBonus=1,Value=-2,Descriptor=ModifierDescriptor.UntypedStackable});"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 60,
+          "text": "Set(agony,\"m_Icon\",PsychicOriginalIcons.Load(\"HowlingAgony\") /* previous Wrath donor: f.Native<BlueprintAbility>(\"d42c6d3f29e07b6409d670792d72bc82\").Icon */);SetEnum(agony,\"m_Flags\",\"Harmful\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 62,
+          "text": "var howling=f.Ability(\"HowlingAgony\",\"Howling Agony\",agonyText,AbilityType.Spell,UnitCommand.CommandType.Standard,AbilityRange.Close,"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 63,
+          "text": "new SpellComponent {name=\"HowlingAgonySchool\",School=SpellSchool.Necromancy},Rank(\"HowlingAgony\"),"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 64,
+          "text": "Save(SavingThrowType.Fortitude,Saved(Array.Empty<GameAction>(),new GameAction[]{pain})),Targets(\"HowlingAgony\",30,TargetType.Enemy),Fx(\"HowlingAgony\",\"cbfe312cb8e63e240a859efaad8e467c\"));"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 68,
+          "text": "howling.LocalizedDuration=Text(\"HowlingAgony\",\"duration\",\"1 round per caster level\");howling.LocalizedSavingThrow=Text(\"HowlingAgony\",\"savingThrow\",\"Fortitude negates\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicComfortSpells.cs",
+          "line": 71,
+          "text": "yield return new PsychicSpells.Entry {Token=\"HowlingAgony\",Level=2,Ability=howling};"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 124,
+          "text": "Add(f,\"HowlingAgony\",2,\"57c894665b7895c499b3dce058c284b3\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicCommonSpellLists.cs",
+          "line": 125,
+          "text": "Add(f,\"HowlingAgony\",3,\"ba0401fdeb4062f40a7aa95b6f07fe89\",\"e17df9977b879b64e8a8cbb4b3569f19\",\"98c05aeff6e3d384f8aec6d584973642\");"
+        },
+        {
+          "path": "outputs\\CallOfTheWild.Wrath.Prototype\\src\\PsychicPresentation.cs",
+          "line": 76,
+          "text": "if(token.StartsWith(\"Invigorate\") || token.StartsWith(\"HowlingAgony\"))continue;"
+        }
+      ],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 3,
+      "originalExpression": "NewSpells.ray_of_exhaustion",
+      "kind": "original_symbol",
+      "symbol": "ray_of_exhaustion",
+      "projectCandidateMentions": [],
+      "identityAndRuntimeVerified": false
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 4,
+      "originalExpression": "library.Get<BlueprintAbility>(\"f34fb78eaaec141469079af124bcfa0f\"), //enervation",
+      "kind": "original_library_guid",
+      "guid": "f34fb78eaaec141469079af124bcfa0f",
+      "nativeArchivePath": "Spells/Level4/Enervation.jbp",
+      "nativeArchiveAssetId": "f34fb78eaaec141469079af124bcfa0f",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 5,
+      "originalExpression": "library.Get<BlueprintAbility>(\"8878d0c46dfbd564e9d5756349d5e439\"), //faves of fatigue",
+      "kind": "original_library_guid",
+      "guid": "8878d0c46dfbd564e9d5756349d5e439",
+      "nativeArchivePath": "Spells/Level5/WavesOfFatigue.jbp",
+      "nativeArchiveAssetId": "8878d0c46dfbd564e9d5756349d5e439",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 6,
+      "originalExpression": "library.Get<BlueprintAbility>(\"a89dcbbab8f40e44e920cc60636097cf\"), //circle of death",
+      "kind": "original_library_guid",
+      "guid": "a89dcbbab8f40e44e920cc60636097cf",
+      "nativeArchivePath": "Spells/Level6/CircleOfDeath.jbp",
+      "nativeArchiveAssetId": "a89dcbbab8f40e44e920cc60636097cf",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 7,
+      "originalExpression": "library.Get<BlueprintAbility>(\"d361391f645db984bbf58907711a146a\"), //banishment",
+      "kind": "original_library_guid",
+      "guid": "d361391f645db984bbf58907711a146a",
+      "nativeArchivePath": "Spells/Level7/Banishment.jbp",
+      "nativeArchiveAssetId": "d361391f645db984bbf58907711a146a",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 8,
+      "originalExpression": "library.Get<BlueprintAbility>(\"3b646e1db3403b940bf620e01d2ce0c7\"), //destruction",
+      "kind": "original_library_guid",
+      "guid": "3b646e1db3403b940bf620e01d2ce0c7",
+      "nativeArchivePath": "Spells/Level7/Destruction.jbp",
+      "nativeArchiveAssetId": "3b646e1db3403b940bf620e01d2ce0c7",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    },
+    {
+      "constellation": "follower",
+      "spellLevel": 9,
+      "originalExpression": "library.Get<BlueprintAbility>(\"37302f72b06ced1408bf5bb965766d46\"), //energy drain",
+      "kind": "original_library_guid",
+      "guid": "37302f72b06ced1408bf5bb965766d46",
+      "nativeArchivePath": "Spells/Level9/EnergyDrain.jbp",
+      "nativeArchiveAssetId": "37302f72b06ced1408bf5bb965766d46",
+      "nativeArchiveType": "da11db195c86e0d4dae17a2c03a4ba9a, BlueprintAbility",
+      "nativeIdentityVerified": true
+    }
+  ]
+}
