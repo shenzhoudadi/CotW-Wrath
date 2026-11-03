@@ -1,0 +1,24 @@
+当前最新正式交付：0.14.65。此分支0.14.66为候选，正式交付清单将在统一发布后更新。以下为原始完整七件交付清单；GitHub公开源包排除既有个人笔记和缓存，实际公开SHA以对应Release摘要为准。
+
+0.14.65 Urban Bloodrager 修复已完成本地交付：Controlled Bloodrage 按 +2 分配至力量、敏捷与体质；原生 Primalist 狂暴之力的受控血怒识别修复了游戏 Mono 的 BlueprintGuid 数组比较差异。
+已通过完整历史构建与门禁、最终安装包 DLL 双 Harmony 运行时及 Mono 原生路径检查、旧正式 DLL 负面对照、源码回读和独立只读复查。TTT Base 的实际 Primalist 狂暴修改参与隔离原生检查；完整游戏环境、视觉与存档由测试者按说明观察，不推定用户已通过。
+本轮没有新增迁移项，沿用既有排除与 HOLD；旧文件全部保留。未启动游戏或 UMM。云端上传状态以实际回执为准。
+
+--- 以下历史记录原样保留 ---
+
+
+CallOfTheWildWrathPrototype-0.14.65-experimental.zip
+SHA256 E15775F9E75709A0DAA3DD7FDBF9BDFC4EE3C3FF00EBA82BFF15B3AE4F27B3CE
+Bytes 5366198
+CallOfTheWildWrathPrototype-0.14.65-源码.zip
+SHA256 7B5146F2DC549BECA7A59FB5E247BFD4FEF0CC095A3409CD435E2C1A53B220D0
+Bytes 4745586
+0.14.65UrbanBloodrager-feedback-test-guide.txt
+SHA256 85509946E42517EFF502B4C402ECC91CE0E62C95B54A4D216081A1675DDCCB44
+Bytes 2716
+0.14.65交付自检.txt
+SHA256 A0433F26520FEE31D9F7A2C998A026C8933D003F25B7015060EE94969A44A730
+Bytes 3406
+0.14.65交付自检.json
+SHA256 05765BE0929C840AE4B939383EE81A19AA9679B8AEB875146C33ADCACCC4C274
+Bytes 66740519

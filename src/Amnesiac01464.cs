@@ -23,7 +23,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal const string ModuleName="Psychic archetype: Amnesiac",RootToken="AmnesiacArchetype01464",BookToken="AmnesiacSpellbook01464";
         internal const string RecallToken="AmnesiacRecollectionFeature01464",CooldownToken="AmnesiacRecollectionCooldown01464",ForbiddenToken="AmnesiacRecollectionForbidden01464";
         internal const string CastingText="An amnesiac retains fewer ordinary spells known at her two highest spell levels. The remaining knowledge can be recalled with Spell Recollection. Knacks, discipline spells, daily spell slots and Psychic casting are unchanged. On gaining a new spell level, spells two levels lower regain full recall through normal spell selection.";
-        internal const string RecallText="Once per hour as a swift action, attempt to recall an unknown spell from the Psychic list in a circle with an available amnesia slot. Roll d100, adding d10 in combat. 1-10: unable to cast spells for one round. 11-35: no spell recalled. 36-95: know the spell until rest. 96+: also refund the amnesia slot. Recollection uses no ordinary spell slot or phrenic points; casting the recalled spell uses ordinary slots. Recalled knowledge is cleared when beginning a level-up, preserving paid knowledge.";
+        internal const string RecallText="As a swift action, attempt to recall an unknown spell from the current Psychic list in a circle with an available amnesia slot. Outside combat, Recollection has a one-hour cooldown. In combat it ignores that cooldown and adds d10 to the d100 roll; a spell recalled in combat must be cast before the start of your next turn or it is forgotten. A successful cast, including a metamagic version, retains it until rest. 1-10: unable to cast spells for one round. 11-35: no spell recalled. 36-95: recall the spell. 96+: also refund the amnesia slot. Recollection uses no ordinary spell slot or phrenic points; casting uses ordinary slots. Recalled knowledge is cleared when beginning a level-up, preserving paid knowledge.";
         internal static readonly int[][] Retained={
             new int[0],new[]{0,1},new[]{0,1},new[]{0,2},new[]{0,2,1},new[]{0,2,1},
             new[]{0,4,1,1},new[]{0,5,2,1},new[]{0,5,3,1,1},new[]{0,5,4,2,1},
@@ -31,11 +31,9 @@ namespace CallOfTheWild.Wrath.Prototype
             new[]{0,5,5,4,4,2,1},new[]{0,5,5,4,4,3,1,1},new[]{0,5,5,4,4,4,2,1},
             new[]{0,5,5,4,4,4,3,1,1},new[]{0,5,5,4,4,4,3,2,1},
             new[]{0,5,5,4,4,4,3,3,1,1},new[]{0,5,5,4,4,4,3,3,2,1},new[]{0,5,5,4,4,4,3,3,2,2}};
-        // This is the original class-level resource contract, independently
-        // checked against all 180 normal-known minus retained-known cells.
-        internal static int Capacity(int level,int circle)=>level<1||level>20||circle<1||circle>9?0:
-            circle==1?(level<=5?1+(level>=5?1:0):0):
-            level>=circle*2+1&&(circle>=8||level<=circle*2+3)?1:0;
+        // The requested early recall slot begins when Psychic gains the circle,
+        // while the unmodified original table remains independently checked.
+        internal static int Capacity(int level,int circle)=>circle>=2&&circle<=9&&level==circle*2?1:OriginalCapacity(level,circle);
         internal static string ResourceToken(int circle)=>"AmnesiacSlot"+circle+"01464";
         internal static string MenuToken(int circle)=>"AmnesiacRecallMenu"+circle+"01464";
         internal static string SpellToken(int circle,BlueprintGuid spell)=>"AmnesiacRecall"+circle+spell+"01464";
@@ -102,6 +100,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 var action=new RecallAmnesiaSpell01464{Circle=circle,Spell=Ref<BlueprintAbilityReference>(spell),Known=Ref<BlueprintBuffReference>(source),Resource=Ref<BlueprintAbilityResourceReference>(state.Resources[circle-1]),Cooldown=Ref<BlueprintBuffReference>(state.Cooldown),Forbidden=Ref<BlueprintBuffReference>(state.Forbidden)};
                 var ability=f.Ability(token,"Recall: "+spell.Name,spell.Description+"\n\n"+RecallText,AbilityType.Extraordinary,UnitCommand.CommandType.Swift,AbilityRange.Personal,
                     gate,ArchetypeBatch01445.Cost(state.Resources[circle-1]),Run(action));
+                // The parent explains Recollection; each option uses the donor's
+                // native localized fields, including later language changes.
+                Set(ability,"m_DisplayName",Get(spell,"m_DisplayName"));
+                Set(ability,"m_Description",Get(spell,"m_Description"));
                 SpellBatch01447.Icon(ability,spell);Set(ability,"m_Parent",Ref<BlueprintAbilityReference>(state.Menus[circle-1]));variants[circle].Add(ability);
             }
             return variants;
@@ -127,7 +129,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var normal=cls.Spellbook.SpellsKnown;
             for(int level=1;level<=20;level++)for(int circle=1;circle<=9;circle++){
                 int retained=circle<Retained[level].Length?Retained[level][circle]:0;
-                if(Math.Max(0,normal.GetCount(level,circle))-retained!=Capacity(level,circle))throw new InvalidOperationException("064 Psychic spells-known donor changed.");
+                if(Math.Max(0,normal.GetCount(level,circle))-retained!=OriginalCapacity(level,circle))throw new InvalidOperationException("064 Psychic spells-known donor changed.");
             }
             var table=f.Clone(normal,"AmnesiacSpellsKnown01464","","");table.Levels=Retained.Select(row=>new SpellsLevelEntry{Count=(int[])row.Clone()}).ToArray();
             var book=f.Clone(cls.Spellbook,BookToken,"","");book.Name=Text(BookToken,"name","Amnesiac");Set(book,"m_SpellsKnown",Ref<BlueprintSpellsTableReference>(table));
@@ -156,5 +158,10 @@ namespace CallOfTheWild.Wrath.Prototype
             States.Add(cache,state);return true;
         }
         static bool ConflictingRoot(BlueprintCharacterClass cls)=>cls.Archetypes.Any(a=>a!=null&&a.AssetGuid!=Id(RootToken)&&a.name.IndexOf("Amnesiac",StringComparison.OrdinalIgnoreCase)>=0);
+        // This is the original class-level resource contract, independently
+        // checked against all 180 normal-known minus retained-known cells.
+        internal static int OriginalCapacity(int level,int circle)=>level<1||level>20||circle<1||circle>9?0:
+            circle==1?(level<=5?1+(level>=5?1:0):0):
+            level>=circle*2+1&&(circle>=8||level<=circle*2+3)?1:0;
     }
 }

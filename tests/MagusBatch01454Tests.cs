@@ -210,6 +210,7 @@ internal static partial class MagusBatch01454Tests
             var chosen=Environment.GetEnvironmentVariable("COTW_01454_CASE");
             if(chosen=="temporary064")Temporary064(parent,h);
             if(chosen=="amnesiac064")Amnesiac064(parent,h);
+            if((chosen??"").StartsWith("feedback066",StringComparison.Ordinal))Feedback066(parent,h,chosen);
             if((chosen??"").EndsWith("063",StringComparison.Ordinal))Urban063(parent,h);
             if((chosen??"").EndsWith("062",StringComparison.Ordinal))Feedback058(parent,h);
             if(chosen=="graph059"||chosen=="display059"||chosen=="reach059"||(chosen??"").EndsWith("060",StringComparison.Ordinal)||(chosen??"").EndsWith("061",StringComparison.Ordinal))Feedback058(parent,h);

@@ -5,7 +5,7 @@
     <LangVersion>latest</LangVersion>
     <AssemblyName>CallOfTheWild.Wrath.Prototype</AssemblyName>
     <RootNamespace>CallOfTheWild.Wrath.Prototype</RootNamespace>
-    <Version>0.14.65</Version>
+    <Version>0.14.66</Version>
     <Deterministic>true</Deterministic>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <WrathPath Condition="'$(WrathPath)' == ''">$(WOTR_GAME_PATH)</WrathPath>

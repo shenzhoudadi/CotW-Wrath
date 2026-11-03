@@ -1,0 +1,839 @@
+{
+  "snapshotVersion": "0.14.66",
+  "formalBuildSource": "formal-attempt03",
+  "inputFingerprintDocumentSHA256": "5CD33AFE1C15B5846A3FDB6B39C537F23F13D9EF549AB9AD45AF709C11481B29",
+  "compileHarmony": "2.0.4.0 from the game Managed directory",
+  "scope": "Recorded reference fingerprints; no game/provider binaries are distributed, and this does not establish an installed optional-provider set.",
+  "gameReferences": [
+    {
+      "path": "Wrath_Data/Managed/0Harmony.dll",
+      "sha256": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5"
+    },
+    {
+      "path": "Wrath_Data/Managed/Accessibility.dll",
+      "sha256": "C36813BDF03FBAD922E6558756C3CC2956E6F74457003947FA4E91952445E19F"
+    },
+    {
+      "path": "Wrath_Data/Managed/Assembly-CSharp-firstpass.dll",
+      "sha256": "9DDE7392853E8D6194905B3B3EEF8C5F8D7DC277733951A4C21F6EDD4343D390"
+    },
+    {
+      "path": "Wrath_Data/Managed/Assembly-CSharp.dll",
+      "sha256": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953"
+    },
+    {
+      "path": "Wrath_Data/Managed/AstarPathfindingProject.dll",
+      "sha256": "9CC4A4C6906AB9D48C18D03FDFB45B0AB36347A77B4314B972AEE7F9BD6FCF54"
+    },
+    {
+      "path": "Wrath_Data/Managed/Core.Async.dll",
+      "sha256": "F2C3307B90273BBC1DA203917F6BF5FE36ADFD30F14FBAB856451AC4C03AE669"
+    },
+    {
+      "path": "Wrath_Data/Managed/Core.Cheats.dll",
+      "sha256": "B82D6160C8699F1E23084A593B134526522DFC0BC3DA594C892F3756B2DF534F"
+    },
+    {
+      "path": "Wrath_Data/Managed/Core.Console.dll",
+      "sha256": "CFF583604678B78AA4F531BFA3B9733A20B739C270D7695949DC8AA1ADB1131E"
+    },
+    {
+      "path": "Wrath_Data/Managed/Core.Overlays.dll",
+      "sha256": "883E89E5B688A1FB5A8B1D82205D679736F02746893D1B5895EEFC411482869A"
+    },
+    {
+      "path": "Wrath_Data/Managed/Core.Reflection.dll",
+      "sha256": "4A32A4172778683589A5A80EE5B6513373E821DDE84F578D5252AD27EF563FD0"
+    },
+    {
+      "path": "Wrath_Data/Managed/DOTween.dll",
+      "sha256": "EB4388B2540EBBF41A1FE1721DAE8925CF8A15EB4CC3D3D48CE67E27C2C18825"
+    },
+    {
+      "path": "Wrath_Data/Managed/DOTween43.dll",
+      "sha256": "73230D96285D15A8779EFB90B19CFF7C4DD96322655756CAB0E2CBD90E4014D7"
+    },
+    {
+      "path": "Wrath_Data/Managed/DOTween46.dll",
+      "sha256": "3B994E90C8F9EE0A3070E133E9716398B02ACF85F23D0944BD179C4321F690F5"
+    },
+    {
+      "path": "Wrath_Data/Managed/DOTween50.dll",
+      "sha256": "7C060D5040DC6B157C625460C82B9CCD07FB471F955E23046A70BBD90E64CF56"
+    },
+    {
+      "path": "Wrath_Data/Managed/DOTweenPro.dll",
+      "sha256": "0E5B5E6979CC24B0C2A22CF3675EE8F42B80CEE04CB01C2A3C1A3A1106266469"
+    },
+    {
+      "path": "Wrath_Data/Managed/DXTCompressor.dll",
+      "sha256": "2A0E0511D48BA0743346A880D5D47945E6DBBD35214B13540C29108DE19D5324"
+    },
+    {
+      "path": "Wrath_Data/Managed/DemiLib.dll",
+      "sha256": "1966890184F0C94A27BC346169EF6599E1F19412A6A756F12B8279635B1F1FF4"
+    },
+    {
+      "path": "Wrath_Data/Managed/DotNetZip.dll",
+      "sha256": "7DD20A2291B05323BBA04BE4AE656D7635AE5E68A5A6FA2B9F86E27841846A31"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Builders.dll",
+      "sha256": "2D7F8AA92DF67EB3B59045E3FFDD3D6512EA6DAC8A4B9B79BF2624AE72E2911A"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Core.dll",
+      "sha256": "74483EF1D28ECCF6BC7DFD6852BE01DA3206FB84FA3B7EEA97E8BBC1E4A3B971"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Common.dll",
+      "sha256": "305743C23B0901E9E4F74669A051FE07FB11467DCF4FE5D03E28E701C9255FAA"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Flow.Implementations.dll",
+      "sha256": "532A2AF416559CFCA4207C001126542B1DD92319E4187ED7A35D36E032124722"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Flow.dll",
+      "sha256": "215D5574227C66A693A00528D918DC41CF902842E1F4782A3EC670E3243D1A54"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Grammar.dll",
+      "sha256": "7405A89BD55C5441AA85F1617636E468E9F00D3C93121E809A42C1F8CD763F25"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Graph.dll",
+      "sha256": "045CCA14AD37A1107F6BE5E1B153413F95358F119D4A557B8EE300CE1F3F8834"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Meshing.dll",
+      "sha256": "CD35E924197FF161D94195FE4FA6395E4AA12F75319F951B2875283BE1AEF6A2"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.Navigation2D.dll",
+      "sha256": "0E92B46E41059D4F36E71A751697079E3CA001B7032BFCA524B3AA7806351707"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.SxEngine.dll",
+      "sha256": "D0DCF8C5A693027E9947140FD273227BDF644F676A0C65F660A6EE2E0AB706FF"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.UI.dll",
+      "sha256": "460CDA769906511E771555F5206DB90E0F4AF978504D0422F5DC9AA13040619F"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.Modules.VisibilityGraph.dll",
+      "sha256": "421FF2EC3946C34BCD063D03B46B5721FF538A7E290D587D2C36C9B30078F86A"
+    },
+    {
+      "path": "Wrath_Data/Managed/DungeonArchitect.ThirdParty.dll",
+      "sha256": "CD0EF7B774CD2C0DF615333E2DDE3998E795FA73D8633A40515D6533FA35FC14"
+    },
+    {
+      "path": "Wrath_Data/Managed/FFmpegOut.dll",
+      "sha256": "7DFD0D0AA9AA313A6720A197EEB486C987C9E6936573F8028D0CBCA71F9AA981"
+    },
+    {
+      "path": "Wrath_Data/Managed/GalaxyCSharp.dll",
+      "sha256": "6D2264A2815D92E062A381B566DBBA60FC3F4077F997F32D3F7C6DECC7129E31"
+    },
+    {
+      "path": "Wrath_Data/Managed/I18N.CJK.dll",
+      "sha256": "38463016B1E3F0D7167859B4851CC1C0D714795F0F7DE48F8B840418A4657804"
+    },
+    {
+      "path": "Wrath_Data/Managed/I18N.MidEast.dll",
+      "sha256": "5C92E6B087CACE099190DD36D24817B1CE21FCC7B9F14D543C34993618F87990"
+    },
+    {
+      "path": "Wrath_Data/Managed/I18N.Other.dll",
+      "sha256": "1CFC50A722A0A753FD3CEBA45141C8E5234E9708DA4EBB57CF781545A3E29E2E"
+    },
+    {
+      "path": "Wrath_Data/Managed/I18N.Rare.dll",
+      "sha256": "DC6625BE5C62433F4098F33AAF674A6A74FDDBCE4A2B6D053306E08730510F20"
+    },
+    {
+      "path": "Wrath_Data/Managed/I18N.West.dll",
+      "sha256": "5777BC889477A55CCAED1FFA1E6C85CD36315120E50010466FC759EB7D437BDD"
+    },
+    {
+      "path": "Wrath_Data/Managed/I18N.dll",
+      "sha256": "F092B968803443DF3815BF957B7B7178E8B09DB83AC313675DB41825CF1D463B"
+    },
+    {
+      "path": "Wrath_Data/Managed/Kingmaker.GameInfo.dll",
+      "sha256": "F378ECAC2FC8611C468972FD48D6F6AB720D45291C702EE96BE13347388F518B"
+    },
+    {
+      "path": "Wrath_Data/Managed/Mono.Data.Sqlite.dll",
+      "sha256": "5CFD7D5E444EC8D53755D4D82220524AA455F34B87A6F740B984D50465D76D4B"
+    },
+    {
+      "path": "Wrath_Data/Managed/Mono.Posix.dll",
+      "sha256": "A33ABCEFFEAA6B6D5DBD2CF77210DADDFE331ED40EEAE4CEA3C5EFB0C0DB2CC0"
+    },
+    {
+      "path": "Wrath_Data/Managed/Mono.Security.dll",
+      "sha256": "2B7651B398DC63AF0DBC0038758981C29238A495681A7ED487357A464AD4DE15"
+    },
+    {
+      "path": "Wrath_Data/Managed/Mono.WebBrowser.dll",
+      "sha256": "7D2EB49A5120D9B1F3EB3C6501D4EED6CACF81F921FBF5C248AAB5F0D093F2EE"
+    },
+    {
+      "path": "Wrath_Data/Managed/Newtonsoft.Json.dll",
+      "sha256": "4B3266C9F61EEE8B832813C7203AC7C5E3CB97131E723ABBBA515C176E93D155"
+    },
+    {
+      "path": "Wrath_Data/Managed/Novell.Directory.Ldap.dll",
+      "sha256": "C1F304FDFD658594FC353DC6CFB5593CEF32C0623FBFB6F26ACC5E0D40877552"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.Runtime.Core.dll",
+      "sha256": "76FCEF053707BA99B9760496F1E71E3D254BAB203FB9B28E04427D8DA4F6A996"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.Runtime.Hardware.dll",
+      "sha256": "D5A57F08C102B2F92D834865565677E543CAC13C2355AE8F80310A07B25CBCEC"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.Runtime.UI.dll",
+      "sha256": "C7EC072D6591382BB8CEEB9FABAC4E3440EF19BDCBF322C1EBAED3771E27634B"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.Runtime.UniRx.dll",
+      "sha256": "259C3EA621671523F124F2947254B1B16E1AE85F1DAF6ED79673625354AC63CA"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.Runtime.Validation.dll",
+      "sha256": "3A3E913F56BA647A4EFD2463282823ACE7B507939B7B6B767A8F91982FED54E0"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.Runtime.Visual.dll",
+      "sha256": "391B971A24D837554E8B5C6AA4F0154B4E7CAE32264AE55BA7113EF3D0EF06E7"
+    },
+    {
+      "path": "Wrath_Data/Managed/Owlcat.SharedTypes.dll",
+      "sha256": "D1567493401788679BC01B741B64BB26497F906108CBE4FBE812807D745A9A37"
+    },
+    {
+      "path": "Wrath_Data/Managed/Pathfinding.ClipperLib.dll",
+      "sha256": "4651EBA68167202DB81C212F445E23A2742560D70B605C0B367AD26A4D8DC1B3"
+    },
+    {
+      "path": "Wrath_Data/Managed/Pathfinding.Ionic.Zip.Reduced.dll",
+      "sha256": "481CC0F9A53A9BA94F8EA3FC0FB2A520B41812C2FDC6AB10581751EADA743D34"
+    },
+    {
+      "path": "Wrath_Data/Managed/Pathfinding.Poly2Tri.dll",
+      "sha256": "6D37C20001D050B2BFD5071D64EE19F7FD7415E021E8122F1E9070613E4D570B"
+    },
+    {
+      "path": "Wrath_Data/Managed/Rewired_Core.dll",
+      "sha256": "25BEB57A80DEDBF963F51AF55809C0CA73207850A91DEDBBD43AE1CA9532A0D5"
+    },
+    {
+      "path": "Wrath_Data/Managed/Rewired_Windows.dll",
+      "sha256": "92BE3A6202E890A3083825F62C953AE754D5FE7687EB85BF878CDE4F10644365"
+    },
+    {
+      "path": "Wrath_Data/Managed/Rewired_Windows_Functions.dll",
+      "sha256": "6A15F6025F371EE1C6710CFA47DDCA6C3728BD8CD0085C2FF548B042968E6E67"
+    },
+    {
+      "path": "Wrath_Data/Managed/Rewited.Internal.dll",
+      "sha256": "F852B188708FCD6792035905D41A29BFD3D1F10C99489EDCBB2D90468549BC39"
+    },
+    {
+      "path": "Wrath_Data/Managed/SonyNP.dll",
+      "sha256": "51C721325BFF8B7986606C1AED7676001F65BCB05C7813C3D4F190D807485591"
+    },
+    {
+      "path": "Wrath_Data/Managed/SonyPS4CommonDialog.dll",
+      "sha256": "984281583D2D6301A7AC5E529D4E22E5D8B4EBD0C776158DA34CF4D41F3EFC03"
+    },
+    {
+      "path": "Wrath_Data/Managed/SonyPS4SaveData.dll",
+      "sha256": "007D27370412B6AF579526E7E8B95B23A5C0227B15B22A28EC3F477D4CDA01E3"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.ComponentModel.Composition.dll",
+      "sha256": "9BDC792FAB55D5820BC9157258C322E447B103E4078DBCB3849FFE0A17E54F17"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.ComponentModel.DataAnnotations.dll",
+      "sha256": "4B2B8F7B2EEBFF970EF247EC94D271D6664514DEE62A0A97F03B03DBE589F357"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Configuration.dll",
+      "sha256": "CD5793957604E1448443DA0D703F29A31100D4A7030C140121C7DDF6B2027D94"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Core.dll",
+      "sha256": "D982F54622EDC2ED4637FE547B70907F589A2AE4DE4B6D604C54EE35F97DCA03"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Data.dll",
+      "sha256": "5D846F404B74488136627E4DF414BFF9FC24457735373B6184746B69900D00BE"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Design.dll",
+      "sha256": "97CD25614C48832B2C655B30ED3D93C3D4B2336514235A5C010A5E64017A6EE7"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Diagnostics.StackTrace.dll",
+      "sha256": "926D996ABD199C8B3A51B837095251D98A3F539A8A678CA37CF8C14F46A279FB"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.DirectoryServices.dll",
+      "sha256": "33ACFAA5891C91FC3BC3E4F8429A205A417F74FAB67C052473C3A98F3B3B9396"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Drawing.Design.dll",
+      "sha256": "314AB8E4BB900F2FA02303B0BCB557627C6DC668DD3E6CC6B735A6C1C943968D"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Drawing.dll",
+      "sha256": "A90E6DDE6BB97560564ADB30F084194BADE099F202A115CCA16D740F216371EE"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.EnterpriseServices.dll",
+      "sha256": "AA83EA4A85632D8C10C0CDDC44771FB06339198A05C96BB516101CF5D7584E36"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Globalization.Extensions.dll",
+      "sha256": "C4F15BBFF3E54178A8B2F10D7FF85A8827C37EBBC47B6794CF3FBDE9F89FF483"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.IO.Compression.FileSystem.dll",
+      "sha256": "FC1595F8E0164010C2AC441266BC532F39E914F4F894D09FDFCFCF262C48E4B9"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.IO.Compression.dll",
+      "sha256": "C457AB509C57506C08C52D23FF0581BA677F2AF930EFC882C8CE8B03E1EB46EC"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Net.Http.dll",
+      "sha256": "F1D8797DE888181DCEC511AFCC63D8AB2DCD91060D943D0AEB0295CC319C9A91"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Numerics.dll",
+      "sha256": "8633CE312516585BD70DD5B4213363CB1E581A75A76CF7A4EA3BFDB4F4BCA85D"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Runtime.Serialization.Formatters.Soap.dll",
+      "sha256": "3001400F6799CFB47F0EB098B13C96C8EC4F5D46626F91D6035953F80367286E"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Runtime.Serialization.Xml.dll",
+      "sha256": "8B4739EE253BD0AF984AD069CE2FCE0F8F69A0051E501ADE202BD7C96CA7AADD"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Runtime.Serialization.dll",
+      "sha256": "C5998C329E93930241728EEF8370496D60A44A3945589320402DB0223C6EF527"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Runtime.dll",
+      "sha256": "CB904FFD053B8B673AFD2C1E6CFC8C39A4FF5078A05447C9BF7FD6EDA5EF6695"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Security.dll",
+      "sha256": "C931417EB4690730438D7C93D1CF6E1864695D8D90A5833FE83298802A84EE58"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.ServiceModel.Internals.dll",
+      "sha256": "44BA40965149AE2CC0021100CA6F5157346D8DF8A88FDAF76489B208F163E933"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Transactions.dll",
+      "sha256": "B77CDE418AED34056FBF0B5F8593857335200C64CE2142FFC17F6B7426F81833"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Web.ApplicationServices.dll",
+      "sha256": "7BBFD2C7D4C33B4FF969C5CE6AB27ED3D91E85BD0F181D9263BCAB37C98051D8"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Web.Services.dll",
+      "sha256": "E6DA8DD0B4C174093DBB86005C881F36D3A4594B1E8868B28B08AC838EAC01CB"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Web.dll",
+      "sha256": "0A8E8068E7E7D53ED418F1A61C490AC6D1DFD162B213F72026818FEA76446226"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Windows.Forms.dll",
+      "sha256": "12C1EF2D6892D8660C7AF00C169FDAE69F3BD958C83F96C748A106BBF620749F"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Xml.Linq.dll",
+      "sha256": "5FA26C37AF7ED3C73C2909C95406F91DAD5BD366BFF822A640142B9C556020C8"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Xml.XPath.XDocument.dll",
+      "sha256": "DA7398FD5892E2288997968E82892DBD776F96F5E0EE38D7B8B5205F335ADE08"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.Xml.dll",
+      "sha256": "340EF89526404EA0A8161EFCEA85216EFAAE956F09FE28A01F565D40DE38E683"
+    },
+    {
+      "path": "Wrath_Data/Managed/System.dll",
+      "sha256": "F74639530606F2DE173F56232E74E63E9AE7DAC48B39AE18E7D0E31FEA4A7550"
+    },
+    {
+      "path": "Wrath_Data/Managed/UniRx.dll",
+      "sha256": "4146BAAAB262F585BE431F8C6DB4EE084DE678F03CE4DB57A55E1F9D6019BF25"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Analytics.DataPrivacy.dll",
+      "sha256": "E6FA962D1D736FB2FBE7F06C013034DD0A3782204D2263AB84B0385D6A42CA59"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Analytics.StandardEvents.dll",
+      "sha256": "DAC3EE3E3CFB4B42BA276F4871D831E89ECEA4ACC893D8FE9B64D92503FD4EBA"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Analytics.Tracker.dll",
+      "sha256": "053F618172AAA43FA32A914B20A6A78CC5FBFC091D2F53B8B5FB9E72BE93220D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Burst.Unsafe.dll",
+      "sha256": "9D9C1FF52411DECBEE5D9F0D1CD61EBEAA222077AA77A52101EA3DEBAFAE98E2"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Burst.dll",
+      "sha256": "65291147A0BAB14C1360AFB0863881A2026874945C9BDE3E2036FAFA1544133D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Collections.LowLevel.ILSupport.dll",
+      "sha256": "DBD7FB37E353BF6609938BE1565C14C952FF6B6A67D2E6436AE3147A084D40F1"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Collections.dll",
+      "sha256": "A31A80956F9C76D55A26FD8712B332CA246E0886739E2D0AB433AB43FD1D1C6E"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Formats.Fbx.Runtime.dll",
+      "sha256": "A85E6AB76FA45826132095F6524EDAA0A1EDA1DE88A1BD12E0BD929ACB060016"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Jobs.dll",
+      "sha256": "853288BCF1D4F3529339A67FC58C8AB370CCBAD1884D43C9C0B55BBD7E14B92C"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Mathematics.dll",
+      "sha256": "E6BF26D93F386B79030208D092BC00FF736FA471C8150239E5A9F352F64AD2E1"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.PlayableGraphVisualizer.dll",
+      "sha256": "05F53F998F24D8DE20D8E8B32F06E48D32EC06681239A1F2AD47CDB5C3300C35"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.ProBuilder.KdTree.dll",
+      "sha256": "F5C94E793AA3EC0EADD010D7D3E9E636D0CCBE37E37CF52872D2C3F7B0256A5D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.ProBuilder.Poly2Tri.dll",
+      "sha256": "1012AA08A162270614629C36D719B5A7FD7A0D222DBE927DDEEB22D5643B232A"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.ProBuilder.Stl.dll",
+      "sha256": "BC7D05D2FF0F428BC3B36CF8A2D88EB0435CE9C86B5F66E52C38733917987986"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.ProBuilder.dll",
+      "sha256": "C79DE3E5A1D5D940046BF4990839C9ABF8D3FBFD99E6020E6F808207BEDBF279"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Recorder.Base.dll",
+      "sha256": "DB2151EBF6C7A20BFFC28C18F7C85EF7EB83D10DA41336CA126125181D22795C"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Recorder.dll",
+      "sha256": "D9015C5DDE91A5A2F14773C0DDEF49F92187A099FB9E974F7B08A1BB8751B31D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.RenderPipelines.Core.Runtime.dll",
+      "sha256": "246AA9EE5ED534593ED57513F148BD0E5BAA1FEE9DD1EA8FADA6EF67AA5B710C"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.RenderPipelines.Core.ShaderLibrary.dll",
+      "sha256": "4F02D2C6E977C34D1753CEC0D2DE1C2AE7CAC070D49EFE47CDDA81A7B29EF8E1"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.dll",
+      "sha256": "E2F869429EC186A4B521327182E2E4405DE324C1D973C62ACC511EB98961FC77"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.ScriptableBuildPipeline.dll",
+      "sha256": "80482E65D12EBF4ED27A91786F44081FD4B1A538908BC2B2E8B8604224FC87EC"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Analytics.dll",
+      "sha256": "CA997B3F16DE726F6D197DB32588FA78BE5B13907F8A9EF824DE50B85898C17C"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Analytics.dll",
+      "sha256": "95B59B4962822311C740C14336BA5AAC5FBC6CA718B05941BBDE3EAF085A5DFE"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Configuration.dll",
+      "sha256": "A44CB22D06F49F63D399481066FDE61517D0CF600D42A09D5FBE41861163E4B2"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Device.dll",
+      "sha256": "12CE7E2F627AFDAC3B04AE02486FAC98672B0793E7923AEFDCE77A73E84EDD67"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Environments.Internal.dll",
+      "sha256": "8D0B29666864411EC2D66143C8E512A18433B6042605F4144FF3C4E80F05F14D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Environments.dll",
+      "sha256": "15310DFF638E95B7AB33CA9CF5A5D91D2E450DF3E7BE7F673CAB707D309977C7"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Internal.dll",
+      "sha256": "F75A1B045A7922C4500FAE565A5D0ACB15C73D157F8783414E50A1B5AED0419E"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Networking.dll",
+      "sha256": "DC9128EE504B9D2B9C278E96CDC02EA9E344E408139EDC266846B3D2C9C9D090"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Registration.dll",
+      "sha256": "A4C617A63283A70CF8BC0425B9D16D16BFCB619D32C11CCCB19B96C1C57CC713"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Scheduler.dll",
+      "sha256": "FE96F15C46DF3A0F924F9A974927C474F946533813610520EA7076E2624FF777"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Telemetry.dll",
+      "sha256": "443AE25F20D9887ABFEFB54C86D391C93A4D9746DA14880E11EBE0A02E8987F6"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.Threading.dll",
+      "sha256": "DFE10FFB74AD41C5AD4D0FBDD3DF4613FD1B7C2FC1B73CF3A8B4EF5430D3EAD8"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Services.Core.dll",
+      "sha256": "2AC7D0FD3D52CA35A0E98FBBC0443581C83133F9D60A0993249D5CE40A2A9F90"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.TerrainTools.dll",
+      "sha256": "780E1B21A4E8BBAA3FD35C97B76DB0269CDD1754242FE25891FA49EEA8AE097D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.TextMeshPro.dll",
+      "sha256": "DCF188EABC7EEDABA0D62918C65BECF508D81A13AE1FCE646C6BB2ED331E162A"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.Timeline.dll",
+      "sha256": "30166F0BCE633E4696F9FE1E1B31CE1B72BF0A2C4699867DA6189711AE4C957F"
+    },
+    {
+      "path": "Wrath_Data/Managed/Unity.VisualEffectGraph.Runtime.dll",
+      "sha256": "236F983B30F5BD239B6E2AD25D913E444AB7355496019AE0104600C2A39F9019"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.AIModule.dll",
+      "sha256": "E50B5A2B8621A88A1AF0B9B45FE2590D975020E28C7719F70FBE8D9C6DFE5B0B"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ARModule.dll",
+      "sha256": "9554696A46859747344FAA4DA743788C699E05E5A11194AB7A0DEA9E0BB99842"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.AccessibilityModule.dll",
+      "sha256": "964152794ECE2508BF31A820FF4B5268846C544B5C3067EB2AC6A3A64A8339E8"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.AndroidJNIModule.dll",
+      "sha256": "64308300A4505B7891A5E7DFE92A37314CF635EEE9F8AFDD98ADB0DFF240A2D0"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.AnimationModule.dll",
+      "sha256": "DEB1B739C1844571C8FD365757FDD51218D79FAD38E7087F2F411DFFEF500C74"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.AssetBundleModule.dll",
+      "sha256": "944BB1EA3B32FDD73815FDCC3D50FDA2B07A7791C6FEB2015A96BC5332B470D9"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.AudioModule.dll",
+      "sha256": "731B0D830CC85560455C6A3FF987FAE13F7A97AF5CD110BE917AF42B695D96F7"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ClothModule.dll",
+      "sha256": "337F775B30EDA2EAE09EEFB6E6B780B4360142ADC659B2DF119D0FF6F92B0268"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ClusterInputModule.dll",
+      "sha256": "62624CA08E156EBB2A36CB1D727CC29BA0A6435422468BAD8A39770214597383"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ClusterRendererModule.dll",
+      "sha256": "AF14E78CD88CCB0EFC4FD316C5BB1D4EB17DA9F48EF80270F9B3569171A21F00"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.CoreModule.dll",
+      "sha256": "B040598EC99A249779661605123E1A09AEB845C2D7CF623940AB07A775440365"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.CrashReportingModule.dll",
+      "sha256": "D49CE579614C9A5148B01AE8DF05C98A75792722FCB100677D5179A483B99512"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.DSPGraphModule.dll",
+      "sha256": "1C404EACA8A3D108A6B75EA47A92AA50BE6E2CF83B67C34EF47A74F110F528B1"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.DirectorModule.dll",
+      "sha256": "60143C64EF0082A69938E25540877BEEEE777DAB4A58F2687881AE771C6B5461"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.GIModule.dll",
+      "sha256": "77657243727E4A8E3CD3C138BA25C4C3F7272F30445069D26C019786D07478BC"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.GameCenterModule.dll",
+      "sha256": "98EFD1758261A42E4AD0D3E2E1E8E48BC38F6DA291E80406DC9E2F74E7030B71"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.GridModule.dll",
+      "sha256": "025AE6AD5B8DF131509DBB0118C319E77AD7E680904F372C42D1A3D168D41E41"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.HotReloadModule.dll",
+      "sha256": "794532338ED20A5FB3342695CE96FAF21EFF52C7D3BDCD4D9A68768A01E7B487"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.IMGUIModule.dll",
+      "sha256": "2E627374D56A04CB8021B4ADAA124C8ACE1F43F7907CDAA68E11C965AB0F017F"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ImageConversionModule.dll",
+      "sha256": "4C008936DD40992849A1429B76FDF9643E71963467930F91EA4A1C301F3C26EA"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.InputLegacyModule.dll",
+      "sha256": "5B337F7A0BDD26B65303C6F35C00D6B26084BBCC42F269E943945814DDBE263D"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.InputModule.dll",
+      "sha256": "31F5149940ABA668DEDF14898BEBB17E0B2181CF09BA629793D1F923D2CA8384"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.JSONSerializeModule.dll",
+      "sha256": "CCBCB9712535F409E657AF1816D6B97F9047DFD596B3E8995045288325CF0686"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.LocalizationModule.dll",
+      "sha256": "A2F96F013285F53FFD80151FB3F83D34ECFC0AC8558BB8F9E69062015DAE861E"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ParticleSystemModule.dll",
+      "sha256": "01D3145D383E24641043D8B025F2C6584192B0F84F9EB4787F20F8FD905F4E07"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.PerformanceReportingModule.dll",
+      "sha256": "D35209B8F2D351B66D1627D4920AB4A43A1A66E5E366BE4B9A7264CD5593C0E3"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.Physics2DModule.dll",
+      "sha256": "C875B5893072F315746CDEBD3809B7AF798499C84B4B143E4F55B040667674DA"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.PhysicsModule.dll",
+      "sha256": "1AF6CFA1ECD8C3E2B1FBCF453DB55600BECB08FAF71D78469319A1C025415CFF"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ProfilerModule.dll",
+      "sha256": "BFDEA2628A830AFC18610D016A1E2C5B613D9CF29D2F86DF6EE02295637FD9E1"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll",
+      "sha256": "DC241D2063D945EB087B369B47510F758807EC65587356BDE4D0DD5F0C4894CA"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.ScreenCaptureModule.dll",
+      "sha256": "98D33CD8E3F22E41B7571EB991C40A09C4512A170DDEB96BBE37CE82C444E62C"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.SharedInternalsModule.dll",
+      "sha256": "82E669F3F262A1E4548E7CA7B6B261B3425FC437C1A5DCE7FE0CFF35A1C423B0"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.SpriteMaskModule.dll",
+      "sha256": "0CEFF30D99F76D59DF90114CE9A4E7E84FC3CDC6AE964FFF48C2923567868C6D"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.SpriteShapeModule.dll",
+      "sha256": "D88CB78FF5BAC9B78B67881703829715AE2AC4F7BDA578656B321FAFECA73589"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.StreamingModule.dll",
+      "sha256": "6C510A18AACDB38F6D8470A467525E7CEDA4BC4B6DEB8BD2007D4E3CE4D8F07D"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.SubstanceModule.dll",
+      "sha256": "6D9B6AA9CCC4DF340D3EC40F4A20D90C635120AA41D4ADE7567D2894B8930E60"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.SubsystemsModule.dll",
+      "sha256": "2E952CEB6FB9737CAB433581AE5DC1E559FE36DD27EEE02B7784C6F41B5FE82F"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.TLSModule.dll",
+      "sha256": "5989E68D8E4DB8827DE87B29704F219B1A52ECD1A45405AB0D5A2338E9F74079"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.TerrainModule.dll",
+      "sha256": "35E938DAA6A7D0A5208563A7E90B3C36B326F6BB736BE591B1AE7FA565236238"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.TerrainPhysicsModule.dll",
+      "sha256": "CD7712D30B020A32398A5FFB7BD0ED3DAEA2643C63FACF1B693C1A672BAD2909"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.TextCoreModule.dll",
+      "sha256": "3E36ED0C0813A7717E87F080FB7CBA978068A800C18CCF0083E8271AFA0780F3"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.TextRenderingModule.dll",
+      "sha256": "A1FECFDFC8F6F40A7274549C26F04529842AE7A1F6FE6EE5D540CFB1DAC424EA"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.TilemapModule.dll",
+      "sha256": "1B1DE4D5A1811DEB2E81C910F64764D998E80ED045ACC14F3A40653D0DDDA085"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UI.dll",
+      "sha256": "69252B96D36FCBC307DBF197FEF3C0BDD57CC36DB7B24710DF680E0B3AF3F930"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UIElementsModule.dll",
+      "sha256": "14A053BD6A0BF722CEB1F17EED98F77619D3F243709AEC3FF21D03DF66BCC3BC"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UIElementsNativeModule.dll",
+      "sha256": "A4A30D5E977848CC2C4FD353130E6CFECF26D675DC36D60C757FA2045749A2F7"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UIModule.dll",
+      "sha256": "6C90D66C44BB19EB96D8368CF1755C9C1471342843FD329398B75CC2E54FFB31"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UNETModule.dll",
+      "sha256": "C5D257058B50AFBBAB2428C92C932701FBA848FC64932E0DA8D819434674B620"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UmbraModule.dll",
+      "sha256": "CD524C38EC291D554826304C99440FE18DD4EFBEAC652AA98243101BD79BE664"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityAnalyticsCommonModule.dll",
+      "sha256": "DF6A5780C282DC16FBA02FD72202F324686167BC4F8D1A3AB85D7EE924FDC4EE"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityAnalyticsModule.dll",
+      "sha256": "A0E0B064C3E34CCB3DF11FD1968F90B5564875D2E2E65024C0508AA6648C3211"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityConnectModule.dll",
+      "sha256": "280EE65B628D34BE39209FA8F5F8F9571E009B0E31CD4C527D5FF8236FEF2F44"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityCurlModule.dll",
+      "sha256": "145099E4CF44FF314D8596DE79D0F579FD4C23884399949563EABEACE7A1320B"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityTestProtocolModule.dll",
+      "sha256": "1EBC2D0DC18066437F7737F91619DFF1B7C11D98C5FB614F0D9AF4A8576738E0"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityWebRequestAssetBundleModule.dll",
+      "sha256": "C3CD4271E5BCFD69C06E4CEDE450FCF59214E9D2C3A12896B9C31C58FC4B916F"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityWebRequestAudioModule.dll",
+      "sha256": "4406B3B8BFE5121FB95791F22E5BDFE97A8EB61398F4033FB9145AAC1CB418C7"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityWebRequestModule.dll",
+      "sha256": "B3D3B4784DCAABA68A6019C95ACA569798670718EFFAB66725C28BED1714D106"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityWebRequestTextureModule.dll",
+      "sha256": "763DC98C7CAAD718AF434739E6448E2CC0C49BA6EA00C235092258546039385C"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.UnityWebRequestWWWModule.dll",
+      "sha256": "33FE825E3C67E5DE4005FD41A88FE4D18AB35D85598F5B5A2B0EFE5CDD4D3D53"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.VFXModule.dll",
+      "sha256": "59912CB33DF20F04112BEB2F6CA335D7FC8BA552457B1BACEAB078DCA619C97E"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.VRModule.dll",
+      "sha256": "F66C68462028FD101701419F795D03C7DCDDC69C0D2244AB1630595D65BD7FB2"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.VehiclesModule.dll",
+      "sha256": "6BC7B8248A2B5AAD6E18035454078C56023EBBFF16CDA8DCD58B5CC3F1996FBF"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.VideoModule.dll",
+      "sha256": "D12918D26D0630BDA1986CB867BAA37465C7039BEEC78F72E5EE4C08105D8EEC"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.VirtualTexturingModule.dll",
+      "sha256": "A374C09361271120EE1EDCE082578DEE99AF6A3A5C2FC4A407F8BA63DAA15B72"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.WindModule.dll",
+      "sha256": "930DD15EE54DC0883378E3D5B24D1772ACC9C67E6EEDE78B496AACCCFF11E297"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.XRModule.dll",
+      "sha256": "42B956ADF86C86EBC9D3333D68B56840A61A4D0D20862490CA7A6B5B5F910D01"
+    },
+    {
+      "path": "Wrath_Data/Managed/UnityEngine.dll",
+      "sha256": "B44EC9EB6FD93A3C2D3953F9653EE7C6F141DADE60505DEA015DB78868F85F5E"
+    },
+    {
+      "path": "Wrath_Data/Managed/Utility.ModsInfo.dll",
+      "sha256": "9DA7D0D1A0BEBE2804FC2AC071C417C97FD474CB7A138F198CC6C00DBF9AA67D"
+    },
+    {
+      "path": "Wrath_Data/Managed/Utility.Reporting.Base.dll",
+      "sha256": "240FE9939438EA39EED0C077CFE7395B4F8B4571481B27C361F1E3BCD21161B8"
+    },
+    {
+      "path": "Wrath_Data/Managed/mscorlib.dll",
+      "sha256": "A3118A7DB8073014A66CDA8076882473E21DC7AED711DD3EFC8AD193BB6B9A0B"
+    },
+    {
+      "path": "Wrath_Data/Managed/netstandard.dll",
+      "sha256": "FADA723DE68ECA78DC6E4279EBF1C886810DCD7B4A970290CB7AC068EF04B766"
+    }
+  ],
+  "otherCompileReferences": [
+    {
+      "file": "BrawlerClassWrath.dll",
+      "sha256": "2822BD555D9F9387BA1261E9C19F124B1F8C313EED3C1E0BA35844D83CA7AFA1"
+    },
+    {
+      "file": "ModMenu.dll",
+      "sha256": "110191A74C3CA9AD5FC9134094D2BA43AF9AE113B3193E18F33BA00E48433EAF"
+    },
+    {
+      "file": "UnityModManager.dll",
+      "sha256": "1387468BC3AF41C50FE51859A3BB7AF4922891AA8F13A6187E7A348CEAABFD88"
+    }
+  ]
+}
