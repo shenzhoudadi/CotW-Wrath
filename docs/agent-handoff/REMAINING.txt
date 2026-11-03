@@ -1,7 +1,9 @@
-CotW 0.14.66 — thirteen allowed HOLD items
-No new migration item in this repair.
+CotW 0.14.66：本轮仅修复Amnesiac；以下十三项HOLD与排除状态沿用既有记录。
 
-仅列用户允许的十三项；Amnesiac已于0.14.64完成，本轮仅修复。排除项不恢复；以下依赖HOLD不是已实现或游戏验收。
+CotW 0.14.65：本轮仅修复 Urban Bloodrager，以下沿用 0.14.64 的待办和依赖状态。
+
+CotW 0.14.64 尚未完成内容清单
+仅列用户允许的十三项；Amnesiac本轮完成。排除项不恢复；以下依赖HOLD不是已实现或游戏验收。
 
 COTW-0020 Havocker
 HOLD_SHARED_KINETICIST
@@ -54,7 +56,3 @@ Native Wizard exists. Original uses all ten SpiritsEngine families with Wizard/I
 COTW-0140 Relic Hunter
 HOLD_SHARED_IMPLEMENT_ENGINE
 Native Inquisitor exists. Original depends on the Occultist ImplementEngine and class-scoped deific focus allocation, invested/locked focus, resonant powers, implement spells and focus powers. Current project has no equivalent shared implement engine; an external class name cannot establish the required focus components and daily lifecycle.
-
-
-Current audit addendum:
-The temporary-knowledge mechanism already exists in TemporaryKnowledge01464.cs and must not be duplicated. Starseeker remains HOLD for the complete 90-spell availability/behavior contract, including five optional-provider candidates and unresolved Mass Fly/Akashic Form differences. HA Investigator interfaces remain unverified. MCE Antipaladin source was located, but its complete provider integration contract was not established.

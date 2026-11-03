@@ -1,0 +1,41 @@
+CotW 0.14.21 — Psychic法术表修复与一个新专长
+
+只支持最新版游戏和最新版mod。内置Medium0.4.3、Way of the Shield4.0.13。替换旧CotW目录，保留存档和既有配置。用户确认的Extra Spell Synthesis、Channel Corruption DC显示与DragonChanges同时进入游戏保持；相关生产文件和Harmony运行时守卫没有改动。
+
+一、Debilitating Pain / Mass：原因与环数
+
+0.14.20的外部法术目录没有这两个PrestigePlus蓝图，因此即使PrestigePlus已经把它们放入Witch列表，CotW仍没有相应Psychic引用。旧实际DLL上的目录检查复现缺项；本版补两个引用，不复制或重做法术效果。
+Debilitating Pain：Psychic 3环；Debilitating Pain, Mass：Psychic 5环。纯Psychic按本包九环自发施法进度分别从职业6级、10级开始获得对应环数；多职角色按该法术书有效进度核对。
+引用GUID分别为edd43108e61a438694624b6f6e6f4bce、776eefcb0ba841bfae8ceba58a19ff29。只链接已启用、有执行组件且有PrestigePlus／原生列表实际发布的能力；缺少PrestigePlus或禁用相应法术时跳过。保留其名称、图标、超魔、目标方式和Witch列表。只接Psychic，不恢复后续幻灵／召唤师资源。
+规则及提供者依据：https://aonprd.com/SpellDisplay.aspx?ItemName=Debilitating+Pain；https://github.com/Kosha99/PrestigePlus/tree/da29f68333101ac6f7d7722dfa50aba1bbb6fd76/Blueprint/Spell。
+
+回归步骤：
+1. 启用最新版PrestigePlus及这两个法术设置，冷启动进入主菜单，打开CotW的ModMenu页，让较晚加载的可选提供者重查。法术整合模块应正常注册。
+2. 新建或升级纯Psychic，在3环选法术页面检查Debilitating Pain，在5环页面检查Debilitating Pain, Mass。分别只有一个条目，不能出现在错误环数。低于对应法术环时不应可选。可以用6级／10级纯Psychic分别检查。
+3. 载入旧Psychic存档，升级到能选对应环法术时检查；洗点后再检查。列表增加不会自动赠送已知法术，也不会改掉原有已知法术。已经越过选法术等级的角色可在后续换法术／学习机会或洗点时学习。
+4. 正常学习后在法术书中核对3／5环消耗并施放一次；单体与群体的具体投递和判定沿用PrestigePlus。再检查Witch法术书，两项原条目应保留。
+5. 多次打开ModMenu、退出升级页面再进入，不应产生重复条目。分别测试缺少PrestigePlus／关闭法术设置并冷启动：CotW不应登记空蓝图或错误替代法术。切换提供者设置后重启游戏。
+
+二、本轮唯一新增：Improved Two-Weapon Feint
+
+台账COTW-0255中的Two-Weapon Feint已经由游戏原生提供，本版只补Improved Two-Weapon Feint，不另造基础专长。普通专长和通用战斗奖励选择池可选；遵循原生Two-Weapon Feint的DLC访问条件。
+前置：敏捷17、智力13、BAB +6、Combat Expertise、Two-Weapon Fighting、Improved Two-Weapon Fighting、原生Two-Weapon Feint。前置和效果规则：https://aonprd.com/FeatDisplay.aspx?ItemName=Improved+Two-Weapon+Feint。
+开启原生Two-Weapon Feint模式，用近战武器作完整攻击。攻击牺牲、目标限制、Bluff检定以及Slayer's Feint的Mobility替换均沿用原生路径。成功后，自身针对该敌人的后续攻击持续享有忽略敏捷AC的虚招收益，直到自身回合结束；实时模式采用6秒期限。不会把收益给其他队友，不延长普通移动动作Feint或Swordplay Upset，不重造Final Feint已有的更强分支。图标取原CotW的TwoWeaponFeintImproved。
+原生虚招投递是排队执行；升级效果按具体AbilityExecutionContext记录，回合结束后才到达的投递不会重新建立升级收益。只保留确切的原生虚招标记；每次攻击临时的AC状态仍按原生清理，无常驻全局措手不及。没有新反击命令、额外攻击或资源退款，也没有新施法菜单。
+
+回归步骤：
+1. 在普通专长／战士奖励专长页面检查可见性；依次缺少一项前置时应不可选，满足前置后选取一次。重复打开页面不应重复登记，洗点后仍可正常选其他普通专长。
+2. 选一个有敏捷AC的敌人，装备符合原生模式要求的双近战武器，开启Two-Weapon Feint，作完整攻击。提高Bluff保证一次成功：对比取得本专长前后的后续攻击AC／偷袭条件。取得后成功虚招的收益应贯穿该回合后续攻击，不再在第一击后消耗；被牺牲的攻击数量仍由原生模式处理。
+3. 用低Bluff制造失败，后续攻击不得获得收益；单次攻击、关闭基础模式、远程完整攻击也不得凭该专长产生升级虚招。
+4. 让另一名队友攻击同一敌人，不能得到本专长施术者独有的收益。两名具备本专长的角色分别对各自目标成功虚招，检查各自效果与回合结束独立。
+5. 主动结束当前回合后再观察后续攻击／借机；旧升级标记应清除。实时模式检查6秒到期。普通Feint、Swordplay Upset和Final Feint各回归一次，效果保持。战斗中保存／载入并结束本回合，不能留下跨回合升级收益；洗掉专长后恢复原生消耗规则。
+
+三、已有内容与交付范围
+
+本轮新增一个根专长、零个法术蓝图；两项法术只是补外部引用。用户已把后续工作改为每次一个专长，本轮交付后停止，不自行接下一项。此前已交付专长汇总，便于按历史范围回归：
+0.14.16：Linnorm Style、Linnorm Vengeance、Linnorm Wrath、Scales and Skin、Vicious Stomp（5项）。
+0.14.17：Toppling Spell、Spontaneous Metafocus、Swordplay Style、Swordplay Upset、Fey Foundling（5项）。
+0.14.19：Extra Spell Synthesis、Ability Focus: Cruelty、Channel Corruption（3项）。
+0.14.21：Improved Two-Weapon Feint（本轮1项）。前述根专长合计14项；开关和子选项不计数，0.14.18／0.14.20修复不计新增。Linnorm Wrath动画限制已接受，Toppling＋Forceful Strike、正式Spell Synthesis依赖和Channel显示均保留。
+
+Harmony编译仍钉实际游戏2.0.4.0；运行时API检查完整沿用0.14.20，复用进程实际已绑定的兼容2.x，不替换游戏／UMM文件。独立兼容检查继续覆盖2.0.4和2.3.6。包完整性、旧GUID/TypeId、模块目录真实调用方、原生选择池保留、前置和升级预览、重复等级表回归及新增专长数据归属纳入构建与交付自检。具体数量、文件SHA256及检查边界见交付自检。游戏回归按上面的步骤执行；本机没有安装UMM或启动游戏。

@@ -27922,8 +27922,7 @@
     ],
     "currentGuide": "0.14.66Amnesiac-feedback-test-guide.txt",
     "details": "See HANDOFF.md for the five requested behavior changes; historical entry statuses and exclusions are preserved.",
-    "playerAcceptanceInferred": false,
-    "status": "candidate-not-formally-released"
+    "playerAcceptanceInferred": false
   },
   "sharedMechanismContext": {
     "temporaryKnowledge": {
@@ -27933,6 +27932,6 @@
       "boundary": "Existing Amnesiac source-ownership/temporary-knowledge mechanism; complete Starseeker constellation/catalog/availability contracts remain HOLD."
     }
   },
-  "mainSourceVersion": "0.14.65",
-  "candidateSourceBranch": "agent-handoff-0.14.66-20261103"
+  "currentReleaseStatus": "0.14.66 delivered under current-content validation policy",
+  "currentValidationScope": "Current compile/package checks and existing matching-DLL Amnesiac focused results only"
 }

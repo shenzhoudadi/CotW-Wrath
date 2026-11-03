@@ -1,0 +1,16 @@
+﻿CotW 0.13.0（内含 Medium 0.4.3）测试说明
+
+用户反馈记录：0.12.2 Howling Agony正常；Invigorate压制疲劳有效，但力竭仍挡冲锋；0.12.1 Divide Mind会使异能法术/能力不可用。后两项本包修复待游戏复测。Locate Weakness与0.11.1尚无明确逐版验收。
+
+安装：使用完整experimental ZIP，按原方式覆盖CotW包。仍内置Medium，不要另装旧独立Medium。没有安装其他法术mod也可使用本包；既有联动保持可选。本次不更改Medium源码，不需要新人物。
+
+重点复测（独立自检不是游戏实测）：
+1. 力竭角色先确认不能冲锋，再施放Invigorate/群体版，应可冲锋；解除或到期后剩余力竭恢复并再次限制冲锋。缠绕、困难地形及其他冲锋限制仍应生效。有坐骑时分别检查骑手和坐骑疲劳。
+2. Divide Mind施放后应能使用异能法术与Center Self等能力。Psychic及Medium异能书0–5环标准/移动施法和合格类法术能力改为迅捷；6–9环、物品、超自然能力、其他职业非异能书及整轮施法保留原动作。每轮迅捷上限保留，检查回合制与即时制；到期/解除/存读档后恢复。专注与Logical/Phrenic规则保留。当前没有收到按钮变灰或错误日志的细节，因此仍需实际组合验证。
+3. 图标：Divide Mind使用CotW原来的双生切换图；Invigorate、Howling Agony、Locate Weakness亦嵌入原CotW引用的拥王者原图。无需另装拥王者/CotW原mod。法术与buff使用同一图。其余已沿用原CotW图标的内容保持。
+4. 新增Halt Undead：Wizard/Sorcerer 3、Inquisitor 3；中距10尺敌方爆发，仅不死生物；Will否定、法抗，CL轮，可Extend。每轮可重作Will，遭攻击（含未命中）或受到伤害解除。确认不影响活物/友军，0伤害事件不自行解除；状态到期无残留。采用CotW区域改编，没有三目标手动选择。
+5. 新增Control Undead：Wizard/Sorcerer 7；近距单个非召唤不死生物；Will否定、法抗，CL分钟，可Extend。使用原生支配AI，不是可手控招募；结束/驱散/存读档后阵营正确恢复，原友军和第三方支配无误清。无精神影响标签，不因普通不死精神免疫直接失效。
+
+这两道新法术按原CotW法表接入，不属于Psychic通用法表。没有新增Phrenic Pool入口。卷轴/商店、其余三个完整流派及Occultist/Spiritualist主体仍待办。
+
+保留英文、稳定GUID与Harmony 2.0.4基线。托管回归中的角色/豁免/场景边界是测试夹具，不是实际游戏战斗/UI/存档验证。

@@ -1,0 +1,51 @@
+CotW 0.14.19 — 反馈修复与新专长第3批（共4批）
+
+只支持最新版游戏及最新版各mod。Harmony固定实际游戏2.0.4.0；内置Medium0.4.3、Way of the Shield4.0.13。安装时替换本mod旧目录，保留存档及已有配置。本机开发流程只运行独立托管检查，游戏回归由测试者执行。
+
+本轮先处理两项反馈，然后按稳定优先的估量新增3个根专长：Extra Spell Synthesis、Ability Focus: Cruelty、Channel Corruption。15种蓄能子选项不单独计数。其余剩余候选依赖尚未迁移的职业、已经有对应功能或需更复杂的新流程，不纳入本批；没有新增根法术。第3批交付后停止，第4批须本批外部复查通过并收到用户继续指令；第4批说明将汇总四批内容。
+
+一、Linnorm Wrath攻击动画结论
+
+结论：当前实现没有漏掉攻击动画调用。Wrath提交的是原生UnitAttackOfOpportunity；实际游戏程序集的OnRun先检查CanRunIdleAction，只有空闲时才创建攻击动画并ExecuteIfIdle。当角色正在受击或执行其他动画、不能运行空闲动作时，原生方法提前返回，不播放这次借机动画。
+原生借机命令是Free且为one-frame，攻击结算独立于上述动画播放。于是可能出现“借机已命中/造成伤害，但角色还在原有受击动画”的表现。当前用户现场的具体动画忙碌状态没有日志快照；这是代码确认的原生条件性限制。为保持已确认正常的Linnorm Style/Vengeance和原生借机次数、时序，本版保留Wrath机制，不强行插入普通攻击命令或打断受击动画。
+回归：开启Linnorm姿态，让近战敌人攻击自己；分别观察空闲可播动画和正在受击时的Wrath反击。以战斗日志的攻击检定、伤害和借机额度为结算依据；忙碌时可出现无独立挥击动画。检查每轮额度、敌人独立窗口、开关不能返还次数仍保持。
+
+二、Toppling Spell＋Forceful Strike
+
+确定根因：Forceful Strike的额外伤害运行在原生武器触发上下文中。伤害动作原先默认复制武器攻击检定的Reason，丢掉蓄能法术的Toppling超魔上下文；Toppling因此认不出这次伤害来自带该超魔的力场法术。
+修复：仅令Forceful Strike的额外伤害以法术Buff作为Reason，保留施法者、超魔配方、施法者等级和来源法术书。武器伤害、Fortitude减半、冲撞及已有Toppling机制保持。
+回归步骤：
+1. 用能施放Forceful Strike的角色取得Toppling Spell，在超魔配方界面制作带Toppling的Forceful Strike（占用提高1级的法术位），装备近战武器。
+2. 施放配方后成功命中可被绊摔的敌人。确认出现额外力场伤害，并对受伤目标发起一次绊摔检定；检定使用来源书施法属性和实际施法者等级。绊摔成功则倒地，失败则保持站立。
+3. 检查目标通过原Forceful Strike的Fortitude时：伤害减半但仍大于0，也应发起Toppling绊摔；Forceful Strike本身的冲撞仍按其原豁免规则处理。
+4. 对照普通Forceful Strike：不得因力场伤害自动获得Toppling。攻击未命中时不消耗Forceful Strike蓄能、不发起绊摔；下一次成功命中再结算。一次蓄能命中只绊摔一次，零有效伤害不发起Toppling。
+5. 换另一来源书/施法属性和不同施法者等级重复，检查不是沿用攻击武器的力量或被伤害10骰上限错误截断。
+
+三、本批专长及依赖
+
+Extra Spell Synthesis（COTW-0202）
+需要最新版PrestigePlus启用enhance并提供Spell Synthesis。角色已取得该提供者的Spell Synthesis后，普通专长可选Extra Spell Synthesis；每次选择使其原有每日资源上限增加1，可重复选择至10阶。使用提供者现有的资源与能力，不另外实现法术合成，不改变其原有施法动作。
+步骤：休息记录原次数；升级选一次并休息，次数应+1；再选一次并休息，总增量应+2。逐次使用法术合成应扣其原有资源。洗掉这两阶后休息，上限恢复；其他法术/资源不增加。缺少该提供者时不出现此专长。
+
+Ability Focus: Cruelty（COTW-0246）
+需要最新版MicroscopicContentExpansion的Antipaladin/Cruelty。普通专长，原有Cruelty资格为前置；已支持的14种Touch of Corruption残虐变体的豁免DC增加2，未附残虐的基础Touch、其他能力与法术不加。保留提供者的原始DC计算，再加此专长的2点。
+步骤：用同一反圣武士、同一残虐记录学习前后DC，差值应为2；更换两种已学残虐分别检查。基础Touch以及无关法术DC应不变。洗掉专长后恢复。也检查下面Channel Corruption携带残虐的DC，只增加一次。
+
+Channel Corruption（COTW-0257）
+需要最新版MCE的Touch of Corruption及完整残虐目录。普通/通用战斗奖励专长，前置Touch of Corruption。迅捷动作预先消耗2次原有Touch资源，选基础效果或自己已学残虐；蓄能持续1轮，下一次近战持械、徒手或天然攻击结算时消费。命中投递对应Touch效果；未命中也消费，且没有额外效果。远程攻击、接触/射线能力和预览不消耗蓄能。没有新的借机/反应命令，也不再进行接触命中检定或额外扣一次Touch资源。
+步骤：装备近战武器，记录Touch次数。选择已学残虐的Channel，确认立即扣2且花迅捷；命中敌人，武器伤害之外出现对应Touch效果和残虐豁免，资源不再扣。再蓄能并让下一次近战未命中：蓄能消失，资源不返还，敌人不受Touch效果。连续多段攻击只有消费蓄能的那一击投递；换远程攻击应保留蓄能到近战消费或到期。试基础Touch与另一已学残虐；未学残虐不可使用。重新蓄能替换旧蓄能，不叠加、不返还资源；到期/休息/洗掉专长清理。对拥有Negative Energy Affinity的目标沿用提供者原有治疗分支，不自行改写免疫规则。
+
+可选集成：提供者缺失或目录尚未完成时跳过。若其他mod较晚初始化，打开CotW的ModMenu页面会重新检查可用提供者；依赖完整后登记且不重复加入选择池。关闭提供者后不支持保留依赖它的角色能力，请保持存档原有依赖组合。
+图标：Channel Corruption使用原CotW WeaponEvil图标，子选项沿用各Touch残虐图标；Extra Spell Synthesis、Ability Focus: Cruelty沿用其提供者对应能力图标。
+
+四、菜单与升级回归
+
+1. 完全退出后冷启动，检查加载日志无新异常；打开ModMenu，CotW页面及模块状态正常。
+2. 新建角色进入普通专长选择页，原有专长和本mod条目应正常显示；不满足可选提供者/前置的角色不能选择本批专长。
+3. 加载旧存档升级，选择普通专长。检查原有条目保留，新增条目不重复，选择、确认和完成升级正常。
+4. 洗点，检查前置随资格变化、资源上限恢复和Channel残留清理；重新选择本批专长，再按各专项步骤核对。
+5. 已确认正常的Linnorm Style/Vengeance、Vicious Stomp、Scales and Skin、Spontaneous Metafocus、Swordplay Style/Upset、Fey Foundling生产机制保留，原先菜单/参数目录修复继续保留。
+
+五、构建与交付检查
+
+构建门禁包含包完整性、实际Harmony2.0.4.0及API兼容、真实菜单调用方、全部原生专长选择池引用/顺序保留、重复注册、前置及原生升级预览数据生成。专项检查覆盖原生Forceful伤害Reason、超魔/属性/CL/次数和本批提供者缺失/迟到、资源阶数、DC范围、蓄能命中/未命中/预览。最终数量、DLL与双包SHA256及独立检查边界见0.14.19交付自检.json；测试者请提供上述游戏步骤结果和相关战斗/加载日志。

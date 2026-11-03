@@ -1,0 +1,38 @@
+CotW 0.14.23：法术表结构兼容紧急修复
+
+一、本轮范围
+只修 CotW 与 Mystical Mayhem 同时安装时的启动卡死，以及同一法术表结构问题对其他固定下标读取者的影响。新增专长、法术均为 0。Improved Two-Weapon Feint 按用户反馈记为正常，其实现保持不变。0.14.22 的缓存快照、有限重试、逐表和外层异常隔离保持不变；本次反馈没有再次报告此前的 ToyBox 并发异常。
+
+二、卡死根因与证据
+Player.log 中的关键链为 GoldRobedWizard.MakeSpellList → DeferredBlueprintPatches.MasterPatch → DeferredPatches → KRXLib FixTMPAssets；GoldRobedWizard.cs 第 140 行读取原生 WizardSpellList.SpellsByLevel[i]。当前 Mystical Mayhem 源码循环条件为 i < 11，实际读取下标 0—10，共 11 行，目标 Gold Robed Wizard 表也预留 11 行。
+当前游戏的 Wizard、Cleric、Druid 等原生职业表同样预留 0—10 行。0.14.22 的 CotW 合并器按有法术的最高环裁剪数组，普通 Wizard 表由 11 行缩为 10 行，删除了空的下标 10。MM 后续访问下标 10 越界，异常沿启动协程传播。这是 CotW 的兼容回归。用已交付 0.14.22 DLL 实际注册，再执行与 MM 源码一致的固定下标读取，已复现 IndexOutOfRangeException。
+紧邻的 EbonsContentMod 异常也符合相同原因：其 CollegiateInitiate 对 Wizard、Druid、Cleric 固定读取下标 0—10。公开最新源码标注 1.1.8，用户日志为 1.1.9；对应访问和报错行吻合，具体二进制版本差异已记录在源码审计中。Ebons 的异常由自身捕获，随后 MM 未隔离的异常是日志中直接中断启动的路径。
+此前“没有法术的高环行应删除”的处理不适合这些共享表。数组容量与角色可施放的最高环数是两件事；空槽本身合法。原生 wrong level value at index 11/12 的原因是追加重复等级行后，下标与 SpellLevel 不一致。
+
+三、修法
+1. 合并法术时保留输入数组的全部容量，至少具备当前原生约定的 0—10 槽；每个输出槽都非空且 SpellLevel 等于下标。不再按最高非空环缩短数组。
+2. 同一等级的重复行仍按蓝图 GUID 稳定合并，保留原有法术、等级及顺序，并隔离共享行对象。若输入已有 12/13 行，归并后多出的槽保留为空，既不缩短数组，也不留下错位的等级值。不会凭空增加 11/12 环法术；遇到有内容的越界等级仍记录并跳过该表，避免丢失外部数据。
+3. 审判者、圣武士、游侠等使用的是原生共享表，全部沿用上述容量约定。CotW 自建 Psychic 表补空下标 10；集成 Medium 的自建表补空下标 5—10。Medium 的原有 0—4 环内容及最高 4 环施法成长不变；Psychic 仍按既有施法成长解锁法术。
+4. 没有增加对 MM/Ebons 的特殊补丁，也不依赖改动它们的安装文件或关闭其职业选项。
+
+四、构建与自动检查
+最终安装包进入完整构建、自检和包完整性流程；具体计数、文件哈希及结果见同版“交付自检”。新增检查在真实生产注册前后捕获被改动的表，逐表验证长度不缩短、下标/等级一致、原有法术引用保留、重复整理稳定。
+检查从当前游戏 blueprints.zip 提取全部 102 张原生法术表，覆盖合法空槽、短表、重复行、共享行和已有 10 环法术；使用真实 BlueprintsCache 与实际 LoadPackTOC 后置补丁重复整理。MM 和 Ebons 按公开源码对应的固定下标读取单独覆盖。真正为空且未被 CotW 改动的原生空表保留原状。
+Medium 自建表另通过最终程序集的 CreateSpellList 实际构建，检查原有 0—4 环内容与空预留槽；独立托管进程为私有字段可见性、Unity 日志和 UMM 静态初始化提供测试边界。原生缓存并发专项另在原游戏程序集上执行。完整游戏进程及外部 mod 的全部启动代码由下述测试者回归覆盖；没有在本机安装 UMM、启动游戏或建立游戏内无人值守检查。
+编译固定当前游戏 Managed/0Harmony.dll 2.0.4.0；运行时继续使用 0.14.20 起的已绑定 Harmony 2.x API 检查，兼容性矩阵覆盖 2.0.4.0 和 2.3.6.0。不随包分发或替换 Harmony，不修改既有运行时策略。只支持最新版游戏与 mod。
+
+五、测试者回归步骤与预期
+1. 完全退出游戏，按原有安装方式换成 0.14.23 最终安装包，确认没有同时保留另一份旧 CotW。保留 Mystical Mayhem 及其依赖，确保 Gold Robed Wizard 相关功能开启。连续做至少 3 次完整冷启动，每次退出进程后再启动。
+   预期：每次均进入主菜单并能载入存档；Player.log 不再出现 GoldRobedWizard.MakeSpellList 的 IndexOutOfRangeException，且不会停在 FixTMPAssets/延迟蓝图补丁阶段。
+2. 在相同组合中打开/创建 Gold Robed Wizard，检查其法术选择与法术书：Wizard 来源法术正常，各已解锁环没有丢失、重复或错放；按该职业原规则加入的 Cleric 善良法术正常。空的预留槽不应额外解锁法术位。
+3. 加回之前的完整组合：ToyBox、DragonChanges、COP（Character Options Plus），以及原有 TabletopTweaks、ExpandedContent、EbonsContentMod 等。保持各自正常设置，同样至少 3 次冷启动；保留 ToyBox 的原有蓝图加载设置。
+   预期：可进入主菜单并载入；没有 CotW ForEachLoaded/Dictionary.MoveNext 的 Collection was modified 异常；没有此次 MM/Ebons 固定下标越界；ThassilonianNecromancy、ThassilonianTransmutation、WarpriestSpelllist 不再因重复等级行出现 wrong level value。
+4. 检查 Wizard、Cleric、Druid、Inquisitor、Paladin、Ranger、Warpriest、两张上述 Thassilonian 专长学派表及 Psychic、Medium。分别查看新建/升级可选法术和旧存档法术书：已有法术保留在原环数，低环职业没有新增高环施法能力，选择列表可正常打开。Psychic 的 Debilitating Pain / Mass 仍分别为 3/5 环；Medium 原有 0—4 环内容保持。
+   若用蓝图查看工具核对数据：被 CotW 整理或写入的非空表数组长度不得缩短，至少保留 0—10；所有行的 SpellLevel 等于其下标。外部追加过重复行的表允许多出空槽，空槽不代表新可施放环数。
+5. 保存每次有异常的完整 Player.log、UMM 日志、版本清单、启用的 MM/Ebons 职业选项以及卡住阶段。若某次成功而另一次失败，也保留两次日志用于对照。
+
+源码依据：
+Mystical Mayhem GoldRobedWizard.cs，提交 48afb630b6293b7f34262d93889aeecfbe4bff8d：
+https://gitgud.io/Kreaddy/mysticalmayhem/-/blob/48afb630b6293b7f34262d93889aeecfbe4bff8d/MysticalMayhem/BlueprintPatches/GoldRobedWizard.cs#L135
+EbonsContentMod CollegiateInitiate.cs，提交 adc05da1b8962b1a9ac6d7f902e22e7756fa5c65：
+https://github.com/EdgarEbonfowl/EbonsContentMod/blob/adc05da1b8962b1a9ac6d7f902e22e7756fa5c65/Archetypes/CollegiateInitiate.cs#L205

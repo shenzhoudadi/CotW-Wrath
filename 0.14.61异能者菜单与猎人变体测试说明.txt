@@ -1,0 +1,55 @@
+CotW Wrath Prototype 0.14.61 测试说明
+2026-10-29
+
+本轮：060反馈三组修复；新增Feral Hunter（COTW-0012）与Totem-Bonded（COTW-0014）两个完整猎人变体。其它已明确正常的060内容保持，按新档测试；没有把托管检查记成用户游戏通过。仅支持当前最新版游戏与所审查模组。Harmony仍以真实2.0.4.0及固定SHA编译，运行时保留既有API检查与2.3.6矩阵。
+
+一、Mimic Metamagic
+
+开启后普通法术应继续可施放。适用、法术环数允许且点数足够时，实际施法应用所选超魔，消耗超魔环数调整值的两倍Phrenic Pool，仍支付原法术位；不适用、超过能施放的最高环或点数不足时保留普通施法，不因可选增幅封锁法术。查询超魔资格时新增按同一个AbilityData隔离的重入保护，异常只使本次可选Mimic不参与，不放宽普通施法要求。
+
+选项读取已加载蓝图中的真实AddMetamagicFeat及当前提供方的DefaultCost，按超魔位去重；后加载的提供方在读取选择菜单时增量刷新，不在每帧或每次施法扫描全部蓝图。用超魔位生成稳定子选择身份，替换旧按序号生成的五十个第一层选择。新旧同义子菜单不并存；晚到资源独立校验并可回滚，不修改其它职业的原始专长池数组。
+
+支持具有单一超魔位和固定正环数调整值的提供方。Heighten的可变环数、复合位、零或负调整值、缺少合法价格的元数据不加入；没有承诺未知提供方的最终超魔效果由CotW重新实现。所选超魔本身的效果由相应模组负责。
+
+回归：用11、13、17、20级异能者，分别选Empower、Maximize、Quicken、Reach、Extend、Persistent、Selective、Bolstered以及CotW Toppling/Logical；对Mind Thrust I/III、Mental Barrier、Thought Shield检查可用状态、实际效果、原环位和点数。再检查不适用法术、点数耗尽、超出最高环、关开模式及Dual Amplification与Undercast Surge同时开启。装当前TTT/CodexLib等提供方后，检查合法外部超魔可选且不重复、点数价格正确；提供方晚加载后菜单能更新。
+
+证据边界：旧060实际DLL的普通可用性、法术书支付及能力栏路径在本机托管检查中均通过，测试者也无法回忆当时组合，因此没有确认现场唯一触发原因。注入真实Spellbook.GetSpellLevel回调查询HasMetamagic可使旧060出现查询循环，当前版已通过同一调用检查；这是具名重入对照，不是现场复现声明。外部价格测试调用实际未改动CodexLib/TTT Core API与真实形状的特征元数据，不等于完整提供方游戏初始化或所有超魔最终效果验证。
+
+二、Agonizing Wound与Undercast Surge
+
+Agonizing Wound只授予一个父入口，Target仅在父菜单中出现；右上角沿用真实每日次数。四个条件选项改为真正持久开关，互斥、不因选模式扣次数、关闭可随时操作；即使剩余次数为0仍可打开菜单关闭模式。没有保留原来四个一次性模式快捷能力及对应旧动作类型。伤口原效果、合法目标、已有状态、豁免与实际消耗保持。
+
+回归：新建Pain异能者，检查能力栏只有一个父入口，父菜单有Target与四个持久模式；选Sickened后关菜单、经过数轮再打开，仍为开启；改选其它条件只保留一个。实际命中与豁免按原规则消耗每日次数，右上角同步；耗尽次数后仍可关模式，Target不能绕过资源要求。
+
+Undercast Surge不再显示额外高版本转换子选项。直接施放已知低版本仍执行所选合法高版本，每提升一阶花2点，支付原低环法术位；保留最高永久已知版本、剩余点数、模式关闭等限制。检查Mind Thrust、Mental Barrier与Thought Shield三族，含高阶效果、低阶位、差额点数和点数不足降回合法普通施法。原内部高阶构造器继续服务真实施法与旧机制回归，不作为玩家菜单入口。
+
+三、Feral Hunter（狂野猎人）
+
+入口为Hunter变体，不进入普通专长或其它职业列表。
+1级失去动物伙伴与原Animal Focus，获得无限自用动物之力和Summon Nature's Ally I类法术能力。动物之力八个基础原生形态使用真实持久开关和原生组限制；8级可同时选两个，20级三个，属性档位仍为1/8/15。只迁移基础八种自用形态；其它模组追加的特殊动物之力保留在其原生入口，本版不自动改造成无限形态。
+自然盟友共享每日3+感知修正次数，标准动作、每猎人等级持续1分钟，奇数等级提升到IX；相应选项沿用原生召唤子项。新召唤只结束该施法者此前本能力召唤的单位，不清除另一名狂野猎人的召唤或其它来源。沿用真实原生召唤模型、投递和效果资源，不新增法术根。
+2级保留Precise Companion选择；3级保留原生团队专长，并把本人相关团队专长分享给自己的自然盟友，之后6/9/12/15/18级原团队奖励由变体替换。原其它猎人能力按实际等级表保留。
+4级获得狼/豹变形，6级增加熊/恐狼，8级增加剑齿虎/乳齿象；次数4级1、每两级增加1至20级9，持续每猎人等级1小时。使用真实原生变形身体、装备、武器、属性与视觉资源。具备本变体动物变形时可满足对应Wild Shape前置（例如Natural Spell），仍须满足感知13、智力3及其它要求，不授予原德鲁伊能力或额外效果。
+
+回归：从1级新建，查看变体说明、成长和八个动物之力图标；无伙伴/每分钟动物之力资源，能力开启后跨轮保持，切换不超过名额。升级到4/6/8/15/20检查形态、次数、持续、身体/肢体和解除后装备恢复；测试Natural Spell有无变形、感知不足、正常德鲁伊与无关前置。各奇数等级测试自然盟友菜单、标准动作与次数/施法者等级，两个狂野猎人先后召唤验证相互隔离；团队专长在自己的召唤物上出现，结束分享后不删去其它来源的同名专长。
+
+四、Totem-Bonded（图腾羁绊）
+
+入口同为Hunter变体。原伙伴选择替换为原生熊、麋鹿、乳齿象、剑齿虎、狼五类及原生暂不选择项，保持伙伴成长、坐骑目标与伙伴变体选择机制。原Animal Focus及8/20级提升由Shared Strength替换；其它职业能力保留。
+伙伴从主人获取豁免+1与运动/灵巧/隐匿/察觉+2，主人8级提高到+2/+4、15级+3/+6；按主人猎人等级，不按伙伴HD。主人升级但伙伴HD未增长时也刷新，不因反复刷新叠加。
+Shared Strength每天猎人等级分钟，迅捷动作支付一整分钟；先用持久开关选方面，再点击Shared Strength启动。1级同时一个、8级两个、20级三个。分钟结束效果停止，保留所选开关但不自动购买下一分钟；在同一分钟内关开方面不重复收费，关闭方面立即停止该方面效果。
+方面：天生防御+1（8级+2）、速度+10尺（8级+20）、爪1d4、啮咬1d6、角刺1d6、拍击1d6；攻击只开放伙伴确实具有的类型。15级爪1d8、啮咬2d6、角刺/拍击2d6。熊/剑齿虎允许爪，熊/剑齿虎/狼允许啮咬，麋鹿/乳齿象允许角刺，乳齿象允许拍击；8级增加变大，麋鹿可选Powerful Charge。冲锋首个近战攻击按原CotW方式翻倍武器伤害骰，不翻倍固定加值，不用于借机和预览，也不重复结算。
+
+回归：分别选五种伙伴检查可用/不可用方面、能力栏剩余分钟，1/7/8/14/15/20级检查名额、档位、资源与伙伴加值；7→8和14→15特别检查主人升级但伙伴HD不变的情况。未购买分钟应无方面效果；购买后立即生效，关开不续时、不收费，计时结束不自动扣费。分钟中保存/读取、场景切换、角色暂停恢复后应只有自己的一个有效效果，剩余时间不重置。麋鹿测试真实冲锋首击/后续攻击/借机及伤害骰与固定伤害，另一个角色不受影响。
+
+五、检查证据与测试者观察项
+
+交付自检TXT/JSON记录正式构建、历史全套回归、最终安装包实际DLL双Harmony运行时、真实旧060对照、蓝图/序列化身份/源码与包回读。新检查执行实际原生选择、能力栏、法术/规则、资源、计时、装备、变形、伙伴等级事件、保存引用与发布失败回滚。断言数量只是对应托管检查记录，不作为用户游戏反馈。
+独立环境对Unity模型替换/恢复、未提供的消失特效、延后场景调度和空间/终端服务设有明确端点，原生其余机制继续执行；因此游戏里的模型/光效/动画、真实回合与即时制行动窗口、完整场景及存读档运输仍按上述步骤观察。没有启动游戏或安装UMM，没有编辑存档；独立外部代码复查状态保持待进行。
+重点保护：已通过的Warped Brain、Hallucinogenic Aura、Synaptic Shock、Major标记、Physical Mutation计数/持续消耗、Elongated Fingers与Aura of Insanity；原生与第三方选择池原条目保留、无需本批内容的职业施法不变。QL仍为Key/ProcessTemplates/enGB/zhCN数组，原4110语言键与原英文保留，新英文回填zhCN供外部汉化；不声称完成中文翻译。全部本地和云端旧文件保留。
+
+
+Feral Hunter four-legged defense review repair (0.14.61)
+Wolf, Leopard, Bear and Smilodon now receive the same native TripDefenseFourLegs fact as Dire Wolf and Mastodon. Each form grants +4 CMD against Trip only; leaving the form removes its owned fact and bonus. Native donors remain unchanged.
+Regression: at Hunter levels 4/6/8, transform into each available animal, compare Trip and Disarm CMD, then dismiss the transformation and check that the four-legged Trip bonus is removed. Repeat for Dire Wolf and Mastodon; unrelated combat maneuvers and other units must not receive the bonus.
+Managed checks execute the native polymorph activation/removal, target event publisher, RuleCalculateCMD and RuleCalculateBaseCMD. Unity model replacement/restoration and the scene flat-footed query are declared controlled endpoints; the latter supplies a deterministic non-flat-footed state. No game launch or rendered combat is claimed.

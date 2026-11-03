@@ -1,0 +1,30 @@
+CotW Wrath Prototype 0.14.53 血脉变异启动兼容修复测试说明
+2026-10-24；新增迁移0。适配当前最新版游戏和相关模组。
+
+本轮反馈与根因证据
+用户再次反馈0.14.52 Bloodline Mutations失败；此前Bloodrager、Nature’s Command、Blood Intensity/Piercing明确接受的范围保持，不扩大为所有血承和存档通过。最新日志确认ECM完成通知以及升级补救入口实际执行，均被同一Abyssal九级选择收据阻断，不能再解释为仅缺通知。
+对正式0.14.52安装DLL执行ECM1.1.9真实EldritchScrapper.Configure：扫描实际Sorcerer父池1/9/15级条目，给46个CotW选择添加原生PrerequisiteNoArchetype，随后在日志同一资产、同一firstDifference=131报错。八条真实父Items->原生选择/升级->子菜单/UI路径均缺项。原夹具执行了血脉/Mutation发布，却漏掉先运行的EldritchScrapper扫描，因而旧托管结果没覆盖这条真实顺序。用户日志截断了前置完整字段，未附现场ECM DLL哈希，因此不把重现等同于每个现场字段的唯一证明。
+
+修法与保护
+只接受已审计ECM扫描实际Sorcerer父进阶条目的精确原生限制：Sorcerer职业、EldritchScrapper变体、All组、CheckInProgression=true及其余原字段默认形状。仅本模块收据拥有、缓存身份和实际父/等级成员均正确的选择可协调；未知组件/错误字段/重复或无关变化继续拒绝。
+ECM先运行时保留源能力上已存在的限制；CotW先包装时接纳真实扫描的9/15级限制，并把初始原能力AddAbilityResources所要求的排除同步到其包装选择，避免包装遮蔽扫描。限制仍由原生前置判断，Eldritch Scrapper不会额外获得被替换的血脉能力。其余变体不捏造被移除的能力位。
+不同可选进阶/协调阶段各自完成事务后汇总失败，合法行不被无关行中止；升级入口即使菜单条目齐全也核对共同及目标完整收据，不能只凭条目数量跳过未知图错误。错误保留诊断；身份、原生前置、资源及效果不覆盖。列表、组件及收据元数据一起回滚；重复健康协调保留已有数组。
+Blood Havoc继续仅由ECM提供。Intensity/Piercing、Nature效果与资源计算、已交付GUID/序列化身份、Medium/Way及语言包保护保持；编译Harmony实际2.0.4.0/SHA固定，运行时2.3.6沿用既有API检查。
+
+验证证据的范围
+验证包含旧安装包对照、新版真实ECM扫描先后顺序、实际原生MeetsPrerequisites的普通术士可选/Scrapper不可选、重复及错误字段反例、八条真实父到子UI状态/Havoc一次授予、已建ProgressionData、Bloodrager图保护和历史全套门禁。最终安装ZIP三DLL另行复跑，两种Harmony运行时、输入/适配副本/宿主和最终包哈希绑定，结果以本版交付自检实际记录为准。
+独立CLR中的同成员访问、配置/资源/UI服务端点明确记录，不修改原生前置和授予结果；此证据不等同于渲染画面或完整存档生命周期。游戏内验证由测试者执行，本轮不启动游戏、不安装UMM、不改存档。
+
+测试者回归
+1. 使用同一最新ECM/TTT/ToTF组合替换CotW，冷启动两次，打开ModMenu和CotW日志，检查血脉模块正常，不再出现Abyssal九级共同收据失败。保留完整日志；同时记录各mod版本。
+2. 普通Sorcerer分别选择Undead、Arcane、Black、Abyssal、ECM Orc/Protean、TTT Aberrant/Destined。一级初始能力交换应有原能力、Familiar及ECM Havoc；未达等级I/P仍禁选。各选原能力、Familiar、Havoc一次，确认不多授予原能力、同项不重复。
+3. 升至真实3/9/15能力位，核对Intensity/Piercing门槛及原能力成长，替换原分支后只失去该分支成长。Seeker与四Primal按实际保留的能力位检查，缺位不补造。奖励专长真实子池I/P保持。
+4. 选择ECM Eldritch Scrapper，对照其1/9/15应得奖励及被替换血脉能力，不能因为CotW包装多出Mutation交换或原能力；普通术士不受该排除。与Seeker互斥等ECM原有前置保持。
+5. 旧档从主菜单读取后升级；备份后洗点重选原生/ECM/TTT血承，再存档返回主菜单读取。检查已有选择、等级/变体及成长保持。失败时提供职业、变体、血承英文名、实际等级、父子菜单及完整日志，不只按译名定位。
+6. 保护回归：Bloodrager/Primalist及凤凰、TTT主/第二血承交换和成长；Nature Mind Thrust点植物及Color Spray范围扣点；I/P效果、付费及与元素转换组合。无ECM时不制造Havoc，错误职业/低等级仍禁选。
+
+附件其他启动错误
+Sunsinger、Urban Skald、Rogue Swashbuckler、Time Stop、三首杰作及Ki的旧附件错误逐项保留。三首杰作m_FreeBlueprint与Ki减费字段可对应外部资源减免扫描；其余日志没有给出完整差异字段。本版血脉修复不统一忽略这些模块的图变化，不宣称上述八项已全部解决；具体核查结论附本轮记录，复测若仍出现请保留完整启动日志。Way的额外旧错误另列，不混入血脉根因。
+
+交付
+安装包、源码包、本文及交付自检TXT/JSON；按原Drive目录上传五件并逐份原始下载核对。本轮保留本地和云端历史，不删除旧文件。完成本轮后停止，不自动增加新内容。

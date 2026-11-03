@@ -1,0 +1,19 @@
+0.3.1 / 0.3.2：拳斗士战斗专长列表衔接测试
+
+0.3.2 仅清理无用界面回调并纠正说明，不改专长或接入规则。用户已反馈 0.3.1“一切正常”，未逐项说明覆盖场景。0.3.1/0.3.2 没有可见设置菜单；0.3.3 的新增 ModMenu 页面请另读《0.3.3测试说明.txt》。
+
+目的
+本版保留 0.3.0 的三个专长与规则，只在检测到 RealityMachina/BrawlerClassWrath 已成功登记拳斗士职业时，把 Improved Combat Expertise 加入其额外战斗专长候选列表。本包不新增拳斗士职业；拳斗士模组为独立的 Unity Mod Manager 模组，其旧版能否在正义之怒 2.7.0x 工作尚未验证。游戏内新专长文字继续使用英文。
+
+先做无拳斗士模组回归
+1. 在没有安装或启用 BrawlerClassWrath 的独立测试环境中启动游戏，在 GameLogFull.txt 中搜索 Experimental CotW port，确认版本与安装包一致、三个专长均有 Registered: 记录，且没有本模组的 Brawler combat feat integration 注册记录。日志目录与保存方法见《测试者必读.txt》。
+2. 用原测试档简单复测 Improved Combat Expertise 开启 Combat Expertise 后的攻击罚值；不要用正式档做卸载实验。
+
+若你已有可在当前游戏正常运行的 BrawlerClassWrath
+1. 记录该模组版本、下载来源及 Unity Mod Manager 版本。在一次性测试档中启动游戏，确认游戏日志多出 Registered: Brawler combat feat integration；若记录 Registration failed，请保存游戏日志。
+2. 创建或升级拳斗士。用正常升级流程，先达到智力 13、基础攻击加值 +8 并取得 Combat Expertise，再到拳斗士额外战斗专长界面查找 Improved Combat Expertise (CotW Prototype)。百宝袋强行添加不能证明该候选列表接入成功。
+3. 从未取得新专长的基准档出发，对照取得前后开启 Combat Expertise 的同条件近战攻击日志。若原罚值为 -3，取得后应为 -1；只比较「寓守于攻 / Combat Expertise」项，不比较随机骰。
+4. 完全退出并重启游戏，重新读取测试档，确认拳斗士等级、专长与罚值都保留。再确认其他职业的普通专长和战斗专长列表没有重复项。
+
+边界
+本包没有修复或重编拳斗士模组自身。若它在 2.7.0x 无法加载、无法创建角色或无法读档，这不是本版列表接入已经通过的证据。两个模组的类与专长身份都不应在已有存档上随意更换。请使用升级前备份和可丢弃档测试。

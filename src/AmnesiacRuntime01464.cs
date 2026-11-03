@@ -8,6 +8,8 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
+using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.Controllers.Units;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -16,7 +18,9 @@ using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Mechanics.Actions;
+using Kingmaker.UnitLogic.FactLogic;
 using Newtonsoft.Json;
+using TurnBased.Controllers;
 
 namespace CallOfTheWild.Wrath.Prototype
 {
@@ -45,7 +49,7 @@ namespace CallOfTheWild.Wrath.Prototype
         [JsonProperty]public int[] Previous;
     }
     [TypeId("45ec5164b9324c20ac57a16f64000201")]
-    public sealed class AmnesiaCapacity01464:UnitFactComponentDelegate<AmnesiaCapacityData01464>,IResourceAmountBonusHandler,IOwnerGainLevelHandler
+    public sealed class AmnesiaCapacity01464:UnitFactComponentDelegate<AmnesiaCapacityData01464>,IResourceAmountBonusHandler,IOwnerGainLevelHandler,ITickEachRound,ITurnBasedModeHandler
     {
         public BlueprintAbilityResourceReference[] Resources;
         int[] Current()
@@ -59,7 +63,7 @@ namespace CallOfTheWild.Wrath.Prototype
         // slots spent on failed attempts or on duplicate level notifications.
         protected override void OnTurnOn()
         {
-            if(Data.Previous!=null)return;
+            if(Data.Previous!=null){HandleUnitGainLevel();return;}
             var current=Current();Data.Previous=current;
             // AddAbilityResources.OnActivate precedes fact subscription, so
             // its first fill cannot see our maximum bonus. Finish that one
@@ -83,20 +87,63 @@ namespace CallOfTheWild.Wrath.Prototype
             var cls=Kingmaker.Blueprints.ResourcesLibrary.TryGetBlueprint<Kingmaker.Blueprints.Classes.BlueprintCharacterClass>(BlueprintGuid.Parse(PsychicClass.ClassId));
             bonus+=Amnesiac01464.Capacity(Owner.Progression.GetClassLevel(cls),index+1);
         }
+        // Native real-time unit ticks skip buffs, so the persistent feature
+        // owns the round listener and expires only this unit's pending sources.
+        void ExpirePending()
+        {
+            foreach(var buff in Owner.Buffs.Enumerable.ToArray()){
+                var runtime=buff.Components.FirstOrDefault(c=>c.SourceBlueprintComponent is AmnesiaSource01464);
+                if(runtime!=null&&runtime.GetData<AmnesiaSourceData01464>().CombatPending)buff.Remove();
+            }
+        }
+        // TickNextRound is the native owner-round boundary in both modes;
+        // turn-based mode calls it for the rider and the mount separately.
+        public void OnNewRound()=>ExpirePending();
+        public void HandleTurnStarted(UnitEntityData unit){if(unit==Owner)ExpirePending();}
+        public void HandleSurpriseRoundStarted(){}
+        public void HandleRoundStarted(int round){}
+        public void HandleUnitControlChanged(UnitEntityData unit){}
+        public void HandleUnitNotSurprised(UnitEntityData unit,RuleSkillCheck check){}
     }
     [TypeId("45ec5164b9324c20ac57a16f64000202")]
     public sealed class AmnesiaRecallGate01464:BlueprintComponent,IAbilityCasterRestriction,IAbilityVisibilityProvider
     {
         public int Circle;public BlueprintAbilityReference Spell;public BlueprintBuffReference Cooldown;
         public bool IsAbilityVisible(AbilityData ability)=>AmnesiaRuntime01464.Eligible(ability?.Caster?.Unit,Circle,Spell?.Get());
-        public bool IsCasterRestrictionPassed(UnitEntityData caster)=>AmnesiaRuntime01464.Eligible(caster,Circle,Spell?.Get())&&!caster.Buffs.HasFact(Cooldown.Get());
-        public string GetAbilityCasterRestrictionUIText()=>"Requires an unknown Psychic spell, an eligible amnesia circle, and no Spell Recollection cooldown.";
+        public bool IsCasterRestrictionPassed(UnitEntityData caster)=>AmnesiaRuntime01464.Eligible(caster,Circle,Spell?.Get())&&(caster.IsInCombat||!caster.Buffs.HasFact(Cooldown.Get()));
+        public string GetAbilityCasterRestrictionUIText()=>"Requires an unknown Psychic spell and an eligible amnesia circle; the cooldown applies outside combat.";
     }
-    public sealed class AmnesiaSourceData01464{[JsonProperty]public bool RefundOnLevelUp=true;}
+    public sealed class AmnesiaSourceData01464{[JsonProperty]public bool RefundOnLevelUp=true;[JsonProperty]public bool CombatPending;}
     [TypeId("45ec5164b9324c20ac57a16f64000203")]
-    public sealed class AmnesiaSource01464:UnitFactComponentDelegate<AmnesiaSourceData01464>,ILevelUpInitiateUIHandler
+    public sealed class AmnesiaSource01464:UnitFactComponentDelegate<AmnesiaSourceData01464>,ILevelUpInitiateUIHandler,IInitiatorRulebookHandler<RuleCastSpell>,IInitiatorRulebookSubscriber
     {
         public BlueprintAbilityResourceReference Resource;
+        public void OnEventAboutToTrigger(RuleCastSpell rule){}
+        public void OnEventDidTrigger(RuleCastSpell rule)
+        {
+            if(!Data.CombatPending||rule?.Success!=true||rule.IsDuplicateSpellApplied||rule.Context?.IsDuplicateSpellApplied==true||rule.Initiator!=Owner||rule.Spell?.SourceItem!=null||!ReferenceEquals(rule.Spell?.Spellbook,AmnesiaRuntime01464.Book(Owner)))return;
+            var source=Fact.Blueprint.GetComponent<AddSpellKnownTemporary>()?.Spell;
+            var spell=rule.Spell.Blueprint;
+            // Metamagic retains the blueprint. A child variant of the recalled
+            // spell also counts; an unrelated spell, item or book does not.
+            var seen=new System.Collections.Generic.HashSet<BlueprintAbility>();
+            while(spell!=null&&seen.Add(spell)){
+                if(ReferenceEquals(spell,source)){Data.CombatPending=false;return;}
+                spell=spell.Parent;
+            }
+        }
+        // Native temporary knowledge raises ILearnSpellHandler, but the action
+        // bar rebuilds its spontaneous spell groups only after UISettings is dirty.
+        void RefreshActionBar()
+        {
+            try{Owner.UISettings?.SetDirty();}
+            catch(Exception error){ModEntry.LogSpellDiagnostic("Spell Recollection action bar refresh failed: "+error);}
+        }
+        protected override void OnTurnOn()=>RefreshActionBar();
+        // The native temporary-known component removes its entry on deactivate,
+        // after TurnOff. This component follows it in the owned buff, so notify
+        // only after knowledge has actually been removed.
+        protected override void OnDeactivate()=>RefreshActionBar();
         // As in CotW, clear borrowed knowledge before native spell selection.
         // Failed attempts keep their spent slot. A free-success source must
         // never refund an unrelated later attempt when the level-up begins.
@@ -131,19 +178,28 @@ namespace CallOfTheWild.Wrath.Prototype
         public override void RunAction()
         {
             var owner=Context.MaybeCaster;
-            if(!AmnesiaRuntime01464.Eligible(owner,Circle,Spell.Get())||owner.Buffs.HasFact(Cooldown.Get()))return;
-            int result=Context.TriggerRule(new RuleRollDice(owner,new DiceFormula(1,DiceType.D100))).Result;
-            if(owner.IsInCombat)result+=Context.TriggerRule(new RuleRollDice(owner,new DiceFormula(1,DiceType.D10))).Result;
+            if(!AmnesiaRuntime01464.Eligible(owner,Circle,Spell.Get())||(!owner.IsInCombat&&owner.Buffs.HasFact(Cooldown.Get())))return;
+            int die=Context.TriggerRule(new RuleRollDice(owner,new DiceFormula(1,DiceType.D100))).Result;
+            int combatDie=owner.IsInCombat?Context.TriggerRule(new RuleRollDice(owner,new DiceFormula(1,DiceType.D10))).Result:0;
+            int result=die+combatDie;
+            try{
+                string roll=owner.CharacterName+": Spell Recollection — d100 "+die+(owner.IsInCombat?" + d10 "+combatDie:"")+" = "+result;
+                EventBus.RaiseEvent<ILogMessageUIHandler>(h=>h.HandleLogMessage(roll));
+            }catch(Exception error){ModEntry.LogSpellDiagnostic("Spell Recollection roll feedback failed: "+error);}
             if(result<=10)AmnesiaRuntime01464.Add(owner,Forbidden.Get(),Context,TimeSpan.FromSeconds(6));
             else if(result>=36){
                 var buff=AmnesiaRuntime01464.Add(owner,Known.Get(),Context,null);
+                if(buff!=null&&owner.IsInCombat){
+                    var source=buff.Components.Single(c=>c.SourceBlueprintComponent is AmnesiaSource01464);
+                    source.GetData<AmnesiaSourceData01464>().CombatPending=true;
+                }
                 if(result>=96&&buff!=null){
                     var runtime=buff.Components.Single(c=>c.SourceBlueprintComponent is AmnesiaSource01464);
                     runtime.GetData<AmnesiaSourceData01464>().RefundOnLevelUp=false;
                     owner.Resources.Restore(Resource.Get(),1);
                 }
             }
-            AmnesiaRuntime01464.Add(owner,Cooldown.Get(),Context,TimeSpan.FromHours(1));
+            if(!owner.IsInCombat)AmnesiaRuntime01464.Add(owner,Cooldown.Get(),Context,TimeSpan.FromHours(1));
         }
     }
 }

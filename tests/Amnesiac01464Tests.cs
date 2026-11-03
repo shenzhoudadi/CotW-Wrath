@@ -26,6 +26,22 @@ using CallOfTheWild.Wrath.Prototype;
 
 internal static partial class MagusBatch01454Tests
 {
+    // Exact historical DLL controls must exercise their own original 064
+    // expectations before reaching the intended negative assertion. Every
+    // other DLL is tested against the current user-requested contract.
+    static bool? AmnesiacLegacyControlCache066;
+    static bool AmnesiacLegacyControl066()
+    {
+        if(!AmnesiacLegacyControlCache066.HasValue){
+            string sha;
+            using(var input=File.OpenRead(Main.Location))
+            using(var algorithm=System.Security.Cryptography.SHA256.Create())
+                sha=BitConverter.ToString(algorithm.ComputeHash(input)).Replace("-","");
+            AmnesiacLegacyControlCache066=sha=="D7E3724D49E0799CC82A839899726DE8E64BEBBF9199ECB2DCB567AA06B4097A"||sha=="31E01B5A95280562457DCE10E7E2A0BC56425A5F0F62B442316F05BB30740B93";
+            Console.WriteLine("066 Amnesiac historical-control contract="+AmnesiacLegacyControlCache066.Value+" SHA256="+sha);
+        }
+        return AmnesiacLegacyControlCache066.Value;
+    }
     static void EnglishInputs064()
     {
         if(GameEnglish060==null)GameEnglish060=(JObject)JObject.Parse(File.ReadAllText(Path.Combine(Root(),"../..", "steam/steamapps/common/Pathfinder Second Adventure/Wrath_Data/StreamingAssets/Localization/enGB.json")))["strings"];
@@ -136,10 +152,10 @@ internal static partial class MagusBatch01454Tests
         for(int level=1;level<=20;level++){
             var owner=AmnesiacOwner064(c,level,out var book);
             for(int circle=1;circle<=9;circle++){
-                int capacity=(int)oracle["capacityByClassLevel"][level-1]["byCircle"][circle-1];
+                int capacity=(int)oracle["capacityByClassLevel"][level-1]["byCircle"][circle-1]+(!AmnesiacLegacyControl066()&&circle>=2&&level==circle*2?1:0);
                 var resource=A<BlueprintAbilityResource>(c,"AmnesiacSlot"+circle+"01464");
                 Check(resource.GetMaxAmount(owner.Descriptor)==capacity&&owner.Resources.GetResourceAmount(resource)==capacity,
-                    "064 actual native maximum and initial balance equal the independent original amnesia capacity level="+level+" circle="+circle+" max="+resource.GetMaxAmount(owner.Descriptor)+" amount="+owner.Resources.GetResourceAmount(resource));
+                    "066 actual native maximum and initial balance equal the old independent oracle plus the requested first-unlock increment level="+level+" circle="+circle+" max="+resource.GetMaxAmount(owner.Descriptor)+" amount="+owner.Resources.GetResourceAmount(resource));
                 bool eligible=capacity>0&&circle<=book.MaxSpellLevel;
                 Check(menus[circle-1].GetComponent<AmnesiaRecallGate01464>().IsAbilityVisible(new AbilityData(menus[circle-1],owner.Descriptor))==eligible,
                     "064 actual native circle visibility follows real available book level and nonzero amnesia capacity level="+level+" circle="+circle);
@@ -267,10 +283,10 @@ internal static partial class MagusBatch01454Tests
             owner.Progression.AddClassLevel(cls);book.AddLevelFromClass(cls);
             EventBus.RaiseEvent<IOwnerGainLevelHandler>(owner,h=>h.HandleUnitGainLevel());
             for(int circle=1;circle<=9;circle++){
-                var resource=A<BlueprintAbilityResource>(c,"AmnesiacSlot"+circle+"01464");int max=(int)oracle["capacityByClassLevel"][level-1]["byCircle"][circle-1];
+                var resource=A<BlueprintAbilityResource>(c,"AmnesiacSlot"+circle+"01464");int max=(int)oracle["capacityByClassLevel"][level-1]["byCircle"][circle-1]+(!AmnesiacLegacyControl066()&&circle>=2&&level==circle*2?1:0);
                 int expected=Math.Min(max,before[circle-1]+Math.Max(0,max-previous[circle-1]));
                 Check(owner.Progression.GetClassLevel(cls)==level&&resource.GetMaxAmount(owner.Descriptor)==max&&owner.Resources.GetResourceAmount(resource)==expected,
-                    "064 same native actor class gain grants only new capacity, clamps retired circles and preserves spent attempts level="+level+" circle="+circle);
+                    "066 same native actor class gain follows the old independent oracle plus the requested first-unlock increment, clamps retired circles and preserves spent attempts level="+level+" circle="+circle);
             }
             var balances=Enumerable.Range(1,9).Select(i=>owner.Resources.GetResourceAmount(A<BlueprintAbilityResource>(c,"AmnesiacSlot"+i+"01464"))).ToArray();
             var saved=Newtonsoft.Json.JsonConvert.SerializeObject(runtime.GetData<AmnesiaCapacityData01464>());
@@ -299,8 +315,9 @@ internal static partial class MagusBatch01454Tests
         Check(owner.Resources.GetResourceAmount(resource)==before-(free?0:1),"064 native recall pays exactly one amnesia slot except 96+ for "+d100+"+"+d10);
         Check(book.IsKnown(ordinary)==success&&(!success||book.GetKnownSpell(ordinary).IsTemporary),"064 native temporary knowledge follows exact d100 threshold for "+d100+"+"+d10);
         Check(owner.State.HasCondition(UnitCondition.SpellcastingForbidden)==(result<=10),"064 actual native one-round casting prohibition follows 1-10 only for "+d100+"+"+d10);
-        var cooldown=owner.Buffs.Enumerable.Single(b=>b.Blueprint==A<BlueprintBuff>(c,"AmnesiacRecollectionCooldown01464"));
-        Check(cooldown.TimeLeft==TimeSpan.FromHours(1)&&!gate.IsCasterRestrictionPassed(owner)&&cooldown.IsNotDispelable,"064 actual shared one-hour nondispellable cooldown rejects another recall across circles");
+        var cooldown=owner.Buffs.Enumerable.SingleOrDefault(b=>b.Blueprint==A<BlueprintBuff>(c,"AmnesiacRecollectionCooldown01464"));
+        if(AmnesiacLegacyControl066()||d10==0)Check(cooldown!=null&&cooldown.TimeLeft==TimeSpan.FromHours(1)&&!gate.IsCasterRestrictionPassed(owner)&&cooldown.IsNotDispelable,"066 actual legacy or out-of-combat one-hour nondispellable cooldown rejects another recall across circles");
+        else Check(cooldown==null,"066 actual in-combat recollection does not start the out-of-combat cooldown");
         Check(book.GetSpontaneousSlots(1)==slots&&owner.Resources.GetResourceAmount(Pool058(c,owner))==poolBefore,"064 recollection preserves real ordinary spell slots and phrenic points");
         if(success){
             var recalled=book.GetKnownSpell(ordinary);Check(book.Spend(recalled,false)&&book.GetSpontaneousSlots(1)==slots-1,"064 casting recalled knowledge actually spends the ordinary native spellbook slot");
@@ -317,7 +334,8 @@ internal static partial class MagusBatch01454Tests
             Game.Instance.Player.GameTime=forbidden.EndTime;owner.Buffs.TickBuff(forbidden,forbidden.EndTime);
             Check(!owner.State.HasCondition(UnitCondition.SpellcastingForbidden),"064 actual native one-round casting prohibition expires at its deadline");
         }
-        Game.Instance.Player.GameTime=cooldown.EndTime;owner.Buffs.TickBuff(cooldown,cooldown.EndTime);
-        Check(!cooldown.IsAttached&&gate.IsCasterRestrictionPassed(owner),"064 actual native one-hour cooldown expiry permits an eligible unknown recall again");
+        if(cooldown!=null){Game.Instance.Player.GameTime=cooldown.EndTime;owner.Buffs.TickBuff(cooldown,cooldown.EndTime);
+            Check(!cooldown.IsAttached&&gate.IsCasterRestrictionPassed(owner),"066 actual native one-hour cooldown expiry permits an eligible unknown recall again");
+        }else Check(!owner.Buffs.HasFact(A<BlueprintBuff>(c,"AmnesiacRecollectionCooldown01464")),"066 combat recollection leaves no out-of-combat cooldown");
     }
 }

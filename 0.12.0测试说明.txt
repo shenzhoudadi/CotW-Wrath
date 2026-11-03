@@ -1,0 +1,33 @@
+CotW 0.12.0（内含 Medium 0.4.3）测试说明
+
+本批：Pageantry完整流派（按原CotW改编）、Silence沉默术。共35道本包迁移法术、三个完整流派Ferocity/Faith/Pageantry。0.11.1仍待游戏反馈，本批独立检查不等于游戏实测。
+
+安装：完全退出游戏后覆盖原生CotW目录；已内含Medium，不同时启用旧独立UMM Medium。英文、旧GUID、旧Harmony兼容保留。新包在暂存目录完整校验后才发布，过时交付ZIP移入archived。
+
+一、Pageantry
+1级选择，灵能池=一半Psychic等级+魅力修正。并获得Ritual Unity。
+Ritual Unity：标准动作、接触其他友军，在11种技能中选择一种。施术者掷对应技能DC20；成功给目标下次同技能检定+4，并恢复自身1灵能，不超过上限。失败也消耗每日次数。每日次数=魅力修正（最低0）。加值在该次检定后或休息时消失；Persuasion也覆盖Bluff/Diplomacy/Intimidate。重复同种协助替换，不叠加。
+5级Power from Pageantry：移动动作花1灵能，为本回合下一次Psychic施法提供+1施法者等级/+1豁免DC（即时制保留1轮）。本回合结束或该次施法后消失，集中失败也消耗准备。其他职业法术/物品不消耗；重复使用不叠加。
+13级Unrivaled Focus：独立即时开关，可与精神增幅同时开启。开启后每次集中检定自动花1灵能，将d20视为20；并非自动成功，仍要达到DC。没点数时正常掷骰；攻击/豁免/法抗检定不扣点。关掉立即停止使用。
+等级1/4/6/8/10/12/14/16/18分别额外学会：Bless、Silence、Slow、Rainbow Pattern、Greater Command、Greater Heroism、Mass Hold Person、Frightful Aspect、Heroic Invocation，对应1至9环。
+
+二、Silence
+2环吟游诗人/牧师/审判官法术；Psychic通过Pageantry4级奖励获得，未加入通用Psychic法表。
+整轮施法，远距选择地面点，20尺固定区域，持续每施法者等级1轮，可Extend。
+区域中普通言语施法受阻，Psychic及合包Medium异能施法可以继续；若还受狂暴等其他禁施法来源限制，不能借此解除限制。沉默区域不跟随任何角色移动。
+区域内免疫音波伤害/带Sonic描述符的法术与状态，并压制现有Sonic状态和Echolocation。离开或区域结束清理自身效果；重叠两个区域，离开其中一个仍应保持另一个的沉默。
+固定空间点按沉默术规则无豁免/法抗；与旧CotW固定区域仍给进入者意志检定的做法不同。不会显示无意义的None豁免栏。使用原CotW Silence图标与原生特效。
+当前Wrath没有CotW的LanguageDependent描述符；未凭模糊名称推断全部语言类能力，也未处理无Sonic标记的语音能力/游戏音效。未实现以生物/物品为移动中心的版本。
+
+三、建议集中测
+1. 新建或洗点选Pageantry，魅力低/高各试每日次数和灵能池；升级到4/5/13级及后续奖励等级，确认九道奖励法术实际进入法术书。
+2. Ritual Unity成功/失败各一次：谁掷DC20、目标是否+4、回点/扣每日次数正确；目标用匹配技能后清理，其他技能不消耗。休息恢复次数并清理未用加值。
+3. Power：检查移动动作和1灵能；下次Psychic法术+1CL/DC，第二发不加；不施法直接结束回合应清理。回合制与即时制各试，能与Phrenic Pool增幅同时生效。
+4. Focus：连续集中检定按次数扣点、日志d20=20、较高DC仍可失败；关掉/零点恢复普通投骰，攻击和法抗不扣点。
+5. Silence：普通法师/牧师、Psychic、Medium进入/离开；区域结束后状态消失、恢复普通施法；两个区域重叠、音波免疫、Echolocation压制与离开后恢复、Extend/图标/特效/存读档。
+6. 顺带回归原Phrenic Pool三级菜单和立即互换、Mind Thrust高低阶当次补选及普通同环法术学习。0.11.1 Psychic Crush反馈仍可一起补。
+
+来源：原CotW固定提交1332fb0db844b7863f484ca978bea2349fe49769，Classes/Psychic.cs的Pageantry和Features/NewSpells.cs的Silence。复用八道原生法术；审计七个现有提供者当前源码，未发现本批同名法术/流派实现（ExpandedContent九处silence命中均为神祇介绍）。未新增强制依赖。
+Pageantry采用CotW的1/5/13级三能力与奖励表，不宣称复原纸面版本的秘仪系统或Force of Habit。Power采用CotW平衡修正+1；即时制由旧5秒调整成游戏1轮，回合制加回合结束清理。
+
+独立检查使用真实游戏托管类型、原生资源/技能动作/骰子/区域归属与构造对象；技能结果预置、最终场景状态安装和移除边界替换。未运行真实战斗、UI渲染、休息和游戏存档序列化，未安装/启动游戏或修改真实存档。实际游戏结果等待反馈。卷轴商店、其余三流派、余下增幅及Occultist/Spiritualist主体仍待办。

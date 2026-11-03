@@ -1,0 +1,387 @@
+当前状态补充（2026-10-06，用户0.13.32反馈）：根数136和稳定身份不变；Rejuvenate Eidolon三档暂停，Ghostbane两档继续搁置。Life Conduit三道、Evolution Surge三道、Ghost Touch是用户取消项，不加入已交付清单。法术移植结束，当前剩余新根0；后续先完善Psychic，再做专长。0.13.32确认 Fire Seeds、Fiery Shuriken、Orb of the Void、Sanctuary、Spirit-Bound Blade 正常；其他反馈问题由0.13.33修复。
+
+CotW → 正义之怒：截至 0.13.32 已交付根法术清单
+核对日期：2026-10-06（用户记录同步；不改历史发布包）
+
+统计口径
+“根法术”指可独立学习/占据法表环级的法术。I–VI、Lesser/Greater、Mass/Communal 若有独立学习根，分别计数；同一根下面的属性、形态、附魔、主副手、释放/移动按钮、接触投递子能力不另算。
+以下按历史首次交付版本统计。0.13.32仅修复加载兼容，无新增根；136个历史根名字与版本区间保留。用户记录确认其他提供者/原生已有的根另外记录，不冒充本包交付。
+本包共 136 道：133 道主法表根 + 3 道可选 Summoner 根。其中 Ghostbane Dirge 两档已交付但继续搁置；Spirit-Bound Blade 已交付四种附魔，Menacing 子项尚未完成。
+
+按交付版本列出（前期修复版本合并，不重复计数）
+
+【0.6.0–0.6.5：17 道】
+001. Mind Thrust I
+002. Mind Thrust II
+003. Mind Thrust III
+004. Mind Thrust IV
+005. Mind Thrust V
+006. Mind Thrust VI
+007. Mental Barrier I
+008. Mental Barrier II
+009. Mental Barrier III
+010. Mental Barrier IV
+011. Mental Barrier V
+012. Thought Shield I
+013. Thought Shield II
+014. Thought Shield III
+015. Intellect Fortress
+016. Synaptic Pulse
+017. Synaptic Pulse, Greater
+
+【0.9.0：2 道】
+018. Burst of Adrenaline
+019. Burst of Insight
+
+【0.9.2：1 道】
+020. Countless Eyes
+
+【0.9.3：2 道】
+021. Force Sword
+022. Psychic Surgery
+
+【0.10.1：5 道】
+023. Pain Strike
+024. Pain Strike, Mass
+025. Synesthesia
+026. Synesthesia, Mass
+027. Synapse Overload
+
+【0.11.0：2 道】
+028. Burst of Force
+029. Telekinetic Storm
+
+【0.11.1：5 道】
+030. Psychic Crush I
+031. Psychic Crush II
+032. Psychic Crush III
+033. Psychic Crush IV
+034. Psychic Crush V
+
+【0.12.0：1 道】
+035. Silence
+
+【0.12.1：2 道】
+036. Divide Mind
+037. Locate Weakness
+
+【0.12.2：3 道】
+038. Invigorate
+039. Invigorate, Mass
+040. Howling Agony
+
+【0.13.0：2 道】
+041. Halt Undead
+042. Control Undead
+
+【0.13.1：2 道】
+043. Warding Weapon
+044. Daze, Mass
+
+【0.13.2：2 道】
+045. Savage Maw
+046. Blood Armor
+
+【0.13.3：2 道】
+047. Globe of Invulnerability, Lesser
+048. Globe of Invulnerability
+
+【0.13.4：2 道】
+049. Debilitating Portent
+050. Irresistible Dance
+
+【0.13.5：1 道】
+051. Fluid Form
+
+【0.13.6：1 道】
+052. Channel Vigor
+
+【0.13.7：1 道】
+053. Blade Tutor
+
+【0.13.8：1 道】
+054. Second Wind
+
+【0.13.9：2 道】
+055. Ghostbane Dirge【已交付，按用户决定搁置】
+056. Ghostbane Dirge, Mass【已交付，按用户决定搁置】
+
+【0.13.10：1 道】
+057. Bloody Claws
+
+【0.13.11：5 道】
+058. Flurry of Snowballs
+059. Touch of Bloodletting
+060. Flame Arrow
+061. Rebuke
+062. Sheet Lightning
+
+【0.13.12：5 道】
+063. Dazzling Blade
+064. Dazzling Blade, Mass
+065. Vine Strike
+066. Flames of the Faithful
+067. Wrathful Weapon
+
+【0.13.13：3 道】
+068. Forceful Strike
+069. Aura of Doom
+070. Litany of Truth
+
+【0.13.14：3 道】
+071. Path of Glory
+072. Path of Glory, Greater
+073. Flashfire
+
+【0.13.15：5 道】
+074. Threefold Aspect
+075. Blistering Invective
+076. Wall of Nausea
+077. Wall of Blindness
+078. Righteous Vigor
+
+【0.13.16：5 道】
+079. Obscuring Mist
+080. Solid Fog
+081. Sleet Storm
+082. River of Wind
+083. Fickle Winds
+
+【0.13.17：2 道】
+084. Screech
+085. Curse, Major
+
+【0.13.18：5 道】
+086. Condensed Ether
+087. Barrow Haze
+088. Bow Spirit
+089. Allied Cloak
+090. Smite Abomination
+
+【0.13.19：5 道】
+091. Air Walk
+092. Air Walk, Communal
+093. Overland Flight
+094. Wind Walk
+095. Earth Tremor
+
+【0.13.20：5 道】
+096. Flaming Sphere
+097. Flaming Sphere, Greater
+098. Aggressive Thundercloud
+099. Aggressive Thundercloud, Greater
+100. Ball Lightning
+
+【0.13.21：4 道】
+101. Suffocation
+102. Suffocation, Mass
+103. Control Construct
+104. Scouring Winds
+
+【0.13.22：5 道】
+105. Undead Anatomy I
+106. Undead Anatomy II
+107. Undead Anatomy III
+108. Giant Form I
+109. Giant Form II
+
+【0.13.23：4 道】
+110. Lend Judgment
+111. Lend Judgment, Greater
+112. Babble
+113. Magical Beast Shape
+
+【0.13.24：4 道】
+114. Sense Spirit Magic
+115. Spirit Call
+116. Font of Spirit Magic
+117. Temporal Stasis
+
+【0.13.28：4 道】
+118. Fire Seeds
+119. Hex Vulnerability
+120. Fiery Shuriken
+121. Orb of the Void
+
+【0.13.29：5 道】
+122. Sanctuary
+123. Battlemind Link
+124. Rejuvenate Eidolon, Lesser【可选 Making Friends / Summoner 联动】
+125. Rejuvenate Eidolon【可选 Making Friends / Summoner 联动】
+126. Rejuvenate Eidolon, Greater【可选 Making Friends / Summoner 联动】
+
+【0.13.30：5 道】
+127. Spiritual Weapon
+128. Spiritual Ally
+129. Mage's Sword
+130. Twilight Knife
+131. Arcane Eye
+
+【0.13.31：5 道】
+132. Contingency
+133. Spite
+134. Delayed Consumption
+135. Emblem of Greed
+136. Spirit-Bound Blade【四附魔已交付，Menacing 未完成】
+
+不计入上述新建根数量的交付
+- 项目初期 0.1–0.5.1 的专长、Brawler/Exemplar、狂暴之力不是新法术；0.6.0 开始交付这套 17 道独立法术。
+- 0.6.0 Psychic 基础法表复用的 139 道原生法术不是本项目新移植根；给职业添加既有法术和流派奖励法术不重复计数。
+- Center Self、Phrenic Amplifications、Psychofeedback、Medium 英灵主动能力、Logical Spell 超魔等不是新根法术。尤其本项目 Psychofeedback 是增幅的 Supernatural 法术位转换能力，不是独立 Spell 根。
+- 0.9.1、0.9.4、0.9.5、0.13.25–0.13.27 等修复不增加根数量；0.10.0 完整 Faith 也不增加独立根。
+
+已经交付的可选复用接入（另计，不冒充本包自建）
+0.7.0–0.9.2 阶段建立/补充、0.13.32 保留：以下 15 道第三方法术可按提供者启用情况加入 Psychic 法表；缺少/关闭提供者时跳过，不强制安装。
+- Long Arm — TabletopTweaks-Base
+- Sands of Time — TabletopTweaks-Base
+- Shadow Enchantment — TabletopTweaks-Base
+- Shadow Enchantment, Greater — TabletopTweaks-Base
+- Inflict Pain — ExpandedContent
+- Inflict Pain, Mass — ExpandedContent
+- Particulate Form — ExpandedContent
+- Hermean Potential — PrestigePlus
+- Resinous Skin — PrestigePlus
+- Phantom Limb — PrestigePlus
+- Akashic Form — PrestigePlus
+- Fleshworm Infestation — CharacterOptionsPlus
+- Telekinetic Strikes — TomeOfTheFirebird
+- Fly — TomeOfTheFirebird
+- Fly, Mass — TomeOfTheFirebird
+另外已接入的 10 道原生共享目录法术：Command；Command, Greater；Ill Omen；Bone Fists；Haunting Mists；Hold Person, Mass；Iron Body；Hold Monster, Mass；Song of Discord, Greater；Implosion。它们不算自建法术。
+共享目录共 39 条映射，其中 25 条适用于已注册的 Psychic（10 原生 + 15 外部）；另外 14 条仅预留 Occultist/Spiritualist 映射（4 原生 + 10 外部），不能把“目录有记录”写成“职业已接入”。
+
+可复核依据
+- work/dedup/phase12-status.json 与 outputs/迁移规划/阶段1-2状态.json：逐版交付沿革。
+- outputs/CallOfTheWild.Wrath.Prototype/src/PsychicExpansion.cs：实际 Build/注册入口。
+- work/psychic01331/psychic-results.json：资产身份及主法表根计数 133；本清单 136 个名字逐一对应其 BlueprintAbility 资产。
+- src/PsychicEidolonHealing.cs：另外 3 个根已构建，按 Making Friends 法表可选接入；不能因基础测试环境没有 Summoner 法表就漏掉。
+- src/PsychicSharedSpellCatalog.cs、PsychicSpellIntegration.cs：已实现接入与仅预留映射的区别。
+- 各版测试说明/归档源码用于核对首次交付；游戏验收结果只按用户实际反馈记录。
+
+用户记录补充的已做/去重排除（不是本包新增交付）：
+- Blade Lash — user_done_list_2.txt:2 【已有原生/外部实现，不重复迁移】
+  原文：Blade Lash（prestige plus做了）,
+- Command and Command, Greater — user_done_list_2.txt:6 【已有原生/外部实现，不重复迁移】
+  原文：Command and Command, Greater（原版做了）
+- Chill Touch — user_done_list_2.txt:7 【已有原生/外部实现，不重复迁移】
+  原文：Chill Touch（CharacterOptionsPlus做了）,
+- Frostbite — user_done_list_2.txt:9 【已有原生/外部实现，不重复迁移】
+  原文：Frostbite（CharacterOptionsPlus做了）,
+- Hermean Potential — user_done_list_2.txt:10 【已有原生/外部实现，不重复迁移】
+  原文：Hermean Potential（prestige plus做了）,
+- Ill Omen — user_done_list_2.txt:12 【已有原生/外部实现，不重复迁移】
+  原文：Ill Omen（原版做了）,
+- Long Arm — user_done_list_2.txt:15 【已有原生/外部实现，不重复迁移】
+  原文：Long Arm（TabletopTweaks-Base做了）,
+- Magic Weapon, Magic Weapon, Greater — user_done_list_2.txt:16 【已有原生/外部实现，不重复迁移】
+  原文：Magic Weapon, Magic Weapon, Greater（原版做了）
+- Produce Flame — user_done_list_2.txt:19 【已有原生/外部实现，不重复迁移】
+  原文：Produce Flame（DarkCodex做了）
+- Shadow Claws — user_done_list_2.txt:23 【已有原生/外部实现，不重复迁移】
+  原文：Shadow Claws（ExpandedContent做了）,
+- Shillelagh — user_done_list_2.txt:24 【已有原生/外部实现，不重复迁移】
+  原文：Shillelagh（ExpandedContent做了）,
+- Bladed Dash and Bladed Dash, Greater — user_done_list_2.txt:30 【已有原生/外部实现，不重复迁移】
+  原文：Bladed Dash and Bladed Dash, Greater（CharacterOptionsPlus做了）,
+- Bone Fists — user_done_list_2.txt:33 【已有原生/外部实现，不重复迁移】
+  原文：Bone Fists（原版做了）
+- Burst of Radiance — user_done_list_2.txt:35 【已有原生/外部实现，不重复迁移】
+  原文：Burst of Radiance（TomeOfTheFirebird做了）
+- Consecrate — user_done_list_2.txt:36 【已有原生/外部实现，不重复迁移】
+  原文：Consecrate（CharacterOptionsPlus做了）,
+- Desecrate — user_done_list_2.txt:37 【已有原生/外部实现，不重复迁移】
+  原文：Desecrate（CharacterOptionsPlus做了）,
+- Flame Blade — user_done_list_2.txt:40 【已有原生/外部实现，不重复迁移】
+  原文：Flame Blade（DarkCodex做了）
+- Haunting Mists — user_done_list_2.txt:48 【已有原生/外部实现，不重复迁移】
+  原文：Haunting Mists（原版做了）
+- Ice Slick — user_done_list_2.txt:49 【已有原生/外部实现，不重复迁移】
+  原文：Ice Slick（CharacterOptionsPlus做了）,
+- Inflict Pain and Inflict Pain Mass — user_done_list_2.txt:50 【已有原生/外部实现，不重复迁移】
+  原文：Inflict Pain and Inflict Pain Mass（ExpandedContent做了）,
+- Invisibility Purge — user_done_list_2.txt:56 【已有原生/外部实现，不重复迁移】
+  原文：Invisibility Purge(CharacterOptionsPlus),
+- Stricken Heart — user_done_list_2.txt:60 【已有原生/外部实现，不重复迁移】
+  原文：Stricken Heart（CharacterOptionsPlus做了）,
+- Telekinetic Strikes — user_done_list_2.txt:61 【已有原生/外部实现，不重复迁移】
+  原文：Telekinetic Strikes（TomeOfTheFirebird做了）,
+- Weapon of Awe — user_done_list_2.txt:63 【已有原生/外部实现，不重复迁移】
+  原文：Weapon of Awe（CharacterOptionsPlus做了）,
+- Winter's Grasp — user_done_list_2.txt:65 【已有原生/外部实现，不重复迁移】
+  原文：Winter's Grasp（原版做了）,
+- Arcane Concordance — user_done_list_2.txt:67 【已有原生/外部实现，不重复迁移】
+  原文：Arcane Concordance,（ExpandedContent做了）,
+- Burning Entanglement — user_done_list_2.txt:72 【已有原生/外部实现，不重复迁移】
+  原文：Burning Entanglement,（原版做了）,
+- Cloak of Winds — user_done_list_2.txt:74 【已有原生/外部实现，不重复迁移】
+  原文：Cloak of Winds（TabletopTweaks-Base做了）,
+- Deadly Juggernaut — user_done_list_2.txt:77 【已有原生/外部实现，不重复迁移】
+  原文：Deadly Juggernaut（MicroscopicContentExpansion做了）
+- Eruptive postules — user_done_list_2.txt:80 【已有原生/外部实现，不重复迁移】
+  原文：Eruptive postules（ExpandedContent做了,但在mod页面它写成Eruptive pustules）,
+- Keen Edge — user_done_list_2.txt:87 【已有原生/外部实现，不重复迁移】
+  原文：Keen Edge,（原版做了）,
+- Locate Weakness — user_done_list_2.txt:89 【与本包已有交付重合，不重复计数】
+  原文：Locate Weakness,（原版做了）,
+- Resinous Skin — user_done_list_2.txt:91 【已有原生/外部实现，不重复迁移】
+  原文：Resinous Skin（prestige plus做了）,
+- Shadow Enchantment — user_done_list_2.txt:95 【已有原生/外部实现，不重复迁移】
+  原文：Shadow Enchantment（TabletopTweaks-Base做了）,
+- Stunning Barrier, Greater — user_done_list_2.txt:101 【已有原生/外部实现，不重复迁移】
+  原文：Stunning Barrier, Greater（原版做了）,
+- Archon's Trumpet — user_done_list_2.txt:111 【已有原生/外部实现，不重复迁移】
+  原文：Archon's Trumpet（原版做了,不过是叫Heaven's Wing Strike）,
+- Fleshworm Infestation — user_done_list_2.txt:118 【已有原生/外部实现，不重复迁移】
+  原文：Fleshworm Infestation（CharacterOptionsPlus做了）,
+- Rigor Mortis — user_done_list_2.txt:125 【已有原生/外部实现，不重复迁移】
+  原文：Rigor Mortis（ExpandedContent做了）,
+- Shadow Conjuration — user_done_list_2.txt:128 【已有原生/外部实现，不重复迁移】
+  原文：Shadow Conjuration（原版做了）,
+- Virtuoso Performance — user_done_list_2.txt:134 【已有原生/外部实现，不重复迁移】
+  原文：Virtuoso Performance（prestige plus做了）,
+- Wall of Fire — user_done_list_2.txt:136 【已有原生/外部实现，不重复迁移】
+  原文：Wall of Fire（ExpandedContent做了）,
+- Tidal Surge — user_done_list_2.txt:145 【已有原生/外部实现，不重复迁移】
+  原文：Tidal Surge（原版做了）,
+- Emblem of Greed — user_done_list_2.txt:150 【与本包已有交付重合，不重复计数】
+  原文：Emblem of Greed（prestige plus做了）,
+- Freezing Sphere — user_done_list_2.txt:154 【已有原生/外部实现，不重复迁移】
+  原文：Freezing Sphere（TomeOfTheFirebird做了）,
+- Poison Breath — user_done_list_2.txt:156 【已有原生/外部实现，不重复迁移】
+  原文：Poison Breath（原版做了）,
+- Ice Body — user_done_list_2.txt:160 【已有原生/外部实现，不重复迁移】
+  原文：Ice Body（原版做了）,
+- Phantom Limb — user_done_list_2.txt:162 【已有原生/外部实现，不重复迁移】
+  原文：Phantom Limb（prestige plus做了）,
+- Shadow Enchantment, Greater — user_done_list_2.txt:165 【已有原生/外部实现，不重复迁移】
+  原文：Shadow Enchantment, Greater（原版做了）,
+- Song of Discord, Greater — user_done_list_2.txt:167 【已有原生/外部实现，不重复迁移】
+  原文：Song of Discord, Greater（原版做了）,
+- Hold Person, Mass — user_done_list_2.txt:172 【已有原生/外部实现，不重复迁移】
+  原文：Hold Person, Mass（原版做了）,
+- Shadow Conjuration, Greater — user_done_list_2.txt:177 【已有原生/外部实现，不重复迁移】
+  原文：Shadow Conjuration, Greater（原版做了）,
+- Particulate Form — user_done_list_2.txt:179 【已有原生/外部实现，不重复迁移】
+  原文：Particulate Form（ExpandedContent做了）,
+- Blood Mist — user_done_list_2.txt:181 【已有原生/外部实现，不重复迁移】
+  原文：Blood Mist（ExpandedContent做了）,
+- Iron Body — user_done_list_2.txt:184 【已有原生/外部实现，不重复迁移】
+  原文：Iron Body（原版做了）,
+- Meteor Swarm — user_done_list_2.txt:188 【已有原生/外部实现，不重复迁移】
+  原文：Meteor Swarm（原版做了）,
+- Hold Monster, Mass — user_done_list_2.txt:190 【已有原生/外部实现，不重复迁移】
+  原文：Hold Monster, Mass（原版做了）,
+- Akashic Form — user_done_list_2.txt:192 【已有原生/外部实现，不重复迁移】
+  原文：Akashic Form（prestige plus做了）,
+- Implosion — user_done_list_2.txt:195 【已有原生/外部实现，不重复迁移】
+  原文：Implosion（原版做了）,
+- Scourge of Horsemen — user_done_list_2.txt:197 【已有原生/外部实现，不重复迁移】
+  原文：Scourge of Horsemen（ExpandedContent做了,不过写成了Scourge of the Horsemen）,
+- Shades — user_done_list_2.txt:199 【已有原生/外部实现，不重复迁移】
+  原文：Shades（原版做了）,
+- Shapechange — user_done_list_2.txt:201 【已有原生/外部实现，不重复迁移】
+  原文：Shapechange（原版做了）,
+- Winds of Vengeance — user_done_list_2.txt:205 【已有原生/外部实现，不重复迁移】
+  原文：Winds of Vengeance（原版做了）,
+
+第1份主要是职业/专长/内部资源清单，没有New spells章节；详见清单更新依据。仅列名/疑似项未认定完成。
