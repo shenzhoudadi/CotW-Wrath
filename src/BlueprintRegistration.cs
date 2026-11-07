@@ -98,6 +98,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 if(!PsychicCasting.RuntimePatchesAvailable) throw new InvalidOperationException("Psychic runtime patches are unavailable; registration skipped.");
                 PsychicClass.Register(cache);
             }, report);
+            RegisterModule(VindictiveBastard0111.ModuleName, () => VindictiveBastard0111.Register(cache), report);
             RegisterModule(PsychicExpansion.ModuleName, () => {
                 if(!PsychicCasting.RuntimePatchesAvailable) throw new InvalidOperationException("Psychic runtime patches are unavailable; registration skipped.");
                 PsychicExpansion.Register(cache);
