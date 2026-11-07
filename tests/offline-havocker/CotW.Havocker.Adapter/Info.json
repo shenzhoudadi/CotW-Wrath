@@ -1,0 +1,9 @@
+{
+  "Id": "CotW.Havocker.BridgeSlice",
+  "DisplayName": "CotW Havocker isolated bridge test adapter",
+  "Author": "CotW-Wrath",
+  "Version": "0.0.1",
+  "ManagerVersion": "0.27.11",
+  "AssemblyName": "CotW.Havocker.Adapter.dll",
+  "EntryMethod": "CotW.Havocker.Adapter.Entry.Load"
+}

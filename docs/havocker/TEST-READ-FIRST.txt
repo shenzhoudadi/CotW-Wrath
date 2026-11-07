@@ -1,0 +1,18 @@
+HUMAN TEST BUILD / 人工测试包 0.14.67
+NOT A FORMAL RELEASE / 不是正式发布
+
+本包将已复查的 Havocker、Spellburn 图标接线和 Mimic 展示改动统一编号为 0.14.67。相对 0.14.66-Havocker-Mimic-TEST-20261107-185200，只改变主程序集／manifest版本与说明，没有再改玩法逻辑。
+
+内容：
+- Havocker 使用 K01-HAVOCKER-20261106-r1 合同的私有念袭／燃素桥、Spellburn、四元素及生命周期实现。
+- Spellburn 2–9 环 Buff、能力和特性引用原生 Gather Power 图标。已验证引用复制；仍需人工实际激活一次，看 Buff 栏是否显示。
+- Mimic Metamagic 采用来源名称／描述／图标完整度评分及后期展示同步；保留旧 tier 与 GUID。单根多 Rank 重构暂缓。
+
+验证范围：
+- 本次仅版本更新，重新编译、核对通常包内容及包内 DLL；没有重跑定向测试。
+- 引用原功能代码的 Havocker K12 141/141、Spellburn 图标引用1/1与Mimic展示同步1/1离线证据；这些是此前执行结果，不冒充0.14.67重新跑过整套测试。
+- 旧 Psychic 夹具 amplifications058、foreign-meta061、062 未运行；实际UI、完整存档／重训及其他旧HOLD未因改版本变成通过。
+
+安装：由人退出游戏后，备份现有模组目录，替换 Owlcat 的 Modifications/CallOfTheWildWrathPrototype；UniqueName保持不变，避免同时启用两份。保留 Modules、资源、语言和必要目录。使用可恢复的测试存档。执行者没有安装或启动 UMM／游戏。
+
+TEST／测试包统一带 TEST；正式 RELEASE／正式包不带 TEST。保留旧测试包和正式附件。当前文件不是正式发布，也没有推送 GitHub。

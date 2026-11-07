@@ -123,6 +123,7 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(UrbanSkald01443.ModuleName, () => UrbanSkald01443.Register(cache), report);
             RegisterModule(RogueSwashbuckler01443.ModuleName, () => RogueSwashbuckler01443.Register(cache), report);
             RegisterModule(HedgeWitch01443.ModuleName, () => HedgeWitch01443.Register(cache), report);
+            RegisterModule(Havocker0020.ModuleName, () => Havocker0020.Register(cache), report);
             RegisterModule(PrimalSorcerer01444.ModuleName, () => PrimalSorcerer01444.Register(cache), report);
             RegisterModule(Rake01444.ModuleName, () => Rake01444.Register(cache), report);
 

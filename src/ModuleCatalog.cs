@@ -86,6 +86,7 @@ namespace CallOfTheWild.Wrath.Prototype
             new ModuleDefinition(UrbanSkald01443.ModuleName, "Skald archetype: controlled ability-score rage, Back of the Crowd dodge AC and Infuriating Mockery; native accept/refuse, resource and rage power paths.", "Not registered"),
             new ModuleDefinition(RogueSwashbuckler01443.ModuleName, "Rogue archetype: Martial Training and Daring. A qualified second Combat Trick is provided only when the upstream talent is once-only.", "Not registered"),
             new ModuleDefinition(HedgeWitch01443.ModuleName, "Witch archetype: native prepared cure conversion and +3 Lore (Religion) at level 8; replaces only hex choices at levels 4 and 8.", "Not registered"),
+            new ModuleDefinition(Havocker0020.ModuleName, "Witch archetype: four patron elements, private Intelligence kinetic blasts and prepared-slot Spellburn. Development HOLD pending remaining execution-path proof.", "Not registered"),
             new ModuleDefinition(TerrorWeaver01444.ModuleName, "Psychic archetype: Command, Aura of Doom and caster-owned intimidation; replaces amplification choices at 11 and 19.", "Not registered"),
             new ModuleDefinition(PrimalSorcerer01444.ModuleName, "Four primal elemental bloodlines with per-die spell damage and Elementalist Summoning at level 9; excludes Dragon Disciple.", "Not registered"),
             new ModuleDefinition(Rake01444.ModuleName, "Rogue archetype: five private Bravado's Blade stances and Rake's Smile; replaces Trapfinding and Danger Sense.", "Not registered"),

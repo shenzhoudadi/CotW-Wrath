@@ -1,3 +1,5 @@
+> Current preview: [0.14.67 Havocker / Mimic TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST). Stable release: 0.14.66. See [scope and handoff](docs/havocker/README.md).
+
 # Call of the Wild — Wrath
 
 Pathfinder: Wrath of the Righteous 的 Call of the Wild 内容移植项目。当前正式版本 **0.14.66**，修复Amnesiac的Spell Recollection；本轮新增迁移项0。

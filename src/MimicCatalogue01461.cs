@@ -7,6 +7,7 @@ using System.Threading;
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.JsonSystem;
@@ -55,6 +56,14 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var sources=s.Stock.Concat(Snapshot(s.Cache)).Where(v=>v!=null).Distinct().ToArray();
             var available=new Dictionary<Metamagic,BlueprintFeature>();
+            int Presentation(BlueprintFeature feature)
+            {
+                int score=0;
+                if(!string.IsNullOrWhiteSpace(feature.Name))score+=4;
+                if(!string.IsNullOrWhiteSpace(feature.Description))score+=2;
+                if(feature.Icon!=null)score+=1;
+                return score;
+            }
             foreach(var feat in sources.OrderBy(v=>v.AssetGuid.ToString(),StringComparer.Ordinal))
             {
                 var components=feat.GetComponents<AddMetamagicFeat>().ToArray();if(components.Length!=1)continue;
@@ -62,21 +71,24 @@ namespace CallOfTheWild.Wrath.Prototype
                 if(bit==0||(bit&(bit-1))!=0||flag==Metamagic.Heighten)continue;
                 try{int cost=PsychicCompletionAmplifications01458.MetaCost(flag);if(cost>9||cost<=0)continue;}
                 catch(Exception error){ModEntry.LogSpellDiagnostic("Mimic skips unreadable metamagic cost for "+feat.AssetGuid+": "+error.Message);continue;}
-                if(!available.ContainsKey(flag))available.Add(flag,feat);
+                // Equal presentation keeps the earlier GUID-ordered feat.
+                if(!available.TryGetValue(flag,out var current)||Presentation(feat)>Presentation(current))available[flag]=feat;
             }
             if(available.Count<7)throw new InvalidOperationException("Mimic requires the native metamagic catalogue.");
-            // Existing flag identity wins over a later equivalent provider feat.
             var all=new Dictionary<string,BlueprintScriptableObject>(s.Assets);
             T Asset<T>(string token,Func<T> create)where T:BlueprintScriptableObject{
                 if(all.TryGetValue(token,out var old))return (T)old;var bp=create();all.Add(token,bp);return bp;
             }
+            void Present(BlueprintUnitFact target,BlueprintUnitFact source){Set(target,"m_DisplayName",Get(source,"m_DisplayName"));Set(target,"m_Description",Get(source,"m_Description"));Icon(target,source);}
             var leaves=new List<BlueprintFeature>();
             foreach(var row in available.OrderBy(p=>unchecked((uint)(int)p.Key)))
             {
                 string token="MimicMetamagicOption"+unchecked((uint)(int)row.Key);int cost=PsychicCompletionAmplifications01458.MetaCost(row.Key);
-                var buff=Asset(token+"Buff01458",()=>{var b=f.Buff(token+"Buff01458","Mimic Metamagic: "+row.Value.Name,D("MimicMetamagicSelection"),new MimicMetamagic01458{Metamagic=row.Key,Price=2*Math.Max(1,cost),LevelCost=cost});Icon(b,row.Value);return b;});
-                var toggle=Asset(token+"01458Toggle",()=>PsychicCompletionAmplifications01458.Toggle(f,token+"01458",buff));modes?.Add(toggle);
-                var leaf=Asset(token+"Feature01458",()=>{var b=f.Feature(token+"Feature01458",buff.Name,buff.Description,Facts(toggle));if(row.Key==TopplingSpell.Metamagic)b.ComponentsArray=b.ComponentsArray.Concat(new[]{new TopplingSpellDamage()}).ToArray();Icon(b,row.Value);return b;});leaves.Add(leaf);
+                var buff=Asset(token+"Buff01458",()=>f.Buff(token+"Buff01458",row.Value.Name,row.Value.Description,new MimicMetamagic01458{Metamagic=row.Key,Price=2*Math.Max(1,cost),LevelCost=cost}));
+                Present(buff,row.Value);
+                var toggle=Asset(token+"01458Toggle",()=>PsychicCompletionAmplifications01458.Toggle(f,token+"01458",buff));Present(toggle,row.Value);modes?.Add(toggle);
+                var leaf=Asset(token+"Feature01458",()=>{var b=f.Feature(token+"Feature01458",row.Value.Name,row.Value.Description,Facts(toggle));if(row.Key==TopplingSpell.Metamagic)b.ComponentsArray=b.ComponentsArray.Concat(new[]{new TopplingSpellDamage()}).ToArray();return b;});
+                Present(leaf,row.Value);leaves.Add(leaf);
             }
             var roots=new List<BlueprintFeatureSelection>();var views=new Dictionary<BlueprintFeatureSelection,BlueprintFeatureReference[]>();
             PrerequisiteFeature Need(BlueprintFeature feature){var p=new PrerequisiteFeature();Set(p,"m_Feature",Ref<BlueprintFeatureReference>(feature));return p;}
@@ -86,8 +98,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 {
                     var meta=leaf.GetComponent<Kingmaker.UnitLogic.FactLogic.AddFacts>().Facts.OfType<BlueprintActivatableAbility>().Single().Buff.GetComponent<MimicMetamagic01458>().Metamagic;
                     string token="MimicMetamagic"+tier+"FirstFlag"+unchecked((uint)(int)meta)+"01461";
-                    var selector=Asset(token,()=>{var no=new PrerequisiteNoFeature();Set(no,"m_Feature",Ref<BlueprintFeatureReference>(leaf));var bp=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,ComponentsArray=new BlueprintComponent[]{no,Facts(leaf)}},token,leaf.Name,D("MimicMetamagicSelection"));Icon(bp,leaf);var choices=leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});
-                    views.Add(selector,leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray());first.Add(selector);
+                    var selector=Asset(token,()=>{var no=new PrerequisiteNoFeature();Set(no,"m_Feature",Ref<BlueprintFeatureReference>(leaf));var bp=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,ComponentsArray=new BlueprintComponent[]{no,Facts(leaf)}},token,leaf.Name,leaf.Description);var choices=leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});
+                    Present(selector,leaf);views.Add(selector,leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray());first.Add(selector);
                 }
                 string rootToken="MimicMetamagic"+tier+"Feature01458";var previous=roots.LastOrDefault();
                 var root=Asset(rootToken,()=>{var prerequisite=new PrerequisiteFeature();var reference=new BlueprintFeatureReference();Set(reference,"deserializedGuid",BlueprintGuid.Parse(PsychicClass.MajorId));Set(prerequisite,"m_Feature",reference);var components=new List<BlueprintComponent>{prerequisite};if(previous!=null)components.Add(Need(previous));var bp=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,ComponentsArray=components.ToArray()},rootToken,"Mimic Metamagic "+tier,D("MimicMetamagicSelection"));Icon(bp,leaves[0]);var choices=first.Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});

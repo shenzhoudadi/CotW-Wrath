@@ -18,6 +18,7 @@ namespace CallOfTheWild.Wrath.Prototype
         // Native Condition.Check stores its last diagnostic result on the blueprint.
         // That result is runtime state, not an authored effect/identity difference.
         internal static string Definition(object value) => Describe(value, new HashSet<object>());
+        internal static string Definition(object value, IEqualityComparer<object> comparer) => Describe(value, new HashSet<object>(comparer));
         static string Describe(object value, HashSet<object> path) {
             if (value == null) return "null";
             if (value is BlueprintReferenceBase reference) return "ref:" + reference.Guid;

@@ -1,3 +1,5 @@
+> Current preview: [0.14.67 Havocker / Mimic TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST). Stable release: 0.14.66. See [scope and handoff](docs/havocker/README.md).
+
 # CotW Wrath 0.14.66
 
 当前版本修复Amnesiac的Spell Recollection：真实检定日志、施法菜单即时刷新、动态读取Psychic法术和名称描述、战斗外冷却与战斗中额外1d10/当回合施放保留，以及对应法术环首次开放时的回想资源。此前已交付功能作为可用基线，新增迁移项0。
