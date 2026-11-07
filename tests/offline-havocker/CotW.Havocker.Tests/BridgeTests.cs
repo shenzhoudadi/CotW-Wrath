@@ -463,7 +463,7 @@ namespace CotW.Havocker.Tests
         [Fact]
         public void LoadImageOverloadsUseGraphicsStubOnPinnedHarmony() {
             game.RequireGame();
-            Assert.Equal(new Version(2,0,4,0), typeof(HarmonyLib.Harmony).Assembly.GetName().Version);
+            Assert.Equal(new Version(2,3,6,0), typeof(HarmonyLib.Harmony).Assembly.GetName().Version);
             var type = Type.GetType("UnityEngine.ImageConversion, UnityEngine.ImageConversionModule", true);
             Assert.StartsWith(OfflineRuntime.RuntimeDirectory, type.Assembly.Location, StringComparison.OrdinalIgnoreCase);
             Assert.StartsWith(OfflineRuntime.RuntimeDirectory, typeof(UnityEngine.Random).Assembly.Location, StringComparison.OrdinalIgnoreCase);
@@ -473,7 +473,7 @@ namespace CotW.Havocker.Tests
                 var args = method.GetParameters().Length == 2 ? new object[] { null, Array.Empty<byte>() } : new object[] { null, Array.Empty<byte>(), false };
                 Assert.Equal(false, method.Invoke(null, args));
             }
-            game.Observations["LoadImage-on-game-Harmony"] = "Both 2/3-argument overloads returned false under 2.0.4.0; no native decoder or rules called.";
+            game.Observations["LoadImage-on-game-Harmony"] = "Both 2/3-argument overloads returned false under 2.3.6.0; no native decoder or rules called.";
         }
 
         [Fact]

@@ -37,7 +37,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var harmonyAssembly = typeof(Harmony).Assembly;
             mod.Logger.Log("Harmony runtime: " + harmonyAssembly.FullName + "; path=" + harmonyAssembly.Location);
             CotW.Runtime.HarmonyRuntimeCompatibility.Verify();
-            mod.Logger.Log("Harmony compile API baseline: 2.0.4.0; using the process-loaded compatible runtime without loading/replacing another copy.");
+            mod.Logger.Log("Harmony compile API baseline: 2.3.6.0; using the process-loaded compatible runtime without loading/replacing another copy.");
             var coreHarmony=new Harmony(mod.Manifest.UniqueName);
             InstallEarlyCorePatches(coreHarmony);
             psychicHarmony=new Harmony(mod.Manifest.UniqueName+".Psychic");

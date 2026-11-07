@@ -71,12 +71,12 @@ internal static class Program
     private static void Execute(string modulePath)
     {
         var harmony = typeof(Harmony).Assembly;
-        Check(harmony.GetName().Version.ToString() == "2.0.4.0", "actual game Harmony version");
+        Check(harmony.GetName().Version.ToString() == "2.3.6.0", "actual game Harmony version");
         string digest;
         using (var sha = SHA256.Create()) using (var stream = File.OpenRead(harmony.Location))
             digest = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "");
-        Check(digest == "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5", "actual game Harmony SHA");
-        Check(Path.GetFullPath(harmony.Location).Equals(Path.Combine(managed, "0Harmony.dll"), StringComparison.OrdinalIgnoreCase), "no copied Harmony runtime");
+        Check(digest == "DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80", "actual game Harmony SHA");
+        Check(Path.GetFullPath(harmony.Location).Equals(Path.Combine(managed, "UnityModManager", "0Harmony.dll"), StringComparison.OrdinalIgnoreCase), "no copied Harmony runtime");
         var game = Assembly.LoadFrom(Path.Combine(managed, "Assembly-CSharp.dll"));
         Check(!Enum.IsDefined(Type(game, "Kingmaker.RuleSystem.Rules.BonusType"), 160), "custom weapon penalty bonus ID has no native collision");
         Check(!Enum.IsDefined(Type(game, "Kingmaker.Enums.ModifierDescriptor"), 81), "custom armor penalty descriptor has no native collision");
@@ -243,7 +243,7 @@ internal static class Program
 
         var data = Type(module, "Way_of_the_shield.NewFeatsAndAbilities.OneHandedToggle+EquipmentForceOneHandedComponent+ComponentData");
         Check(data.GetField("Retained").GetCustomAttributes(false).Any(a => a.GetType().FullName == "Newtonsoft.Json.JsonIgnoreAttribute"), "grip retention is per runtime and rebuilt after load");
-        File.WriteAllText(Path.Combine(Path.GetDirectoryName(modulePath), "equipment-smoke-result.json"), "{\"checks\":" + checks + ",\"nativeRuntimeTargets\":" + nativeTargetCount + ",\"harmony\":\"2.0.4.0\",\"nativeIl\":true}");
+        File.WriteAllText(Path.Combine(Path.GetDirectoryName(modulePath), "equipment-smoke-result.json"), "{\"checks\":" + checks + ",\"nativeRuntimeTargets\":" + nativeTargetCount + ",\"harmony\":\"2.3.6.0\",\"nativeIl\":true}");
         Console.WriteLine("PASS " + checks + " actual-game equipment IL and penalty checks");
     }
 }

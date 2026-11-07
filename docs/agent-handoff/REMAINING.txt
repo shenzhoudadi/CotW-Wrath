@@ -1,4 +1,4 @@
-# 当前十三项HOLD
+# 当前十一项HOLD
 
 0.14.66已交付；以下不是自动开工队列。排除项和依赖状态保持。
 
@@ -42,14 +42,6 @@ COTW-0110 Sacred Servant
 HOLD_SHARED_DOMAINS_BOND
 Native Paladin exists, but original ClassToProgression.addClassToDomains adapts all deity-selected domains to Paladin preparation and special slots. Project has no complete class/archetype-isolated domain preparation/scaling contract. Bond choices also require locked per-activation allocation and non-renewable daily Lay on Hands restoration; copying shared DivineWeaponProperty group is unsafe.
 
-COTW-0111 Vindictive Bastard
-HOLD_SHARED_RETALIATION_CLASS
-Original is a separate class with retaliation entitlement after real ally harm, source/target-owned smite, Gang Up, swift sharing and Ultimate Vindication. Current project has no complete retaliation/source ledger or separate-class qualification/transport contract. ExpandedContent Oathbreaker is an adapted reference, not completion of this original class.
-
 COTW-0117 Spirit Whisperer
 HOLD_SHARED_SPIRITS
 Native Wizard exists. Original uses all ten SpiritsEngine families with Wizard/Intelligence and secondary Charisma scaling, tiers 1/8/20, matching hex selection and familiar-only bond. No complete class-isolated spirit/hex/resource bridge is published. Shares the Spirit Guide blocker.
-
-COTW-0140 Relic Hunter
-HOLD_SHARED_IMPLEMENT_ENGINE
-Native Inquisitor exists. Original depends on the Occultist ImplementEngine and class-scoped deific focus allocation, invested/locked focus, resonant powers, implement spells and focus powers. Current project has no equivalent shared implement engine; an external class name cannot establish the required focus components and daily lifecycle.

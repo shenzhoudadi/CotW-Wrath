@@ -50,7 +50,7 @@ static int RunSmoke()
         if (!condition) throw new InvalidOperationException(label);
     }
     Check(typeof(AccessTools).Assembly.GetName().Version == new Version(2, 0, 4, 0),
-        "The compatibility run must actually load the actual game Harmony 2.0.4.0.");
+        "The compatibility run must actually load the actual game Harmony 2.3.6.0.");
     BlueprintTool.Register(Guids.Medium, new BlueprintCharacterClass());
     BlueprintTool.Register(Guids.SpiritPower, new BlueprintFeature());
     var main = BlueprintTool.Register(Guids.MediumSpellbook, new BlueprintSpellbook

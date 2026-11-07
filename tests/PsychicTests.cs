@@ -61,7 +61,7 @@ internal static class PsychicTests
     private static void Register(Fixture f) => AccessTools.Method(module, "Register").Invoke(null, new object[] { f.Cache });
     public static void Run(string[] args)
     {
-        RequiredHarmonyRuntime.Verify(Path.Combine(args[0],"0Harmony.dll"));
+        RequiredHarmonyRuntime.Verify(Path.Combine(args[0],"UnityModManager","0Harmony.dll"));
         var profiling = new Harmony("CotWPsychic.ProfilingOnly");
         profiling.Patch(AccessTools.Method(typeof(Kingmaker.Utility.ProfileScope), "New", new[] { typeof(string), typeof(UnityEngine.Object) }),
             prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests), nameof(SkipProfiling))));

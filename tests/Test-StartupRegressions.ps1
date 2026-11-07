@@ -12,10 +12,10 @@ $module=Join-Path $project 'Modules/MediumClass'
 $output=[IO.Path]::GetFullPath($OutputDirectory)
 $null=New-Item -ItemType Directory -Path $output -Force
 $managed=[IO.Path]::GetFullPath((Join-Path $WrathPath 'Wrath_Data/Managed'))
-$runtime=Join-Path $managed '0Harmony.dll'
-$expectedSHA='DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5'
-if(([Reflection.AssemblyName]::GetAssemblyName($runtime)).Version -ne [Version]'2.0.4.0' -or (Get-FileHash -LiteralPath $runtime).Hash -cne $expectedSHA){
-    throw 'Startup regression requires the audited game Harmony 2.0.4.0 bytes.'
+$runtime=Join-Path $managed 'UnityModManager/0Harmony.dll'
+$expectedSHA='DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80'
+if(([Reflection.AssemblyName]::GetAssemblyName($runtime)).Version -ne [Version]'2.3.6.0' -or (Get-FileHash -LiteralPath $runtime).Hash -cne $expectedSHA){
+    throw 'Startup regression requires the audited game Harmony 2.3.6.0 bytes.'
 }
 $main=[IO.Path]::GetFullPath($MainAssemblyPath)
 $medium=[IO.Path]::GetFullPath($MediumAssemblyPath)
@@ -87,22 +87,22 @@ $changed=Join-Path $output 'same-version-different-bytes.dll'
 Copy-Item -LiteralPath $runtime -Destination $changed
 $stream=[IO.File]::Open($changed,[IO.FileMode]::Append)
 try{$stream.WriteByte(0)}finally{$stream.Dispose()}
-if(([Reflection.AssemblyName]::GetAssemblyName($changed)).Version -ne [Version]'2.0.4.0' -or (Get-FileHash -LiteralPath $changed).Hash -ceq $expectedSHA){throw 'Invalid same-version negative fixture.'}
-Run-Case 'direct-EXE-same-version-wrong-hash' $harmonyExe @($managed,$main,$changed) 'Regression requires actual game Harmony 2.0.4 bytes'
+if(([Reflection.AssemblyName]::GetAssemblyName($changed)).Version -ne [Version]'2.3.6.0' -or (Get-FileHash -LiteralPath $changed).Hash -ceq $expectedSHA){throw 'Invalid same-version negative fixture.'}
+Run-Case 'direct-EXE-same-version-wrong-hash' $harmonyExe @($managed,$main,$changed) 'Regression requires actual game Harmony 2.3.6 bytes'
 foreach($name in @('integrated','main','medium')){
-    Run-Case "$name-rejects-wrong-hash" $launchers[$name] @($managed,$medium,$main,$changed,$references,'mediumfirst',(Join-Path $output "$name-wrong-hash.json"),$nativeFixture) 'Regression requires actual game Harmony 2.0.4 bytes'
+    Run-Case "$name-rejects-wrong-hash" $launchers[$name] @($managed,$medium,$main,$changed,$references,'mediumfirst',(Join-Path $output "$name-wrong-hash.json"),$nativeFixture) 'Regression requires actual game Harmony 2.3.6 bytes'
 }
 $shadow=Join-Path $output 'direct-EXE-shadow'
 $null=New-Item -ItemType Directory -Path $shadow -Force
 Copy-Item -LiteralPath $harmonyExe,($harmonyExe+'.config') -Destination $shadow
 Copy-Item -LiteralPath $changed -Destination (Join-Path $shadow '0Harmony.dll')
-Run-Case 'direct-EXE-shadowed-runtime' (Join-Path $shadow 'HarmonyTests.exe') @($managed,$main,$runtime) 'Regression requires actual game Harmony 2.0.4 bytes'
+Run-Case 'direct-EXE-shadowed-runtime' (Join-Path $shadow 'HarmonyTests.exe') @($managed,$main,$runtime) 'Regression requires actual game Harmony 2.3.6 bytes'
 Copy-Item -LiteralPath $runtime -Destination (Join-Path $shadow '0Harmony.dll') -Force
-Run-Case 'direct-EXE-wrong-expected-path' (Join-Path $shadow 'HarmonyTests.exe') @($managed,$main,$changed) 'Regression requires actual game Harmony 2.0.4 bytes'
+Run-Case 'direct-EXE-wrong-expected-path' (Join-Path $shadow 'HarmonyTests.exe') @($managed,$main,$changed) 'Regression requires actual game Harmony 2.3.6 bytes'
 foreach($file in $inputs){if((Get-FileHash -LiteralPath $file).Hash -cne $originalHashes[$file]){throw "Regression modified a production input: $file"}}
 @{
     passedCases=$results.Count;expectedRejections=@($results|Where-Object expectedRejection).Count;results=$results
-    requiredGameHarmony=@{version='2.0.4.0';path=$runtime;sha256=$expectedSHA}
+    requiredGameHarmony=@{version='2.3.6.0';path=$runtime;sha256=$expectedSHA}
     blueprintCorePatchesInstalled=5
     fixtures=@{visibility=$nativeFixture;assetBundle=Join-Path $fixture 'UnityEngine.AssetBundleModule.dll';scope='Original public LoadAsset patch target preserved; private native endpoint is a managed trap. All five actual patch classes installed/owner-checked/removed.'}
     sceneDependency01458=@{fixture=$scene058;fixtureSHA256=(Get-FileHash -LiteralPath $scene058).Hash;audit=$sceneAudit058;auditSHA256=(Get-FileHash -LiteralPath $sceneAudit058).Hash;productionPatchTargetsUnchanged=$true}

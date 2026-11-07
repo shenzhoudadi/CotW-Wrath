@@ -21,20 +21,21 @@ $managed = Join-Path $WrathPath 'Wrath_Data/Managed'
 if (!(Test-Path -LiteralPath (Join-Path $managed 'Assembly-CSharp.dll'))) {
     throw 'WrathPath must point to the installed Wrath of the Righteous game.'
 }
-$gameHarmonyPath = [IO.Path]::GetFullPath((Join-Path $managed '0Harmony.dll'))
+# UMM 0.33.2 keeps Harmony under Managed/UnityModManager; re-audited 2026-11-07.
+$gameHarmonyPath = [IO.Path]::GetFullPath((Join-Path $managed 'UnityModManager/0Harmony.dll'))
 if (!$HarmonyReferencePath) { $HarmonyReferencePath = $gameHarmonyPath }
 $HarmonyReferencePath = [IO.Path]::GetFullPath($HarmonyReferencePath)
-if ($HarmonyReferencePath -ine $gameHarmonyPath) { throw 'HarmonyReferencePath must be the actual game Managed/0Harmony.dll; replacement copies are forbidden.' }
+if ($HarmonyReferencePath -ine $gameHarmonyPath) { throw 'HarmonyReferencePath must be the actual game Managed/UnityModManager/0Harmony.dll; replacement copies are forbidden.' }
 $harmonyBaseline = [Reflection.AssemblyName]::GetAssemblyName([IO.Path]::GetFullPath($HarmonyReferencePath))
-if ($harmonyBaseline.Name -ne '0Harmony' -or $harmonyBaseline.Version -ne [Version]'2.0.4.0') { throw 'The current game runtime regression baseline is Harmony 2.0.4.0.' }
-if ((Get-FileHash -LiteralPath $gameHarmonyPath).Hash -cne 'DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5') { throw 'Game Harmony SHA256 differs from the audited 2.0.4.0 runtime.' }
+if ($harmonyBaseline.Name -ne '0Harmony' -or $harmonyBaseline.Version -ne [Version]'2.3.6.0') { throw 'The current game runtime regression baseline is Harmony 2.3.6.0.' }
+if ((Get-FileHash -LiteralPath $gameHarmonyPath).Hash -cne 'DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80') { throw 'Game Harmony SHA256 differs from the audited 2.3.6.0 runtime.' }
 # Retained only to reject obsolete multi-version invocations before any DLL loads.
 foreach ($requestedRuntime in $AdditionalHarmonyPaths) {
-    if ([IO.Path]::GetFullPath($requestedRuntime) -ine $gameHarmonyPath) { throw 'AdditionalHarmonyPaths cannot select another runtime. Regression uses only the actual game Harmony 2.0.4.0.' }
+    if ([IO.Path]::GetFullPath($requestedRuntime) -ine $gameHarmonyPath) { throw 'AdditionalHarmonyPaths cannot select another runtime. Regression uses only the actual game Harmony 2.3.6.0.' }
 }
 if ($TestManagedPath) {
     if ((Get-FileHash (Join-Path $TestManagedPath 'Assembly-CSharp.dll')).Hash -ne (Get-FileHash (Join-Path $managed 'Assembly-CSharp.dll')).Hash) { throw 'Test runtime must use identical game assembly bytes.' }
-    if ((Get-FileHash (Join-Path $TestManagedPath '0Harmony.dll')).Hash -ne (Get-FileHash $HarmonyReferencePath).Hash) { throw 'Test runtime Harmony differs from selected target.' }
+    if ((Get-FileHash (Join-Path $TestManagedPath 'UnityModManager/0Harmony.dll')).Hash -ne (Get-FileHash $HarmonyReferencePath).Hash) { throw 'Test runtime Harmony differs from selected target.' }
     $managed = $TestManagedPath
 }
 # Default: compile and package; diagnostics run only when explicitly selected.

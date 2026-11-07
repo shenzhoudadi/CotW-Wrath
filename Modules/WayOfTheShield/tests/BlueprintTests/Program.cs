@@ -115,7 +115,7 @@ public static class BlueprintRegistrationTests
  public static void Run(string[] args)
  {
   var actualHarmony=typeof(Harmony).Assembly;
-  var runtimePath=Environment.GetEnvironmentVariable("COTW_HARMONY_MATRIX_PATH");var selected=string.IsNullOrEmpty(runtimePath)?Path.Combine(Path.GetFullPath(args[0]),"0Harmony.dll"):Path.GetFullPath(runtimePath);
+  var runtimePath=Environment.GetEnvironmentVariable("COTW_HARMONY_MATRIX_PATH");var selected=string.IsNullOrEmpty(runtimePath)?Path.Combine(Path.GetFullPath(args[0]),"UnityModManager","0Harmony.dll"):Path.GetFullPath(runtimePath);
   Check(actualHarmony.GetName().Version==AssemblyName.GetAssemblyName(selected).Version,"explicit runtime version");
   Check(Sha(actualHarmony.Location)==Sha(selected),"explicit runtime bytes");
   Check(Path.GetFullPath(actualHarmony.Location).Equals(selected,StringComparison.OrdinalIgnoreCase),"explicit runtime resolver");

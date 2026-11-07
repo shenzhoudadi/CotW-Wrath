@@ -13,7 +13,7 @@ internal static class Startup01422Launcher {
   catch(Exception e){Console.Error.WriteLine(e);return 1;}
  }
  static void Run(string[] args) {
-  RequiredHarmonyRuntime.Verify(Path.Combine(args[0],"0Harmony.dll"));
+  RequiredHarmonyRuntime.Verify(Path.Combine(args[0],"UnityModManager","0Harmony.dll"));
   var result=args.Length>6&&args[6]=="medium-only"?new Newtonsoft.Json.Linq.JObject():Feedback01422StartupTests.Run(Assembly.LoadFrom(args[1]),args.Length>3&&args[3]=="old");
   if(args.Length>3&&args[3]!="old")result["mediumListContract"]=Feedback01423MediumTests.Run(Assembly.LoadFrom(args[3]));
   File.WriteAllText(args[2],result.ToString());Console.WriteLine(result.ToString());

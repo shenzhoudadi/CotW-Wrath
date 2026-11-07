@@ -92,4 +92,5 @@
 <ItemGroup><EmbeddedResource Include="assets/IntensifiedSpell.png" LogicalName="CotW.IntensifiedSpell.png" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="assets/PiercingSpell.png" LogicalName="CotW.PiercingSpell.png" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="assets/WhipHurricane.png" LogicalName="CotW.WhipHurricane.png" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="assets/HWMenacing.png" LogicalName="CotW.HWMenacing.png" /></ItemGroup>
 </Project>

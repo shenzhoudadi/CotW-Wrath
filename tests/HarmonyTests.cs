@@ -43,15 +43,15 @@ internal static class HarmonyTests
     {
         if(sceneFixture058!=null){if(Path.GetFullPath(typeof(UnityEngine.Component).Assembly.Location)!=sceneFixture058)throw new Exception("058 Unity fixture was not the actual loaded dependency.");Console.WriteLine("SCENE_058_FIXTURE="+typeof(UnityEngine.Component).Assembly.Location);}
         var runtime = typeof(Harmony).Assembly;
-        if(runtime.GetName().Version==new Version(2,0,4,0))RequiredHarmonyRuntime.Verify(harmonyPath);
-        else if(runtime.GetName().Version==new Version(2,3,6,0)&&Path.GetFullPath(runtime.Location)==harmonyPath) {
+        if(runtime.GetName().Version==new Version(2,3,6,0))RequiredHarmonyRuntime.Verify(harmonyPath);
+        else if(runtime.GetName().Version.Major==2&&runtime.GetName().Version>=new Version(2,0,4,0)&&Path.GetFullPath(runtime.Location)==harmonyPath) {
             var verify=Assembly.LoadFrom(modPath).GetType("CotW.Runtime.HarmonyRuntimeCompatibility").GetMethod("Verify",BindingFlags.Static|BindingFlags.NonPublic,null,Type.EmptyTypes,null);verify.Invoke(null,null);
         } else throw new Exception("Unexpected isolated runtime: "+runtime.FullName);
         // A test-local copy is permitted only when byte-identical to the game
         // runtime; RequiredHarmonyRuntime verifies the bytes and logs its path.
         var mod = Assembly.LoadFrom(modPath);
         var referenced = mod.GetReferencedAssemblies().Single(a => a.Name == "0Harmony");
-        if (referenced.Version != new Version(2,0,4,0))
+        if (referenced.Version != new Version(2,3,6,0))
             throw new Exception("Compile API baseline changed: " + referenced);
         const string owner = "CotWWrathPrototype.IsolatedHarmonyTest";
         var harmony = new Harmony(owner);

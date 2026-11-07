@@ -212,7 +212,7 @@ internal static class Checks
             prefix:new HarmonyMethod(AccessTools.Method(typeof(Checks),nameof(SkipProfiling))));
         var assembly=Assembly.LoadFrom(args[1]);
         Check(assembly.GetName().Version==new Version(0,4,3,0),"Merged mod version 0.4.3.0");
-        Check(assembly.GetReferencedAssemblies().Single(a=>a.Name=="0Harmony").Version==new Version(2,0,4,0),"Old Harmony compile reference preserved");
+        Check(assembly.GetReferencedAssemblies().Single(a=>a.Name=="0Harmony").Version==new Version(2,3,6,0),"Pinned Harmony compile reference preserved");
         // Actual merged production helper, with the game's real StatType catalogue.
         var marshalRules=assembly.GetType("MediumClass.Medium.MarshalSpiritRules",true);
         var passive=(Kingmaker.EntitySystem.Stats.StatType[])Call(marshalRules,"get_PassiveBonusStats");

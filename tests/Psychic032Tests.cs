@@ -46,7 +46,7 @@ internal static class Psychic032Tests {
  }
  static void Invoke(AbilityExecutionContext c,UnitEntityData target,AbilityApplyEffect effect)=>AccessTools.Method(typeof(Psychic032Tests),nameof(EffectBoundary)).Invoke(null,new object[]{c,new TargetWrapper(target),effect});
  internal static int Run(BlueprintsCache cache){
-  Check(typeof(Harmony).Assembly.GetName().Version==new Version(2,0,4,0),"mandatory actual game Harmony version");
+  Check(typeof(Harmony).Assembly.GetName().Version==new Version(2,3,6,0),"mandatory actual game Harmony version");
   var h=new Harmony("CotW032.Dispatcher");var foreign=new Harmony("CotW032.Foreign");var oldTime=Kingmaker.Game.Instance.TimeController;
   Set(Kingmaker.Game.Instance,"TimeController",Empty<TimeController>());
   h.Patch(AccessTools.Method(typeof(UnitEntityData),"IsEnemy",new[]{typeof(UnitEntityData)}),prefix:new HarmonyMethod(typeof(Psychic032Tests),nameof(Enemy)));
