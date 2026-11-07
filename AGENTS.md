@@ -31,3 +31,9 @@
 5. 提交前至少检查：`git diff --name-status upstream/main..HEAD`、`git diff --check`、JSON 可解析、相关注册存在、资源已嵌入、本地化 key 存在、清单项数与 HOLD 数量正确。输出若出现大规模无意义增删，先处理编码、BOM、CRLF/LF 或整文件覆盖问题。
 6. 精选提交推送到 `origin/upstream-submissions`。当前账号 `sxl1216` 对 `shenzhoudadi/CotW-Wrath` 没有直接写权限，直接 push 会返回 HTTP 403；因此从 `sxl1216:upstream-submissions` 向 `shenzhoudadi:main` 发起跨仓库 Pull Request。
 7. 不强推 `upstream/main`，不把上游 Release 附件迁移到 fork。若一个 PR 已合并或关闭，下一轮先重新以最新 `upstream/main` 重建专用分支，再加入新的精选改动。
+8. 用户只是在询问 Git 同步、分支或协作流程时，只回答和分析，**不得执行任何 Git 命令**。只有用户明确要求“同步、拉取、合并、重建、恢复、推送、删除或重命名分支”时才能实际操作。
+9. 对方持续开发的新提交应正常同步到 `main`：先获取 `upstream/main`，再在 `main` 上进行普通 merge（或用户明确指定的 rebase），解决冲突并验证后推送到 `origin/main`。该同步用于保留双方协作成果，不应改写或清除本地功能提交。
+10. `upstream-submissions` 不参与日常上游同步，也不作为 `main` 的合并来源。它只用于准备回馈给上游的精选 Pull Request。
+11. 未经用户明确授权，禁止对 `upstream-submissions` 执行 `reset --hard`、force push、删除、重建或改写历史。旧 PR 未合并或未关闭时，必须保留对应远程分支和提交。
+12. 需要重建 `upstream-submissions` 时，先 `git fetch origin upstream --prune`，核对本地分支、`origin/upstream-submissions`、旧 PR 状态和目标基线；确认远程精选提交已保存且用户明确要求后，才以最新 `upstream/main` 重建。若本地与远程不一致，优先保护远程提交，不得盲目覆盖。
+13. 任何 force push 都必须由用户明确授权，并使用 `--force-with-lease`；若出现 stale info、权限拒绝或安全检查阻止，立即停止并报告，不能换方式绕过。
