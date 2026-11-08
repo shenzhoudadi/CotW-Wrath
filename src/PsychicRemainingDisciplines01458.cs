@@ -121,16 +121,15 @@ namespace CallOfTheWild.Wrath.Prototype
             var maximum=Get(uses,"m_MaxAmount");Set(maximum,"BaseValue",0);Set(maximum,"StartingLevel",3);Set(maximum,"StartingIncrease",0);Set(uses,"m_MaxAmount",maximum);
             var native=f.Native<BlueprintAbility>("8d6073201e5395d458b8251386d72df1");var ability=f.Clone(native,"LiveOnAbility01458",N("LiveOn"),D("LiveOn"));
             ability.ComponentsArray=ability.ComponentsArray.Where(c=>!(c is AbilityResourceLogic)&&!(c is ContextRankConfig)&&!(c is AbilityCasterAlignment)).Concat(new BlueprintComponent[]{Cost(uses),Rank(cls,"Custom",4,0,6,1,8,2,10,3,12,4,14,5,16,6,18,7,20,8),new LiveOnCasterLevel01458()}).ToArray();ability.CanTargetSelf=true;ability.CanTargetFriends=ability.CanTargetEnemies=false;ability.Range=AbilityRange.Personal;
-            var original=f.Native<BlueprintFeatureSelection>("02b187038a8dce545bb34bbfb346428d");var choices=new List<BlueprintFeature>();var map=new Dictionary<BlueprintGuid,BlueprintFeature>();
+            var original=f.Native<BlueprintFeatureSelection>("02b187038a8dce545bb34bbfb346428d");
             if(original.AllFeatures.Any(v=>v==null))throw new InvalidOperationException("058 Live On requires resolved native mercy selection entries; registration rolled back.");
-            foreach(var feat in original.AllFeatures){var copy=f.Clone(feat,"LiveOnMercy"+feat.AssetGuid+"01458",feat.Name,feat.Description);copy.Groups=Array.Empty<FeatureGroup>();foreach(var req in copy.GetComponents<PrerequisiteClassLevel>()){Set(req,"m_CharacterClass",Ref<BlueprintCharacterClassReference>(cls));req.Level+=3;}map.Add(feat.AssetGuid,copy);choices.Add(copy);}
-            var selection=f.Clone(original,"LiveOnMercySelection01458",original.Name,D("LiveOn"));Set(selection,"m_Features",choices.Select(Ref<BlueprintFeatureReference>).ToArray());Set(selection,"m_AllFeatures",choices.Select(Ref<BlueprintFeatureReference>).ToArray());
-            foreach(var condition in Graph(ability.ComponentsArray).OfType<ContextConditionCasterHasFact>()){
-                var reference=(BlueprintUnitFactReference)Get(condition,"m_Fact");if(reference!=null&&map.TryGetValue(reference.Guid,out var mercy))Set(condition,"m_Fact",Ref<BlueprintUnitFactReference>(mercy));
-            }
-            foreach(var copy in choices)foreach(var reference in Graph(copy.ComponentsArray).OfType<BlueprintFeatureReference>())if(map.TryGetValue(reference.Guid,out var privateMercy)){
-                Set(reference,"deserializedGuid",privateMercy.AssetGuid);Set(reference,"guid",privateMercy.AssetGuid.ToString());Set(reference,"<Cached>k__BackingField",null);
-            }
+            // Keep the selection wrapper private, but reference every native Paladin
+            // mercy directly. Names, descriptions, icons, prerequisite chains and
+            // any provider-added mercies therefore remain owned by the Paladin
+            // catalogue instead of being copied into a parallel Psychic graph.
+            var selection=f.Clone(original,"LiveOnMercySelection01458",original.Name,D("LiveOn"));
+            Set(selection,"m_Features",original.AllFeatures.Select(Ref<BlueprintFeatureReference>).ToArray());
+            Set(selection,"m_AllFeatures",original.AllFeatures.Select(Ref<BlueprintFeatureReference>).ToArray());
             var live=f.Add(new BlueprintProgression{Ranks=1,IsClassFeature=true,ComponentsArray=new BlueprintComponent[]{Facts(ability),Grant(uses)},LevelEntries=new[]{6,9,12,15,18}.Select(l=>Entry(l,selection)).ToArray(),UIGroups=Array.Empty<UIGroup>()},"LiveOnProgression01458",N("LiveOn"),D("LiveOn"));Set(live,"m_Classes",new[]{new BlueprintProgression.ClassWithLevel{m_Class=Ref<BlueprintCharacterClassReference>(cls)}});Icon(live,ability);return live;
         }
         static BlueprintProgression Psychedelia(PsychicAssets f,BlueprintCharacterClass cls)

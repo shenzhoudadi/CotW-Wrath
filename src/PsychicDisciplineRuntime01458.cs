@@ -2,10 +2,14 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Prerequisites;
+using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Units;
 using Kingmaker.ElementsSystem;
@@ -105,6 +109,20 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         public void OnEventAboutToTrigger(RuleCalculateAbilityParams e){if(e.AbilityData?.Blueprint==OwnerBlueprint)e.ReplaceCasterLevel=Math.Max(0,PsychicDisciplineRuntime01458.Level(Owner)-3);}
         public void OnEventDidTrigger(RuleCalculateAbilityParams e){}
+    }
+    [HarmonyPatch(typeof(PrerequisiteClassLevel), "CheckInternal")]
+    internal static class LiveOnMercyLevel01458
+    {
+        const string MercySelectionId="02b187038a8dce545bb34bbfb346428d";
+        static void Postfix(PrerequisiteClassLevel __instance,UnitDescriptor unit,ref bool __result)
+        {
+            if(__result||unit?.Unit==null||__instance?.OwnerBlueprint is not BlueprintFeature mercy)return;
+            var selection=ResourcesLibrary.TryGetBlueprint<BlueprintFeatureSelection>(BlueprintGuid.Parse(MercySelectionId));
+            if(selection==null||!selection.AllFeatures.Contains(mercy))return;
+            var live=ResourcesLibrary.TryGetBlueprint<BlueprintProgression>(PsychicAssets.Id("LiveOnProgression01458"));
+            if(live==null||!unit.HasFact(live))return;
+            __result=PsychicDisciplineRuntime01458.Level(unit.Unit)-3>=__instance.Level;
+        }
     }
     [TypeId("45ec5158b9324c20ac57a16f58000105")]
     public sealed class WarpedBrain01458:UnitFactComponentDelegate,IApplyAbilityEffectHandler,IGlobalSubscriber

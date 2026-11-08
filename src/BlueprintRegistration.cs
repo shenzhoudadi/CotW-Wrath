@@ -99,6 +99,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 PsychicClass.Register(cache);
             }, report);
             RegisterModule(VindictiveBastard0111.ModuleName, () => VindictiveBastard0111.Register(cache), report);
+            RegisterModule(SacredServant0110.ModuleName, () => SacredServant0110.Register(cache), report);
             RegisterModule(PsychicExpansion.ModuleName, () => {
                 if(!PsychicCasting.RuntimePatchesAvailable) throw new InvalidOperationException("Psychic runtime patches are unavailable; registration skipped.");
                 PsychicExpansion.Register(cache);
@@ -256,6 +257,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 RegisterModule(DrillSergeant01445.ModuleName, () => DrillSergeant01445.Register(cache), report);
             if(cache.Load(PsychicAssets.Id("PainDiscipline01458"))!=null)RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
             if(cache.Load(PsychicAssets.Id(Amnesiac01464.RootToken))!=null)RegisterAvailableModule(Amnesiac01464.ModuleName, () => Amnesiac01464.Register(cache), report);
+            if(cache.Load(PsychicAssets.Id(SacredServant0110.RootToken))!=null)RegisterAvailableModule(SacredServant0110.ReconcileModuleName, () => SacredServant0110.Reconcile(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)
