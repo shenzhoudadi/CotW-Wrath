@@ -1,0 +1,2 @@
+先完整读取 C:\Users\xuenc\agent-tools\spirit-whisperer-next\HANDOFF-0117-ABCD-20261108.md（跨机器可读 GitHub docs/work-packages/COTW-0117/README.md），以及最新 WORK_STATUS、issue #7、A/C产物。
+只执行其中角色 B；C明确放行后才实现。你是共享生产唯一整合人，从最新GitHub main隔离分支开始，不复制含未提交Speaker的整树。完整十族与唯一最小桥，按全文做必要定向语义正反例，禁止占位／全量／游戏／UMM。写 B-progress.md、B-evidence.json 和失败保留日志，交独立D，不自行替D宣布通过。D通过后才按正常流程统一TEST与GitHub交付。

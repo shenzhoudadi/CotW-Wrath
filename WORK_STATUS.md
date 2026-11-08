@@ -4,6 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
+- **COTW-0117 Spirit Whisperer** — [认领issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)。负责人：仓库维护者／本会话协调，按A→C→B→独立D；阶段仅选题／A/C准备，**B尚未实现**。[完整分工及可执行prompt](docs/work-packages/COTW-0117/README.md)。范围是Wizard完整十魂域、Int／次要Cha、1/8/20、5/10/15魂域巫术及仅魔宠，含本项最小S-SPIRIT桥。已核对本库提交／全部PR／分支及sxl1216 fork，未见本项实现或认领；不触碰Speaker修复或Vindictive／Menacing。A/C可只读进行，C放行后B从最新main隔离实现，共享生产文件串行合并；不预占新版本。
 - **COTW-0046 Speaker for the Past** — [认领issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。负责人：仓库维护者／本会话协调，B为单一生产整合负责人。阶段：A/C完成，B v2已实现；**D复查 NEEDS_FIX，尚未出包**。[复查及修复要求](docs/work-packages/COTW-0046/D-review.md)：Rewind Time扣费／一次性销毁、奖励法术来源清理、Blood of Heroes豁免范围、Sacred Council检定范围。已有175条蓝图／组件断言不能覆盖这些实际分支，未声称玩家验收。[A/C/B/D分工](docs/work-packages/COTW-0046/README.md)。保留施工占用，不另起重复实现；0.14.68 Starseeker原交付不受影响。
 
 ## 已完成开发／TEST交付
