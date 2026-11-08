@@ -2,7 +2,7 @@
 
 日期：2026-11-08。**已认领施工，禁止重复实现同一包。**
 占用记录：https://github.com/shenzhoudadi/CotW-Wrath/issues/6
-阶段：A资料／C机制合同准备中，B尚未实现，不代表变体已经可用。只启动这一项。
+阶段：A/C完成，B v2已实现；**D复查 NEEDS_FIX，尚未发布新包**。[D复查与最小修复要求](D-review.md)。Rewind Time、法术来源清理、Blood of Heroes与Sacred Council存在具体行为差异，交既有B整合负责人修复，不新增全量门禁。175条既有蓝图／组件检查不等于真实规则链通过。只启动这一项。
 
 ## 基线与目标
 
