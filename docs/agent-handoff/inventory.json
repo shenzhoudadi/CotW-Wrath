@@ -9,14 +9,13 @@
     "COTW-0060",
     "COTW-0068",
     "COTW-0070",
-    "COTW-0081",
     "COTW-0095",
     "COTW-0098",
     "COTW-0109",
     "COTW-0110",
     "COTW-0117"
   ],
-  "authority": "The eleven HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
+  "authority": "The thirteen HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
   "provenance": "Project inventory copied with all entry IDs, status/exclusion flags and source references preserved. Local machine prefixes are replaced by portable placeholders; this is a public context export, not the original private evidence file.",
   "items": [
     {
@@ -2180,17 +2179,19 @@
       "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "施工中／已认领：A/C准备，B未实现",
       "importance": "中",
       "dependsOn": [
         "Shaman 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "见issue #6及docs/work-packages/COTW-0046/README.md；请勿重复开发",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L27",
       "currentProfile": "仍需实现、外部模组或核验",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且正常做的东西",
+      "historicalStatusBeforeWorkTracking": "待迁移候选：未找到对应",
+      "currentWorkStatus": "IN_PROGRESS_RESERVED"
     },
     {
       "id": "COTW-0047",
@@ -3479,17 +3480,19 @@
       "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已完成开发／TEST交付（0.14.68）；实机边界未验收",
       "importance": "中",
       "dependsOn": [
         "Psychic 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "不重复实现；仅按明确bug或实机反馈修复，见WORK_STATUS.md",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L32",
       "currentProfile": "仍需实现、外部模组或核验",
       "ecosystemProfile": "待迁移候选：未找到对应",
-      "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userSelectionAllowed": false,
+      "userAnnotationGroup": "暂且正常做的东西",
+      "historicalStatusBeforeWorkTracking": "待迁移候选：未找到对应",
+      "currentWorkStatus": "COMPLETED_DEVELOPMENT_TEST"
     },
     {
       "id": "COTW-0082",

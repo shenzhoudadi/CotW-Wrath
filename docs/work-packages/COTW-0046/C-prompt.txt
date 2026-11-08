@@ -1,0 +1,11 @@
+Read the full shared handoff first: C:\Users\xuenc\agent-tools\speaker-next\HANDOFF-0046-ABCD-20261108.md
+Execute ONLY role C.
+
+## 角色 C — 可直接执行
+
+读取本文件和A三份交付，**只执行C**。写 `C-frozen-contract.md`、`C-cases.json`，明确B可执行yes/no及条件。
+
+逐项裁定：16项复用／私有适配边界；Shaman等级与Wisdom具体输入；技能与1／4／6／12／14／20进展；所有先决；资源／DC／动作／取消失败／重复事件；重掷与先攻取值和日志；Oracle／混职隔离；18项法术进哪本书及合法准备环级；魔宠依赖资格；休息／重训／移除；缺项／迟加载的原子注册。给实际expected，不以“待确认”关键空位放行。
+
+真缺依赖就命名blocker，限制对应分支，不扩大成全项目环境重建；不得悄悄删难启示或替代奖励法术凑齐。只冻结本项，勿重开Havocker／Starseeker合同，不实现功能、不push、不要求额外全量门禁。
+

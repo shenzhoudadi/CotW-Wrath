@@ -454,7 +454,7 @@ internal static class Psychic070Tests
         var available=AccessTools.Method(bridge,"Available");var register=AccessTools.Method(bridge,"Register");
         var entries=(Array)AccessTools.Field(assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicSharedSpellCatalog"),"Entries").GetValue(null);
         var list=(BlueprintSpellList)cache.Load(BlueprintGuid.Parse("6a4b9d6651b155058004354a803da3bf"));
-        Check(entries.Length==41,"41 audited spell identities across three original class lists");
+        Check(entries.Length==42,"42 audited spell identities across three original class lists");
         Check(!assembly.GetReferencedAssemblies().Any(a=>new[]{"PrestigePlus","CharacterOptionsPlus","ExpandedContent","TomeOfTheFirebird","TabletopTweaks-Core","TabletopTweaks-Base"}.Contains(a.Name)),"Optional spell providers are not assembly dependencies");
         var native=JObject.Parse(System.IO.File.ReadAllText(evidence))["linkedNative"];
         foreach(var row in entries.Cast<object>().Where(e=>(string)Get(e,"Provider")=="Wrath")) {
@@ -491,7 +491,7 @@ internal static class Psychic070Tests
             if((int)Get(row,"Psychic")>=0) expected++;
         }
         int before=list.SpellsByLevel.Sum(l=>l.Spells.Count());register.Invoke(null,new object[]{cache});register.Invoke(null,new object[]{cache});
-        Check(list.SpellsByLevel.Sum(l=>l.Spells.Count())==before+expected && expected==27,"Only 27 matching Psychic spells linked once; other-class-only spells excluded");
+        Check(list.SpellsByLevel.Sum(l=>l.Spells.Count())==before+expected && expected==28,"Only 28 matching Psychic spells linked once, including the 0081 ExpandedContent Hypnotic Pattern link; other-class-only spells excluded");
         Check(foreignLists.All(l=>l.SpellsByLevel[0].Spells.Count()==1),"Provider spell lists untouched");
         foreach(var row in entries) {
             var spell=(BlueprintAbility)cache.Load(BlueprintGuid.Parse((string)Get(row,"Guid")));

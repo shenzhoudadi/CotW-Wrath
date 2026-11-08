@@ -120,6 +120,7 @@ namespace CallOfTheWild.Wrath.Prototype
             new ModuleDefinition(UrbanBloodrager01463.ModuleName, "Original CotW Urban Bloodrager: controlled bloodrage, restrained magic and adopted magic.", "Not registered"),
             new ModuleDefinition(Amnesiac01464.ModuleName, "Original CotW Amnesiac: retained spell knowledge and hourly Spell Recollection.", "Not registered"),
             new ModuleDefinition(PsychicDisciplineBridge01458.ModuleName, "Add the three completed disciplines to Magaambyan Telepath while preserving its replacement of discipline bonus spells.", "Not registered"),
+            new ModuleDefinition(EsotericStarseeker0081.ModuleName, "Original CotW Esoteric Starseeker: psychic archetype replacing discipline bonus spells with Written in the Stars, attuning to a Cosmic Caravan constellation for one bonus spell per castable level (two constellations and two daily uses from 11th, Major Amplifications delayed to 15th). Registers only when all 90 constellation spells, including five from external providers, are available.", "Not registered"),
         };
         internal static Dictionary<string, string> InitialStates() =>
             Definitions.ToDictionary(d => d.Name, d => d.InitialState);

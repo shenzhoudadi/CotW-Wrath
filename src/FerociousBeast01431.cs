@@ -181,7 +181,9 @@ namespace CallOfTheWild.Wrath.Prototype
             var b = new PrerequisiteArchetypeLevel { Level = level, Group = Prerequisite.GroupType.Any }; Set(b, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(blood)); Set(b, "m_Archetype", Ref<BlueprintArchetypeReference>(primal));
             return new BlueprintComponent[] { a, b };
         }
-        static string Definition(object value) => (string)HarmonyLib.AccessTools.Method(typeof(Migration01426), "Definition").Invoke(null, new[] { value });
+        // Migration01426.Definition gained a second overload in 0.14.67 TEST; name
+        // the single-argument original so this collision check keeps resolving.
+        static string Definition(object value) => (string)HarmonyLib.AccessTools.Method(typeof(Migration01426), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
         static bool ContainsBuff(object value, string guid) => Definition(value).Contains("ref:" + guid);
         internal static bool IsConstantPower(BlueprintFeature root)
         {

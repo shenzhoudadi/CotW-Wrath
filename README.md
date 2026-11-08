@@ -1,4 +1,5 @@
-> Current preview: [0.14.67 Havocker / Mimic TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST). Stable release: 0.14.66. See [scope and handoff](docs/havocker/README.md).
+> 🚧 **[施工占用 / WORK STATUS](WORK_STATUS.md)**：COTW-0046 Speaker for the Past已认领，请勿重复开发。
+> Current preview: [0.14.68 Starseeker TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST). Stable: 0.14.66.
 
 # Call of the Wild — Wrath
 

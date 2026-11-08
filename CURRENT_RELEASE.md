@@ -2,6 +2,11 @@
 
 0.14.66已发布。入口为仓库根 `build.ps1`；本地原工程位于 `outputs/CallOfTheWild.Wrath.Prototype`。
 
+2026-11-08：当前开发预发布为 **0.14.68 Starseeker TEST**（程序集0.14.68.0），[GitHub下载](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST)。完整变体已完成开发和D复查；先前本项隔离定向536条断言通过、48.36秒；版本更新没有重跑同内容专项。实机／完整存档等边界仍未验收。施工占用与已完成条目统一看 [WORK_STATUS.md](WORK_STATUS.md)。正式稳定版仍为0.14.66，旧附件保留。
+
+
+## sxl1216 分支已完成功能与协作边界
+
 2026-11-07：当前预发布为 **0.14.67 TEST**（程序集0.14.67.0），包含Havocker、Spellburn图标接线及Mimic展示更新。[下载测试包](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST)。正式稳定版仍为0.14.66；说明见 [Havocker交接](docs/havocker/README.md)。版本更新编译15.514秒、包检查2.066秒，未重复运行同逻辑定向检查。
 
 2026-11-07（基线切换）：按用户决定，把 Harmony 编译基线由已不存在的 `Wrath_Data/Managed/0Harmony.dll` 2.0.4.0（SHA `DE50CD61…`）切到 UMM 0.33.2 自带的 `Wrath_Data/Managed/UnityModManager/0Harmony.dll` 2.3.6.0（SHA `DF043F05…`）。同步更新构建守卫、引用路径、参考指纹、测试断言与依赖说明；历史 .txt 记录原样保留，其中 2.0.4.0 描述均为旧基线。本轮只改代码：未编译、未打包、未启动游戏或 UMM，验证与上传由用户在出包时进行。

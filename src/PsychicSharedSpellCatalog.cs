@@ -28,6 +28,7 @@ namespace CallOfTheWild.Wrath.Prototype {
             new PsychicSpellLink("2bba038472a64f67b235674c7e27d90c", "RigorMortisAbility", "ExpandedContent", SpellSchool.Transmutation, true, -1, 4, 3),
             new PsychicSpellLink("7402ae487e0b41968be48c103904d237", "ShadowClawsAbility", "ExpandedContent", SpellSchool.Illusion, true, -1, -1, 2),
             new PsychicSpellLink("80189142f7c640f39195defdc9777b27", "WallOfFireAbility", "ExpandedContent", SpellSchool.Evocation, true, -1, 4, -1),
+            new PsychicSpellLink("56b8f0304a704a67b3c35cbe8c774854", "HypnoticPatternAbility", "ExpandedContent", SpellSchool.Illusion, true, 2, -1, -1),
             new PsychicSpellLink("37853550902a4cadae16833c5f4c6b17", "NewSpell.UseHermeanPotential", "PrestigePlus", SpellSchool.Enchantment, false, 1, -1, -1),
             new PsychicSpellLink("4b8f3792a86e45f4b40a2c01805f1e5e", "NewSpell.UseResinousSkin", "PrestigePlus", SpellSchool.Transmutation, false, 3, -1, -1),
             new PsychicSpellLink("2aee92b93eac4290ae38a7a131abe7d7", "NewSpell.UsePhantomLimb", "PrestigePlus", SpellSchool.Necromancy, false, 6, -1, 5),

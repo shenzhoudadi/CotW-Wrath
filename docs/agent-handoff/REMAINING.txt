@@ -1,13 +1,14 @@
-# 当前十一项HOLD
+# 剩余项与当前开发状态（已合并 sxl1216 已完成功能）
 
-0.14.66已交付；以下不是自动开工队列。排除项和依赖状态保持。
+0.14.68 TEST已包含Starseeker；施工占用与完成状态以WORK_STATUS.md为准。以下不是自动开工队列，排除项不恢复。
 
 COTW-0020 Havocker
 HOLD_SHARED_KINETICIST
 Native Witch and Kineticist exist. Original mutates shared blast progressions, prerequisite class levels, ability visibility and all kineticist parameter scaling; spellburn consumes prepared Witch slots and offsets infusion burn. No isolated Witch/Intelligence burn, progression and multiclass contract is published in the current project. A leaf that only grants native blasts would be incomplete.
 
 COTW-0046 Speaker for the Past
-HOLD_SHARED_REVELATIONS
+IN_PROGRESS_RESERVED — issue #6；A/C完成、B v2已实现，D复查NEEDS_FIX，交原B修复；未交付，请勿重复开发。
+Historical blocker: HOLD_SHARED_REVELATIONS
 Original builds sixteen Ancestor/Time revelations with Shaman/Wisdom scaling and a private additional spell list. Current project has no shared revelation engine that preserves prerequisites, source-aware rerolls, class resources, initiative and cross-class isolation. Native Oracle identity alone does not establish these contracts.
 
 COTW-0060 Spirit Guide
@@ -23,8 +24,7 @@ HOLD_PROVIDER_HA
 Fresh review retains the 063 blocker: no current HA implementation binary/source proves studied combat/strike, inspiration payment, creature identification (type and every subtype), talent exclusion or source-specific 24-hour immunity. The old public name index is not a component/API contract.
 
 COTW-0081 Esoteric Starseeker
-HOLD_SHARED_TEMPORARY_KNOWLEDGE_AND_CATALOG
-Shares the temporary-knowledge dependency with Amnesiac. In addition, every one of the original ten by nine constellation spells must be resolved to a real native/project/provider root, including optional Mass Fly, Particulate Form and Akashic Form. The complete ninety-entry provider/catalog and two-constellation/major-at-15 contract is not yet frozen. Do not substitute missing spells or register a partial constellation.
+COMPLETED_DEVELOPMENT_TEST — 0.14.68 TEST，536条定向断言与D复查已完成。90项目录及5项外部能力按当前合同原子校验；实机未测边界见docs/starseeker/README.md。不再进入新迁移队列。
 
 COTW-0095 Insinuator
 HOLD_PROVIDER_AND_INVOCATION
@@ -42,6 +42,14 @@ COTW-0110 Sacred Servant
 HOLD_SHARED_DOMAINS_BOND
 Native Paladin exists, but original ClassToProgression.addClassToDomains adapts all deity-selected domains to Paladin preparation and special slots. Project has no complete class/archetype-isolated domain preparation/scaling contract. Bond choices also require locked per-activation allocation and non-renewable daily Lay on Hands restoration; copying shared DivineWeaponProperty group is unsafe.
 
+COTW-0111 Vindictive Bastard
+HOLD_SHARED_RETALIATION_CLASS
+Original is a separate class with retaliation entitlement after real ally harm, source/target-owned smite, Gang Up, swift sharing and Ultimate Vindication. Current project has no complete retaliation/source ledger or separate-class qualification/transport contract. ExpandedContent Oathbreaker is an adapted reference, not completion of this original class.
+
 COTW-0117 Spirit Whisperer
-HOLD_SHARED_SPIRITS
+IN_PROGRESS_RESERVED — issue #7；已认领，A/C准备，B未实现。分工见docs/work-packages/COTW-0117/README.md；历史阻塞：HOLD_SHARED_SPIRITS。
 Native Wizard exists. Original uses all ten SpiritsEngine families with Wizard/Intelligence and secondary Charisma scaling, tiers 1/8/20, matching hex selection and familiar-only bond. No complete class-isolated spirit/hex/resource bridge is published. Shares the Spirit Guide blocker.
+
+COTW-0140 Relic Hunter
+HOLD_SHARED_IMPLEMENT_ENGINE
+Native Inquisitor exists. Original depends on the Occultist ImplementEngine and class-scoped deific focus allocation, invested/locked focus, resonant powers, implement spells and focus powers. Current project has no equivalent shared implement engine; an external class name cannot establish the required focus components and daily lifecycle.
