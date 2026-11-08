@@ -167,6 +167,7 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(UrbanBloodrager01463.ModuleName, () => UrbanBloodrager01463.Register(cache), report);
             RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
             RegisterAvailableModule(Amnesiac01464.ModuleName, () => Amnesiac01464.Register(cache), report);
+            RegisterAvailableModule(EsotericStarseeker0081.ModuleName, () => EsotericStarseeker0081.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -255,6 +256,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 RegisterModule(DrillSergeant01445.ModuleName, () => DrillSergeant01445.Register(cache), report);
             if(cache.Load(PsychicAssets.Id("PainDiscipline01458"))!=null)RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
             if(cache.Load(PsychicAssets.Id(Amnesiac01464.RootToken))!=null)RegisterAvailableModule(Amnesiac01464.ModuleName, () => Amnesiac01464.Register(cache), report);
+            RegisterAvailableModule(EsotericStarseeker0081.ModuleName, () => EsotericStarseeker0081.Register(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)

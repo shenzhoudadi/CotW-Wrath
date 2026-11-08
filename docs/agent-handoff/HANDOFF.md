@@ -1,9 +1,8 @@
 # 当前交接：从简继续
 
-- 当前预发布：**0.14.67 TEST**，含Havocker／S-KINETIC、Spellburn图标接线及Mimic展示移植。稳定正式版0.14.66保留。
-- [测试包及源码](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST)。本包主DLL SHA256：`3aad748c77197d5b1f1de5a253b1b8349f43509d7ef8bd4f36cac69edc03ad61`。
-- 用户试玩反馈Havocker总体正常、仅缺Spellburn Buff图标；图标已接线，实际画面待再次确认，不据此宣称全部旧HOLD通过。
-- 先读根AGENTS.md、CURRENT_RELEASE.md和[当前功能交接](../havocker/README.md)。不重做0.14.66，不恢复排除项，不启动其他HOLD。
-- “出包”默认包括相关源码commit／push、GitHub附件上传及一次下载核对；TEST继续标测试版，不能只交本地ZIP。
-- 新版本只改版本戳，编译15.514秒、包检查2.066秒；已有定向证据按功能代码复用，具体运行边界见当前交接。
-- 当前测试源码及离线宿主边界补丁在tests/offline-havocker；合法游戏和第三方本地夹具不在公开仓库，不安装／启动UMM或游戏。
+- 当前预发布：[0.14.68 Starseeker TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST)。主DLL SHA256：`fe7bef1d8ac3f2529bf7eb7233bb89f84dcb9d3006eca09599d4f2775418d7eb`。
+- COTW-0081已完成开发、D-F01修复与独立复查，本项隔离定向536条断言通过。角色A旧星座命名与C文档部分名称错误，以生产目录和docs/starseeker/README.md勘误为准。
+- 保留0.14.67的Havocker与Mimic内容；正式稳定版0.14.66不变。TEST交付不等于完整玩家验收。
+- 下一项COTW-0046 Speaker for the Past已认领施工，A/C准备，B未实现：[issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)，请勿重复开发。分工在docs/work-packages/COTW-0046/README.md。
+- 接手先读AGENTS、CURRENT_RELEASE、WORK_STATUS；状态板优先于历史库存的旧进度描述，不重复已交付功能，不自动恢复排除项。
+- 出包包含commit/push、GitHub附件和一次下载核对；新内容先登记施工，完成必要验证与交付后归档并关闭认领issue。只做本轮必要检查，不启动游戏/UMM，不跑全量。

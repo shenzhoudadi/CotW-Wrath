@@ -35,7 +35,9 @@ internal static class Repair01436CallerTests
     static BlueprintGuid Id(string token) => (BlueprintGuid)AccessTools.Method(Module("PsychicAssets"), "Id").Invoke(null, new object[] { token });
     static T CopyData<T>(T value) => (T)AccessTools.Method(Module("PsychicAssets"), "CopyData").MakeGenericMethod(typeof(T)).Invoke(null, new object[] { value });
     static SimpleBlueprint Copy(SimpleBlueprint value) => (SimpleBlueprint)AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(value, null);
-    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition").Invoke(null, new object[] { value });
+    // Migration01426.Definition gained a second overload in 0.14.67 TEST, so the
+    // reflection lookup must name the single-argument original explicitly.
+    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { value });
     static BlueprintFeatureReference[] Refs(BlueprintFeatureSelection p, string field) => (BlueprintFeatureReference[])Get(p, field) ?? Array.Empty<BlueprintFeatureReference>();
     static object Cached(BlueprintReferenceBase r) => AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").GetValue(r, null);
     static void Uncache(BlueprintReferenceBase r) => AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, null, null);

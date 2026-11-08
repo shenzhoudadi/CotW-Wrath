@@ -1,0 +1,11 @@
+Read the full shared handoff first: C:\Users\xuenc\agent-tools\speaker-next\HANDOFF-0046-ABCD-20261108.md
+Execute ONLY role A.
+
+## 角色 A — 可直接执行
+
+先读本文件，**只执行A**。允许只读上述工作区、固定原作、合法本地游戏／提供方源码或元数据；写 `A-source-scope.md`、`A-map16-and-spells18.json`、`A-gaps.md` 到输出目录。
+
+从真实selection数组和法术表逐项提取，不照抄旧报告；分别记录16项与18项的数量、原表达式和候选当前根。找不到的条目精确报缺口，原生缺失不等于应新增迁移。静态匹配和运行验证分开标记，不写PASS。额外追踪MysteryEngine／HexEngine对等级／属性／重掷／资源的原作设置，列真实冲突供C决定。
+
+不改生产、不全量检测、不启游戏／UMM、不push、不将问题扩到其他HOLD。原件路径失效时按固定commit读具体文件，不下载整个旧work。完成交C，无需再问用户是否开启攻坚模型。
+

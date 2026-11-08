@@ -6,3 +6,5 @@ alwaysApply: true
 执行根AGENTS.md与CURRENT_RELEASE.md。默认只编译、打包、核对包内必要文件/DLL；实际改行为才做一次必要定向检查，不重复历史或旧证书链。不为说明、打包和上传重测同一内容。未测/失败如实记录，不启动游戏或UMM，不记作玩家验收。记录各步骤实际耗时。
 
 用户说“出包”默认包含本轮相关源码commit／push、GitHub安装包上传及下载核对；仅本地ZIP不算完成。TEST包使用测试标记和预发布属性。
+
+新内容确定后先在GitHub认领施工并更新WORK_STATUS.md；完成开发、必要验证和交付后归档并关闭issue，明确TEST与实机验收边界。

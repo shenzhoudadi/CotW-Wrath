@@ -2,7 +2,7 @@
 
 0.14.66已发布。入口为仓库根 `build.ps1`；本地原工程位于 `outputs/CallOfTheWild.Wrath.Prototype`。
 
-2026-11-07：当前预发布为 **0.14.67 TEST**（程序集0.14.67.0），包含Havocker、Spellburn图标接线及Mimic展示更新。[下载测试包](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST)。正式稳定版仍为0.14.66；说明见 [Havocker交接](docs/havocker/README.md)。版本更新编译15.514秒、包检查2.066秒，未重复运行同逻辑定向检查。
+2026-11-08：当前开发预发布为 **0.14.68 Starseeker TEST**（程序集0.14.68.0），[GitHub下载](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST)。完整变体已完成开发和D复查；先前本项隔离定向536条断言通过、48.36秒；版本更新没有重跑同内容专项。实机／完整存档等边界仍未验收。施工占用与已完成条目统一看 [WORK_STATUS.md](WORK_STATUS.md)。正式稳定版仍为0.14.66，旧附件保留。
 
 1. 只处理本轮明确改动。实际改行为时，选择一次必要定向检查；已有同内容结果不因文档、打包、上传重复执行。
    用户说“出包”默认包含本轮相关源码commit／push、GitHub安装包附件上传和下载核对；仅生成本地包不算完成。测试包保持TEST标记及预发布属性。
