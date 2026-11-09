@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,7 +60,7 @@ internal static class KineticUtility01433Tests
     static BlueprintGuid Id(string token) => (BlueprintGuid)Helper(typeof(Migration01426Tests), "Id", token);
     static T Asset<T>(BlueprintsCache cache, string token) where T : SimpleBlueprint => (T)cache.Load(Id(token));
     static void Register(BlueprintsCache cache, string method) => AccessTools.Method(Module, method).Invoke(null, new object[] { cache });
-    static string Definition(object o) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { o });
+    static string Definition(object o) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { o });
     static void Check(bool value, string reason) { if (!value) throw new Exception("KineticUtility01433: " + reason); checks++; }
     static bool Skip() => false;
     static bool No(ref bool __result) { __result = false; return false; }
@@ -110,7 +110,7 @@ internal static class KineticUtility01433Tests
         var donors = ((string[])AccessTools.Field(Module, "Dependencies").GetValue(null)).Distinct().Select(x => cache.Load(BlueprintGuid.Parse(x))).OfType<BlueprintScriptableObject>().ToArray();
         var donorDefinitions = donors.Select(x => Definition(x.ComponentsArray)).ToArray();
         var oldPools = new[] { Get(pool, "m_Features"), Get(pool, "m_AllFeatures") };
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(KineticUtility01433Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(KineticUtility01433Tests), nameof(AppendFault)));
         for (int index = 0; index < modules.Length; index++) {
             Register(cache, modules[index]);
             var root = Asset<BlueprintFeature>(cache, tokens[index]);

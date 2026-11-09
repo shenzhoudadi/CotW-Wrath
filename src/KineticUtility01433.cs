@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -174,14 +174,20 @@ namespace CallOfTheWild.Wrath.Prototype
             const string text = "Element: fire. Utility wild talent, level 3; requires kineticist level 6. Burn: 0. As a standard action, create a 20-foot-radius smoke cloud within medium range for 1 round per kineticist level. It obscures vision as obscuring mist. Each round, creatures beginning their turns inside attempt a Fortitude save or become sickened for 1d4+1 rounds. Undead, constructs, elementals, and creatures already sickened are unaffected by the sickness. The smoke affects allies and enemies. Only one Smoke Storm from each caster can remain; different casters maintain independent clouds.";
             var donor = cache.Load(Id("ObscuringMistArea")) as BlueprintAbilityAreaEffect
                 ?? throw new InvalidOperationException("Smoke Storm requires registered Obscuring Mist.");
-            if (donor.Shape != AreaEffectShape.Cylinder || donor.Size.Value != 20 || donor.GetComponents<AbilityAreaEffectBuff>().Count() != 1)
+            if (donor.Shape != AreaEffectShape.Cylinder || donor.Size.Value != 20)
                 throw new InvalidOperationException("Smoke Storm mist donor contract changed.");
-            var fogDonor = donor.GetComponent<AbilityAreaEffectBuff>().Buff;
-            if (fogDonor == null || !fogDonor.GetComponents<AddConcealment>().Any() || fogDonor.GetComponent<PsychicOutgoingFog>() == null)
-                throw new InvalidOperationException("Smoke Storm fog donor is incomplete.");
-            var fog = f.Clone(fogDonor, "SmokeStormFogBuff", "Smoke Storm", text);
+            // Obscuring Mist keeps its concealment in a dedicated owned buff, so locate the
+            // fog owner by contract instead of assuming the area has exactly one effect.
+            var fogOwner = donor.GetComponents<AbilityAreaEffectBuff>().FirstOrDefault(o => o.Buff != null &&
+                o.Buff.GetComponents<AddConcealment>().Any() && o.Buff.GetComponent<PsychicOutgoingFog>() != null);
+            if (fogOwner == null) throw new InvalidOperationException("Smoke Storm fog donor is incomplete.");
+            var fog = f.Clone(fogOwner.Buff, "SmokeStormFogBuff", "Smoke Storm", text);
             var area = f.Clone(donor, "SmokeStormArea", "Smoke Storm", text);
-            Set(area.GetComponent<AbilityAreaEffectBuff>(), "m_Buff", Ref<BlueprintBuffReference>(fog));
+            // Smoke Storm carries only the concealment effect; drop the other borrowed owners.
+            var cloneOwners = area.GetComponents<AbilityAreaEffectBuff>().ToArray();
+            Set(cloneOwners[0], "m_Buff", Ref<BlueprintBuffReference>(fog));
+            if (cloneOwners.Length > 1)
+                area.ComponentsArray = area.ComponentsArray.Where(c => c is not AbilityAreaEffectBuff || c == cloneOwners[0]).ToArray();
             var sick = f.Native<BlueprintBuff>(SickenedId);
             var apply = Apply(sick, 1, DurationRate.Rounds); apply.DurationValue.DiceType = DiceType.D4; apply.DurationValue.DiceCountValue = 1;
             var save = new ContextActionSavingThrow { Type = SavingThrowType.Fortitude,

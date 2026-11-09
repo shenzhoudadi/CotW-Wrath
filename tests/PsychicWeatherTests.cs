@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Parts;
@@ -63,24 +63,25 @@ internal static class PsychicWeatherTests
         Patch(AccessTools.Method(typeof(RuleSkillCheck),"AdjustDCByDifficulty"),nameof(Difficulty));
         PsychicRuleTestBoundary.Patch(h,typeof(RuleSkillCheck),AccessTools.Method(typeof(PsychicWeatherTests),nameof(Skill)));
         Patch(AccessTools.Method(typeof(UnitHelper),"AddBuff",new[]{typeof(UnitDescriptor),typeof(BlueprintBuff),typeof(MechanicsContext),typeof(TimeSpan?)}),nameof(Add));Patch(AccessTools.Method(typeof(Buff),"Remove"),nameof(Remove));
-        try{Metadata(cache,a);Ownership(cache,a);Attacks(cache,a);Sleet(cache,a);River(cache,a);Conceal(cache,a,h);}finally{h.UnpatchAll(h.Id);Set(Kingmaker.Game.Instance,"TimeController",oldTime);Clear();}
+        try{Metadata(cache,a);Ownership(cache,a);NativeFogCloudEffects(cache);Attacks(cache,a);Sleet(cache,a);River(cache,a);Conceal(cache,a,h);}finally{h.UnpatchAll(h.Id);Set(Kingmaker.Game.Instance,"TimeController",oldTime);Clear();}
         PsychicExpansionTests.Inventory["weatherSpellAssertions"]=count;Console.WriteLine("PASS: "+count+" weather checks: native area ownership, concealment and senses, overlap-safe penalties, weapon/ray direction, seeded native Mobility, River first/later saves and immunities, class lists and durations. Scene endpoints and random inputs substituted.");return count;
     }
     static void Metadata(BlueprintsCache c,Psychic070Tests.Caster a){
-        string[] names={"ObscuringMist","SolidFog","SleetStorm","RiverOfWind","FickleWinds"};int[][] levels={new[]{1,1,1,1},new[]{4,4},new[]{3,3,3},new[]{4,4,4},new[]{3,5,5,5}};
+        string[] names={"ObscuringMist","FogCloud","SolidFog","SleetStorm","RiverOfWind","FickleWinds"};int[][] levels={new[]{1,1,1,1},new[]{2,2,2,2},new[]{4,4},new[]{3,3,3},new[]{4,4,4},new[]{3,5,5,5}};
         for(int i=0;i<names.Length;i++){
             var bp=Asset<BlueprintAbility>(c,names[i]);var links=bp.GetComponents<SpellListComponent>().ToArray();Check(links.Select(x=>x.SpellLevel).OrderBy(x=>x).SequenceEqual(levels[i]),"Original class levels "+names[i]);
             foreach(var l in links)Check(l.SpellList.SpellsByLevel[l.SpellLevel].Spells.Count(s=>s==bp)==1&&l.SpellList!=a.Book.Blueprint.SpellList,"Unique reciprocal native lists");
-            Check(bp.Parent==null&&!ReferenceEquals(bp.Icon,null)&&bp.CanTargetPoint&&bp.Type==AbilityType.Spell,"Learnable point root and icon");Check(bp.SpellResistance==(i==3),"River only SR");
+            Check(bp.Parent==null&&!ReferenceEquals(bp.Icon,null)&&bp.Type==AbilityType.Spell,"Learnable root and icon");
+            Check(i==0?!bp.CanTargetPoint&&bp.CanTargetSelf&&bp.Range==AbilityRange.Personal&&!bp.AvailableMetamagic.HasFlag(Metamagic.Reach):bp.CanTargetPoint,"Obscuring Mist is self-centered; other weather roots target points");Check(bp.SpellResistance==(i==4),"River only SR");
             var action=bp.GetComponent<AbilityEffectRunAction>().Actions.Actions.Single();var duration=(action as ContextActionApplyBuff)?.DurationValue??((ContextActionSpawnAreaEffect)action).DurationValue;
-            foreach(int cl in new[]{1,3,5,10,20,40})foreach(bool ext in new[]{false,true})Check(duration.Calculate(Context(a,bp,cl,ext?Metamagic.Extend:0)).Seconds==TimeSpan.FromSeconds(cl*(i==2||i==3?6:60)*(ext?2:1)),"Native duration/Extend "+names[i]);
-            if(i<4){var area=((ContextActionSpawnAreaEffect)action).AreaEffect;Check(area.Shape==(i==3?AreaEffectShape.Wall:AreaEffectShape.Cylinder)&&area.Size.Value==(i==3?60:20)&&area.SpellResistance==(i==3),"Area geometry and SR");Check(!string.IsNullOrEmpty(area.Fx.AssetId),"Persistent visual");Check((bool)Get(area,"m_TickRoundAfterSpawn")== (i==3),"Initial tick only River; other entry handles it");}
+            foreach(int cl in new[]{1,3,5,10,20,40})foreach(bool ext in new[]{false,true})Check(duration.Calculate(Context(a,bp,cl,ext?Metamagic.Extend:0)).Seconds==TimeSpan.FromSeconds(cl*(i==1?600:i==3||i==4?6:60)*(ext?2:1)),"Native duration/Extend "+names[i]);
+            if(i<5){var area=((ContextActionSpawnAreaEffect)action).AreaEffect;Check(area.Shape==(i==4?AreaEffectShape.Wall:AreaEffectShape.Cylinder)&&area.Size.Value==(i==4?60:20)&&area.SpellResistance==(i==4),"Area geometry and SR");Check(!string.IsNullOrEmpty(area.Fx.AssetId),"Persistent visual");Check((bool)Get(area,"m_TickRoundAfterSpawn")== (i==4),"Initial tick only River; other entry handles it");}
         }
         var fickle=Asset<BlueprintAbility>(c,"FickleWinds");Check(fickle.NotOffensive&&!fickle.CanTargetEnemies&&(TargetType)Get(fickle.GetComponent<AbilityTargetsAround>(),"m_TargetType")==TargetType.Ally,"Fickle allies only");
     }
     static void Ownership(BlueprintsCache c,Psychic070Tests.Caster a){
         var enter=AccessTools.Method(typeof(AbilityAreaEffectBuff),"OnUnitEnter");var exit=AccessTools.Method(typeof(AbilityAreaEffectBuff),"OnUnitExit");
-        foreach(string name in new[]{"ObscuringMist","SolidFog","SleetStorm","CondensedEther","BarrowHaze"}){
+        foreach(string name in new[]{"ObscuringMist","FogCloud","SolidFog","SleetStorm","CondensedEther","BarrowHaze"}){
             var bp=Asset<BlueprintAbilityAreaEffect>(c,name+"Area");var ctx=Context(a,Asset<BlueprintAbility>(c,name));
             foreach(var owned in bp.GetComponents<AbilityAreaEffectBuff>().Where(b=>!b.Condition.Conditions.OfType<Kingmaker.UnitLogic.Mechanics.Conditions.ContextCondition>().Any(x=>x is PsychicSleetMovementFailure))){
                 Clear();var one=Area("one",ctx,bp,true);var two=Area("two",ctx,bp,true);
@@ -89,6 +90,32 @@ internal static class PsychicWeatherTests
                 enter.Invoke(owned,new object[]{ctx,two,unit});Check(facts.List.Count==2,"Overlap retains both owners");exit.Invoke(owned,new object[]{ctx,one,unit});Check(facts.List.Count==1&&unit.Buffs.Enumerable.Single().SourceAreaEffectId=="two","Exit removes only its source");exit.Invoke(owned,new object[]{ctx,two,unit});Check(facts.List.Count==0,"Last exit/end cleans status");
             }
         }Clear();
+    }
+    static void NativeFogCloudEffects(BlueprintsCache c){
+        // Obscuring Mist and Fog Cloud have concealment as their only effect, so the
+        // area owns one buff that carries it instead of a second concealment buff.
+        foreach(string token in new[]{"ObscuringMist","FogCloud"}){
+            var area=Asset<BlueprintAbilityAreaEffect>(c,token+"Area");
+            var owners=area.GetComponents<AbilityAreaEffectBuff>().Where(x=>x.CheckConditionEveryRound).ToArray();
+            Check(owners.Length==1&&owners[0].Buff==Asset<BlueprintBuff>(c,token+"Buff"),token+" owns exactly its own buff");
+            var single=owners[0].Buff;
+            Check(single.ComponentsArray.OfType<AddConcealment>().Count()==2&&single.ComponentsArray.OfType<PsychicOutgoingFog>().Count()==1&&single.ComponentsArray.All(x=>x is AddConcealment||x is PsychicOutgoingFog),token+" buff carries the whole concealment contract and nothing else");
+            Check(Asset<BlueprintBuff>(c,token+"Fog")==null,token+" no longer publishes a separate concealment buff");
+        }
+        var fog=Asset<BlueprintBuff>(c,"NativeFogCloudConcealmentBuff");
+        Check(fog.ComponentsArray.OfType<AddConcealment>().Count()==2&&fog.ComponentsArray.OfType<PsychicOutgoingFog>().Count()==1,"Native fog effects use the complete incoming and outgoing fog contract");
+        foreach(string id in new[]{"aa2e0a0fe89693f4e9205fd52c5ba3e5","053c8fd966bbcb94bb8db6582d990650","b342e42d2ed58484c8dff9150d18f4e4","ba09d51375db5f34790184443416d84b","6cae3c64989f3684bb078efcfa9021a1","6fa0adacca8d00f4aaba1e8df77a318f","706df636208b2864aa80032b72e0aabd","6df1ac314d4e6e9418e34470b79f90d8","1a62a0463e7d4da0814167e8308f1ebd","b6017edf09fe0374fa9a9bf06135f84b"}){
+            var area=(BlueprintAbilityAreaEffect)c.Load(BlueprintGuid.Parse(id));
+            var owners=(area.ComponentsArray??Array.Empty<BlueprintComponent>()).OfType<AbilityAreaEffectBuff>().Where(x=>x.Buff==fog).ToArray();
+            Check(owners.Length==1&&owners[0].CheckConditionEveryRound,"Native fog area has one source-owned concealment effect: "+id);
+        }
+        var mephit=(BlueprintAbility)c.Load(BlueprintGuid.Parse("34283d686f5f5a847b4d0d6470b52a65"));
+        var spawn=(ContextActionSpawnAreaEffect)mephit.GetComponent<AbilityEffectRunAction>().Actions.Actions.Single();
+        Check(spawn.AreaEffect.AssetGuid==BlueprintGuid.Parse("aa2e0a0fe89693f4e9205fd52c5ba3e5"),"Water mephit Stinking Cloud shares the patched native area");
+        var shadow=(BlueprintBuff)c.Load(BlueprintGuid.Parse("8de8e078992d7a4479f3d76e21aa1195"));
+        var shadowArea=Asset<BlueprintAbilityAreaEffect>(c,"ShadowyMistFogArea");
+        Check(shadow.GetComponents<AddAreaEffect>().Count(x=>x.AreaEffect==shadowArea)==1,"Shadowy Mist Form emits one moving 20-foot fog aura");
+        Check(shadowArea.Size.Value==20&&shadowArea.GetComponents<AbilityAreaEffectBuff>().Single().Buff==fog,"Shadowy Mist Form aura applies the shared fog contract");
     }
     static void Attacks(BlueprintsCache c,Psychic070Tests.Caster a){
         var other=new Psychic070Tests.Caster(c).Unit;
@@ -143,9 +170,9 @@ internal static class PsychicWeatherTests
         // A native same-value entry must survive temporary outgoing concealment cleanup.
         var existing=new UnitPartConcealment.ConcealmentEntry {Concealment=Kingmaker.Enums.Concealment.Partial,Descriptor=ConcealmentDescriptor.Fog};targetPart.AddConcealment(existing);
         try{
-            foreach(string name in new[]{"ObscuringMistBuff","SolidFogBuff","SleetStormBuff"})foreach(float feet in new[]{1f,5f,5.01f,30f})foreach(int mode in new[]{0,1,2,3,4}){
-                Clear();var b=Fact(Asset<BlueprintBuff>(c,name),Context(a,Asset<BlueprintAbility>(c,name.Replace("Buff",""))));facts.List.Add(b);Refresh();distance=new Feet(feet).Meters;Set(other,"m_Position",new UnityEngine.Vector3(distance,0,0));Set(senses,"m_IgnoreAllCount",mode==1?1:0);Set(senses,"m_IgnorePartialCount",mode==2?1:0);Set(senses,"m_TreatTotalAsPartialCount",mode==3?1:0);if(mode==4)senses.AddBlindsight(new Feet(60),null);
-                var raw=name=="SleetStormBuff"||feet>5?Kingmaker.Enums.Concealment.Total:Kingmaker.Enums.Concealment.Partial;var expected=mode==1||mode==4?Kingmaker.Enums.Concealment.None:mode==2&&raw==Kingmaker.Enums.Concealment.Partial?Kingmaker.Enums.Concealment.None:mode==3?Kingmaker.Enums.Concealment.Partial:raw;
+            foreach(string name in new[]{"ObscuringMistBuff","FogCloudBuff","SolidFogFog","SleetStormFog"})foreach(float feet in new[]{1f,5f,5.01f,30f})foreach(int mode in new[]{0,1,2,3,4}){
+                Clear();var b=Fact(Asset<BlueprintBuff>(c,name),Context(a,Asset<BlueprintAbility>(c,name.EndsWith("Buff")?name.Substring(0,name.Length-4):name.Substring(0,name.Length-3))));facts.List.Add(b);Refresh();distance=new Feet(feet).Meters;Set(other,"m_Position",new UnityEngine.Vector3(distance,0,0));Set(senses,"m_IgnoreAllCount",mode==1?1:0);Set(senses,"m_IgnorePartialCount",mode==2?1:0);Set(senses,"m_TreatTotalAsPartialCount",mode==3?1:0);if(mode==4)senses.AddBlindsight(new Feet(60),null);
+                var raw=name=="SleetStormFog"||feet>5?Kingmaker.Enums.Concealment.Total:Kingmaker.Enums.Concealment.Partial;var expected=mode==1||mode==4?Kingmaker.Enums.Concealment.None:mode==2&&raw==Kingmaker.Enums.Concealment.Partial?Kingmaker.Enums.Concealment.None:mode==3?Kingmaker.Enums.Concealment.Partial:raw;
                 var actual=UnitPartConcealment.Calculate(unit,other,true);Check(actual==expected,"Native distance/sensory fog calculation "+name+" "+feet+" "+mode+" actual="+actual+" distance="+unit.DistanceTo(other)+" corpus="+unit.View.Corpulence);
                 var entries=(List<UnitPartConcealment.ConcealmentEntry>)Get(targetPart,"m_Concealments");Check(entries.Count==1&&ReferenceEquals(entries[0],existing),"Temporary native entries fully removed; same-value foreign entry preserved");
                 if(mode==4)senses.RemoveBlindsight(new Feet(60),null);
@@ -153,14 +180,14 @@ internal static class PsychicWeatherTests
             Set(senses,"m_IgnoreAllCount",0);Set(senses,"m_IgnorePartialCount",0);Set(senses,"m_TreatTotalAsPartialCount",0);
             foreach(bool otherEngine in new[]{false,true})foreach(bool own in new[]{false,true})foreach(bool suppressed in new[]{false,true})foreach(bool inside in new[]{false,true}){
                 Clear();manager.List.Clear();var mc=Get(manager,"m_Cache");AccessTools.Method(mc.GetType(),"Clear").Invoke(mc,null);
-                replacementConcealment=otherEngine;var cloudCaster=own?a:new Psychic070Tests.Caster(c);var b=Fact(Asset<BlueprintBuff>(c,"BarrowHazeBuff"),Context(cloudCaster,Asset<BlueprintAbility>(c,"BarrowHaze")));
+                replacementConcealment=otherEngine;var cloudCaster=own?a:new Psychic070Tests.Caster(c);var b=Fact(Asset<BlueprintBuff>(c,"BarrowHazeFog"),Context(cloudCaster,Asset<BlueprintAbility>(c,"BarrowHaze")));
                 Set(b,"<IsTurnedOn>k__BackingField",!suppressed);if(inside)facts.List.Add(b);else{b.RestoreOwnerLink(manager);manager.List.Add(b);AccessTools.Method(mc.GetType(),"Clear").Invoke(mc,null);}Refresh();var hazePart=(inside?unit:other).Ensure<UnitPartConcealment>();var hazeEntries=(List<UnitPartConcealment.ConcealmentEntry>)Get(hazePart,"m_Concealments");if(hazeEntries==null){hazeEntries=new List<UnitPartConcealment.ConcealmentEntry>();Set(hazePart,"m_Concealments",hazeEntries);}var beforeHaze=hazeEntries.ToArray();if(!suppressed)foreach(var comp in b.Blueprint.GetComponents<AddConcealment>()){var rt=Runtime(comp,b);using(rt.RequestEventContext())AccessTools.Method(typeof(AddConcealment),"OnTurnOn").Invoke(comp,null);}distance=new Feet(30).Meters;Set(other,"m_Position",new UnityEngine.Vector3(distance,0,0));
                 Check(UnitPartConcealment.Calculate(unit,other,true)==(!own&&!suppressed?Kingmaker.Enums.Concealment.Total:Kingmaker.Enums.Concealment.Partial),"Barrow own vision, foreign source, inactive cloud, either endpoint; foreign native partial preserved");
                 Check(((List<UnitPartConcealment.ConcealmentEntry>)Get(targetPart,"m_Concealments")).Count==(inside||suppressed?1:3),"Haze native entries retained; temporary entries removed");hazeEntries.Clear();hazeEntries.AddRange(beforeHaze);
             }
             replacementConcealment=false;manager.List.Clear();AccessTools.Method(Get(manager,"m_Cache").GetType(),"Clear").Invoke(Get(manager,"m_Cache"),null);
 
-            Clear();facts.List.Add(Fact(Asset<BlueprintBuff>(c,"SolidFogBuff"),Context(a,Asset<BlueprintAbility>(c,"SolidFog"))));Refresh();
+            Clear();facts.List.Add(Fact(Asset<BlueprintBuff>(c,"SolidFogFog"),Context(a,Asset<BlueprintAbility>(c,"SolidFog"))));Refresh();
             // Force an exception in the native calculation after the production prefix ran.
             // A throwing prefix on Calculate runs after ours at Last priority even if DistanceTo was inlined.
             var errorPatch=new Harmony("CotW.Weather.ExceptionBoundary");errorPatch.Patch(AccessTools.Method(typeof(UnitPartConcealment),"Calculate"),prefix:new HarmonyMethod(typeof(PsychicWeatherTests),nameof(Fault)){priority=Priority.Last});
