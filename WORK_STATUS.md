@@ -1,6 +1,6 @@
 # 工作状态：先认领，避免重复
 
-更新：2026-11-08。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
+更新：2026-11-09。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
 
 ## 🚧 施工中／已认领，请勿重复开发
 
@@ -12,9 +12,11 @@
 - **COTW-0081 Esoteric Starseeker** — [0.14.68 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST)。完整10星座×9环、双星座、15级Major及来源/资源生命周期；D-F01闭环，隔离托管定向536条断言通过。5项外部能力需合法提供方，任一缺失不半注册。[内容与未测边界](docs/starseeker/README.md)。实机UI、完整存档/重训等未验收。
 - **COTW-0020 Havocker／S-KINETIC与Mimic展示更新** — [0.14.67 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST)。已有TEST实现作为基线，不重复开发；仍有明确场景/提供方等HOLD，见docs/havocker/README.md。不能把TEST交付写成全部历史边界已通过。
 
-## 外部已完成实现／待合入，勿重复开发
+## 外部贡献已合入源码／待后续安装包，勿重复开发
 
-- **COTW-0111 Vindictive Bastard、COTW-0473 Spirit-Bound Blade的Menacing部分** — sxl1216的[PR #5](https://github.com/shenzhoudadi/CotW-Wrath/pull/5)，提交 `71a9c2d6755dc6dd09f5cca5ade9058e5d5f4ab2`。对方报告已完成并经实机确认，用户已明确接受该测试结果，不追加重复验证；本机没有冒充亲测。PR当前尚未合入且有冲突，后续整合只做必要冲突／编译／包内DLL核对，不能将“待合入”误作待从零实现。PR #3／#4是同批旧入口，不能算成额外施工包。
+- **COTW-0111 Vindictive Bastard、COTW-0473 Spirit-Bound Blade的Menacing部分** — sxl1216的[PR #5](https://github.com/shenzhoudadi/CotW-Wrath/pull/5)，原提交 `71a9c2d6755dc6dd09f5cca5ade9058e5d5f4ab2`。2026-11-09已整合，保留当前Starseeker／认领文档并解决旧分支冲突。对方实机测试由用户接受，本机未重复实机／专项测试。PR #3／#4为同批旧入口，不算其他施工包。
+- **COTW-0110 Sacred Servant及Live On原生mercy复用** — sxl1216的[PR #8](https://github.com/shenzhoudadi/CotW-Wrath/pull/8)，原提交 `bcd27389616f3abb5539dd00c65fc5c0c7cda694`。2026-11-09已整合，与#5同时保留注册／状态入口；接受用户认可的贡献者测试，只做静态与合并编译检查。没有恢复Sacred Servant重复开发队列，也没有合入fork上无关的构建／测试环境改动。
+- 两份合并后主工程编译0警告／0错误，5.138秒；DLL新类型与Menacing嵌入图标已核对。[本次整合记录](docs/contributions/20261109-integration.md)。**这些新源码尚未进入新的GitHub安装包，旧0.14.68附件未改变。**
 
 ## 正式稳定基线
 

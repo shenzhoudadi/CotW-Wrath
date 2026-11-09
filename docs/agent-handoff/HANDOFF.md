@@ -5,6 +5,6 @@
 - 保留0.14.67的Havocker与Mimic内容；正式稳定版0.14.66不变。TEST交付不等于完整玩家验收。
 - COTW-0046 Speaker for the Past已完成A/C及B v2实现，D复查发现具体行为问题，**NEEDS_FIX，尚未新出包**：[issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。修复要求见docs/work-packages/COTW-0046/D-review.md，交既有B生产负责人修复后复查，不重复开发。0.14.68 Starseeker仍为当前已交付TEST。
 - 新认领COTW-0117 Spirit Whisperer：[issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)，仅A/C准备、B未实现。分工与prompt在docs/work-packages/COTW-0117/README.md；十魂域Wizard变体及最小S-SPIRIT，不开Spirit Guide。与Speaker共享生产的正式整合串行；不要复制带未提交Speaker的整树作为干净基线。
-- 外部sxl1216已提交Vindictive Bastard与Menacing，[PR #5](https://github.com/shenzhoudadi/CotW-Wrath/pull/5)待合入；用户已认可其对方实机结果，不补重复验证、不另起重复开发。选新项必须先查提交/PR/分支/fork；他人正在做的范围只有用户明确要求才介入。
+- 2026-11-09：sxl1216的Vindictive Bastard／Menacing [PR #5](https://github.com/shenzhoudadi/CotW-Wrath/pull/5)及Sacred Servant／Live On [PR #8](https://github.com/shenzhoudadi/CotW-Wrath/pull/8)已合入源码。用户认可贡献者测试，不重复实机／专项；仅解决冲突、合并编译与DLL／图标核对。旧0.14.68安装包不含这批新增，也未改动；本轮未抬版本或新发布。见docs/contributions/20261109-integration.md。不要重新开发这些内容。
 - 接手先读AGENTS、CURRENT_RELEASE、WORK_STATUS；状态板优先于历史库存的旧进度描述，不重复已交付功能，不自动恢复排除项。
 - 出包包含commit/push、GitHub附件和一次下载核对；新内容先登记施工，完成必要验证与交付后归档并关闭认领issue。只做本轮必要检查，不启动游戏/UMM，不跑全量。
