@@ -39,8 +39,7 @@ HOLD_SHARED_REROLL_AC_KI
 Fresh review: 063 native RuleRollDice still uses one signed accumulator with Min/Max. No source-aware second-lowest-of-three, take-worst interaction and roll-history adapter has since been added. Original also changes shared Scaled Fist AC/Ki. Class/archetype-isolated AC/Ki multiclass and Personal Trial source ownership remain unfrozen. Do not force native AddReroll as an equivalent.
 
 COTW-0110 Sacred Servant
-HOLD_SHARED_DOMAINS_BOND
-Native Paladin exists, but original ClassToProgression.addClassToDomains adapts all deity-selected domains to Paladin preparation and special slots. Project has no complete class/archetype-isolated domain preparation/scaling contract. Bond choices also require locked per-activation allocation and non-renewable daily Lay on Hands restoration; copying shared DivineWeaponProperty group is unsafe.
+SOURCE_MERGED — sxl1216 PR #8，2026-11-09；已合入Sacred Servant与原生领域目录适配，不重复开发。沿用用户认可的贡献者测试；合并编译已通过，尚未进入新安装包，见WORK_STATUS.md。
 
 COTW-0117 Spirit Whisperer
 IN_PROGRESS_RESERVED — issue #7；已认领，A/C准备，B未实现。分工见docs/work-packages/COTW-0117/README.md；历史阻塞：HOLD_SHARED_SPIRITS。
