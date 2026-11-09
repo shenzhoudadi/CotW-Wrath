@@ -1,5 +1,7 @@
 # 当前交接：从简继续
 
+- 新认领COTW-0060 Spirit Guide：[issue #10](https://github.com/shenzhoudadi/CotW-Wrath/issues/10)，Sol已亲自完成A和C，合同C-0060-20261110-r1放行B；尚未实现／检查／出包。见docs/work-packages/COTW-0060/README.md及同目录A/C产物，不重做A/C。十魂域Oracle版与0117不同，尤其Lore、Waves、Cha/Wis、Mystery技能和来源清理；不抢Speaker或fork其他修复。
+
 - 当前预发布：[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)，含Spirit Whisperer和PR #5／#8外部贡献，保留此前功能。主DLL SHA256：`A638DA2FEC71B7E8915B600E60572A8CE280C987694DA1CB7CF31DD571D3E491`。旧附件与0.14.66正式版保留。
 - COTW-0081已完成开发、D-F01修复与独立复查，本项隔离定向536条断言通过。角色A旧星座命名与C文档部分名称错误，以生产目录和docs/starseeker/README.md勘误为准。
 - 保留0.14.67的Havocker与Mimic内容；正式稳定版0.14.66不变。TEST交付不等于完整玩家验收。

@@ -1,0 +1,95 @@
+{
+  "objective": "开个没人做的新内容，规划好，由本会话完成A/C",
+  "date": "2026-11-10",
+  "package": "COTW-0060 Spirit Guide",
+  "contract": "C-0060-20261110-r1",
+  "issue": 10,
+  "base": "91825bcd021a0e7439a5d8541c3a631f0c9a6d5d",
+  "A": {
+    "complete": true,
+    "verifiedOriginalFiles": 13,
+    "nativeCandidates": 38,
+    "spirits": 10,
+    "spells": 90,
+    "hexEntries": 39,
+    "externalUniqueRoots": 4
+  },
+  "C": {
+    "complete": true,
+    "adjudications": 10,
+    "frozenCases": 24,
+    "bExecutable": true,
+    "blockers": []
+  },
+  "plan": {
+    "roles": [
+      "A: Sol completed",
+      "C: Sol completed",
+      "B: single owner pending",
+      "D: independent pending"
+    ],
+    "sequence": "ownership/skill/source bridge -> complete feature -> directed actual branches -> independent D -> one TEST delivery"
+  },
+  "authoritativeChecks": [
+    "current main and 4 branches",
+    "all open/closed PRs 1-9",
+    "all current reservations incl Speaker6",
+    "sxl1216 3 branches and fork-only commits",
+    "fork WORK_STATUS/HANDOFF/REMAINING: COTW0060 still HOLD, not claimed",
+    "fixed source blob equality and current native identity/API metadata",
+    "artifact JSON/count/required-field and no-empty-adjudication checks"
+  ],
+  "compile": "未运行，仅规划",
+  "directed": "未运行，仅冻结expected",
+  "gameStarted": false,
+  "ummStarted": false,
+  "productionModified": false,
+  "Bimplemented": false,
+  "artifacts": {
+    "A-source-scope.md": {
+      "bytes": 5912,
+      "sha256": "2f305f29520ed0e41d2225c582eb391f69d3edfd978c3fbdf07c1cb86962e320"
+    },
+    "A-source-index.json": {
+      "bytes": 12566,
+      "sha256": "34259e13c173546976d2fed1a6669c9d4fe9f2319fc434e798cdfdd097aac6eb"
+    },
+    "A-spirit-map.json": {
+      "bytes": 165375,
+      "sha256": "722b9e54d5255ca49c7ba74fb9a3c7bd977760da86d8ae47a5ff10dce5334bd7"
+    },
+    "A-api-and-provider-anchors.json": {
+      "bytes": 1337,
+      "sha256": "adf76f3a780fa700320176e9e67e7c05eb8c6d8d50f57bc314c738bfd9979822"
+    },
+    "A-gaps.md": {
+      "bytes": 2691,
+      "sha256": "50ac4c87725bf9d640908456b31663fb15811907ec899a2694e935b77d67e9d2"
+    },
+    "A-collection-evidence.json": {
+      "bytes": 145,
+      "sha256": "17d787e6c48ee3deef7f1074390f2116a350317e69548dd10d8c94cef929e26f"
+    },
+    "C-frozen-contract.md": {
+      "bytes": 17283,
+      "sha256": "207c11bbedba1699f76b78f2ca5ca0b99fe5a3e0b5ad5a00d3e9fe0863998b3b"
+    },
+    "C-cases.json": {
+      "bytes": 15450,
+      "sha256": "0ef3b80a33d815aff6fe03b8e2c9e6e5f52ea06adc9eafaa7222ec2a14fde27b"
+    },
+    "HANDOFF-0060-ABCD-20261110.md": {
+      "bytes": 8246,
+      "sha256": "fe363bb11cf09890ee16d1df0143be8e6c14e61ad2aa53020dec9c7b78c70af5"
+    },
+    "B-prompt.txt": {
+      "bytes": 736,
+      "sha256": "2209cc2777b713c9eeab97ae6648ea735824d494997593e8ab283a20a34cc8d6"
+    },
+    "D-prompt.txt": {
+      "bytes": 629,
+      "sha256": "d83ebead6ff5a2bdaf6907b35eef82967f75005b47c4d75b34a9ece37e193933"
+    }
+  },
+  "artifactPaths": "Local agent-tools filenames; GitHub full handoff is README.md with identical content. GitHub post-upload verification is recorded separately."
+}
