@@ -3,7 +3,11 @@ using Kingmaker.UnitLogic.Buffs.Components;
 using System.Linq;
 using Newtonsoft.Json;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Designers.Mechanics.EquipmentEnchants;
+using Kingmaker.PubSubSystem;
+using Kingmaker.RuleSystem.Rules;
 using Kingmaker.Blueprints.Items.Ecnchantments;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
@@ -34,9 +38,14 @@ namespace CallOfTheWild.Wrath.Prototype {
    var b=f.Buff("EmblemOfGreedBuff","Emblem of Greed",text+PsychicStorageSpells.StorageHelp,new PsychicGreedWeapon{Weapons=items.Select(Ref<BlueprintItemWeaponReference>).ToArray()},new PsychicGreedBAB(),new PsychicStoredSpell{Kind=3},new AddProficiencies{WeaponProficiencies=new[]{WeaponCategory.Glaive}});Set(b,"m_Icon",f.Native<BlueprintAbility>("a26c23a887a6f154491dc2cefdad2c35").Icon);PsychicStorageSpells.Buttons(f,"EmblemOfGreed","Emblem of Greed",text+PsychicStorageSpells.StorageHelp,b,3);var spell=Spell(f,"EmblemOfGreed","Emblem of Greed",text+PsychicStorageSpells.StorageHelp,b,true);spell.ComponentsArray=spell.ComponentsArray.Concat(new[]{(BlueprintComponent)new PsychicGreedHands()}).ToArray();
   }
   static void Blade(PsychicAssets f){
-   const string text="Touch a manufactured weapon in the selected hand. For 1 minute per caster level it gains ghost touch and your choice of vicious, keen, cruel or heartseeker. Identical properties do not stack. Removing or switching away from this weapon ends the spell. Menacing is not included in this release.";
-   var anchor=(BlueprintWeaponEnchantment)f.Assets["WeaponSpellAnchorEnchantment"];var ghost=f.Native<BlueprintWeaponEnchantment>("47857e1a5a3ec1a46adf6491b1423b4f");var effects=new[]{f.Native<BlueprintWeaponEnchantment>("a1455a289da208144981e4b1ef92cc56"),f.Native<BlueprintWeaponEnchantment>("102a9c8c9b7a75e4fb5844e79deaf4c0"),f.Native<BlueprintWeaponEnchantment>("629c383ffb407224398bb71d1bd95d14"),f.Native<BlueprintWeaponEnchantment>("e252b26686ab66241afdf33f2adaead6")};string[] labels={"Vicious","Keen","Cruel","Heartseeker"};var variants=new BlueprintAbility[8];
-   for(int i=0;i<4;i++)for(int hand=0;hand<2;hand++){string token="SpiritBoundBlade"+labels[i]+(hand==0?"Main":"Off"),title="Spirit-Bound Blade: "+labels[i]+(hand==0?" (Main Hand)":" (Off-Hand)");var b=f.Buff(token+"Buff",title,text,new PsychicFixedWeaponEnchantment{Anchor=Ref<BlueprintItemEnchantmentReference>(anchor),Effect=Ref<BlueprintItemEnchantmentReference>(ghost),OffHand=hand==1},new PsychicFixedWeaponEnchantment{Anchor=Ref<BlueprintItemEnchantmentReference>(anchor),Effect=Ref<BlueprintItemEnchantmentReference>(effects[i]),OffHand=hand==1});Set(b,"m_Icon",PsychicOriginalIcons.Load(i==0?"HWVicious":i==2?"HWCruel":"SpiritualWeapon"));var a=Spell(f,token,title,text,b,false);a.ComponentsArray=a.ComponentsArray.Concat(new[]{(BlueprintComponent)new PsychicWeaponTarget{OffHand=hand==1}}).ToArray();variants[i*2+hand]=a;}
+   const string text="Touch a manufactured weapon in the selected hand. For 1 minute per caster level it gains ghost touch and your choice of vicious, keen, cruel, heartseeker or menacing. Identical properties do not stack. Removing or switching away from this weapon ends the spell.";
+   const string menacingText="Menacing: while you are adjacent to a creature that your allies are flanking, those flanking allies gain a +2 bonus on attack rolls against it, even if you are not flanking the creature yourself.";
+   var anchor=(BlueprintWeaponEnchantment)f.Assets["WeaponSpellAnchorEnchantment"];var ghost=f.Native<BlueprintWeaponEnchantment>("47857e1a5a3ec1a46adf6491b1423b4f");
+   var menacingFeature=f.Feature("SpiritBoundBladeMenacingFeature","Menacing",menacingText,new PsychicMenacing());menacingFeature.HideInUI=menacingFeature.HideInCharacterSheetAndLevelUp=true;
+   var add=new AddUnitFeatureEquipment();Set(add,"m_Feature",Ref<BlueprintFeatureReference>(menacingFeature));
+   var menacing=f.Clone(f.Native<BlueprintWeaponEnchantment>("66e9e299c9002ea4bb65b6f300e43770"),"SpiritBoundBladeMenacingEnchantment","Menacing",menacingText);menacing.ComponentsArray=new BlueprintComponent[]{add};Set(menacing,"m_EnchantmentCost",0);Set(menacing,"m_EnchantName",Text("SpiritBoundBladeMenacingEnchantment","name","Menacing"));Set(menacing,"m_Description",Text("SpiritBoundBladeMenacingEnchantment","description",menacingText));Set(menacing,"m_Prefix",Text("SpiritBoundBladeMenacingEnchantment","prefix",""));Set(menacing,"m_Suffix",Text("SpiritBoundBladeMenacingEnchantment","suffix",""));
+   var effects=new[]{f.Native<BlueprintWeaponEnchantment>("a1455a289da208144981e4b1ef92cc56"),f.Native<BlueprintWeaponEnchantment>("102a9c8c9b7a75e4fb5844e79deaf4c0"),f.Native<BlueprintWeaponEnchantment>("629c383ffb407224398bb71d1bd95d14"),f.Native<BlueprintWeaponEnchantment>("e252b26686ab66241afdf33f2adaead6"),menacing};string[] labels={"Vicious","Keen","Cruel","Heartseeker","Menacing"};var variants=new BlueprintAbility[10];
+   for(int i=0;i<effects.Length;i++)for(int hand=0;hand<2;hand++){string token="SpiritBoundBlade"+labels[i]+(hand==0?"Main":"Off"),title="Spirit-Bound Blade: "+labels[i]+(hand==0?" (Main Hand)":" (Off-Hand)"),description=i==4?text+" "+menacingText:text;var b=f.Buff(token+"Buff",title,description,new PsychicFixedWeaponEnchantment{Anchor=Ref<BlueprintItemEnchantmentReference>(anchor),Effect=Ref<BlueprintItemEnchantmentReference>(ghost),OffHand=hand==1},new PsychicFixedWeaponEnchantment{Anchor=Ref<BlueprintItemEnchantmentReference>(anchor),Effect=Ref<BlueprintItemEnchantmentReference>(effects[i]),OffHand=hand==1});Set(b,"m_Icon",PsychicOriginalIcons.Load(i==0?"HWVicious":i==2?"HWCruel":i==4?"HWMenacing":"SpiritualWeapon"));var a=Spell(f,token,title,description,b,false);a.ComponentsArray=a.ComponentsArray.Concat(new[]{(BlueprintComponent)new PsychicWeaponTarget{OffHand=hand==1}}).ToArray();variants[i*2+hand]=a;}
    var root=f.Clone(variants[0],"SpiritBoundBlade","Spirit-Bound Blade",text);var choices=new AbilityVariants();Set(choices,"m_Variants",variants.Select(Ref<BlueprintAbilityReference>).ToArray());root.ComponentsArray=new BlueprintComponent[]{new SpellComponent{School=SpellSchool.Transmutation},choices};foreach(var a in variants)Set(a,"m_Parent",Ref<BlueprintAbilityReference>(root));
   }
  }
@@ -51,5 +60,20 @@ namespace CallOfTheWild.Wrath.Prototype {
  public sealed class PsychicGreedHands:BlueprintComponent,IAbilityTargetRestriction {
   public bool IsTargetRestrictionPassed(UnitEntityData caster,TargetWrapper target)=>caster!=null&&PsychicForceSword.HandFree(caster.Body.PrimaryHand)&&PsychicForceSword.HandFree(caster.Body.SecondaryHand);
   public string GetAbilityTargetRestrictionUIText(UnitEntityData caster,TargetWrapper target)=>"Both hands must be empty and unlocked.";
+ }
+ // Menacing is not a native Wrath weapon enchantment. CotW's Kingmaker build
+ // patched RuleCalculateAttackBonus.FlankingBonus, which Wrath does not expose;
+ // add the same +2 to flanking allies through the native rule event instead.
+ [TypeId("dfad8430c0924a079b3f8cac50afc0bb")]
+ public sealed class PsychicMenacing:UnitFactComponentDelegate,IGlobalRulebookHandler<RuleCalculateAttackBonus>,IGlobalSubscriber {
+  public void OnEventAboutToTrigger(RuleCalculateAttackBonus e){
+   var attacker=e.Initiator;var target=e.Target;
+   if(Owner==null||attacker==null||target==null||attacker==Owner)return;
+   if(!attacker.IsAlly(Owner)||target.IsAlly(Owner))return;
+   if(!target.CombatState.IsFlanked||!target.CombatState.EngagedBy.Contains(attacker))return;
+   if(Owner.DistanceTo(target)>new Feet(7).Meters)return;
+   e.AddModifier(2,Fact,ModifierDescriptor.UntypedStackable);
+  }
+  public void OnEventDidTrigger(RuleCalculateAttackBonus e){}
  }
 }

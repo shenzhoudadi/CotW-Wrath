@@ -13,11 +13,9 @@
     "COTW-0098",
     "COTW-0109",
     "COTW-0110",
-    "COTW-0111",
-    "COTW-0117",
-    "COTW-0140"
+    "COTW-0117"
   ],
-  "authority": "The thirteen HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
+  "authority": "The eleven HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
   "provenance": "Project inventory copied with all entry IDs, status/exclusion flags and source references preserved. Local machine prefixes are replaced by portable placeholders; this is a public context export, not the original private evidence file.",
   "items": [
     {
@@ -4949,18 +4947,18 @@
           "external": []
         }
       ],
-      "note": "ExpandedContent 的 Oathbreaker 是基于 Vindictive Bastard 的改编且默认禁用；仅作为机制参考，不将此原版变体标为已覆盖。",
+      "note": "ExpandedContent 的 Oathbreaker 仅作机制参考。2026-11-08 已实现独立 Vindictive Bastard 职业，并按原 CotW 与 Wrath 原生蓝图多轮对齐：克隆 Paladin 法术书并重绑职业；直接引用 Inquisitor Solo Tactics；复用 Smite Evil resource 与额外次数 feature；移植 CotW 的 RuleDealDamage 伤害触发账本；实现 Vindictive Smite、Gang Up、Swift Justice、Aura of Self-Righteousness 与 Ultimate Vindication。Ultimate Vindication 按原 CotW createUltimateVindication 结构实现为击倒盟友后标记攻击者、下一次武器命中自动施放 Disintegrate，并给目标 24 小时冷却。玩家已确认存档、Smite 次数与目标限制、Gang Up 及 Ultimate Vindication 正常，本项完整实测通过。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已实现并获玩家确认：Vindictive Bastard 完整规则（2026-11-08）",
       "importance": "中",
       "dependsOn": [
         "Paladin 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "已完成并获玩家确认；后续仅在出现新日志或游戏回归时定向维护。",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L39",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "本项目已实现并获玩家确认",
+      "ecosystemProfile": "职业、施法、Solo Tactics、Smite、Gang Up、Swift Justice、Aura 与 Ultimate 均已接入并获玩家确认",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },
@@ -6832,20 +6830,20 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "2026-11-08 用户决定暂且搁置。Relic Hunter 依赖 Occultist 的 ImplementEngine、deific focus 分配、invested/locked focus、resonant powers、implement spells 与 focus powers；当前 Occultist 基础职业及其相关资源本身同样处于暂且搁置状态，因此不应先做缺少共享底座的 Relic Hunter 叶子实现。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "搁置：依赖 Occultist 职业及相关资源（用户决定，2026-11-08）",
       "importance": "中",
       "dependsOn": [
-        "Inquisitor 主体与相关能力稳定"
+        "Occultist 基础职业与 ImplementEngine/相关资源解除搁置并稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "保持搁置；Occultist 主体与 implement/focus 共享机制恢复开发后再重新评估。",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L49",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "暂且搁置：受 Occultist 共享资源阻塞",
+      "ecosystemProfile": "暂且搁置：Occultist 主体与 implement/focus 体系尚未实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0141",
@@ -21740,16 +21738,16 @@
           "external": []
         }
       ],
-      "note": "0.13.31完成独立自检与Medium/Harmony2.4.2回归；具体行为/边界见0.13.28-0.13.31汇总测试说明。当前四种原生附魔×主副手；Menacing不开放，其他附魔遵循Wrath原生实现。",
+      "note": "0.13.31完成独立自检与 Medium/Harmony 回归；具体行为/边界见0.13.28-0.13.31汇总测试说明。2026-11-07 用户点名补完 Menacing，覆盖历史 excludeNewImplementation/userSelectionAllowed 与 0.14.12「不新增Menacing」范围；使用独立 BlueprintWeaponEnchantment、AddUnitFeatureEquipment 与 PsychicMenacing 夹击规则，图标取自原 CotW。2026-11-08 玩家确认 Menacing 正常。历史 repairHistory 原样保留。",
       "priority": "P2",
       "difficulty": "中",
-      "status": "部分实现：Menacing待补",
+      "status": "已实现并获玩家确认：Menacing（2026-11-08）",
       "importance": "中",
       "dependsOn": [],
       "action": "按整轮汇总说明集中检查。",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L413",
       "currentProfile": "已交付根；不重复新建（首次版本见0.13.32已交付清单）",
-      "ecosystemProfile": "部分实现：Menacing待补",
+      "ecosystemProfile": "已实现并获玩家确认：Spirit-Bound Blade Menacing（2026-11-08）",
       "excludeNewImplementation": true,
       "deliveredSpellRoots": [
         "Spirit-Bound Blade"
