@@ -42,5 +42,4 @@ COTW-0110 Sacred Servant
 SOURCE_MERGED — sxl1216 PR #8，2026-11-09；已合入Sacred Servant与原生领域目录适配，不重复开发。沿用用户认可的贡献者测试；合并编译已通过，尚未进入新安装包，见WORK_STATUS.md。
 
 COTW-0117 Spirit Whisperer
-IN_PROGRESS_RESERVED — issue #7；已认领，A/C准备，B未实现。分工见docs/work-packages/COTW-0117/README.md；历史阻塞：HOLD_SHARED_SPIRITS。
-Native Wizard exists. Original uses all ten SpiritsEngine families with Wizard/Intelligence and secondary Charisma scaling, tiers 1/8/20, matching hex selection and familiar-only bond. No complete class-isolated spirit/hex/resource bridge is published. Shares the Spirit Guide blocker.
+SOURCE_MERGED_AWAITING_TEST_PACKAGE — issue #7；A/C/B/D和最终整合复查完成，完整十魂域Wizard变体与最小隔离桥已合入源码，不再按HOLD重复开发。174条隔离检查及合并编译通过；未测行为／UI及已知选标边界见docs/spirit-whisperer/README.md。尚未出新安装包，Spirit Guide并未因此完成。
