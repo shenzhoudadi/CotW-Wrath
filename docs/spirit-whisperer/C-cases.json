@@ -1,0 +1,142 @@
+{
+  "contractId": "C-0117-20261108",
+  "workPackage": "COTW-0117",
+  "bExecutable": "yes",
+  "conditions": [
+    "Isolate from current GitHub main. Do not copy an uncommitted Speaker tree and do not edit Speaker sources.",
+    "Publish all ten spirits or nothing. A missing required provider rejects the whole archetype.",
+    "Use Wizard level, Intelligence and Charisma only on the branches named in C-frozen-contract.md.",
+    "Run these cases through native resource, restriction and parameter components. A component field being present is not a pass."
+  ],
+  "nonBlockingLimit": "LIMIT-0117-DESCRIPTOR-ENERGY-ONLY",
+  "cases": [
+    {
+      "id": "PAY-R1-ONCE",
+      "branch": "R1 single spend",
+      "setup": "Wizard 8 Spirit Whisperer, Charisma 14, full Enemies' Bane pool (5).",
+      "action": "Execute Enemies' Bane once through AbilityCastRateUtils.SpendResources and its effect.",
+      "expect": "Pool is 4. The one-minute weapon effect is applied once.",
+      "negative": "A second resource component on the parent or weapon enchantment must not move the pool to 3."
+    },
+    {
+      "id": "PAY-R1-ZERO",
+      "branch": "R1 empty pool",
+      "setup": "Same character with the pool spent to 0.",
+      "action": "Ask IsAbilityRestrictionPassed, then do not run the effect.",
+      "expect": "Restriction is false, pool stays 0, no bane effect is present.",
+      "negative": "Calling the effect after a failed restriction is not a legal cast and must not be recorded as success."
+    },
+    {
+      "id": "PAY-R1-CANCEL",
+      "branch": "cancelled cast",
+      "setup": "Pool at 5. Caster restriction fails, or the cast is cancelled before SpendResources.",
+      "action": "Do not execute the ability.",
+      "expect": "Pool stays 5 and no cooldown or effect buff is applied.",
+      "negative": "A failed save after a legal cast does not refund the point."
+    },
+    {
+      "id": "PAY-R3-COOLDOWN",
+      "branch": "fixed three plus cooldown",
+      "setup": "Wizard 8, Shard Soul pool at 3, no cooldown buff.",
+      "action": "Execute once, then attempt again while the 1d4-round cooldown fact remains.",
+      "expect": "First cast leaves the pool at 2 and applies the private cooldown to the caster. Second attempt fails AbilityCasterHasNoFacts, leaves the pool at 2, and does not refresh the cooldown.",
+      "negative": "Changing Intelligence or Charisma does not change the maximum of 3. Rest removes the cooldown buff and refills the pool to 3 without refilling a foreign resource."
+    },
+    {
+      "id": "PAY-BATTLE-ROUND",
+      "branch": "activatable rounds",
+      "setup": "Charisma 10, Battle Spirit pool at 3. No AbilityResourceLogic on the toggle.",
+      "action": "Activate with a standard command and invoke ActivatableAbilityResourceLogic.OnNewRound once. Then deactivate.",
+      "expect": "Exactly one point is spent by the new-round callback. Deactivate does not refund it. Combat-end deactivation does not spend an extra point.",
+      "negative": "At 0 the toggle is unavailable and cannot remain on. A parallel AbilityResourceLogic must not spend a second point."
+    },
+    {
+      "id": "PAY-LIFE-SHARED",
+      "branch": "Life channel shared pool and Charisma DC",
+      "setup": "Wizard 8, Charisma 14 so the shared channel pool is 3. Intelligence 10.",
+      "action": "Spend the heal leaf once. Calculate harm-leaf DC.",
+      "expect": "Both leaves use one resource. After heal, harm sees 2 remaining. Channel DC is 18. The variant parent has no AbilityResourceLogic.",
+      "negative": "Raising Intelligence does not change this DC or this pool. A cleric or native Extra Channel resource is unchanged. Extra Channel (Spirit Whisperer Life Spirit) adds 2 only to this pool."
+    },
+    {
+      "id": "PAY-LIFE-LINK",
+      "branch": "bond slot refund",
+      "setup": "Wizard 5, Life Link pool at 5.",
+      "action": "Apply one link, then remove that buff through its own end action.",
+      "expect": "The link spends one point, then ending it restores exactly one point.",
+      "negative": "Ending it does not restore two points or raise the pool above 5. A sixth simultaneous link is impossible."
+    },
+    {
+      "id": "STAT-SPLIT",
+      "branch": "Intelligence and Charisma are independent",
+      "setup": "Wizard 8. Start at Intelligence 18, Charisma 10. Then set Intelligence 10 and Charisma 18.",
+      "action": "Read Shard Soul DC, Enemies' Bane maximum, Life Channel DC, and Heavens Manifestation save bonus.",
+      "expect": "First state: Shard Soul DC 18, Bane maximum 3, Channel DC 14, Heavens saves +4. Second state: Shard Soul DC 14, Bane maximum 7, Channel DC 18, Heavens saves +0.",
+      "negative": "No branch uses Wisdom. Benefit of Wisdom changes Lore (Nature/Religion) to Intelligence and does not rewrite Knowledge (Arcana/World)."
+    },
+    {
+      "id": "LEVEL-WIZARD-ONLY",
+      "branch": "multiclass isolation",
+      "setup": "Wizard 1 / Fighter 19 with the archetype, and a separate Shaman 20 without it.",
+      "action": "Evaluate progression entries, a class-ranked damage value, and Shaman blueprint identity.",
+      "expect": "The whisperer has only the level-1 ability. Dice and DC use Wizard level 1. Shaman archetype count and a sampled native spirit component array are unchanged.",
+      "negative": "Fighter or Shaman levels do not unlock level 8 or 20 and do not enter m_Class."
+    },
+    {
+      "id": "HEX-GATE",
+      "branch": "hex eligibility and bonus feat",
+      "setup": "Battle progression selected. Hex selection at level 5.",
+      "action": "Evaluate CanSelect for a Battle hex, a Flame hex, and WizardFeatSelection.",
+      "expect": "Battle hex and the wizard bonus feat are selectable. Flame hex is not. IgnorePrerequisites is false.",
+      "negative": "Level 20 does not contain a fourth hex selection. The same hex cannot be taken at both level 5 and 10. Waves does not offer Fluid Magic and does offer Beckoning Chill."
+    },
+    {
+      "id": "FAMILIAR-ONLY",
+      "branch": "arcane bond",
+      "setup": "Level-1 archetype additions.",
+      "action": "Inspect the bond selection and the removed native selections.",
+      "expect": "Specialist school and the original arcane bond are removed. The new selection's own components are empty, its choices come from 363cab72f77c47745bf3a8807074d183, and it contains no bonded item.",
+      "negative": "The native familiar selection and BloodlineFamiliar01446 are not rewritten. A wizard 5 / rogue 0 familiar does not scale from rogue level."
+    },
+    {
+      "id": "LORE-LIFE-EXCEPTIONS",
+      "branch": "named source exceptions",
+      "setup": "Published Lore and Life progressions at the levels being tested.",
+      "action": "Read level-8 and level-20 features.",
+      "expect": "Lore level 8 is Perfect Knowledge (+10 competence on the four knowledge/lore skills), not Arcane Enlightenment. Lore level 20 includes one fixed Wish use with Intelligence parameters. Life level 8 is Healer's Touch. Life has no Quick Healing feature.",
+      "negative": "Heavens level 20 has no Extend/Reach toggle. Flame, Stone, Waves and Wind level 20 do, and those toggles do not raise spell level."
+    },
+    {
+      "id": "META-EXCLUSIVE",
+      "branch": "energy metamagic",
+      "setup": "Flame manifestation. One fire spell and one non-fire spell prepared.",
+      "action": "Activate Extend, then activate Reach.",
+      "expect": "Extend turns off when Reach turns on. The fire spell gains that metamagic with no spell-level or cast-time increase. The non-fire spell does not.",
+      "negative": "No resource is spent. A spell tagged only with an absent Air/Water/Earth flag is outside the filter. AutoMetamagic.ShouldApplyTo is not globally patched."
+    },
+    {
+      "id": "OWNERSHIP-REMOVE",
+      "branch": "same-name source cleanup",
+      "setup": "Character has a whisperer Stardust effect and a foreign buff with the same display name but a different source blueprint.",
+      "action": "Remove the whisperer progression feature, including retraining that fact away.",
+      "expect": "Only facts and resources whose source GUID is in the 0117 set are removed. The ability no longer passes its caster restriction.",
+      "negative": "The foreign buff and any native shaman or cleric resource remain. Removal does not push a resource pool negative."
+    },
+    {
+      "id": "REST-LEVEL",
+      "branch": "restore and clamp",
+      "setup": "R1 pool partially spent. Charisma then rises by 4, later falls by 4. A rest occurs with a cooldown buff up.",
+      "action": "Apply the stat changes and a native rest.",
+      "expect": "The maximum follows Charisma. An increase adds the new uses. A decrease clamps the current amount to the new maximum. Rest refills this pool to maximum and removes the cooldown.",
+      "negative": "Rest does not refill an unrelated foreign pool, because this package does not patch global rest."
+    },
+    {
+      "id": "ATOMIC-REJECT",
+      "branch": "missing provider",
+      "setup": "Cache missing one required donor GUID from contract section 9.",
+      "action": "Call register.",
+      "expect": "Register returns false, writes no private blueprint, and does not append a Wizard archetype, UI group or feat.",
+      "negative": "A later call after the donor appears may publish the complete archetype once. A second successful call does not append a duplicate archetype."
+    }
+  ]
+}

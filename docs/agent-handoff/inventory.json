@@ -11,11 +11,9 @@
     "COTW-0070",
     "COTW-0095",
     "COTW-0098",
-    "COTW-0109",
-    "COTW-0110",
-    "COTW-0117"
+    "COTW-0109"
   ],
-  "authority": "The thirteen HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
+  "authority": "The eleven HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
   "provenance": "Project inventory copied with all entry IDs, status/exclusion flags and source references preserved. Local machine prefixes are replaced by portable placeholders; this is a public context export, not the original private evidence file.",
   "items": [
     {
@@ -4918,18 +4916,18 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "Sacred Servant、原生领域目录适配与Live On原生mercy复用已由sxl1216提交并合入。用户接受贡献者测试；本机只做必要静态检查、合并编译和DLL内容核对，未冒充玩家亲测。 已统一纳入0.14.69 Combined TEST；不代表本机已完成玩家游戏全场景验收。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已完成开发／TEST交付：0.14.69（2026-11-09）",
       "importance": "中",
       "dependsOn": [
         "Paladin 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "不重复开发；按实际玩家log定向维护，已知／未测边界保留。",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L39",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "本项目已纳入0.14.69 Combined TEST",
+      "ecosystemProfile": "贡献者已实现，用户接受其测试；PR #8已合入",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },
@@ -5295,18 +5293,18 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "A/C/B/D完成；174条隔离检查37.59秒，合并编译8.138秒、0警告0错误。检查非完整玩家游戏，已知选标与未测支付／休息／重训等如实保留。 已统一纳入0.14.69 Combined TEST；不代表本机已完成玩家游戏全场景验收。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已完成开发／TEST交付：0.14.69（2026-11-09）",
       "importance": "中",
       "dependsOn": [
         "Wizard 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "不重复开发；按实际玩家log定向维护，已知／未测边界保留。",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L41",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "本项目已纳入0.14.69 Combined TEST",
+      "ecosystemProfile": "本项目完整十魂域Wizard变体源码已合入，实际未测边界保留",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },

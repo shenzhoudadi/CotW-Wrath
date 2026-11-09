@@ -1,0 +1,35 @@
+{
+  "version": "0.14.69",
+  "channel": "TEST",
+  "formalRelease": false,
+  "dlls": {
+    "Assemblies/CallOfTheWild.Wrath.Prototype.dll": "A638DA2FEC71B7E8915B600E60572A8CE280C987694DA1CB7CF31DD571D3E491",
+    "Modules/Medium/MediumClass.dll": "2E85AC9C15839695BEBAA4120DC271AC8FF2EFB881B55A462BB1DB56CE6C6775",
+    "Modules/WayOfTheShield/Way of the shield.dll": "7F31F1498A9D7F84A2EEA780AB477ACBE366B65B266B4076152529F53893BC62"
+  },
+  "normalTimings": {
+    "compileSeconds": 29.737,
+    "packageChecksSeconds": 2.157,
+    "incrementalChecksExecuted": false,
+    "incrementalChecksSeconds": null,
+    "checks": {},
+    "totalSeconds": 32.036
+  },
+  "testRepackAndChecksSeconds": 0.653,
+  "directedRerun": false,
+  "priorSpiritWhisperer": {
+    "count": 174,
+    "seconds": 37.59,
+    "exitCode": 0,
+    "candidateSHA256": "E52FCD5C7325F99189A1ABF57C19DFA33B3325DEB600B99DAB56CDEC354BC91D"
+  },
+  "contributorTesting": "Accepted by user; no duplicate game tests",
+  "gameLaunched": false,
+  "ummLaunched": false,
+  "buildScriptChanged": false,
+  "installer": {
+    "bytes": 4953016,
+    "sha256": "94E03E2F5067D56C8D049F878294550658274BF711162D256D20D985A011EBBA",
+    "filename": "CallOfTheWildWrathPrototype-0.14.69-Combined-TEST.zip"
+  }
+}

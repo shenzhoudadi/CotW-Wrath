@@ -39,17 +39,7 @@ HOLD_SHARED_REROLL_AC_KI
 Fresh review: 063 native RuleRollDice still uses one signed accumulator with Min/Max. No source-aware second-lowest-of-three, take-worst interaction and roll-history adapter has since been added. Original also changes shared Scaled Fist AC/Ki. Class/archetype-isolated AC/Ki multiclass and Personal Trial source ownership remain unfrozen. Do not force native AddReroll as an equivalent.
 
 COTW-0110 Sacred Servant
-HOLD_SHARED_DOMAINS_BOND
-Native Paladin exists, but original ClassToProgression.addClassToDomains adapts all deity-selected domains to Paladin preparation and special slots. Project has no complete class/archetype-isolated domain preparation/scaling contract. Bond choices also require locked per-activation allocation and non-renewable daily Lay on Hands restoration; copying shared DivineWeaponProperty group is unsafe.
-
-COTW-0111 Vindictive Bastard
-HOLD_SHARED_RETALIATION_CLASS
-Original is a separate class with retaliation entitlement after real ally harm, source/target-owned smite, Gang Up, swift sharing and Ultimate Vindication. Current project has no complete retaliation/source ledger or separate-class qualification/transport contract. ExpandedContent Oathbreaker is an adapted reference, not completion of this original class.
+SOURCE_MERGED — sxl1216 PR #8，2026-11-09；已合入Sacred Servant与原生领域目录适配，不重复开发。沿用用户认可的贡献者测试；合并编译已通过，已纳入0.14.69 TEST，见WORK_STATUS.md。
 
 COTW-0117 Spirit Whisperer
-IN_PROGRESS_RESERVED — issue #7；已认领，A/C准备，B未实现。分工见docs/work-packages/COTW-0117/README.md；历史阻塞：HOLD_SHARED_SPIRITS。
-Native Wizard exists. Original uses all ten SpiritsEngine families with Wizard/Intelligence and secondary Charisma scaling, tiers 1/8/20, matching hex selection and familiar-only bond. No complete class-isolated spirit/hex/resource bridge is published. Shares the Spirit Guide blocker.
-
-COTW-0140 Relic Hunter
-HOLD_SHARED_IMPLEMENT_ENGINE
-Native Inquisitor exists. Original depends on the Occultist ImplementEngine and class-scoped deific focus allocation, invested/locked focus, resonant powers, implement spells and focus powers. Current project has no equivalent shared implement engine; an external class name cannot establish the required focus components and daily lifecycle.
+COMPLETED_DEVELOPMENT_TEST — 0.14.69 Combined TEST／issue #7；A/C/B/D和最终整合复查完成，完整十魂域Wizard变体与最小隔离桥已合入源码，不再按HOLD重复开发。174条隔离检查及合并编译通过；未测行为／UI及已知选标边界见docs/spirit-whisperer/README.md。已纳入0.14.69 TEST，Spirit Guide并未因此完成。

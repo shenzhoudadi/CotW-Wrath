@@ -1,6 +1,6 @@
 # COTW-0117 Spirit Whisperer：A／C／B／D 分工与执行 prompt
 
-日期：2026-11-08。认领：[issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)。**选题与 A/C 准备阶段；B 尚未实现，未编译、未测试、未交付。**
+更新：2026-11-09。认领：[issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)。**A/C/B/D及最终整合复查已完成，已纳入0.14.69 Combined TEST，不重复开发。**174条隔离检查37.59秒，合并编译8.138秒、0警告／0错误。实际范围、已知边界与未测项见[源码交付说明](../../spirit-whisperer/README.md)。下文保留原分工作为历史交接，不能把旧“B未实现”描述当当前状态。
 
 这是完整 Wizard 变体包 F-0117，含它必需的最小 S-SPIRIT 隔离桥。一个变体统一交付，不拆成十次魂域发布。将本文件完整交给 agent，再指定“只执行 A／C／B／D”即可。
 
