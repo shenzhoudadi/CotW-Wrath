@@ -1,6 +1,6 @@
 # Spirit Whisperer — 源码交付与边界
 
-2026-11-09：COTW-0117／S-SPIRIT-0117 已完成 A/C/B/D 工作及最终整合复查，源码合入基线为 `48abc49ffe4839d45dc3ac224f8ce762629e89c2`。**尚未出新安装包，旧0.14.68 Starseeker TEST附件不变。**
+2026-11-09：COTW-0117／S-SPIRIT-0117 已完成 A/C/B/D 工作及最终整合复查，源码合入基线为 `48abc49ffe4839d45dc3ac224f8ce762629e89c2`。**已纳入[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)，旧0.14.68 Starseeker TEST附件不变。**
 
 内容：Wizard完整十魂域（Battle、Bones、Flame、Heavens、Life、Lore、Nature、Stone、Waves、Wind）、1/8/20能力、5/10/15巫术入口、仅魔宠Arcane Bond、Wizard／Intelligence与指定Charisma资源隔离、Lore的特殊层级、Life私有Extra Channel及原作保留的bonus feat选项。只使用一份本项隔离桥，不发Spirit Magic法术，不改原生Shaman或Speaker。
 
@@ -20,4 +20,4 @@
 
 沿用D的非阻断记录：Heaven's Leap若同时残留自己和队友的标记，可能优先选中自己；选标／实际移动控制器仍待TEST玩家验证。Stormwalker天气更新、Deathly Being治疗转换等已有局部回调检查不冒充完整游戏测试。原生效果共享部分没有逐项重建全场景。后续按玩家实际log定向修复，不自动启动新的HOLD深挖队列。
 
-本轮仅按用户要求提交合并源码。issue #7标为“开发完成／源码已合入，待TEST交付”，保留占用，避免别人重做；后续正常TEST安装包交付后再关闭，不把源码合并写成已发布新版。
+用户随后要求统一测试包，现已纳入0.14.69 Combined TEST；本节8.138秒为先前整合编译，版本更新的正常出包编译29.737秒、包检查2.157秒。174条同内容专项未重跑；上传下载核对后关闭issue #7。该TEST交付仍不等于完整玩家验收。

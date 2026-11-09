@@ -1,10 +1,10 @@
 # 当前开发与出包流程
 
-0.14.66已发布。入口为仓库根 `build.ps1`；本地原工程位于 `outputs/CallOfTheWild.Wrath.Prototype`。
+0.14.66正式稳定版保留。当前预发布为 **[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)**（程序集0.14.69.0）：Spirit Whisperer、Vindictive Bastard／Menacing、Sacred Servant／Live On统一测试包，保留已有Havocker／Mimic／Starseeker和内置模块；不含待修复的Speaker。编译29.737秒、常规包检查2.157秒，已有同内容专项未重跑。未测与已知边界见docs/releases/0.14.69-TEST.md。正常入口仍是build.ps1。
 
-2026-11-09：Spirit Whisperer COTW-0117已完成A/C/B/D和最终源码整合，尚未发布新安装包。沿用174条／37.59秒隔离检查，合并编译8.138秒、0警告／0错误。未测及已知边界见docs/spirit-whisperer/README.md；当前GitHub安装包仍为原0.14.68。
+历史源码阶段（现已纳入0.14.69）：Spirit Whisperer COTW-0117已完成A/C/B/D和最终源码整合，尚未发布新安装包。沿用174条／37.59秒隔离检查，合并编译8.138秒、0警告／0错误。未测及已知边界见docs/spirit-whisperer/README.md；当前GitHub安装包仍为原0.14.68。
 
-2026-11-09：main另已合入sxl1216的PR #5（Vindictive Bastard／Menacing）与PR #8（Sacred Servant／Live On），尚未新出安装包。沿用用户认可的贡献者测试，本机仅完成必要静态整合、编译和DLL内容核对，不宣称亲测游戏；旧0.14.68附件及版本未变。记录见docs/contributions/20261109-integration.md。
+历史源码阶段（现已纳入0.14.69）：main另已合入sxl1216的PR #5（Vindictive Bastard／Menacing）与PR #8（Sacred Servant／Live On），尚未新出安装包。沿用用户认可的贡献者测试，本机仅完成必要静态整合、编译和DLL内容核对，不宣称亲测游戏；旧0.14.68附件及版本未变。记录见docs/contributions/20261109-integration.md。
 
 2026-11-08：当前开发预发布为 **0.14.68 Starseeker TEST**（程序集0.14.68.0），[GitHub下载](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST)。完整变体已完成开发和D复查；先前本项隔离定向536条断言通过、48.36秒；版本更新没有重跑同内容专项。实机／完整存档等边界仍未验收。施工占用与已完成条目统一看 [WORK_STATUS.md](WORK_STATUS.md)。正式稳定版仍为0.14.66，旧附件保留。
 
