@@ -4887,17 +4887,17 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "原作六份固定blob与Wrath原生锚点已核对，C-0109-20261111-r1已冻结。施工issue #11。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "施工中：A/C已完成，B待实现",
       "importance": "中",
       "dependsOn": [
         "Paladin 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "按docs/work-packages/COTW-0109交B实现，交独立D复查；尚未编译或出包",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L39",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "原生圣武士变体待实现，已完成原作与原生依赖核对",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"

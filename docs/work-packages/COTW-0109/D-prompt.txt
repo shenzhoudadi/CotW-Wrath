@@ -1,0 +1,7 @@
+你是 COTW-0109 Iroran Paladin 的独立 D。读同目录 README.md、A-source-and-compat.md、A-native-anchors.json、C-frozen-contract.md、C-cases.json，及 B 交付的候选提交、B-progress.md、B-evidence.json、原始日志和指纹。生产只读，在 C:\Users\xuenc\agent-tools\iroran-paladin-next\D-review.md 记录复查；可随实际需要附一份精简证据摘要。基线 a3f5346 / 0.14.70 TEST，认领 issue #11。
+
+重点查实际等级选择只能用 Irori、Wrath 的武器／坐骑选择确实被替换、Personal Trial 两施法者标记和资源实际支付、同一原生气池的 retain/release 和真实 Scaled Fist 计级、Dodge 在失去 Dex 时、武器切换下 Divine Body 仅增强当前真实拳头、重掷聚合／晚到批次及 raw history。检查正反例能区分错误实现，不能把字段或直接 Resource.Spend 当成完整消费链。查有没有重复造轮子、是否改了原生共享资产和已经在施工的范围。
+
+给出 REVIEW_PASS 或 NEEDS_FIX 和最小可定位证据。未测场景如实记录，沿用既有同内容结果，只验证被修改或证据不成立的本项分支。禁止全历史、全量、游戏／UMM。真实缺陷退原 B。D 通过后才进入用户授权的正常 TEST 整合、GitHub 发布及下载核验，交付后更新 WORK_STATUS 并关闭 #11。
+
+Iroran TEST 的包内中文 README 保留单独一行「猫猫堡是猪猪」。

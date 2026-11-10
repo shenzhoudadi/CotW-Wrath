@@ -1,0 +1,515 @@
+{
+  "pin": "1332fb0db844b7863f484ca978bea2349fe49769",
+  "sourceGitBlobs": {
+    "Archetypes/IroranPaladin.cs": "ef9882c82a9fbc68427cb8623ea47d7f79741f3e",
+    "ShowRerolls.cs": "863be27b9d2a86790826821ea794a130fca35d4a",
+    "NewMechanics/NewMechanics.cs": "0c180cf7ddaf6fe1f7e685973f9e5e39d55d0574",
+    "Common.cs": "eabe586810759541425b0e9ab1522caed337e2db",
+    "ClassToProgression.cs": "900b8e24867ddae0850d9e348e0d1b122340f184",
+    "settings.json": "d9f21b517b824733619de65f58e825f572f49ee2"
+  },
+  "base": "a3f534625643b94cfa644e19c8a7fbcb7d6e528a",
+  "gameAssemblySHA256": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+  "harmonySHA256": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5",
+  "nativeIdentities": [
+    {
+      "guid": "23a77a5985de08349820429ce1b5a234",
+      "path": "Classes/Basic/Deities/IroriFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "PrerequisiteAlignment",
+        "AddFeatureOnClassLevel",
+        "AddFacts",
+        "ForbidSpellbookOnAlignmentDeviation",
+        "PrerequisiteNoArchetype",
+        "PrerequisiteNoArchetype",
+        "AddFeatureIfHasFact",
+        "AddFacts",
+        "PrerequisiteNoArchetype",
+        "PrerequisiteNoArchetype",
+        "PrerequisiteNoArchetype",
+        "PrerequisiteNoFeature",
+        "PrerequisiteNoFeature"
+      ]
+    },
+    {
+      "guid": "6d3728d4e9c9898458fe5e9532951132",
+      "path": "Classes/Basic/Proficiencies/LightArmorProficiency.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddProficiencies",
+        "PrerequisiteNotProficient",
+        "FeatureTagsComponent",
+        "PrerequisiteClassLevel"
+      ]
+    },
+    {
+      "guid": "203992ef5b35c864390b4e4a1e200629",
+      "path": "Classes/Basic/Proficiencies/MartialWeaponProficiency.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddProficiencies",
+        "PrerequisiteNotProficient",
+        "AddProficiencies",
+        "AddProficiencies",
+        "AddProficiencies",
+        "AddProficiencies",
+        "AddProficiencies",
+        "PrerequisiteClassLevel",
+        "FeatureTagsComponent"
+      ]
+    },
+    {
+      "guid": "e70ecf1ed95ca2f40b754f1adb22bbdd",
+      "path": "Classes/Basic/Proficiencies/SimpleWeaponProficiency.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddProficiencies",
+        "PrerequisiteNotProficient",
+        "PrerequisiteClassLevel"
+      ]
+    },
+    {
+      "guid": "e8f21e5b58e0569468e420ebea456124",
+      "path": "Classes/Monk/MonkClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "componentTypes": [
+        "PrerequisiteNoClassLevel",
+        "PrerequisiteAlignment",
+        "PrerequisiteIsPet"
+      ]
+    },
+    {
+      "guid": "c3fbeb2ffebaaa64aa38ce7a0bb18fb0",
+      "path": "Classes/Monk/MonkUnarmedStrike.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "EmptyHandWeaponOverride"
+      ]
+    },
+    {
+      "guid": "3929bfd1beeeed243970c9fc0cf333f8",
+      "path": "Classes/Monk/Archetypes/ScaledFist/ScaledFistACBonus.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddFacts"
+      ]
+    },
+    {
+      "guid": "5868fc82eb11a4244926363983897279",
+      "path": "Classes/Monk/Archetypes/ScaledFist/ScaledFistArchetype.jbp",
+      "type": "BlueprintArchetype"
+    },
+    {
+      "guid": "ca948bb4ce1a2014fbf4d8d44b553074",
+      "path": "Classes/Monk/Archetypes/ScaledFist/ScaledFistKiPowers/ScaledFistExtraAttack.jbp",
+      "type": "BlueprintAbility",
+      "componentTypes": [
+        "AbilityEffectRunAction",
+        "AbilityResourceLogic",
+        "AbilitySpawnFx"
+      ]
+    },
+    {
+      "guid": "4694f6ac27eaed34abb7d09ab67b4541",
+      "path": "Classes/Monk/Archetypes/ScaledFist/ScaledFistKiPowers/ScaledFistKiPowerSelection.jbp",
+      "type": "BlueprintFeatureSelection"
+    },
+    {
+      "guid": "ae98ab7bda409ef4bb39149a212d6732",
+      "path": "Classes/Monk/Archetypes/ScaledFist/ScaledFistKiPowers/ScaledFistPowerFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddAbilityResources",
+        "AddFacts"
+      ],
+      "jbpSHA256": "f6d0c34cc5dd848e364db76459cfbadeba4c04a8484b27c6451ed12138a4bd3c"
+    },
+    {
+      "guid": "7d002c1025fbfe2458f1509bf7a89ce1",
+      "path": "Classes/Monk/Archetypes/ScaledFist/ScaledFistKiPowers/ScaledFistPowerResource.jbp",
+      "type": "BlueprintAbilityResource",
+      "jbpSHA256": "6feddf836dc58083571dbc0f4df78a789dff817707b56c9caa44b6ac14907167"
+    },
+    {
+      "guid": "ddc10a3463bd4d54dbcbe993655cf64e",
+      "path": "Classes/Monk/KiStrike/KiStrikeAdamantine.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddOutgoingPhysicalDamageProperty",
+        "AddOutgoingPhysicalDamageProperty",
+        "SavesFixerRecalculate"
+      ]
+    },
+    {
+      "guid": "7b657938fde78b14cae10fc0d3dcb991",
+      "path": "Classes/Monk/KiStrike/KiStrikeColdIronSilver.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddOutgoingPhysicalDamageProperty",
+        "AddOutgoingPhysicalDamageProperty",
+        "AddOutgoingPhysicalDamageProperty",
+        "AddOutgoingPhysicalDamageProperty",
+        "SavesFixerRecalculate"
+      ]
+    },
+    {
+      "guid": "34439e527a8f5fb4588024e71960dd42",
+      "path": "Classes/Monk/KiStrike/KiStrikeLawful.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddOutgoingPhysicalDamageProperty",
+        "AddOutgoingPhysicalDamageProperty",
+        "SavesFixerRecalculate"
+      ]
+    },
+    {
+      "guid": "1188005ee3160f84f8bed8b19a7d46cf",
+      "path": "Classes/Monk/KiStrike/KiStrikeMagic.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddOutgoingPhysicalDamageProperty",
+        "AddOutgoingPhysicalDamageProperty",
+        "SavesFixerRecalculate"
+      ]
+    },
+    {
+      "guid": "bfa11238e7ae3544bbeb4d0b92e897ec",
+      "path": "Classes/Paladin/PaladinClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "componentTypes": [
+        "PrerequisiteNoClassLevel",
+        "PrerequisiteAlignment",
+        "PrerequisiteNoFeature",
+        "PrerequisiteIsPet",
+        "PrerequisiteFeaturesFromList",
+        "DeityDependencyClass"
+      ]
+    },
+    {
+      "guid": "a7c8b73528d34c2479b4bd638503da1d",
+      "path": "Classes/Paladin/PaladinDeitySelection.jbp",
+      "type": "BlueprintFeatureSelection",
+      "componentTypes": [
+        "NoSelectionIfAlreadyHasFeature"
+      ],
+      "jbpSHA256": "a38775a56480488b6b26b683f0bcd84137d532541e0aeb0d1708a79b8ac09953"
+    },
+    {
+      "guid": "b10ff88c03308b649b50c31611c2fefb",
+      "path": "Classes/Paladin/PaladinProficiencies.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddFacts"
+      ]
+    },
+    {
+      "guid": "fd325cbba872e5f40b618970678db002",
+      "path": "Classes/Paladin/PaladinProgression.jbp",
+      "type": "BlueprintProgression",
+      "levelFeatures": {
+        "1": [
+          "PaladinProficiencies",
+          "SmiteEvilFeature",
+          "PaladinAlignmentRestriction",
+          "!bp_d3e6275cfa6e7a04b9213b7b292a011c",
+          "!bp_62ef1cdb90f1d654d996556669caf7fa"
+        ],
+        "2": [
+          "DivineGrace",
+          "LayOnHandsFeature"
+        ],
+        "3": [
+          "AuraOfCourageFeature",
+          "DivineHealth",
+          "SelectionMercy"
+        ],
+        "4": [
+          "SmiteEvilAdditionalUse",
+          "ChannelEnergyPaladinFeature",
+          "!bp_5451c9b8530f4b71aadcaea42bd54ab7"
+        ],
+        "5": [
+          "PaladinDivineBondSelection"
+        ],
+        "6": [
+          "SelectionMercy"
+        ],
+        "7": [
+          "SmiteEvilAdditionalUse"
+        ],
+        "8": [
+          "AuraOfResolveFeature"
+        ],
+        "9": [
+          "SelectionMercy"
+        ],
+        "10": [
+          "SmiteEvilAdditionalUse"
+        ],
+        "11": [
+          "AuraOfJusticeFeature"
+        ],
+        "12": [
+          "SelectionMercy"
+        ],
+        "13": [
+          "SmiteEvilAdditionalUse"
+        ],
+        "14": [
+          "AuraOfFaithFeature"
+        ],
+        "15": [
+          "SelectionMercy"
+        ],
+        "16": [
+          "SmiteEvilAdditionalUse"
+        ],
+        "17": [
+          "AuraOfRighteousnessFeature"
+        ],
+        "18": [
+          "SelectionMercy"
+        ],
+        "19": [
+          "SmiteEvilAdditionalUse"
+        ],
+        "20": [
+          "HolyChampion"
+        ]
+      }
+    },
+    {
+      "guid": "e45ab30f49215054e83b4ea12165409f",
+      "path": "Classes/Paladin/AuraOfCourage/AuraOfCourageFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "BuffDescriptorImmunity",
+        "AuraFeatureComponent",
+        "SpellImmunityToSpellDescriptor"
+      ],
+      "jbpSHA256": "a47b8fa6a1eae710e18aa09e69ca38b8bb09021c5511b43785c4d1d040fd391b"
+    },
+    {
+      "guid": "cb6d55dda5ab906459d18a435994a760",
+      "path": "Classes/Paladin/ChannelEnergyPaladin/ChannelEnergyPaladinFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddFacts"
+      ]
+    },
+    {
+      "guid": "ad7dc4eba7bf92f4aba23f716d7a9ba6",
+      "path": "Classes/Paladin/DivineBond/PaladinDivineBondSelection.jbp",
+      "type": "BlueprintFeatureSelection",
+      "jbpSHA256": "0cfe3ef1f36cac9e925286c50db49948917f09c9a8921edea85f5b02a903d355"
+    },
+    {
+      "guid": "9f13fdd044ccb8a439f27417481cb00e",
+      "path": "Classes/Paladin/SmiteEvil/AuraOfJusticeFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddFacts"
+      ]
+    },
+    {
+      "guid": "7bb9eb2042e67bf489ccd1374423cdec",
+      "path": "Classes/Paladin/SmiteEvil/SmiteEvilAbility.jbp",
+      "type": "BlueprintAbility",
+      "componentTypes": [
+        "AbilityEffectRunAction",
+        "ContextCalculateSharedValue",
+        "ContextCalculateSharedValue",
+        "ContextRankConfig",
+        "ContextRankConfig",
+        "AbilityResourceLogic",
+        "AbilitySpawnFx",
+        "AbilityCasterAlignment",
+        "AbilityTargetIsAlly"
+      ]
+    },
+    {
+      "guid": "0f5c99ffb9c084545bbbe960b825d137",
+      "path": "Classes/Paladin/SmiteEvil/SmiteEvilAdditionalUse.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "IncreaseResourceAmount"
+      ]
+    },
+    {
+      "guid": "3a6db57fce75b0244a6a5819528ddf26",
+      "path": "Classes/Paladin/SmiteEvil/SmiteEvilFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddFacts",
+        "AddAbilityResources"
+      ]
+    },
+    {
+      "guid": "5a64de5435667da4eae2e4c95ec87917",
+      "path": "Classes/Paladin/WeaponBond/WeaponBondAdditionalUse.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "IncreaseResourceAmount"
+      ]
+    },
+    {
+      "guid": "bf570774501886f47b395a4bfe75eeb2",
+      "path": "Classes/Paladin/WeaponBond/WeaponBondDurationBuff.jbp",
+      "type": "BlueprintBuff"
+    },
+    {
+      "guid": "1c7cdc1605554954f838d85bbdd22d90",
+      "path": "Classes/Paladin/WeaponBond/WeaponBondFeature.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "AddFacts",
+        "AddAbilityResources"
+      ]
+    },
+    {
+      "guid": "e08a817f475c8794aa56fdd904f43a57",
+      "path": "Classes/Paladin/WeaponBond/WeaponBondProgression.jbp",
+      "type": "BlueprintProgression",
+      "levelFeatures": {
+        "5": [
+          "WeaponBondFeature"
+        ],
+        "8": [
+          "WeaponBondPlus2"
+        ],
+        "11": [
+          "WeaponBondPlus3"
+        ],
+        "14": [
+          "WeaponBondPlus4"
+        ],
+        "17": [
+          "WeaponBondPlus5",
+          "WeaponBondAdditionalUse"
+        ],
+        "20": [
+          "WeaponBondPlus6"
+        ],
+        "9": [
+          "WeaponBondAdditionalUse"
+        ],
+        "13": [
+          "WeaponBondAdditionalUse"
+        ]
+      },
+      "jbpSHA256": "1875944a8e8d07f907faaf78c303db3453419c6243bcd11d53e88bd9ef9affe4"
+    },
+    {
+      "guid": "7ff088ab58c69854b82ea95c2b0e35b4",
+      "path": "Classes/Paladin/WeaponBond/WeaponBondSwitchAbility.jbp",
+      "type": "BlueprintAbility",
+      "componentTypes": [
+        "AbilityEffectRunAction",
+        "ContextRankConfig",
+        "AbilityResourceLogic",
+        "AbilitySpawnFx",
+        "AbilitySpawnFx",
+        "AbilityCasterAlignment"
+      ],
+      "jbpSHA256": "4bc1573409b3a73033523f3a8b78ab29500354bdcf6b27bdf92d48f699d7116f"
+    },
+    {
+      "guid": "7812ad3672a4b9a4fb894ea402095167",
+      "path": "Feats/ImprovedUnarmedStrike.jbp",
+      "type": "BlueprintFeature",
+      "componentTypes": [
+        "EmptyHandWeaponOverride",
+        "AddMechanicsFeature",
+        "PrerequisiteStatValue",
+        "FeatureTagsComponent"
+      ]
+    },
+    {
+      "guid": "59e7a76987fe3b547b9cce045f4db3e4",
+      "path": "Classes/Basic/DeitySelection.jbp",
+      "type": "BlueprintFeatureSelection",
+      "jbpSHA256": "50e1e70d642a6eaa3d83c41da7bec921b1a9fd74b27d290fe8fd883d90a8d724"
+    },
+    {
+      "guid": "284102c119dc492eb030813093af8ba8",
+      "path": "Classes/Monk/MonkUnarmedStrikeLevel1.jbp",
+      "type": "BlueprintFeature",
+      "weapon": "f60c5a820b69fb243a4cce5d1d07d06e",
+      "jbpSHA256": "c483fc8af4b59727aeeead951d7b331f438fe391239c31559d477fbc7aa1a3b5"
+    },
+    {
+      "guid": "b3889f445dbe42948b8bb1ba02e6d949",
+      "path": "Classes/Monk/MonkUnarmedStrikeLevel12.jbp",
+      "type": "BlueprintFeature",
+      "weapon": "889e2927a67bd724ea1c203fe1b8b652",
+      "jbpSHA256": "8ba5ace0779e98c30af1d1d9e15de0f1271cdd047da58ba57e339c69bf95120c"
+    },
+    {
+      "guid": "078636a2ce835e44394bb49a930da230",
+      "path": "Classes/Monk/MonkUnarmedStrikeLevel16.jbp",
+      "type": "BlueprintFeature",
+      "weapon": "84af5e0b4f5f251449aac2b530fab3d0",
+      "jbpSHA256": "c03133925c1583af8ec55e119d58569db4ce19658eb6c8f3cbffddebd9a46de9"
+    },
+    {
+      "guid": "df38e56fa8b3f0f469d55f9aa26b3f5c",
+      "path": "Classes/Monk/MonkUnarmedStrikeLevel20.jbp",
+      "type": "BlueprintFeature",
+      "weapon": "7afc18ecb2cd96541b5cb8395f40d48c",
+      "jbpSHA256": "bdcd153cd4ec39d45767541dd98c8a2914d17b58afdfc2d2a33f8709c7716d0f"
+    },
+    {
+      "guid": "8267a0695a4df3f4ca508499e6164b98",
+      "path": "Classes/Monk/MonkUnarmedStrikeLevel4.jbp",
+      "type": "BlueprintFeature",
+      "weapon": "9e87f72f8069310469d4431e925f035a",
+      "jbpSHA256": "1967b201c9230f5157ba2f9905140b151a962ee1c7bc7b2c0b8c2bd1dcbd410b"
+    },
+    {
+      "guid": "f790a36b5d6f85a45a41244f50b947ca",
+      "path": "Classes/Monk/MonkUnarmedStrikeLevel8.jbp",
+      "type": "BlueprintFeature",
+      "weapon": "ee31a19c8aa965f46a90ae02d59d4af7",
+      "jbpSHA256": "76ecfc573264d192ccfd5d1cbc9a52bd4fa0c489f4143a8b387f6eed290acb97"
+    },
+    {
+      "guid": "7ced0efa297bd5142ab749f6e33b112b",
+      "path": "Classes/Paladin/AuraOfCourage/AuraOfCourageArea.jbp",
+      "type": "BlueprintAbilityAreaEffect",
+      "jbpSHA256": "a198e7533ff86e0c88a30aa9f6440536ee81d295ad87d3e1546cf87d1bea20dd"
+    },
+    {
+      "guid": "c96380f6dcac83c45acdb698ae70ffc4",
+      "path": "Classes/Paladin/AuraOfCourage/AuraOfCourageBuff.jbp",
+      "type": "BlueprintBuff",
+      "jbpSHA256": "5aa8147b41bdfb643e70c55475f7a859a4567f1ffb98f1559a9ede5a067c3f0a"
+    },
+    {
+      "guid": "b4274c5bb0bf2ad4190eb7c44859048b",
+      "path": "Classes/Paladin/SmiteEvil/SmiteEvilResource.jbp",
+      "type": "BlueprintAbilityResource",
+      "jbpSHA256": "83905db94488f07509dfed202cf126bed29fcf6906129c724eb49bf1efd2749f"
+    },
+    {
+      "guid": "3683d1af071c1744185ff93cba9db10b",
+      "path": "Classes/Paladin/WeaponBond/WeaponBondResourse.jbp",
+      "type": "BlueprintAbilityResource",
+      "jbpSHA256": "e28807c7e4ee6022da070f283feffb8555e33bbfb5b60ddac7d9eae610f1e60b"
+    }
+  ],
+  "nativeCallPaths": [
+    "RuleRollD20 : RuleRollDice; AddReroll(int,bool,EntityFact) -> Roll/Reroll()",
+    "RuleRollDice.Reroll(EntityFact,bool) late callers: AzataFavorableMagic, DemonSocothbenothAspect, RerollConcealment",
+    "ModifyD20.OnEventAboutToTrigger -> PreRollDice / Override / AddReroll",
+    "UnitAbilityResourceCollection.Add/Remove retain/release; BlueprintAbilityResource.GetMaxAmount(UnitDescriptor)",
+    "HandSlot.HasWeapon -> MaybeWeapon; ContextActionWeaponEnchantPool.RunAction -> fallback UnitBody.EmptyHandWeapon",
+    "UnitPartEnchantPoolData.AddEnchant/ClearEnchantPool/HandleEquipmentSlotUpdated",
+    "EmptyHandWeaponOverride -> UnitBody.SetEmptyHandWeapon/RemoveEmptyHandWeapon",
+    "RuleCalculateAC.OnTrigger -> RuleCheckTargetFlatFooted -> native AC, Touch or FlatFooted",
+    "UniqueBuff -> caster UnitPartUniqueBuffs.NewBuff/RemoveBuff",
+    "AuraFeatureComponent.HandleUnitLifeStateChanged",
+    "RuleSavingThrow.Reason.Caster; RuleDealDamage.IgnoreDamageReduction"
+  ],
+  "evidenceLevel": "Static archive identities and current managed call sites; compile and runtime not run."
+}
