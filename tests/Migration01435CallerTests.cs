@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,7 @@ internal static class Migration01435CallerTests
     static BlueprintGuid Id(string token) => (BlueprintGuid)AccessTools.Method(Module("PsychicAssets"), "Id").Invoke(null, new object[] { token });
     static T CopyData<T>(T value) => (T)AccessTools.Method(Module("PsychicAssets"), "CopyData").MakeGenericMethod(typeof(T)).Invoke(null, new object[] { value });
     static SimpleBlueprint Copy(SimpleBlueprint value) => (SimpleBlueprint)AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(value, null);
-    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition").Invoke(null, new object[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { value });
     static BlueprintFeatureReference[] Refs(BlueprintFeatureSelection p, string field) => (BlueprintFeatureReference[])Get(p, field) ?? Array.Empty<BlueprintFeatureReference>();
     static object Cached(BlueprintReferenceBase r) => AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").GetValue(r, null);
     static void Uncache(BlueprintReferenceBase r) => AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, null, null);

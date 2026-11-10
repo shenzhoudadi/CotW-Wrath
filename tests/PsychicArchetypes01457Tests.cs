@@ -23,14 +23,14 @@ internal static partial class MagusBatch01454Tests
         if(token=="ElongatedFingers"){
             using(var stream=Main.GetManifestResourceStream("CotW.ElongatedFingers.png"))using(var bytes=new MemoryStream()){
                 Check(stream!=null,"059 Long Arm original image is embedded in actual candidate");stream.CopyTo(bytes);
-                Check(bytes.ToArray().SequenceEqual(File.ReadAllBytes(Path.Combine(Root(),"outputs/CallOfTheWild.Wrath.Prototype/assets/ElongatedFingers.png"))),"059 actual embedded Long Arm image equals pinned source PNG");
+                Check(bytes.ToArray().SequenceEqual(File.ReadAllBytes(TestPaths.Outputs("assets/ElongatedFingers.png"))),"059 actual embedded Long Arm image equals pinned source PNG");
             }
             __result=(UnityEngine.Sprite)FormatterServices.GetUninitializedObject(typeof(UnityEngine.Sprite));return false;
         }
         if(token!="Slimy")return true;
         using(var s=Main.GetManifestResourceStream("CotW.Slimy.png"))using(var m=new MemoryStream()){
             if(s==null)throw new Exception("057 original icon missing from actual candidate DLL");s.CopyTo(m);
-            Check(m.ToArray().SequenceEqual(File.ReadAllBytes(Path.Combine(Root(),"outputs/CallOfTheWild.Wrath.Prototype/assets/Slimy.png"))),"actual embedded Slimy image equals original pinned upstream PNG");
+            Check(m.ToArray().SequenceEqual(File.ReadAllBytes(TestPaths.Outputs("assets/Slimy.png"))),"actual embedded Slimy image equals original pinned upstream PNG");
         }
         __result=(UnityEngine.Sprite)FormatterServices.GetUninitializedObject(typeof(UnityEngine.Sprite));return false;
     }

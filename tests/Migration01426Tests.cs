@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -115,7 +115,7 @@ internal static class Migration01426Tests
         h.Patch(AccessTools.Method(typeof(BlueprintFeatureSelection), "IsIgnorePrerequisites"), prefix: new HarmonyMethod(typeof(Migration01426Tests), nameof(PoolIgnore)));
         h.Patch(AccessTools.PropertyGetter(typeof(Game), "LevelUpController"), prefix: new HarmonyMethod(typeof(Migration01426Tests), nameof(NullController)));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache), "AddCachedBlueprint"), postfix: new HarmonyMethod(typeof(Migration01426Tests), nameof(PublishFault)));
-        h.Patch(AccessTools.Method(Module("T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(Migration01426Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module("T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(Migration01426Tests), nameof(AppendFault)));
         Provider01419Tests.PatchLabels(h);
         h.Patch(AccessTools.Method(typeof(RuleCalculateAbilityParams), "OnTrigger"), transpiler: new HarmonyMethod(typeof(Migration01426Tests), nameof(DifficultyBoundary)));
         h.Patch(AccessTools.PropertyGetter(typeof(UnitEntityData), "IsPlayersEnemy"), prefix: new HarmonyMethod(typeof(Migration01426Tests), nameof(No)));

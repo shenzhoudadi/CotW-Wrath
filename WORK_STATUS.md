@@ -9,6 +9,7 @@
 ## 本次0.14.69 TEST交付
 
 - **COTW-0117 Spirit Whisperer** — [issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)。A/C/B/D和最终整合复查完成，十魂域Wizard变体及唯一隔离桥已合入源码；174条隔离检查37.59秒，合并后编译8.138秒、0警告／0错误。保留D报告的选标／控制器等边界，不宣称玩家游戏通过。[交付范围与未测](docs/spirit-whisperer/README.md)。已纳入[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)，GitHub上传下载核对后关闭issue，不重复开发。
+  - **2026-11-10 后续修复（玩家实机确认，不重开开发队列）**：hex 专属列表、双 Touch of Flames、L20 Manifestation 超魔选项、开启超魔后法术全暗，四处均已恢复正常。查明两处是 Owlcat 原版数据缺陷（五魂域 `m_Variants` 填成 `[Extend, Bolster, Bolster]`、Flame L1 两个同名 `AddFacts`），按用户决定连原生一起修；另一处是内置模块 `MediumClass.Prowler.ShapeQuickenPatch` 的 `AutoMetamagic.Owner` 异常。本地包 `d978d92e…` SHA256 `0C1EDFCA…` 尚未替换／上传 GitHub 附件。详见 [交付说明「原生游戏缺陷修复」](docs/spirit-whisperer/README.md) 与 [CURRENT_RELEASE.md 2026-11-10 条](CURRENT_RELEASE.md)。当前待办见 [REMAINING.txt 下一步待做](docs/agent-handoff/REMAINING.txt)。
 
 ## 已完成开发／TEST交付
 

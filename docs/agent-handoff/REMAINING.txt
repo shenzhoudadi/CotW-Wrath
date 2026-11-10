@@ -43,3 +43,17 @@ SOURCE_MERGED — sxl1216 PR #8，2026-11-09；已合入Sacred Servant与原生�
 
 COTW-0117 Spirit Whisperer
 COMPLETED_DEVELOPMENT_TEST — 0.14.69 Combined TEST／issue #7；A/C/B/D和最终整合复查完成，完整十魂域Wizard变体与最小隔离桥已合入源码，不再按HOLD重复开发。174条隔离检查及合并编译通过；未测行为／UI及已知选标边界见docs/spirit-whisperer/README.md。已纳入0.14.69 TEST，Spirit Guide并未因此完成。
+
+2026-11-10 后续修复（玩家实机确认，不重开开发队列）：hex 描述专属列表、双 Touch of Flames、L20 Manifestation 超魔选项与"开启超魔后法术全暗"均已修复。查明其中两项是 Owlcat 原版数据缺陷（五魂域 m_Variants 为 [Extend, Bolster, Bolster] 而 AddFacts 授予 Extend/Bolster/Reach；Flame L1 两个同名 AddFacts 组件），按用户决定连原生一起修；第三项是内置模块 MediumClass.Prowler.ShapeQuickenPatch 的 AutoMetamagic.Owner 异常。详见 docs/spirit-whisperer/README.md「原生游戏缺陷修复」节与 CURRENT_RELEASE.md 2026-11-10 条。此项为定向玩家确认，不等于全魂域／全职业验收。
+
+## 下一步待做（按依赖顺序；不是自动开工队列，HOLD 项须用户点名）
+
+1. 交付收尾（用户侧，按约定本仓库不 commit/push/上传）：把 2026-11-10 本地包 `d978d92e…/CallOfTheWildWrathPrototype-0.14.69-experimental.zip`（SHA256 `0C1EDFCA…`）替换／上传到 0.14.69 Combined TEST 附件，保持 TEST 与预发布标记，做一次下载核对；随后按 AGENTS.md 第 12 条完成相关源码 commit/push。
+2. 同步文档指纹：HANDOFF.md 第 3 行主 DLL SHA 仍是旧的 `A638DA2F…`；docs/releases/0.14.69-TEST.md 的安装包与主 DLL SHA 也对应旧包。上传新包后应改为 `0C1EDFCA…`（包）、`0087FB88…`（主 DLL）、`673C8045…`（MediumClass.dll），并在发布说明补记本轮三项修复。
+3. 确认 issue #7 关闭条件：WORK_STATUS.md 记为"GitHub上传下载核对后关闭issue"。附件替换与下载核对完成后再关闭，并在 issue 里注明玩家 2026-11-10 的实机确认结果。
+4. 上游精选 PR：`upstream-sacred-servant-liveon`（基于 upstream/main `5275b86`，提交 `bcd2738`）已推送 origin，PR 需手动创建（本机无 gh CLI）。本轮新增的 `src/SpiritWhisperer0117.cs`、`Modules/MediumClass/Prowler/ProwlerForms.cs` 修复尚未纳入该分支；若要回馈上游，需先确认用户是否批准把这两处加入精选改动。旧 `upstream-submissions` PR 未合并，保持 `71a9c2d` 不动。
+5. 定向回归验收（玩家侧）：本轮修改了共享原生蓝图，影响所有 Shaman，且改了 Prowler 的 AutoMetamagic 补丁。建议抽查 Frost／Stone／Waves／Wind 的 L20 Manifestation 是否都显示三个不同超魔、普通萨满是否同步恢复，以及 Prowler 剑齿虎形态压制瞬发法术的原有语义没有回归。不要写成完整玩家验收。
+6. 工作区未提交改动清理：当前 `git status` 有约 46 项改动，除本轮的 `src/SpiritWhisperer0117.cs` 与 `Modules/MediumClass/Prowler/ProwlerForms.cs` 外，还有上一模型留下的多个 tests/*.cs、`src/SpiritClassBridge0117.cs`、未跟踪的 tests/TestPaths.cs 等。提交前请用户确认哪些保留、哪些回滚，不要整体 `git add .`。
+7. COTW-0046 Speaker for the Past（issue #6）：D 复查 NEEDS_FIX，交原 B 生产负责人按 docs/work-packages/COTW-0046/D-review.md 修四项后复查；不重复开发、不并入 0.14.69 TEST。
+8. HOLD 队列（inventory.json 的 allowedRemainingIds：0020、0046、0060、0068、0070、0095、0098、0109）：保持搁置，只有用户点名才启动；开工前仍按 AGENTS.md 第 14 条先查 GitHub 已有提交／PR／分支／认领。
+9. 对方持续开发的新上游提交：按 AGENTS.md 第 9 条在 main 上正常 merge upstream/main、解决冲突并编译验证后推送；`upstream-submissions` 不参与日常同步。

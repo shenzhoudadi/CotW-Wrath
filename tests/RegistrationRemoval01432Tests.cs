@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -43,7 +43,7 @@ internal static class RegistrationRemoval01432Tests
     static Assembly Production => typeof(FlameJetHover01429).Assembly;
     static Type Module(string name) => Production.GetType(Prefix + name, true);
     static object Get(object value, string field) => AccessTools.Field(value.GetType(), field).GetValue(value);
-    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition").Invoke(null, new[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
     static BlueprintGuid Id(string token) => (BlueprintGuid)AccessTools.Method(Module("PsychicAssets"), "Id").Invoke(null, new object[] { token });
     static string[] RetiredDerivedTokens() => Enumerable.Range(0, 3).SelectMany(mode => RetiredTokens.SelectMany(token => new[] {
         "FerociousBeastPassive" + mode + Id(token), "FerociousBeastPassiveFact" + mode + Id(token)
@@ -172,12 +172,9 @@ internal static class RegistrationRemoval01432Tests
     }
     static string SourceProject()
     {
-        foreach (var anchor in new[] { Directory.GetCurrentDirectory(), AppDomain.CurrentDomain.BaseDirectory }) {
-            for (var dir = new DirectoryInfo(anchor); dir != null; dir = dir.Parent) {
-                foreach (var candidate in new[] { dir.FullName, Path.Combine(dir.FullName, "outputs", "CallOfTheWild.Wrath.Prototype") })
-                    if (File.Exists(Path.Combine(candidate, "src", "ModEntry.cs"))) return candidate;
-            }
-        }
+        // The frozen outputs/ copy is optional now; the live tree is canonical.
+        foreach (var candidate in new[] { TestPaths.RepoRoot, Path.Combine(TestPaths.EvidenceRoot, "outputs", "CallOfTheWild.Wrath.Prototype") })
+            if (File.Exists(Path.Combine(candidate, "src", "ModEntry.cs"))) return candidate;
         throw new DirectoryNotFoundException("Canonical source tree required for the removal contract.");
     }
     static void SourceRemoval()

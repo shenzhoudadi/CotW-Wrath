@@ -44,8 +44,8 @@ internal static partial class MagusBatch01454Tests
     }
     static void EnglishInputs064()
     {
-        if(GameEnglish060==null)GameEnglish060=(JObject)JObject.Parse(File.ReadAllText(Path.Combine(Root(),"../..", "steam/steamapps/common/Pathfinder Second Adventure/Wrath_Data/StreamingAssets/Localization/enGB.json")))["strings"];
-        if(PackageEnglish060==null)PackageEnglish060=(JObject)JObject.Parse(File.ReadAllText(Path.Combine(Root(),"outputs/CallOfTheWild.Wrath.Prototype/package/Localization/enGB.json")))["strings"];
+        if(GameEnglish060==null)GameEnglish060=(JObject)JObject.Parse(File.ReadAllText(TestPaths.Game("Wrath_Data/StreamingAssets/Localization/enGB.json")))["strings"];
+        if(PackageEnglish060==null)PackageEnglish060=(JObject)JObject.Parse(File.ReadAllText(TestPaths.Outputs("package/Localization/enGB.json")))["strings"];
     }
     static string EnglishName064(BlueprintScriptableObject bp){EnglishInputs064();return EnglishName060(bp);}
     static string EnglishDescription064(BlueprintScriptableObject bp)

@@ -81,7 +81,8 @@ internal static class Sunsinger01443Tests
     }
     static bool Reject(Action action) { try { action(); return false; } catch (Exception e) { while (e is TargetInvocationException) e = e.InnerException; if (e is InvalidOperationException) return true; throw; } }
     static T Ref<T>(SimpleBlueprint b) where T : BlueprintReferenceBase, new() { var r = BlueprintReferenceBase.CreateTyped<T>(b); AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, b, null); return r; }
-    static string Definition(object value) => (string)Call(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", value);
+    // Migration01426.Definition also has an (object, IEqualityComparer) overload.
+    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { value });
     static bool Enemy(UnitEntityData __instance, UnitEntityData __0, ref bool __result) { var hostile = (UnitEntityData)AccessTools.Field(typeof(BardMasterpieces01435Tests), "hostile").GetValue(null); __result = (__instance == hostile) != (__0 == hostile); return false; }
     static bool SacredCatalogue(AddFacts __instance)
     {
@@ -224,10 +225,33 @@ internal static class Sunsinger01443Tests
             }
         } finally { AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, previous); }
     }
+    static MethodInfo LinkMethod(Type runtime, string name)
+    {
+        // The closed link type is unresolvable in this process: a second
+        // UnityEngine.CoreModule identity makes the GameObject constraint
+        // fail, so the runtime type keeps ContainsGenericParameters and
+        // Harmony refuses its methods. Re-close each base with the type
+        // arguments that base already carries, which are the game's own
+        // identities, and only then reflect the declared method.
+        var parameters = name == "Load" ? new[] { typeof(bool), typeof(bool) } : Type.EmptyTypes;
+        for (var type = runtime; type != null; type = type.BaseType)
+        {
+            var target = type;
+            if (target.ContainsGenericParameters && target.IsGenericType)
+            {
+                var arguments = target.GetGenericArguments();
+                if (arguments.All(a => !a.ContainsGenericParameters))
+                    target = target.GetGenericTypeDefinition().MakeGenericType(arguments);
+            }
+            var found = target.GetMethod(name, BindingFlags.Public | BindingFlags.Instance, null, parameters, null);
+            if (found != null && !found.ContainsGenericParameters) return found;
+        }
+        throw new MissingMethodException(runtime.FullName + "." + name);
+    }
     static void LinkWarmup(BlueprintsCache c, Harmony h)
     {
         var area = Asset<BlueprintAbilityAreaEffect>(c, Area); var link = area.Fx; string id = link.AssetId;
-        var load = AccessTools.Method(typeof(WeakResourceLink<UnityEngine.GameObject>), "Load", new[] { typeof(bool), typeof(bool) }); var unload = AccessTools.Method(typeof(WeakResourceLink<UnityEngine.GameObject>), "ForceUnload");
+        var load = LinkMethod(link.GetType(), "Load"); var unload = LinkMethod(link.GetType(), "ForceUnload");
         h.Patch(load, transpiler: new HarmonyMethod(typeof(Sunsinger01443Tests), nameof(LoadBoundary))); h.Patch(unload, transpiler: new HarmonyMethod(typeof(Sunsinger01443Tests), nameof(UnloadBoundary)));
         try {
             Check(Get(link, "<m_Handle>k__BackingField") == null, "native resource handle starts cold"); link.Load(); resourceLinkLoads++; Check(Get(link, "<m_Handle>k__BackingField") != null, "real native WeakResourceLink.Load writes a handle with resource allocator/object endpoints controlled"); Stable(c);

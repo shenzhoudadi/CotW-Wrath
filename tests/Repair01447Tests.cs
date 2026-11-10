@@ -37,7 +37,7 @@ internal static class Repair01447Tests
     static TAsset N<TAsset>(BlueprintsCache c,string id)where TAsset:SimpleBlueprint=>(TAsset)c.Load(BlueprintGuid.Parse(id));
     static int checks;
     static void Check(bool ok,string why){if(!ok)throw new Exception("Repair01447: "+why);checks++;}
-    static string Root() {var p=new DirectoryInfo(Environment.CurrentDirectory);while(p!=null&&!File.Exists(Path.Combine(p.FullName,"HANDOFF.md")))p=p.Parent;return p?.FullName??throw new Exception("Project evidence root missing");}
+    static string Root()=>TestPaths.EvidenceRoot;
     static IDisposable Begin(AbilityData a)=>(IDisposable)Call(T("AdmixtureDescriptors01447"),"Begin",a);
     static void Descriptor(BlueprintsCache parent,Harmony h) {
         foreach(string patch in new[]{"AdmixtureParams01447Patch","AdmixtureAbilityDescriptor01447Patch","AdmixtureBlueprintDescriptor01447Patch"})h.CreateClassProcessor(T(patch)).Patch();

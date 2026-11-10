@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,7 +87,7 @@ internal static class AntimagicRage01434Tests
     static T Asset<T>(BlueprintsCache c, string token) where T : SimpleBlueprint => (T)c.Load(Id(token));
     static T Native<T>(BlueprintsCache c, string id) where T : SimpleBlueprint => (T)c.Load(BlueprintGuid.Parse(id));
     static void Check(bool ok, string reason) { if (!ok) throw new Exception("AntimagicRage01434: " + reason); checks++; }
-    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
     static void Register(BlueprintsCache c, string method = "Register") => AccessTools.Method(Module, method).Invoke(null, new object[] { c });
     static T Ref<T>(SimpleBlueprint bp) where T : BlueprintReferenceBase, new() { var r = BlueprintReferenceBase.CreateTyped<T>(bp); AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, bp, null); return r; }
     static bool Skip() => false;
@@ -433,7 +433,7 @@ internal static class AntimagicRage01434Tests
         h.Patch(AccessTools.Method(typeof(RuleCheckCastingDefensively), "OnTrigger"), transpiler: new HarmonyMethod(typeof(AntimagicRage01434Tests), nameof(DefensiveBoundary))); h.Patch(AccessTools.Method(typeof(RuleCalculateAbilityParams), "OnTrigger"), transpiler: new HarmonyMethod(typeof(Migration01426Tests), "DifficultyBoundary"));
         h.Patch(AccessTools.Method(typeof(RuleCanApplyBuff), "OnTrigger"), transpiler: new HarmonyMethod(typeof(Howl01428Tests), "DifficultyBoundary"));
         h.Patch(AccessTools.Method(typeof(RuleCalculateAC), "OnTrigger"), transpiler: new HarmonyMethod(typeof(AntimagicRage01434Tests), nameof(ACScene)));
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(AntimagicRage01434Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(AntimagicRage01434Tests), nameof(AppendFault)));
         var buffHelper = AccessTools.Method(typeof(UnitHelper), "AddBuff", new[] { typeof(UnitDescriptor), typeof(BlueprintBuff), typeof(MechanicsContext), typeof(TimeSpan?) });
         var capture = AccessTools.Method(typeof(Psychic070Tests), "CaptureDefense"); var outer = Harmony.GetPatchInfo(buffHelper)?.Prefixes.SingleOrDefault(p => p.PatchMethod == capture); if (outer != null) h.Unpatch(buffHelper, capture);
         Provider01419Tests.PatchLabels(h);

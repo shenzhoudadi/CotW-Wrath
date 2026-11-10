@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +54,7 @@ internal static class Ki01427Tests
         var unit = __instance.ToCaster ? context.Context.MaybeCaster : context.CurrentTarget.Unit;
         Check(unit == recipient, "native apply recipient is correct for self/advice"); casts++; return false;
     }
-    static string Signature(BlueprintScriptableObject source) => (string)AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new object[] { source.ComponentsArray });
+    static string Signature(BlueprintScriptableObject source) => (string)AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { source.ComponentsArray });
     static int adviceGrants, adviceRemovals;
     static bool AdviceGrant(UnitEntityData __0, BlueprintUnitFact __1, ref EntityFact __result) { Check(__1 is BlueprintAbility && __1.name.Contains("Advice"), "native Sensei grant dispatches correct ability"); __result = (EntityFact)FormatterServices.GetUninitializedObject(typeof(Ability)); adviceGrants++; return false; }
     static bool AdviceRemove(UnitEntityData __0, EntityFact __1) { if (__1 != null) adviceRemovals++; return false; }
@@ -112,7 +112,7 @@ internal static class Ki01427Tests
         var signatures = originals.Select(Signature).ToArray();
         var before = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();
         var initial = ((IDictionary)Get(cache, "m_LoadedBlueprints")).Keys.Cast<BlueprintGuid>().ToHashSet();
-        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(Ki01427Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(Ki01427Tests), nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(FeatureCollection), "CheckStatPrerequisitesAndUpdate"), prefix: new HarmonyMethod(typeof(Migration01426Tests), "Skip"));
         h.Patch(AccessTools.PropertyGetter(typeof(IgnorePrerequisites), "Ignore"), prefix: new HarmonyMethod(typeof(Migration01426Tests), "No"));
         h.Patch(AccessTools.Method(typeof(BlueprintFeatureSelection), "IsIgnorePrerequisites"), prefix: new HarmonyMethod(typeof(Migration01426Tests), "PoolIgnore"));

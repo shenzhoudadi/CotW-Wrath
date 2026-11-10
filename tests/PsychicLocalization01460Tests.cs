@@ -14,15 +14,15 @@ internal static partial class MagusBatch01454Tests{
   throw new InvalidOperationException("060 localization donor has no actual English key: "+bp.name+" / "+key);
  }
  static void LocalizationInputs060(Harmony h){
-  GameEnglish060=(JObject)JObject.Parse(File.ReadAllText(Path.Combine(Root(),"../..", "steam/steamapps/common/Pathfinder Second Adventure/Wrath_Data/StreamingAssets/Localization/enGB.json")))["strings"];
-  PackageEnglish060=(JObject)JObject.Parse(File.ReadAllText(Path.Combine(Root(),"outputs/CallOfTheWild.Wrath.Prototype/package/Localization/enGB.json")))["strings"];
+  GameEnglish060=(JObject)JObject.Parse(File.ReadAllText(TestPaths.Game("Wrath_Data/StreamingAssets/Localization/enGB.json")))["strings"];
+  PackageEnglish060=(JObject)JObject.Parse(File.ReadAllText(TestPaths.Outputs("package/Localization/enGB.json")))["strings"];
   LocaleExport060=true;
  }
  static void Localization060(BlueprintsCache c,Harmony h){
   bool current061=Main.GetType("CallOfTheWild.Wrath.Prototype.MimicCatalogue01461")!=null;
   if(current061){Register(c,"FeralHunter01461");Register(c,"TotemBonded01461");}
   var authored=(Dictionary<string,string>)AccessTools.Field(T("PsychicAssets"),"Strings").GetValue(null);
-  var original=(JObject)JObject.Parse(File.ReadAllText(Path.Combine(Root(),"outputs/CallOfTheWild.Wrath.Prototype/package/Localization/enGB.json")))["strings"];
+  var original=(JObject)JObject.Parse(File.ReadAllText(TestPaths.Outputs("package/Localization/enGB.json")))["strings"];
   var catalog=new SortedDictionary<string,string>(original.Properties().ToDictionary(p=>p.Name,p=>(string)p.Value),StringComparer.Ordinal);
   // Snapshot only inside the cache callback. Reflection and key resolution
   // occur afterwards, so export cannot load into a dictionary being enumerated.

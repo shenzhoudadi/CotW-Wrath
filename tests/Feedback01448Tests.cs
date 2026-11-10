@@ -38,7 +38,7 @@ internal static class Feedback01448Tests
     static TAsset N<TAsset>(BlueprintsCache c,string id)where TAsset:SimpleBlueprint=>(TAsset)c.Load(BlueprintGuid.Parse(id));
     static int checks;
     static void Check(bool value,string message){if(!value)throw new Exception("Feedback01448: "+message);checks++;}
-    static string Root(){var p=new DirectoryInfo(Environment.CurrentDirectory);while(p!=null&&!File.Exists(Path.Combine(p.FullName,"HANDOFF.md")))p=p.Parent;return p.FullName;}
+    static string Root()=>TestPaths.EvidenceRoot;
     static object Invoke(object o,string name,params object[] args)=>o.GetType().GetMethods().Single(m=>m.Name==name&&m.GetParameters().Length==args.Length).Invoke(o,args);
     static void NativeProxyClone(BlueprintProgression progression)
     {

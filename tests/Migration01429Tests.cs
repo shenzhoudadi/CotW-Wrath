@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +53,7 @@ internal static class Migration01429Tests
     static T Asset<T>(BlueprintsCache c,string t)where T:SimpleBlueprint=>(T)c.Load(Id(t));
     static void Check(bool b,string message){if(!b)throw new Exception("Migration01429: "+message);checks++;}
     static void Register(BlueprintsCache c,string n)=>AccessTools.Method(Module(n),"Register").Invoke(null,new object[] { c });
-    static string Definition(object o)=>(string)AccessTools.Method(Module("Migration01426"),"Definition").Invoke(null,new[] { o });
+    static string Definition(object o)=>(string)AccessTools.Method(Module("Migration01426"),"Definition", new[] { typeof(object) }).Invoke(null,new[] { o });
     static bool Skip()=>false;
     static bool No(ref bool __result){__result=false;return false;}
     static bool NoController(ref LevelUpController __result){__result=null;return false;}

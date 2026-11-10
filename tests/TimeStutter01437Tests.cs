@@ -68,7 +68,8 @@ internal static class TimeStutter01437Tests
     static T Empty<T>() where T : class => (T)FormatterServices.GetUninitializedObject(typeof(T));
     static void Check(bool ok, string message) { if (!ok) throw new Exception("TimeStutter01437: " + message); checks++; }
     static void Register(BlueprintsCache cache) => Call(Module, "Register", cache);
-    static string Definition(object o) => (string)Call(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", o);
+    // Migration01426.Definition also has an (object, IEqualityComparer) overload.
+    static string Definition(object o) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { o });
     static bool Rejected(Action action) { try { action(); return false; } catch (Exception e) { while (e is TargetInvocationException) e = e.InnerException; if (e is InvalidOperationException) return true; throw; } }
     static bool Skip() => false;
     static bool No(ref bool __result) { __result = false; return false; }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,7 +78,7 @@ internal static class AngerInquisition01431Tests
     static T Ref<T>(SimpleBlueprint bp) where T : BlueprintReferenceBase, new() { var r = BlueprintReferenceBase.CreateTyped<T>(bp); AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, bp, null); return r; }
     static void Check(bool condition, string message) { if (!condition) throw new Exception("Anger01431: " + message); checks++; }
     static void Register(BlueprintsCache cache) => AccessTools.Method(Module, "Register").Invoke(null, new object[] { cache });
-    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
     static bool Skip() => false;
     static bool ParticleSceneBoundary() { fxBoundaryCalls++; return false; }
     static bool ActionFxSceneBoundary() { actionFxBoundaryCalls++; return false; }
@@ -196,7 +196,7 @@ internal static class AngerInquisition01431Tests
         Register(cache); assets.AddRange(Tokens.Select(token => (BlueprintScriptableObject)cache.Load(Id(token)))); Check(assets.All(a => a != null) && assets.Select(a => a.AssetGuid).Distinct().Count() == Tokens.Length, "all Anger assets exist with unique stable identities");
         var root = Asset<BlueprintProgression>(cache, "AngerInquisition"); var pools = PoolIds.Select(id => Native<BlueprintFeatureSelection>(cache, id)).ToArray();
         var arrays = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();
-        harmony.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(AngerInquisition01431Tests), nameof(AppendFault)));
+        harmony.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(AngerInquisition01431Tests), nameof(AppendFault)));
         try {
             foreach (var asset in assets) cache.RemoveCachedBlueprint(asset.AssetGuid);
             foreach (var pool in pools) foreach (string field in new[] { "m_Features", "m_AllFeatures" }) Set(pool, field, ((BlueprintFeatureReference[])Get(pool, field)).Where(r => r.Guid != root.AssetGuid).ToArray());

@@ -181,6 +181,11 @@ required.update(['008be7892c994b7198e49567eace329c', '011f6f86a0b16df4bbf7f40878
 # Psychic058 actual stock metamagic source facts, independent of ordinary pool filters.
 required.update(['46fad72f54a33dc4692d3b62eca7bb78', '7f2b282626862e345935bbea5e66424b', '85f3340093d144dd944fff9a9adfd2f2', 'a1de1e4f92195b442adb946f0e2b9d4e', 'cd26b9fa3f734461a0fcedc81cafaaac', 'ef7ece7bb5bb66a41b256976b27f424e', 'f180e72e4a9cbaa4da8be9bc958132ef', 'fbf5d9ce931f47f3a0c818b3f8ef8414'])
 
+# Native fog area effects patched with shared concealment, plus Shadowy Mist Form's concealment emitter target
+# and the water mephit ability that must keep spawning the patched Stinking Cloud area.
+required.add('34283d686f5f5a847b4d0d6470b52a65')
+required.update(['aa2e0a0fe89693f4e9205fd52c5ba3e5', '053c8fd966bbcb94bb8db6582d990650', 'b342e42d2ed58484c8dff9150d18f4e4', 'ba09d51375db5f34790184443416d84b', '6cae3c64989f3684bb078efcfa9021a1', '6fa0adacca8d00f4aaba1e8df77a318f', '706df636208b2864aa80032b72e0aabd', '6df1ac314d4e6e9418e34470b79f90d8', '1a62a0463e7d4da0814167e8308f1ebd', 'b6017edf09fe0374fa9a9bf06135f84b', '8de8e078992d7a4479f3d76e21aa1195'])
+
 with zipfile.ZipFile(pathlib.Path(sys.argv[1])/'blueprints.zip') as archive:
 
     for name in archive.namelist():

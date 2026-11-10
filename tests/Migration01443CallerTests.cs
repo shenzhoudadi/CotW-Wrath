@@ -35,7 +35,8 @@ internal static class Migration01443CallerTests
     static string Constant(string type, string field) => (string)AccessTools.Field(Module(type), field).GetValue(null);
     static string[] Constants(string type, string field) => (string[])AccessTools.Field(Module(type), field).GetValue(null);
     static BlueprintGuid Id(string token) => (BlueprintGuid)Call(Module("PsychicAssets"), "Id", token);
-    static string Definition(object value) => (string)Call(Module("Migration01426"), "Definition", value);
+    // Migration01426.Definition also has an (object, IEqualityComparer) overload.
+    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { value });
     static SimpleBlueprint[] Loaded(BlueprintsCache cache) => ((IDictionary)Get(cache, "m_LoadedBlueprints")).Values.Cast<object>().Select(e => (SimpleBlueprint)Get(e, "Blueprint")).Where(b => b != null).ToArray();
     static BlueprintFeatureReference[] Refs(BlueprintFeatureSelection pool, string field) => (BlueprintFeatureReference[])Get(pool, field) ?? Array.Empty<BlueprintFeatureReference>();
     static void Check(bool value, string why) { if (!value) throw new Exception("Migration01443Caller: " + why); checks++; }

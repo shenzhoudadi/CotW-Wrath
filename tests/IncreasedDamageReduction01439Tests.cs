@@ -549,7 +549,7 @@ internal static class IncreasedDamageReduction01439Tests
     }
     static void Texts()
     {
-        var root = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "..", "outputs", "CallOfTheWild.Wrath.Prototype", "package", "Localization"));
+        var root = TestPaths.Outputs("package", "Localization");
         var en = File.ReadAllText(Path.Combine(root, "enGB.json"));
         var zh = File.ReadAllText(Path.Combine(root, "zhCN.json"));
         Check(en.Contains(Text("DescriptionKey")) && en.Contains(Text("DescriptionEn")) && zh.Contains(Text("DescriptionZh")), "Both locale files retain the same English 2/4 description at " + root);

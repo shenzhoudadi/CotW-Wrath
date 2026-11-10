@@ -60,10 +60,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private const string FamiliarId = "363cab72f77c47745bf3a8807074d183";
         private const string FamiliarIconId = "1194129055923ae46a6b876ff6a30358";
         private const string ExtraChannelId = "cd9f19775bd9d3343a31a065e93f0c47";
-        private const string FaerieFireBuffId = "cc383a9eaae4d2b45a925d442b367b54";
-        private const string GlitterdustId = "ce7dad2b25acf85429b6c9550787b2d9";
         private const string LifeLinkBuffId = "598200ff68114111ba44d2fa08750771";
-        private const string LoreIconId = "f0455c9295b53904f9e02fc571dd2ce1"; // owl's wisdom
 
         internal static readonly string[] PoolIds =
         {
@@ -72,119 +69,245 @@ namespace CallOfTheWild.Wrath.Prototype
             "a21acdafc0169f5488a9bd3256e2e65b"
         };
 
-        // A hex either clones a real Wrath donor feature (Donor != null) or is
-        // built privately from native components (Donor == null). Resource is
-        // the contract shape: 0 passive, 2 = R2 (1+Cha), 5 = R5 (1/Wizard level).
-        private sealed class HexSpec
-        {
-            internal string Name;
-            internal string Donor;
-            internal int Resource;
-            internal HexSpec(string name, string donor, int resource) { Name = name; Donor = donor; Resource = resource; }
-        }
-
+        // One discovered shaman spirit. Nothing here is authored: the spirit
+        // progression and its 1/8/20 features are read off the game's own
+        // Shaman spirit selection at registration time, so a new spirit from
+        // any other mod is picked up without a code change.
         private sealed class Row
         {
-            internal string Name;
-            internal string[] Tiers;          // L1, L8, L20 donor GUIDs; null = private build
-            internal HexSpec[] Hexes;         // full contract hex list
-            internal int[] Resource;          // 0 none, 1 R1, 2 R2, 3 R3, 4 R4
-            internal string[] TierNames;
-            internal bool ChannelDc;          // Life channel uses Charisma for DC
-            internal string PrivateSpirit;    // "Heavens" | "Lore": no native Wrath spirit
-            internal string L8Private;        // "healersTouch" | null
+            internal string Name;                 // localized spirit name, used for display only
+            internal string Token;                // stable progression GUID, used for private identities
+            internal BlueprintProgression Progression;
+            internal BlueprintFeature[] Tiers;    // L1, L8, L20 donor features
+            internal List<BlueprintFeature> Hexes = new List<BlueprintFeature>();
+            // Per-tier resource shape copied from the donor itself.
+            internal bool[] HasPool = new bool[3];
+            internal int[] PoolBase = new int[3];
+            internal StatType?[] PoolStat = new StatType?[3];
+            internal bool[] PoolPerLevel = new bool[3];
+            internal string[] TierNames = new string[3];
         }
 
-        // Wrath donor identities were read offline from the game's own blueprint
-        // archive; see B-native-donor-map.json. Heavens and Lore have no native
-        // Wrath spirit, so their three tiers are built privately (Tiers = null)
-        // and never clone the Shaman frost-spirit GUIDs.
-        private static readonly Row[] Rows =
-        {
-            new Row { Name = "Battle",
-                Tiers = new[] { "5e1161a3a7e5a83458de8a5f412c8d0c", "cc6b293550ac66c48a0c787b5e986a34", "1ddcc62d55d24285be8c687c94180578" },
-                Hexes = new[] {
-                    new HexSpec("Battle Master", "4db9f3d913a59f14f9cc4ffaa73de2f0", 0),
-                    new HexSpec("Battle Ward", "6f60723288b405c48af821cf995e4389", 0),
-                    new HexSpec("Curse of Suffering", null, 0),
-                    new HexSpec("Hampering Hex", "36f07f59f983cd042ae0c8c91e4dcea6", 0) },
-                Resource = new[] { 1, 1, 0 }, TierNames = new[] { "Battle Spirit", "Enemies' Bane", "Manifestation" } },
-            new Row { Name = "Bones",
-                Tiers = new[] { "f556c44606e5eaa47bac31aae9ebc96d", "3f8db74aafbcaff40ae3f2cf5192ca4f", "10bb6847ee6b4cbf86dded2d86b76ab6" },
-                Hexes = new[] {
-                    new HexSpec("Bone Lock", "e506667113c93f94a962a90adedcdb03", 0),
-                    new HexSpec("Bone Ward", "96a99ea4866da4b4cbd51b81f1a61a72", 0),
-                    new HexSpec("Fearful Gaze", "89603c7a9ba690d46b95148b46a34f7d", 0),
-                    new HexSpec("Deathly Being", null, 0) },
-                Resource = new[] { 1, 3, 4 }, TierNames = new[] { "Touch of the Grave", "Shard Soul", "Manifestation" } },
-            new Row { Name = "Flame",
-                Tiers = new[] { "ee5503b51c0c9684cb7300d28e3fc4e1", "c2a4ce87f8600db41a9a74d33af87c2c", "e508bc6f64d64fc197ace10d66084b6d" },
-                Hexes = new[] {
-                    new HexSpec("Fire Nimbus", "24074b42608fff54f8e1a5b7fa4a7d29", 0),
-                    new HexSpec("Flame Curse", "dec5607ab6ea68d4aac0772049e80be7", 0),
-                    new HexSpec("Ward of Flames", "c95e1ccf872844b44a47378f761689be", 0),
-                    new HexSpec("Cinder Dance", "6e67eae3081853544b191943f5ed4534", 0) },
-                Resource = new[] { 1, 3, 0 }, TierNames = new[] { "Touch of Flame", "Fiery Soul", "Manifestation" } },
-            new Row { Name = "Heavens",
-                Tiers = new string[] { null, null, null },
-                Hexes = new[] {
-                    new HexSpec("Enveloping Void", null, 0),
-                    new HexSpec("Lure of Heavens", null, 0),
-                    new HexSpec("Heaven's Leap", null, 0),
-                    new HexSpec("Starburn", null, 2) },
-                Resource = new[] { 1, 0, 0 }, TierNames = new[] { "Stardust", "Void Adaptation", "Manifestation" },
-                PrivateSpirit = "Heavens" },
-            new Row { Name = "Life",
-                Tiers = new[] { "9ae3ba76663a19141a3996c1e3ce95e3", "8cae5b62ad604de41bf3e9f4489c6b8f", "83a2f66218554ea3ada1aceacb4aad54" },
-                Hexes = new[] {
-                    new HexSpec("Curse of Suffering", null, 0),
-                    new HexSpec("Enhanced Cures", "973a22b02c793ca49b48652e3d70ae80", 0),
-                    new HexSpec("Life Link", "ef97c9bcc1c54ea7993ef8b2489c908a", 5),
-                    new HexSpec("Life Sight", null, 5) },
-                Resource = new[] { 2, 0, 0 }, TierNames = new[] { "Channel Positive Energy", "Healer's Touch", "Manifestation" },
-                ChannelDc = true, L8Private = "healersTouch" },
-            new Row { Name = "Lore",
-                Tiers = new string[] { null, null, null },
-                Hexes = new[] {
-                    new HexSpec("Benefit of Wisdom", null, 0),
-                    new HexSpec("Brain Drain", null, 0),
-                    new HexSpec("Confusion Curse", null, 0),
-                    new HexSpec("Mental Acuity", "736d3d5d940736b4e87792e94eaff96b", 0) },
-                Resource = new[] { 1, 0, 4 }, TierNames = new[] { "Monstrous Insight", "Perfect Knowledge", "Manifestation" },
-                PrivateSpirit = "Lore" },
-            new Row { Name = "Nature",
-                Tiers = new[] { "0a7166e9c6ea5874e9fc4984f30f2d8d", "f54191d614633da4baac7a47a659746b", "f0bf97f286bb44a686108a97988de89c" },
-                Hexes = new[] {
-                    new HexSpec("Entangling Curse", "176ee8bedc899964a96ef1b7478dcce7", 0),
-                    new HexSpec("Erosion Curse", null, 0),
-                    new HexSpec("Friend to Animals", "0d92799cecf414249a23ad82f7e9901a", 0),
-                    new HexSpec("Stormwalker", null, 0) },
-                Resource = new[] { 1, 0, 4 }, TierNames = new[] { "Storm Burst", "Spirit of Nature", "Manifestation" } },
-            new Row { Name = "Stone",
-                Tiers = new[] { "5c3ccab7cb27f4a408531197eb2abd3f", "ef692472df1b10f4caec90b4984965ef", "936734437ee8493497760174a0543045" },
-                Hexes = new[] {
-                    new HexSpec("Stone Stability", "05b6b99b0f394284899eccd4728031b7", 0),
-                    new HexSpec("Loadstone", null, 0),
-                    new HexSpec("Metal Curse", "ea8e9fef24350684d82b38fec2cc3139", 0),
-                    new HexSpec("Ward of Stone", null, 0) },
-                Resource = new[] { 1, 3, 0 }, TierNames = new[] { "Touch of Acid", "Body of Earth", "Manifestation" } },
-            new Row { Name = "Waves",
-                Tiers = new[] { "62f408b7561adb34b899363c905fa13a", "b2387cc5ccce4f9428ffd069aa03d029", "600780f354f24984b2fe210e2b54ad57" },
-                Hexes = new[] {
-                    new HexSpec("Beckoning Chill", "905a9eccb9fa73e4da1d3e86bcb1e421", 0),
-                    new HexSpec("Crashing Waves", null, 0),
-                    new HexSpec("Mist's Shroud", null, 0) },
-                Resource = new[] { 1, 3, 0 }, TierNames = new[] { "Ice Splinter", "Frigid Blast", "Manifestation" } },
-            new Row { Name = "Wind",
-                Tiers = new[] { "5d810adea03fb644582eb74de32c75ec", "59550028efc886a4e8ca2c80b680642f", "a8c0403a27b6471f85d2bc441db5a993" },
-                Hexes = new[] {
-                    new HexSpec("Air Barrier", "4b5b0f429730a984fb56fc3e34e5231e", 0),
-                    new HexSpec("Sparkling Aura", null, 0),
-                    new HexSpec("Vortex Spells", "d54e52f0e3d086f468ede43222e053e9", 0),
-                    new HexSpec("Wind Ward", "2a7f7b35e1a0fb44ba7f01e28fa7a535", 0) },
-                Resource = new[] { 1, 3, 0 }, TierNames = new[] { "Shocking Touch", "Spark Soul", "Manifestation" } },
-        };
+        // A shaman hex is a spirit's own when one of its Any-group
+        // PrerequisiteFeature entries points at the spirit progression, its L1
+        // feature or the spirit's wandering wrapper. Wrath authors hexes that
+        // way (Battle Ward -> the Battle progression), so the ownership edge is
+        // data, not a list we maintain.
+        private const string ShamanSpiritSelectionId = "00c8c566d1825dd4a871250f35285982";
+        private const string ShamanHexSelectionId = "4223fe18c75d4d14787af196a04e14e7";
 
+        // The one authored rule. Life's own hexes gate on the oracle mysteries
+        // that share them instead of on the Life spirit, so the ownership edge
+        // is simply missing in the data. When a hex gates on a
+        // PrerequisiteFeaturesFromList whose entries carry the same localized
+        // name as a spirit, the hex belongs to that spirit. No GUID is stored.
+        private static readonly string[] SpiritGroupSuffixes = { "Mystery", "Spirit", "MysteryProgression" };
+
+        // Wrath keeps a spirit's own hexes out of the shared pool by gating each
+        // hex on an Any-group prerequisite pointing back at the spirit. The one
+        // exception is authored here rather than in data: Life's two hexes gate
+        // on the oracle mysteries that also grant them (they were written for
+        // the oracle side and the shaman edge was never added), so a hex whose
+        // from-list prerequisites all resolve to features carrying the same
+        // localized name as a spirit is attributed to that spirit. No GUID is
+        // stored, so a renamed or reloaded mystery still matches.
+        private static Row[] Discover(BlueprintsCache cache)
+        {
+            var selection = cache.Load(BlueprintGuid.Parse(ShamanSpiritSelectionId)) as BlueprintFeatureSelection;
+            if (selection == null) return Array.Empty<Row>();
+
+            var pool = cache.Load(BlueprintGuid.Parse(ShamanHexSelectionId)) as BlueprintFeatureSelection;
+            if (pool == null) return Array.Empty<Row>();
+            var hexes = ((BlueprintFeatureReference[])Get(pool, "m_AllFeatures") ?? Array.Empty<BlueprintFeatureReference>())
+                .Select(r => r?.Get() as BlueprintFeature).Where(h => h != null).ToArray();
+
+            var rows = new List<Row>();
+            foreach (var reference in (BlueprintFeatureReference[])Get(selection, "m_AllFeatures") ?? Array.Empty<BlueprintFeatureReference>())
+            {
+                var progression = reference?.Get() as BlueprintProgression;
+                if (progression == null) continue;
+                if (!HasGroup(progression, "ShamanSpirit")) continue;
+                var entries = progression.LevelEntries;
+                var l1 = Features(entries, 1);
+                var l20 = Features(entries, 20);
+                if (l1.Count == 0 || l20.Count == 0) continue;
+
+                var row = new Row
+                {
+                    Name = Name(progression),
+                    Token = progression.AssetGuid.ToString().Replace("-", ""),
+                    Progression = progression,
+                    Tiers = new[] { l1[0], Features(entries, 8).FirstOrDefault(), l20[0] }
+                };
+                if (row.Tiers[1] == null) continue;
+
+                // Any-group prerequisite pointing at the spirit, its L1 feature or
+                // the spirit's wandering wrapper (a progression that re-grants L1).
+                var keys = new HashSet<BlueprintGuid> { progression.AssetGuid, row.Tiers[0].AssetGuid };
+                foreach (var candidate in BlueprintSnapshot<BlueprintProgression>(cache))
+                {
+                    if (candidate == null || !References(candidate, progression.AssetGuid)) continue;
+                    keys.Add(candidate.AssetGuid);
+                    foreach (var entry in candidate.LevelEntries)
+                        foreach (var fact in entry.Features)
+                            if (fact is BlueprintFeature feature) keys.Add(feature.AssetGuid);
+                }
+                row.Hexes.AddRange(hexes.Where(h => Owned(h, keys, row.Name)));
+                rows.Add(row);
+            }
+            return rows.ToArray();
+        }
+
+        private static List<BlueprintFeature> Features(LevelEntry[] entries, int level)
+            => (entries ?? Array.Empty<LevelEntry>()).Where(e => e != null && e.Level == level)
+                .SelectMany(e => e.Features).OfType<BlueprintFeature>().ToList();
+
+        private static T[] BlueprintSnapshot<T>(BlueprintsCache cache) where T : BlueprintScriptableObject
+        {
+            var gate = Get(cache, "m_Lock");
+            var loaded = Get(cache, "m_LoadedBlueprints") as System.Collections.IDictionary;
+            if (gate == null || loaded == null) return Array.Empty<T>();
+            var arguments = loaded.GetType().GetGenericArguments();
+            if (arguments.Length < 2) return Array.Empty<T>();
+            var blueprint = AccessTools.Field(arguments[1], "Blueprint");
+            if (blueprint == null) return Array.Empty<T>();
+            object[] entries = null;
+            for (int attempt = 0; ; attempt++)
+            {
+                try
+                {
+                    lock (gate)
+                    {
+                        entries = new object[loaded.Count];
+                        loaded.Values.CopyTo(entries, 0);
+                    }
+                    break;
+                }
+                catch (Exception error) when (attempt < 2 &&
+                    (error is InvalidOperationException || error is ArgumentException || error is IndexOutOfRangeException))
+                {
+                }
+            }
+            return entries.Where(e => e != null).Select(e => blueprint.GetValue(e)).OfType<T>().ToArray();
+        }
+
+        private static bool References(BlueprintScriptableObject bp, BlueprintGuid guid)
+        {
+            bool found = false;
+            Walk(bp.ComponentsArray, new HashSet<object>(PsychicAssets.IdentityComparer), o =>
+            {
+                if (found) return;
+                foreach (var field in o.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                {
+                    if (field.GetValue(o) is BlueprintReferenceBase reference && reference.Guid == guid) { found = true; return; }
+                }
+            });
+            return found;
+        }
+
+        private static bool Owned(BlueprintFeature hex, HashSet<BlueprintGuid> keys, string spirit)
+        {
+            foreach (var component in hex.ComponentsArray)
+            {
+                if (component == null || !component.GetType().Name.StartsWith("Prerequisite")) continue;
+                var single = AccessTools.Field(component.GetType(), "m_Feature")?.GetValue(component) as BlueprintReferenceBase;
+                if (single != null && keys.Contains(single.Guid)) return true;
+                var list = AccessTools.Field(component.GetType(), "m_Features")?.GetValue(component) as BlueprintReferenceBase[];
+                if (list == null || list.Length == 0) continue;
+                if (list.Any(r => r != null && keys.Contains(r.Guid))) return true;
+                // The authored Life rule: every entry must be a same-named feature
+                // of another class' group (oracle mystery), never a shaman one.
+                if (list.All(r => SameName((r as BlueprintFeatureReference)?.Get(), spirit))) return true;
+            }
+            return false;
+        }
+
+        // Groups may be a field or a property depending on the blueprint type,
+        // and its element type differs per class (FeatureGroup vs string), so
+        // read it without assuming either and compare by name.
+        private static bool HasGroup(SimpleBlueprint bp, string group)
+        {
+            if (bp == null) return false;
+            object raw;
+            try { raw = Get(bp, "Groups"); }
+            catch (MissingFieldException)
+            {
+                var property = AccessTools.Property(bp.GetType(), "Groups");
+                if (property == null) return false;
+                raw = property.GetValue(bp, null);
+            }
+            if (!(raw is System.Collections.IEnumerable items)) return false;
+            foreach (var item in items)
+                if (item != null && item.ToString() == group) return true;
+            return false;
+        }
+
+        private static bool SameName(SimpleBlueprint bp, string spirit)
+        {
+            if (bp == null) return false;
+            if (!SpiritGroupSuffixes.Any(s => HasGroup(bp, s))) return false;
+            return string.Equals(Name(bp), spirit, StringComparison.Ordinal);
+        }
+
+        // The localized spirit name; the asset name is a fallback for a locale
+        // that has not resolved yet.
+        private static string Name(SimpleBlueprint bp)
+        {
+            try
+            {
+                var text = (bp as BlueprintUnitFact)?.Name;
+                if (!string.IsNullOrEmpty(text)) return text;
+            }
+            catch { /* localized string not resolved yet */ }
+            return bp.name ?? "Spirit";
+        }
+
+        // A row's tier names and its private resource shape. The mapping is
+        // inferred from the donor itself instead of a table: the L1 feature's
+        // own resource is 3 + Charisma, the L8 feature consumes one per use
+        // (fixed three) and the L20 manifestation is passive.
+        private static void Classify(Row row)
+        {
+            for (int tier = 0; tier < 3; tier++)
+            {
+                row.TierNames[tier] = Name(row.Tiers[tier]);
+                ReadPoolShape(row.Tiers[tier], out row.HasPool[tier], out row.PoolBase[tier],
+                    out row.PoolStat[tier], out row.PoolPerLevel[tier]);
+            }
+        }
+
+        // Copy the donor's own ability-resource shape instead of guessing a
+        // base value: native spirits differ per tier (L1 is always 3 + Charisma,
+        // L8/L20 vary between fixed pools and none at all).
+        private static void ReadPoolShape(BlueprintFeature feature, out bool has, out int baseValue,
+            out StatType? stat, out bool perLevel)
+        {
+            has = false; baseValue = 0; stat = null; perLevel = false;
+            if (feature == null) return;
+            BlueprintAbilityResource found = null;
+            Walk(feature.ComponentsArray, new HashSet<object>(PsychicAssets.IdentityComparer), o =>
+            {
+                if (found != null) return;
+                var component = o as AddAbilityResources;
+                if (component == null) return;
+                var reference = Get(component, "m_Resource") as BlueprintAbilityResourceReference;
+                found = reference?.Get();
+            });
+            if (found == null) return;
+            var amount = Get(found, "m_MaxAmount");
+            if (amount == null) return;
+            has = true;
+            baseValue = Convert.ToInt32(Get(amount, "BaseValue") ?? 0);
+            perLevel = Equals(Get(amount, "IncreasedByLevel"), true);
+            if (Equals(Get(amount, "IncreasedByStat"), true))
+            {
+                var value = Get(amount, "ResourceBonusStat");
+                if (value is StatType type && type != StatType.Unknown)
+                    // Wisdom is the shaman casting stat: the whisperer's pool
+                    // scales on Intelligence instead. Charisma is kept as is.
+                    stat = type == StatType.Wisdom ? StatType.Intelligence : type;
+            }
+        }
         private sealed class State
         {
             internal BlueprintGuid Root;
@@ -200,13 +323,8 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             yield return WizardId; yield return SchoolId; yield return BondId; yield return WizardFeatId;
             yield return FamiliarId; yield return ExtraChannelId;
-            yield return FaerieFireBuffId; yield return GlitterdustId;
+            yield return ShamanSpiritSelectionId; yield return ShamanHexSelectionId;
             foreach (var p in PoolIds) yield return p;
-            foreach (var row in Rows)
-            {
-                foreach (var t in row.Tiers) if (!string.IsNullOrEmpty(t)) yield return t;
-                foreach (var h in row.Hexes) if (!string.IsNullOrEmpty(h.Donor)) yield return h.Donor;
-            }
         }
 
         // Every original effect now has a native Wrath component or a bounded
@@ -272,6 +390,11 @@ namespace CallOfTheWild.Wrath.Prototype
             if (gaps.Count > 0) { Log("reject: 0117 contract gap: " + string.Join(" | ", gaps)); return false; }
 
             var f = new Factory(cache);
+            // Discovery happens before the transaction: a spirit set that cannot
+            // be read rejects the package instead of publishing a partial link.
+            var rows = Discover(cache);
+            if (rows.Length == 0) { Log("reject: 0117 no shaman spirit discovered"); return false; }
+            foreach (var row in rows) Classify(row);
             var rootRef = (BlueprintArchetypeReference[])Get(wizard, "m_Archetypes");
             var uiGroups = wizard.Progression.UIGroups;
             var determinators = (BlueprintFeatureBaseReference[])Get(wizard.Progression, "m_UIDeterminatorsGroup");
@@ -280,9 +403,14 @@ namespace CallOfTheWild.Wrath.Prototype
             var poolSnapshots = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();
 
             BlueprintArchetype root = null;
+            var nativeUndo = new List<Action>();
             try
             {
-                root = Build(f, wizard, cache);
+                // Must run before Build(): the private tier clones deep-copy the
+                // donor's components, so they inherit the repaired variant menu.
+                int repaired = RepairNativeManifestations(rows, nativeUndo);
+                if (repaired > 0) Log("0117 repaired " + repaired + " native manifestation variant menu(s)");
+                root = Build(f, wizard, cache, rows);
                 var assets = new[] { (BlueprintScriptableObject)root }.Concat(
                     f.Assets.Values.Where(a => !ReferenceEquals(a, root))).ToArray();
                 foreach (var a in assets)
@@ -299,6 +427,9 @@ namespace CallOfTheWild.Wrath.Prototype
                         Set(pools[i], "m_Features", poolSnapshots[i][0]);
                         Set(pools[i], "m_AllFeatures", poolSnapshots[i][1]);
                     }
+                    // Native blueprints are shared with plain Shamans: a rejected
+                    // package must not leave any global edit behind.
+                    RollbackNative(nativeUndo);
                 });
 
                 try
@@ -313,7 +444,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     var spiritLink = f.Find<BlueprintFeatureSelection>("SpiritLink");
                     var familiar = f.Find<BlueprintFeatureSelection>("FamiliarOnlyBond");
                     var hexSelection = f.Find<BlueprintFeatureSelection>("SpiritHex");
-                    var extra = f.Find<BlueprintFeature>("ExtraChannel");
+                    var extra = f.Has("ExtraChannel") ? f.Find<BlueprintFeature>("ExtraChannel") : null;
 
                     var refs = rootRef ?? Array.Empty<BlueprintArchetypeReference>();
                     if (!refs.Any(r => r != null && r.Guid == root.AssetGuid))
@@ -329,7 +460,7 @@ namespace CallOfTheWild.Wrath.Prototype
                         var all = (BlueprintFeatureReference[])Get(pools[i], "m_AllFeatures") ?? Array.Empty<BlueprintFeatureReference>();
                         // The clone may only enter pools that already offer the
                         // native Extra Channel feat (same gate as Sunsinger).
-                        if (!all.Any(r => r != null && r.Guid == nativeExtraGuid)) continue;
+                        if (extra == null || !all.Any(r => r != null && r.Guid == nativeExtraGuid)) continue;
                         foreach (string field in new[] { "m_Features", "m_AllFeatures" })
                         {
                             var old = (BlueprintFeatureReference[])Get(pools[i], field) ?? Array.Empty<BlueprintFeatureReference>();
@@ -359,18 +490,33 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             catch (Exception error)
             {
+                // Covers a failure before inner undo() is even created, so the
+                // native edits are always restored on a rejected package.
+                RollbackNative(nativeUndo);
                 Log("reject: 0117 " + error.GetType().Name + ": " + error.Message + "\n" + error.StackTrace);
                 return false;
             }
         }
 
-        private static BlueprintArchetype Build(Factory f, BlueprintCharacterClass wizard, BlueprintsCache cache)
+        // Each restore assigns back the exact array captured before the edit,
+        // so replaying it (both undo paths) is harmless.
+        private static void RollbackNative(List<Action> undo)
+        {
+            foreach (var restore in undo)
+            {
+                try { restore(); }
+                catch (Exception error) { Log("0117 native rollback failed: " + error.Message); }
+            }
+            undo.Clear();
+        }
+
+        private static BlueprintArchetype Build(Factory f, BlueprintCharacterClass wizard, BlueprintsCache cache, Row[] rows)
         {
             var school = f.Native<BlueprintFeatureSelection>(SchoolId);
             var bond = f.Native<BlueprintFeatureSelection>(BondId);
             var wizardFeat = f.Native<BlueprintFeatureSelection>(WizardFeatId);
 
-            // Spirit Link: exactly one of ten progressions, never a second or
+            // Spirit Link: exactly one spirit progression, never a second or
             // wandering spirit and no daily switching.
             var link = Selection(f, "SpiritLink", "Spirit Link",
                 "At 1st level a spirit whisperer forms a bond with one spirit. He uses his wizard level as his shaman level for these abilities and his Intelligence modifier in place of Wisdom. He does not gain spirit magic spells or the shaman true spirit ability.",
@@ -383,25 +529,51 @@ namespace CallOfTheWild.Wrath.Prototype
             var progressions = new List<BlueprintProgression>();
             var hexSubs = new List<BlueprintFeature>();
 
-            foreach (var row in Rows)
+            // Native spirits prepend the same shared "hexes granted" lead-in
+            // through AddFeaturesFromSelectionToDescription. Life is the one
+            // spirit whose native progression never carried that component,
+            // so cache the shared introduction from whichever spirit does and
+            // reuse it for every private list (including Life's).
+            object sharedHexIntroduction = null;
+            foreach (var row in rows)
+            {
+                var nativeList = row.Progression?.ComponentsArray?.FirstOrDefault(
+                    c => c != null && c.GetType().Name == "AddFeaturesFromSelectionToDescription");
+                if (nativeList == null) continue;
+                sharedHexIntroduction = ReadIntroduction(nativeList);
+                if (sharedHexIntroduction != null) break;
+            }
+            // A build without any donor component still gets the game's own
+            // "Additional Hexes:" lead-in instead of an empty introduction.
+            if (sharedHexIntroduction == null)
+                sharedHexIntroduction = Text("SpiritWhisperer0117HexList", "introduction", "Additional Hexes:");
+
+            foreach (var row in rows)
             {
                 var features = new BlueprintFeature[3];
                 for (int tier = 0; tier < 3; tier++)
                     features[tier] = Tier(f, cache, wizard, row, tier);
 
-                var prog = f.Progression(row.Name + "Progression", row.Name + " Spirit",
-                    "Spirit Whisperer " + row.Name + " spirit. Wizard level and Intelligence drive this progression.",
+                var prog = f.Progression(row.Token + "Progression", row.Name, string.Empty,
                     new[] { Entry(1, features[0]), Entry(8, features[1]), Entry(20, features[2]) },
                     new[] { Group(features[0], features[1], features[2]) });
                 SetClasses(prog, wizard);
-                Icon(prog, row.PrivateSpirit != null ? PrivateIcon(f, row) : f.Native<BlueprintUnitFact>(row.Tiers[2]));
+                // The spirit entry reuses the shaman spirit's own text and icon.
+                Present(prog, row.Progression);
                 progressions.Add(prog);
 
+                // Only the chosen spirit's own hexes, never the shared shaman
+                // pool: a whisperer takes hexes from his spirit alone.
                 var hexFeatures = row.Hexes.Select((hex, i) =>
                     BuildHexFeature(f, cache, wizard, row, hex, i)).ToArray();
-                var sub = Selection(f, row.Name + "HexSelection", row.Name + " Spirit Hex",
+                var sub = Selection(f, row.Token + "HexSelection", row.Name + " Spirit Hex",
                     "Select one hex granted by the " + row.Name + " spirit.", hexFeatures,
                     Migration01426.Require(prog));
+                Icon(sub, row.Progression);
+                // Built after the sub-selection, which requires the progression
+                // to exist first. Point the description at this spirit's own
+                // hex list so no other spirit's hexes leak into the wording.
+                DescribeHexes(prog, sub, sharedHexIntroduction);
                 hexSubs.Add(sub);
             }
 
@@ -427,18 +599,24 @@ namespace CallOfTheWild.Wrath.Prototype
             Icon(familiar, iconDonor ?? familiarDonor);
 
             // Extra Channel points only at this package's Life channel resource.
-            var nativeExtra = f.Native<BlueprintFeature>(ExtraChannelId);
-            var extra = (BlueprintFeature)f.Clone(nativeExtra, "ExtraChannel",
-                "Extra Channel (Spirit Whisperer Life Spirit)",
-                "You can channel the Life spirit's positive energy two additional times per day. Requires Channel Positive Energy from this archetype.");
-            var increase = extra.ComponentsArray.FirstOrDefault(c => c != null && c.GetType().Name == "IncreaseResourceAmount");
-            if (increase == null) throw new InvalidOperationException("native Extra Channel resource component changed.");
-            var lifeChannel = f.Find<BlueprintFeature>("LifeTier0");
-            var lifeResource = f.Find<BlueprintAbilityResource>("LifeR2");
-            Set(increase, "m_Resource", Ref<BlueprintAbilityResourceReference>(lifeResource));
-            Set(increase, "Value", 2);
-            extra.ComponentsArray = extra.ComponentsArray.Where(c => !(c is Prerequisite))
-                .Concat(new BlueprintComponent[] { Migration01426.Require(lifeChannel) }).ToArray();
+            // Life is discovered by name, so a game without a Life spirit simply
+            // skips the clone instead of rejecting the package.
+            var life = rows.FirstOrDefault(r => string.Equals(r.Name, "Life", StringComparison.OrdinalIgnoreCase));
+            if (life != null && f.Has(life.Token + "Tier0") && f.Has(life.Token + "Tier0Pool"))
+            {
+                var nativeExtra = f.Native<BlueprintFeature>(ExtraChannelId);
+                var extra = (BlueprintFeature)f.Clone(nativeExtra, "ExtraChannel",
+                    "Extra Channel (Spirit Whisperer Life Spirit)",
+                    "You can channel the Life spirit's positive energy two additional times per day. Requires Channel Positive Energy from this archetype.");
+                var increase = extra.ComponentsArray.FirstOrDefault(c => c != null && c.GetType().Name == "IncreaseResourceAmount");
+                if (increase == null) throw new InvalidOperationException("native Extra Channel resource component changed.");
+                var lifeChannel = f.Find<BlueprintFeature>(life.Token + "Tier0");
+                var lifeResource = f.Find<BlueprintAbilityResource>(life.Token + "Tier0Pool");
+                Set(increase, "m_Resource", Ref<BlueprintAbilityResourceReference>(lifeResource));
+                Set(increase, "Value", 2);
+                extra.ComponentsArray = extra.ComponentsArray.Where(c => !(c is Prerequisite))
+                    .Concat(new BlueprintComponent[] { Migration01426.Require(lifeChannel) }).ToArray();
+            }
 
             var root = f.Add(new BlueprintArchetype
             {
@@ -456,12 +634,42 @@ namespace CallOfTheWild.Wrath.Prototype
             return root;
         }
 
-        private static BlueprintUnitFact PrivateIcon(Factory f, Row row)
+        // Native shaman spirits append their hex list to the description through
+        // AddFeaturesFromSelectionToDescription pointing at a feature selection.
+        // Our private progression points it at this spirit's own sub-selection,
+        // so only this spirit's hexes are listed. OnlyIfRequiresThisFeature must
+        // be false: the cloned hexes keep only PrerequisiteNoFeature, so the
+        // native "requires this feature" filter would hide every entry.
+        // The introduction is the native shared lead-in, reused for every spirit
+        // including Life (whose native progression never carried this component
+        // at all - the game's own omission).
+        private static void DescribeHexes(BlueprintProgression progression, BlueprintFeatureSelection selection,
+            object sharedIntroduction)
         {
-            // Heavens uses the glitterdust icon (original createSpiritWhispererSpirit);
-            // Lore uses a loadable divination icon. Both are read-only native facts.
-            var guid = row.PrivateSpirit == "Heavens" ? GlitterdustId : LoreIconId;
-            return f.Native<BlueprintUnitFact>(guid) ?? f.Native<BlueprintUnitFact>(GlitterdustId);
+            if (progression == null || selection == null) return;
+            var fields = new List<KeyValuePair<string, object>>
+            {
+                F("m_FeatureSelection", Ref<BlueprintFeatureSelectionReference>(selection)),
+                F("OnlyIfRequiresThisFeature", false)
+            };
+            if (sharedIntroduction != null) fields.Add(F("Introduction", sharedIntroduction));
+            var hexList = Component("AddFeaturesFromSelectionToDescription", fields.ToArray());
+            if (hexList == null) return; // component type absent in this build
+            hexList.name = "$AddFeaturesFromSelectionToDescription$" + selection.name;
+            var typeName = hexList.GetType().Name;
+            progression.ComponentsArray = (progression.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .Where(c => c != null && c.GetType().Name != typeName)
+                .Concat(new[] { hexList }).ToArray();
+        }
+
+        // The native component exposes the lead-in as a field; some builds
+        // surface it as a property, so read whichever the runtime provides.
+        private static object ReadIntroduction(object component)
+        {
+            var field = AccessTools.Field(component.GetType(), "Introduction");
+            if (field != null) return field.GetValue(component);
+            var property = AccessTools.Property(component.GetType(), "Introduction");
+            return property != null ? property.GetValue(component, null) : null;
         }
 
         private static BlueprintFeatureSelection Selection(Factory f, string token, string name, string description,
@@ -494,135 +702,41 @@ namespace CallOfTheWild.Wrath.Prototype
                 archetypesField.SetValue(progression, Array.CreateInstance(archetypesField.FieldType.GetElementType(), 0));
         }
 
+        // The stat substitution is exactly one direction: Intelligence replaces
+        // Wisdom. Charisma is never replaced, so a resource or DC that names
+        // Charisma keeps naming it.
+        private const StatType DcStat = StatType.Intelligence;
+
         private static BlueprintFeature Tier(Factory f, BlueprintsCache cache, BlueprintCharacterClass wizard, Row row, int tier)
         {
-            string token = row.Name + "Tier" + tier;
+            string token = row.Token + "Tier" + tier;
             string display = row.TierNames[tier];
 
-            // Heavens and Lore have no native Wrath spirit: build all three tiers
-            // privately from the original whisperer methods, never a frost clone.
-            if (row.PrivateSpirit != null)
-                return PrivateTier(f, cache, wizard, row, tier, token, display);
-
-            // Life level 8 is Healer's Touch: Lore (Religion) +3 untyped stacking
-            // (Life.cs createGreaterSpiritAbility), not a competence bonus.
-            if (tier == 1 && row.L8Private == "healersTouch")
-                return SkillFeature(f, token, display,
-                    "Lore (Religion) checks gain a +3 untyped bonus that stacks with other bonuses.",
-                    3, new[] { "SkillLoreReligion" }, "UntypedStackable");
-
-            var donorFeature = f.Native<BlueprintFeature>(row.Tiers[tier]);
+            var donorFeature = row.Tiers[tier];
             if (donorFeature == null) throw new InvalidOperationException("tier donor missing: " + row.Name + " L" + new[] { 1, 8, 20 }[tier]);
-            var feature = (BlueprintFeature)f.Clone(donorFeature, token, display,
-                "Spirit Whisperer " + row.Name + " " + display + ". Wizard level and Intelligence apply; Charisma affects only the specifically named daily uses.");
+            var feature = (BlueprintFeature)f.Clone(donorFeature, token, display, string.Empty);
             StripSpellLists(feature);
-            Icon(feature, donorFeature);
+            // Keep the spirit power's own wording and icon.
+            Present(feature, donorFeature);
             feature.ComponentsArray = feature.ComponentsArray
                 .Where(c => c != null && c.GetType().Name != "AddAbilityResources").ToArray();
 
             BlueprintAbilityResource resource = null;
-            string resourceToken = null;
-            switch (row.Resource[tier])
+            if (row.HasPool[tier])
             {
-                case 1: resourceToken = row.Name + "R1"; resource = GetOrCreateResource(f, resourceToken, 3, StatType.Charisma, false); break;
-                case 2: resourceToken = row.Name + "R2"; resource = GetOrCreateResource(f, resourceToken, 1, StatType.Charisma, false); break;
-                case 3: resourceToken = row.Name + "R3"; resource = GetOrCreateResource(f, resourceToken, 3, null, false); break;
-                case 4: resourceToken = row.Name + "R4"; resource = GetOrCreateResource(f, resourceToken, 1, null, false); break;
+                resource = GetOrCreateResource(f, token + "Pool", row.PoolBase[tier], row.PoolStat[tier], row.PoolPerLevel[tier]);
+                // A fixed pool that is spent per use carries the original 1d4
+                // round lockout; a stat- or level-scaled pool does not.
+                if (!row.PoolPerLevel[tier] && !row.PoolStat[tier].HasValue && HasConsumption(feature))
+                    AddCooldown(f, feature, token, wizard);
             }
-            var dcStat = row.ChannelDc && tier == 0 ? StatType.Charisma : StatType.Intelligence;
-            Rebind(feature, wizard, dcStat, _ => resource);
-            CloneDirectAbilities(f, wizard, feature, token, dcStat, resource);
-            if (resource != null)
-                feature.ComponentsArray = feature.ComponentsArray.Concat(new BlueprintComponent[] { Grant(resource) }).ToArray();
-
-            if (row.Resource[tier] == 3)
-                AddCooldown(f, feature, token, wizard);
-            return feature;
-        }
-
-        // Private 1/8/20 for the two spirits Wrath lacks. Each builder follows the
-        // original createSpiritWhispererSpirit method using native Wrath components.
-        private static BlueprintFeature PrivateTier(Factory f, BlueprintsCache cache, BlueprintCharacterClass wizard,
-            Row row, int tier, string token, string display)
-        {
-            BlueprintAbilityResource resource = null;
-            switch (row.Resource[tier])
-            {
-                case 1: resource = GetOrCreateResource(f, row.Name + "R1", 3, StatType.Charisma, false); break;
-                case 4: resource = GetOrCreateResource(f, row.Name + "R4", 1, null, false); break;
-            }
-
-            BlueprintFeature feature;
-            if (row.PrivateSpirit == "Heavens")
-            {
-                if (tier == 0) feature = HeavensStardust(f, wizard, token, display, resource);
-                else if (tier == 1) feature = HeavensVoid(f, token, display);
-                else feature = HeavensManifestation(f, wizard, token, display);
-            }
-            else
-            {
-                if (tier == 0) feature = MonstrousInsight(f, wizard, token, display, resource);
-                else if (tier == 1) feature = SkillFeature(f, token, display,
-                    "Four knowledge and lore skills gain a +10 competence bonus.", 10,
-                    new[] { "SkillKnowledgeArcana", "SkillKnowledgeWorld", "SkillLoreNature", "SkillLoreReligion" }, "Competence");
-                else feature = LoreManifestation(f, cache, wizard, token, display, resource);
-            }
-
+            Rebind(feature, wizard, DcStat, _ => resource);
+            CloneDirectAbilities(f, wizard, feature, token, DcStat, resource);
             if (resource != null)
                 feature.ComponentsArray = feature.ComponentsArray.Concat(new BlueprintComponent[] { Grant(resource) }).ToArray();
             return feature;
         }
 
-        // Heavens.cs createSpiritAbility: Stardust. A private faerie-fire buff
-        // imposes a stacking penalty to attack rolls and sight-based Perception
-        // that grows with Wizard level; the ability is a close-range supernatural
-        // standard action spending one R1 use.
-        private static BlueprintFeature HeavensStardust(Factory f, BlueprintCharacterClass wizard,
-            string token, string display, BlueprintAbilityResource resource)
-        {
-            const string desc = "Stardust materializes around one creature within 30 feet. It sheds light as a candle, cannot benefit from concealment or invisibility, and takes a penalty on attack rolls and sight-based Perception checks that increases by 1 at 4th level and every 4 levels thereafter. The effect lasts 1 round per 2 wizard levels. Sightless creatures are unaffected.";
-            var buff = (BlueprintBuff)f.Clone(f.Native<BlueprintBuff>(FaerieFireBuffId), token + "Buff", "Stardust", desc);
-            buff.ComponentsArray = buff.ComponentsArray.Concat(new[]
-            {
-                Component("AddContextStatBonus", F("Stat", "SkillPerception"), F("Descriptor", "UntypedStackable"), F("Value", Rank()), F("Multiplier", -1)),
-                Component("AddContextStatBonus", F("Stat", "AdditionalAttackBonus"), F("Descriptor", "UntypedStackable"), F("Value", Rank()), F("Multiplier", -1)),
-                Component("ContextRankConfig", F("m_BaseValueType", "ClassLevel"), F("m_Class", new[] { Ref<BlueprintCharacterClassReference>(wizard) }), F("m_Progression", "OnePlusDivStep"), F("m_StepLevel", 4)),
-            }).Where(c => c != null).ToArray();
-
-            var ability = f.Ability(token + "Ability", display, desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Run(RankRounds(buff)),
-                Component("ContextRankConfig", F("m_BaseValueType", "ClassLevel"), F("m_Class", new[] { Ref<BlueprintCharacterClassReference>(wizard) }), F("m_Progression", "Div2"), F("m_UseMin", true), F("m_Min", 1)),
-                Cost(resource));
-            return f.Feature(token, display, desc, PsychicAssets.Facts(ability));
-        }
-
-        // Heavens.cs createGreaterSpiritAbility. Wrath has no suffocation buff or
-        // condition, so the immunity that can be expressed is poison plus blindsense.
-        private static BlueprintFeature HeavensVoid(Factory f, string token, string display)
-        {
-            const string desc = "Blindsense 30 feet and immunity to poison.";
-            var poison = new BuffDescriptorImmunity { Descriptor = SpellDescriptor.Poison };
-            var sense = new Blindsense { Range = new Feet(30), Blindsight = false };
-            return f.Feature(token, display, desc, poison, sense);
-        }
-
-        // Heavens.cs createManifestation: saves bonus equal to the Intelligence
-        // modifier, fear immunity, and automatic confirmation of her own crits.
-        private static BlueprintFeature HeavensManifestation(Factory f, BlueprintCharacterClass wizard, string token, string display)
-        {
-            const string desc = "The shaman becomes the spirit of heaven. She gains a bonus on all saving throws equal to her Intelligence modifier, is immune to fear effects, and automatically confirms critical hits she threatens.";
-            return f.Feature(token, display, desc, new[]
-            {
-                Component("AddConditionImmunity", F("Condition", "Shaken")),
-                Component("AddConditionImmunity", F("Condition", "Frightened")),
-                Component("CritAutoconfirmAgainstAlignment", F("EnemyAlignment", "None")),
-                Component("AddContextStatBonus", F("Stat", "SaveFortitude"), F("Descriptor", "UntypedStackable"), F("Value", Rank())),
-                Component("AddContextStatBonus", F("Stat", "SaveReflex"), F("Descriptor", "UntypedStackable"), F("Value", Rank())),
-                Component("AddContextStatBonus", F("Stat", "SaveWill"), F("Descriptor", "UntypedStackable"), F("Value", Rank())),
-                Component("ContextRankConfig", F("m_BaseValueType", "StatBonus"), F("m_Stat", "Intelligence")),
-            }.Where(c => c != null).ToArray());
-        }
 
         private static BlueprintAbilityResource GetOrCreateResource(Factory f, string token, int baseValue, StatType? stat, bool perLevel)
         {
@@ -634,15 +748,6 @@ namespace CallOfTheWild.Wrath.Prototype
 
         private static ContextValue Rank(AbilityRankType type = AbilityRankType.Default)
             => new ContextValue { ValueType = ContextValueType.Rank, ValueRank = type };
-
-        private static BlueprintFeature SkillFeature(Factory f, string token, string name, string description,
-            int value, string[] stats, string descriptor)
-        {
-            var components = stats.Select(s => Component("AddStatBonus",
-                F("Stat", s), F("Descriptor", descriptor), F("Value", value))).Where(c => c != null).ToArray();
-            if (components.Length == 0) throw new InvalidOperationException("AddStatBonus component type unavailable.");
-            return f.Feature(token, name, description, components);
-        }
 
         private static BlueprintComponent Component(string typeName, params KeyValuePair<string, object>[] fields)
         {
@@ -675,10 +780,17 @@ namespace CallOfTheWild.Wrath.Prototype
         // One level of private ability cloning: the feature's AddFacts entries
         // that are abilities become private graphs with re-bound class/stat/
         // resource fields. Native read-only buffs remain shared references.
+        // A donor may be granted by more than one AddFacts component (Flame's
+        // Touch of Flames is listed twice), so each donor is cloned once and
+        // every reference points at that single private copy. Variant menus
+        // inside a clone still name the native children, so they are remapped
+        // onto the private copies below.
         private static void CloneDirectAbilities(Factory f, BlueprintCharacterClass wizard, BlueprintFeature feature,
             string token, StatType dcStat, BlueprintAbilityResource resource)
         {
+            DeduplicateAddFacts(feature);
             int index = 0;
+            var clones = new Dictionary<BlueprintGuid, BlueprintUnitFact>();
             foreach (var component in feature.ComponentsArray)
             {
                 if (component == null || component.GetType().Name != "AddFacts" || !Has(component, "m_Facts")) continue;
@@ -689,19 +801,164 @@ namespace CallOfTheWild.Wrath.Prototype
                     var donor = reference?.Get() as BlueprintScriptableObject;
                     if (donor is BlueprintAbility || donor is BlueprintActivatableAbility)
                     {
-                        var clone = (BlueprintUnitFact)f.Clone((BlueprintScriptableObject)donor,
-                            token + "Ability" + index, donor.name + " (Spirit Whisperer)",
-                            "Private Spirit Whisperer adaptation of " + donor.name + ".");
-                        StripSpellLists(clone);
-                        if (Has(clone, "m_Parent")) Set(clone, "m_Parent", null);
-                        Rebind(clone, wizard, dcStat, _ => resource);
+                        if (!clones.TryGetValue(donor.AssetGuid, out var clone))
+                        {
+                            clone = (BlueprintUnitFact)f.Clone(donor,
+                                token + "Ability" + index, donor.name, string.Empty);
+                            StripSpellLists(clone);
+                            if (Has(clone, "m_Parent")) Set(clone, "m_Parent", null);
+                            Rebind(clone, wizard, dcStat, _ => resource);
+                            // The ability is what the character sheet actually lists,
+                            // so it must carry the original wording and icon too.
+                            Present(clone, (BlueprintUnitFact)donor);
+                            clones.Add(donor.AssetGuid, clone);
+                            index++;
+                        }
                         rewritten.Add(Ref<BlueprintUnitFactReference>(clone));
                     }
                     else rewritten.Add(reference);
-                    index++;
                 }
                 Set(component, "m_Facts", rewritten.ToArray());
             }
+            foreach (var clone in clones.Values) RebindVariants(clone, clones);
+        }
+
+        // Native Flame L1 grants Touch of Flames through two AddFacts components
+        // that share the same component name; the game folds those into one by
+        // name, but Prepare()/UniqueNames() renames duplicate components, so both
+        // would take effect and the action bar would list the ability twice.
+        // Drop AddFacts components with an identical name and fact list before
+        // UniqueNames() runs. Other component shapes are left untouched.
+        private static void DeduplicateAddFacts(BlueprintFeature feature)
+        {
+            var seen = new HashSet<string>();
+            var kept = new List<BlueprintComponent>();
+            foreach (var component in feature.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+            {
+                if (component != null && component.GetType().Name == "AddFacts" && Has(component, "m_Facts"))
+                {
+                    var refs = (BlueprintUnitFactReference[])Get(component, "m_Facts")
+                        ?? Array.Empty<BlueprintUnitFactReference>();
+                    var key = (component.name ?? "") + "|" +
+                              string.Join("|", refs.Select(r => r == null ? "" : r.Guid.ToString()));
+                    if (!seen.Add(key)) continue;
+                }
+                kept.Add(component);
+            }
+            feature.ComponentsArray = kept.ToArray();
+        }
+
+        // Owlcat's own L20 manifestation blueprints list Bolster twice and omit
+        // Reach in ActivatableAbilityVariants.m_Variants, even though AddFacts
+        // grants all three metamagic toggles. Rebuild the menu from the granted
+        // facts so a plain Shaman also sees Extend / Bolster / Reach. The edit is
+        // idempotent and every change records a reversible undo action.
+        private static int RepairNativeManifestations(Row[] rows, List<Action> undo)
+        {
+            int repaired = 0;
+            foreach (var row in rows)
+            {
+                var l20 = row.Tiers[2];
+                if (l20 == null) continue;
+                var granted = new List<BlueprintUnitFact>();
+                foreach (var component in l20.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                {
+                    if (component == null || component.GetType().Name != "AddFacts" || !Has(component, "m_Facts")) continue;
+                    var refs = (BlueprintUnitFactReference[])Get(component, "m_Facts")
+                        ?? Array.Empty<BlueprintUnitFactReference>();
+                    foreach (var reference in refs)
+                    {
+                        var fact = reference?.Get() as BlueprintUnitFact;
+                        if (fact != null && !granted.Any(g => ReferenceEquals(g, fact))) granted.Add(fact);
+                    }
+                }
+                foreach (var parent in granted)
+                {
+                    var variants = parent.ComponentsArray?.FirstOrDefault(
+                        c => c != null && c.GetType().Name == "ActivatableAbilityVariants");
+                    if (variants == null) continue;
+                    var field = AccessTools.Field(variants.GetType(), "m_Variants");
+                    if (field == null || !field.FieldType.IsArray) continue;
+                    var siblings = granted.Where(g => !ReferenceEquals(g, parent)).ToArray();
+                    if (siblings.Length < 2) continue;
+                    var element = field.FieldType.GetElementType();
+                    var rebuilt = Array.CreateInstance(element, siblings.Length);
+                    bool complete = true;
+                    for (int i = 0; i < siblings.Length; i++)
+                    {
+                        var mapped = VariantReference(element, siblings[i]);
+                        if (mapped == null) { complete = false; break; }
+                        rebuilt.SetValue(mapped, i);
+                    }
+                    if (!complete) continue;
+                    var current = field.GetValue(variants) as Array;
+                    if (current != null && current.Length == rebuilt.Length)
+                    {
+                        bool same = true;
+                        for (int i = 0; i < current.Length; i++)
+                        {
+                            var a = (current.GetValue(i) as BlueprintReferenceBase)?.Guid;
+                            var b = (rebuilt.GetValue(i) as BlueprintReferenceBase)?.Guid;
+                            if (a != b) { same = false; break; }
+                        }
+                        if (same) continue;
+                    }
+                    var captured = current;
+                    field.SetValue(variants, rebuilt);
+                    undo.Add(() => field.SetValue(variants, captured));
+                    repaired++;
+                }
+            }
+            return repaired;
+        }
+
+        // ActivatableAbilityVariants / AbilityVariants are deep-copied together
+        // with their parent ability, but their m_Variants still name the native
+        // children. The character owns only the private clones, so a menu that
+        // keeps the native GUIDs shows no options (the L20 Flame/Frost/Stone/
+        // Waves/Wind manifestation metamagic choices). Point the menu at the
+        // private copies instead. Native entries with no private clone are
+        // left untouched, so this is a no-op for any other feature shape.
+        private static void RebindVariants(BlueprintUnitFact clone, Dictionary<BlueprintGuid, BlueprintUnitFact> clones)
+        {
+            foreach (var component in clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+            {
+                var name = component?.GetType().Name;
+                if (name != "ActivatableAbilityVariants" && name != "AbilityVariants") continue;
+                var field = AccessTools.Field(component.GetType(), "m_Variants");
+                if (field == null || !field.FieldType.IsArray) continue;
+                var old = field.GetValue(component) as Array;
+                if (old == null || old.Length == 0) continue;
+                var element = field.FieldType.GetElementType();
+                var rebuilt = Array.CreateInstance(element, old.Length);
+                for (int i = 0; i < old.Length; i++)
+                {
+                    var reference = old.GetValue(i) as BlueprintReferenceBase;
+                    if (reference != null && clones.TryGetValue(reference.Guid, out var mapped))
+                        rebuilt.SetValue(VariantReference(element, mapped) ?? old.GetValue(i), i);
+                    else rebuilt.SetValue(old.GetValue(i), i);
+                }
+                field.SetValue(component, rebuilt);
+            }
+        }
+
+        private static object VariantReference(Type element, BlueprintUnitFact target)
+        {
+            if (element == typeof(BlueprintActivatableAbilityReference)) return Ref<BlueprintActivatableAbilityReference>(target);
+            if (element == typeof(BlueprintAbilityReference)) return Ref<BlueprintAbilityReference>(target);
+            if (element == typeof(BlueprintUnitFactReference)) return Ref<BlueprintUnitFactReference>(target);
+            try
+            {
+                var create = typeof(BlueprintReferenceBase).GetMethods(
+                        BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+                    .FirstOrDefault(m => m.Name == "CreateTyped" && m.IsGenericMethodDefinition &&
+                                         m.GetParameters().Length == 1);
+                if (create == null) return null;
+                var reference = create.MakeGenericMethod(element).Invoke(null, new object[] { target });
+                AccessTools.Property(typeof(BlueprintReferenceBase), "Cached")?.SetValue(reference, target, null);
+                return reference;
+            }
+            catch { return null; }
         }
 
         // R3: fixed three uses plus a private 1d4-round cooldown. The cooldown
@@ -734,20 +991,17 @@ namespace CallOfTheWild.Wrath.Prototype
         // D-F02 / D-F03: a hex clones a real Wrath donor, strips the oracle class
         // and revelation prerequisites, and rebinds every consumption leaf onto a
         // package-private resource granted on this feature. No donor resource GUID
-        // survives. Life Link / Life Sight use R5 (one point per Wizard level).
+        // survives. A per-level pool (R5) is used where the donor charges per
+        // round rather than per use.
         private static BlueprintFeature BuildHexFeature(Factory f, BlueprintsCache cache, BlueprintCharacterClass wizard,
-            Row row, HexSpec hex, int index)
+            Row row, BlueprintFeature hex, int index)
         {
-            string token = row.Name + "Hex" + index;
-            if (string.IsNullOrEmpty(hex.Donor))
-                return PrivateHex(f, wizard, row, hex, token);
-
-            var donor = f.Native<BlueprintFeature>(hex.Donor);
-            if (donor == null) throw new InvalidOperationException("hex donor missing: " + hex.Donor);
-            var feature = (BlueprintFeature)f.Clone(donor, token, hex.Name + " (Spirit Whisperer)",
-                "Spirit Whisperer hex adaptation. Wizard level and Intelligence replace shaman level and Wisdom. Wrath effect donor: " + donor.name + ".");
+            string token = row.Token + "Hex" + index;
+            string name = Name(hex);
+            var feature = (BlueprintFeature)f.Clone(hex, token, name, string.Empty);
             StripSpellLists(feature);
-            Icon(feature, donor);
+            // Keep the hex's own wording and icon.
+            Present(feature, hex);
             // Drop the donor's resource grant and every oracle/revelation
             // prerequisite; keep PrerequisiteNoFeature so a hex cannot be taken twice.
             feature.ComponentsArray = feature.ComponentsArray
@@ -755,20 +1009,32 @@ namespace CallOfTheWild.Wrath.Prototype
                             (!(c is Prerequisite) || c is PrerequisiteNoFeature)).ToArray();
 
             BlueprintAbilityResource resource = null;
-            if (hex.Resource == 5) resource = GetOrCreateResource(f, token + "R5", 0, null, true);
-            else if (hex.Resource == 2) resource = GetOrCreateResource(f, token + "R2", 1, StatType.Charisma, false);
+            if (HasPerRoundSpend(feature)) resource = GetOrCreateResource(f, token + "R5", 0, null, true);
             else if (HasConsumption(feature)) resource = GetOrCreateResource(f, token + "R1", 3, StatType.Charisma, false);
 
-            Rebind(feature, wizard, StatType.Intelligence, _ => resource);
-            CloneDirectAbilities(f, wizard, feature, token, StatType.Intelligence, resource);
+            Rebind(feature, wizard, DcStat, _ => resource);
+            CloneDirectAbilities(f, wizard, feature, token, DcStat, resource);
             if (resource != null)
                 feature.ComponentsArray = feature.ComponentsArray.Concat(new BlueprintComponent[] { Grant(resource) }).ToArray();
-            if (hex.Name == "Life Link" && resource != null)
+            if (name == "Life Link" && resource != null)
                 AddLifeLinkRefund(f, feature, resource);
-            if (hex.Name == "Mental Acuity") FixMentalAcuity(feature);
-            if (hex.Name == "Entangling Curse") FixEntanglingMinimum(feature);
-            if (hex.Name == "Friend to Animals") RetargetSummon(f, feature, wizard, token);
+            if (name == "Mental Acuity") FixMentalAcuity(feature);
+            if (name == "Entangling Curse") FixEntanglingMinimum(feature);
+            if (name == "Friend to Animals") RetargetSummon(f, feature, wizard, token);
             return feature;
+        }
+
+        // A round-by-round toggle (Life Sight) charges on NewRound instead of on
+        // activation, so it needs the per-level pool rather than a use count.
+        private static bool HasPerRoundSpend(BlueprintScriptableObject bp)
+        {
+            bool found = false;
+            Walk(bp.ComponentsArray, new HashSet<object>(PsychicAssets.IdentityComparer), o =>
+            {
+                var logic = o as ActivatableAbilityResourceLogic;
+                if (logic != null && logic.SpendType == ActivatableAbilityResourceLogic.ResourceSpendType.NewRound) found = true;
+            });
+            return found;
         }
 
         private static bool HasConsumption(BlueprintScriptableObject bp)
@@ -782,342 +1048,6 @@ namespace CallOfTheWild.Wrath.Prototype
             return found;
         }
 
-        // Donor-less hexes are built privately from native Wrath components per
-        // the original method. The trailing throw guards a future row naming a
-        // hex with no builder.
-        private static BlueprintFeature PrivateHex(Factory f, BlueprintCharacterClass wizard, Row row, HexSpec hex, string token)
-        {
-            switch (hex.Name)
-            {
-                case "Life Sight": return LifeSight(f, wizard, token);
-                case "Curse of Suffering": return CurseOfSuffering(f, wizard, token);
-                case "Deathly Being": return DeathlyBeing(f, wizard, token);
-                case "Stormwalker": return Stormwalker(f, wizard, token);
-                case "Crashing Waves": return CrashingWaves(f, wizard, token);
-                case "Sparkling Aura": return SparklingAura(f, wizard, token);
-                case "Loadstone": return Loadstone(f, token);
-                case "Ward of Stone": return WardOfStone(f, wizard, token);
-                case "Enveloping Void": return EnvelopingVoid(f, wizard, token);
-                case "Lure of Heavens": return LureOfHeavens(f, wizard, token);
-                case "Heaven's Leap": return HeavensLeap(f, token);
-                case "Starburn": return Starburn(f, wizard, token);
-                case "Benefit of Wisdom": return BenefitOfWisdom(f, token);
-                case "Brain Drain": return BrainDrain(f, wizard, token);
-                case "Confusion Curse": return ConfusionCurse(f, wizard, token);
-                case "Erosion Curse": return ErosionCurse(f, wizard, token);
-                case "Mist's Shroud": return MistsShroud(f, token);
-            }
-            throw new NotSupportedException("0117 private hex '" + hex.Name +
-                "' has no same-scope Wrath effect; ContractGaps rejects the package before this builder runs.");
-        }
-
-        private static BlueprintFeature CurseOfSuffering(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "The target takes 1 extra point of damage whenever it takes bleed damage, and healing restores only half. The curse lasts one round per wizard level.";
-            var heal = Component("IncomingDamageAndHealingModifier", F("Type", "OnlyHeal"), F("ModifierPercents", new ContextValue { Value = 50 }));
-            if (heal == null) throw new InvalidOperationException("IncomingDamageAndHealingModifier missing.");
-            var buff = f.Buff(token + "Buff", "Curse of Suffering", desc, heal, new BleedIncrease0117());
-            var ability = f.Ability(token + "Ability", "Curse of Suffering", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Run(RankRounds(buff)), WizardParams(wizard), Rank(wizard, "AsIs"));
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Curse of Suffering", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature DeathlyBeing(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "Positive energy that would heal the spirit whisperer harms her, and negative energy heals her. She has a +4 bonus on saves against death effects and immunity to negative energy.";
-            var immune = new AddEnergyImmunity { Type = DamageEnergyType.NegativeEnergy };
-            var death = new SavingThrowBonusAgainstDescriptor { SpellDescriptor = SpellDescriptor.Death, ModifierDescriptor = ModifierDescriptor.UntypedStackable, Value = 4 };
-            return f.Feature(token, "Deathly Being", desc, immune, death, new DeathlyHealing0117());
-        }
-
-        private static BlueprintFeature Stormwalker(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "While the weather is bad, the spirit whisperer's speed increases by 10 feet. At 10th wizard level she ignores fog concealment.";
-            var gate = new AddFeatureOnClassLevel { Level = 10 };
-            Set(gate, "m_Class", Ref<BlueprintCharacterClassReference>(wizard));
-            var fog = f.Feature(token + "Fog", "Stormwalker Fog", desc, new FogConcealment0117());
-            Set(gate, "m_Feature", Ref<BlueprintFeatureReference>(fog));
-            return f.Feature(token, "Stormwalker", desc, new WeatherSpeed0117(), gate);
-        }
-
-        private static BlueprintFeature CrashingWaves(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "Water spells are cast at a higher caster level and can knock a damaged target prone unless it succeeds at a Fortitude save. From 8th wizard level cold spells are also cast higher. From 16th wizard level any damaging spell can knock the target prone on a failed Fortitude save.";
-            return f.Feature(token, "Crashing Waves", desc, new CrashingWaves0117());
-        }
-
-        private static BlueprintFeature SparklingAura(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "A creature within close range glows for 1 round per 2 wizard levels. A metal weapon that hits it deals extra electricity damage to that creature equal to the spirit whisperer's Charisma modifier.";
-            var buff = f.Buff(token + "Buff", "Sparkling Aura", desc, new SparklingAura0117());
-            var ability = f.Ability(token + "Ability", "Sparkling Aura", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close, PsychicAssets.Run(RankRounds(buff)), Rank(wizard, "Div2"));
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Sparkling Aura", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature Loadstone(Factory f, string token)
-        {
-            var slow = f.Native<BlueprintAbility>("f492622e473d34747806bdb39356eb89");
-            if (slow == null) throw new InvalidOperationException("Slow spell missing for Loadstone.");
-            var ability = (BlueprintAbility)f.Clone(slow, token + "Ability", "Loadstone", "A single creature is slowed, as the Slow spell.");
-            ability.Type = AbilityType.Supernatural;
-            ability.Range = AbilityRange.Close;
-            ability.SpellResistance = false;
-            ability.ActionType = UnitCommand.CommandType.Standard;
-            StripSpellLists(ability);
-            ability.ComponentsArray = ability.ComponentsArray.Where(c => c != null && c.GetType().Name != "SpellComponent" && c.GetType().Name != "AbilityTargetsAround").ToArray();
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Loadstone", "A single creature is slowed, as the Slow spell.", PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature WardOfStone(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "A touched ally gains DR 5/adamantine for 1 minute. The ward is discharged after one hit, after two hits at 8th wizard level, or after three hits at 16th wizard level.";
-            var dr = new AddDamageResistancePhysical { Value = 5, BypassedByMaterial = true, Material = PhysicalDamageMaterial.Adamantite };
-            var buff = f.Buff(token + "Buff", "Ward of Stone", desc, dr, new WardCharges0117());
-            var ability = f.Ability(token + "Ability", "Ward of Stone", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Touch,
-                PsychicAssets.Run(PsychicAssets.Apply(buff, 1, DurationRate.Minutes)));
-            ability.CanTargetEnemies = false;
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Ward of Stone", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature MonstrousInsight(Factory f, BlueprintCharacterClass wizard, string token, string display, BlueprintAbilityResource resource)
-        {
-            const string desc = "As a standard action, attempt the Knowledge or Lore check appropriate to the target's type, with an insight bonus equal to your wizard level. For 1 minute you also gain a +2 insight bonus on attacks against that creature and to AC against its attacks.";
-            var attack = new Kingmaker.Designers.Mechanics.Buffs.AttackBonusAgainstTarget { Value = new ContextValue { Value = 2 }, Descriptor = ModifierDescriptor.Insight, CheckCaster = true };
-            var ac = new Kingmaker.Designers.Mechanics.Buffs.ACBonusAgainstTarget { Value = new ContextValue { Value = 2 }, Descriptor = ModifierDescriptor.Insight, CheckCaster = true };
-            var buff = f.Buff(token + "Buff", display, desc, attack, ac);
-            var ability = f.Ability(token + "Ability", display, desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Touch,
-                PsychicAssets.Run(new MonsterLore0117(), PsychicAssets.Apply(buff, 1, DurationRate.Minutes)),
-                Cost(resource), WizardParams(wizard));
-            return f.Feature(token, display, desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature LoreManifestation(Factory f, BlueprintsCache cache, BlueprintCharacterClass wizard, string token, string display, BlueprintAbilityResource resource)
-        {
-            const string desc = "Take 20 on Knowledge and Lore checks. Once per day, cast a wizard spell of 8th level or lower that has no material component. The spell uses wizard level and Intelligence, and cannot grant an ability score bonus.";
-            var skills = new[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld, StatType.SkillLoreNature, StatType.SkillLoreReligion };
-            var take = new ModifyD20 { Rule = RuleType.SkillCheck, SpecificSkill = true, Skill = skills, Replace = true,
-                RollResult = new ContextValue { Value = 20 },
-                ActionsToTrigger = PsychicAssets.Actions(), ActionsToTriggerBeforeRoll = PsychicAssets.Actions() };
-            var menu = WishMenu(f, cache, wizard, token, resource);
-            return f.Feature(token, display, desc, take, PsychicAssets.Facts(menu), Grant(resource));
-        }
-
-        // Contract section 3 forbids Wish granting ability-score bonuses. Match the twelve
-        // native enhancement spells by AssetGuid (stable); blueprint .name is not reliably
-        // the asset filename in every load path. GUIDs verified against blueprints.zip.
-        private static readonly HashSet<string> WishBlockedSpells = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "4c3d08935262b6544ae97599b3a9556d", // BullsStrength
-            "a900628aea19aa74aad0ece0e65d091a", // BearsEndurance
-            "de7a025d48ad5da4991e7d3c682cf69d", // CatsGrace
-            "446f7bf201dc1934f96ac0a26e324803", // EaglesSplendor
-            "ae4d3ad6a8fda1542acf2e9bbc13d113", // FoxsCunning
-            "f0455c9295b53904f9e02fc571dd2ce1", // OwlsWisdom
-            "6a234c6dcde7ae94e94e9c36fd1163a7", // BullsStrengthMass
-            "f6bcea6db14f0814d99b54856e918b92", // BearsEnduranceMass
-            "1f6c94d56f178b84ead4c02f1b1e1c48", // CatsGraceMass
-            "2caa607eadda4ab44934c5c9875e01bc", // EaglesSplendorMass
-            "2b24159ad9907a8499c2313ba9c0f615", // FoxsCunningMass
-            "9f5ada581af3db4419b54db77f44e430", // OwlsWisdomMass
-        };
-
-        private static BlueprintAbility WishMenu(Factory f, BlueprintsCache cache, BlueprintCharacterClass wizard, string token, BlueprintAbilityResource resource)
-        {
-            var list = cache.Load(BlueprintGuid.Parse("ba0401fdeb4062f40a7aa95b6f07fe89")) as BlueprintSpellList;
-            if (list == null) throw new InvalidOperationException("Wizard spell list missing for Lore wish.");
-            var parent = f.Ability(token + "Wish", "Manifestation: Wish", "Once per day, cast one wizard spell of 8th level or lower with no material component.",
-                AbilityType.SpellLike, UnitCommand.CommandType.Standard, AbilityRange.Personal, WizardParams(wizard));
-            var children = new List<BlueprintAbilityReference>();
-            var levels = list.SpellsByLevel;
-            int max = Math.Min(8, levels.Length - 1);
-            for (int level = 1; level <= max; level++)
-            {
-                foreach (var spell in levels[level].Spells)
-                {
-                    if (spell == null) continue;
-                    var material = spell.MaterialComponent;
-                    if (material != null && material.Item != null) continue;
-                    if (WishBlockedSpells.Contains(spell.AssetGuid.ToString().Replace("-", ""))) continue;
-                    var copy = (BlueprintAbility)f.Clone(spell, token + "Wish" + spell.AssetGuid.ToString().Replace("-", ""), spell.name, "Wish copy of " + spell.name);
-                    copy.Type = AbilityType.SpellLike;
-                    copy.ActionType = UnitCommand.CommandType.Standard;
-                    StripSpellLists(copy);
-                    copy.ComponentsArray = copy.ComponentsArray.Where(c => c != null && c.GetType().Name != "SpellListComponent" && c.GetType().Name != "AbilityResourceLogic")
-                        .Concat(new BlueprintComponent[] { Cost(resource), WizardParams(wizard) }).ToArray();
-                    Set(copy, "m_Parent", Ref<BlueprintAbilityReference>(parent));
-                    children.Add(Ref<BlueprintAbilityReference>(copy));
-                }
-            }
-            if (children.Count == 0) throw new InvalidOperationException("Lore wish found no wizard spells.");
-            var variants = new AbilityVariants();
-            Set(variants, "m_Variants", children.ToArray());
-            parent.ComponentsArray = parent.ComponentsArray.Concat(new BlueprintComponent[] { variants }).ToArray();
-            return parent;
-        }
-
-        private static BlueprintFeature EnvelopingVoid(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "One enemy within close range is blinded for one round per wizard level. A Will save negates.";
-            var donor = f.Native<BlueprintBuff>("187f88d96a0ef464280706b63635f2af");
-            if (donor == null) throw new InvalidOperationException("blindness buff missing.");
-            var buff = (BlueprintBuff)f.Clone(donor, token + "Buff", "Enveloping Void", desc);
-            var ability = f.Ability(token + "Ability", "Enveloping Void", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Save(SavingThrowType.Will, PsychicAssets.Saved(Array.Empty<GameAction>(), new GameAction[] { RankRounds(buff) })),
-                WizardParams(wizard), Rank(wizard, "AsIs"));
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Enveloping Void", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature LureOfHeavens(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "At 10th wizard level the spirit whisperer can fly.";
-            var flight = Component("AddMechanicsFeature", F("m_Feature", "Flying"));
-            if (flight == null) throw new InvalidOperationException("Flying mechanics feature missing.");
-            var gate = Component("PrerequisiteClassLevel", F("m_CharacterClass", Ref<BlueprintCharacterClassReference>(wizard)), F("Level", 10));
-            var parts = new List<BlueprintComponent> { flight };
-            if (gate != null) parts.Add(gate);
-            return f.Feature(token, "Lure of Heavens", desc, parts.ToArray());
-        }
-
-        private static BlueprintFeature HeavensLeap(Factory f, string token)
-        {
-            const string desc = "Choose one ally, or yourself, within close range. Then choose a point within close range; that creature moves there. The same creature cannot be chosen again for 24 hours.";
-            var mark = f.Buff(token + "Mark", "Heaven's Leap Target", desc);
-            var day = f.Buff(token + "Day", "Heaven's Leap (already targeted)", "This creature cannot be the target of Heaven's Leap again for 24 hours.");
-            var choose = f.Ability(token + "Select", "Heaven's Leap: Select", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Free, AbilityRange.Close, PsychicAssets.Run(PsychicAssets.Apply(mark, 1)));
-            choose.CanTargetEnemies = false;
-            choose.CanTargetFriends = true;
-            choose.CanTargetSelf = true;
-            var gate = new AbilityTargetHasFact { Inverted = true };
-            Set(gate, "m_CheckedFacts", new[] { Ref<BlueprintUnitFactReference>(day) });
-            choose.ComponentsArray = choose.ComponentsArray.Concat(new BlueprintComponent[] { gate }).ToArray();
-            var leap = new HeavensLeap0117 { Mark = mark, DayLock = day };
-            var move = f.Ability(token + "Ability", "Heaven's Leap", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close, leap);
-            move.CanTargetPoint = true;
-            move.CanTargetFriends = false;
-            move.CanTargetEnemies = false;
-            move.CanTargetSelf = false;
-            return f.Feature(token, "Heaven's Leap", desc, PsychicAssets.Facts(choose, move), PsychicAssets.Facts(mark));
-        }
-
-        private static BlueprintFeature Starburn(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "One creature within close range takes 1d6 fire damage per 2 wizard levels and shines for 1 round. A Fortitude save halves the damage. Uses are 1 + Charisma, and each use imposes a 1d4-round cooldown.";
-            var resource = GetOrCreateResource(f, token + "R2", 1, StatType.Charisma, false);
-            var light = (BlueprintBuff)f.Clone(f.Native<BlueprintBuff>(FaerieFireBuffId), token + "Light", "Starburn", desc);
-            var damage = new ContextActionDealDamage {
-                DamageType = new DamageTypeDescription { Type = DamageType.Energy, Energy = DamageEnergyType.Fire },
-                Value = new ContextDiceValue { DiceType = DiceType.D6, DiceCountValue = Rank(), BonusValue = 0 },
-                HalfIfSaved = true, IgnoreCritical = true, DisableSneakDamage = true
-            };
-            var cooldown = f.Buff(token + "Cooldown", "Starburn cooldown", "This hex cannot be used again while this cooldown lasts.");
-            var restriction = new AbilityCasterHasNoFacts();
-            Set(restriction, "m_Facts", new[] { Ref<BlueprintUnitFactReference>(cooldown) });
-            var cooldownApply = new ContextActionApplyBuff { ToCaster = true, IsFromSpell = false,
-                DurationValue = new ContextDurationValue { Rate = DurationRate.Rounds, DiceType = DiceType.D4, DiceCountValue = 1, BonusValue = 0 } };
-            Set(cooldownApply, "m_Buff", Ref<BlueprintBuffReference>(cooldown));
-            var ability = f.Ability(token + "Ability", "Starburn", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Save(SavingThrowType.Fortitude, damage, PsychicAssets.Saved(Array.Empty<GameAction>(), new GameAction[] { PsychicAssets.Apply(light, 1) })),
-                PsychicAssets.Run(cooldownApply), restriction,
-                Cost(resource), WizardParams(wizard), Rank(wizard, "Div2"));
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Starburn", desc, PsychicAssets.Facts(ability), Grant(resource));
-        }
-
-        private static BlueprintFeature BenefitOfWisdom(Factory f, string token)
-        {
-            const string desc = "Lore (Nature) and Lore (Religion) checks use Intelligence instead of Wisdom.";
-            var nature = Component("ReplaceStatBaseAttribute", F("TargetStat", "SkillLoreNature"), F("BaseAttributeReplacement", "Intelligence"));
-            var religion = Component("ReplaceStatBaseAttribute", F("TargetStat", "SkillLoreReligion"), F("BaseAttributeReplacement", "Intelligence"));
-            if (nature == null || religion == null) throw new InvalidOperationException("ReplaceStatBaseAttribute missing.");
-            return f.Feature(token, "Benefit of Wisdom", desc, nature, religion);
-        }
-
-        private static BlueprintFeature BrainDrain(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "One intelligent enemy within 30 feet takes 1d4 damage per 2 wizard levels. A Will save negates. This is a mind-affecting effect.";
-            var damage = new ContextActionDealDamage {
-                DamageType = new DamageTypeDescription { Type = DamageType.Direct },
-                Value = new ContextDiceValue { DiceType = DiceType.D4, DiceCountValue = Rank(), BonusValue = 0 },
-                IgnoreCritical = true, DisableSneakDamage = true
-            };
-            var ability = f.Ability(token + "Ability", "Brain Drain", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Save(SavingThrowType.Will, PsychicAssets.Saved(Array.Empty<GameAction>(), new GameAction[] { damage })),
-                WizardParams(wizard), Rank(wizard, "Div2"));
-            AddDayLock(f, ability, token, true);
-            return f.Feature(token, "Brain Drain", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature ConfusionCurse(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "One intelligent enemy within 30 feet is confused for a number of rounds equal to the Charisma modifier, minimum 1. A Will save negates.";
-            var donor = f.Native<BlueprintBuff>("886c7407dc629dc499b9f1465ff382df");
-            if (donor == null) throw new InvalidOperationException("confused buff missing.");
-            var buff = (BlueprintBuff)f.Clone(donor, token + "Buff", "Confusion Curse", desc);
-            var ability = f.Ability(token + "Ability", "Confusion Curse", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Save(SavingThrowType.Will, PsychicAssets.Saved(Array.Empty<GameAction>(), new GameAction[] { RankRounds(buff) })),
-                WizardParams(wizard), CharismaRounds());
-            AddDayLock(f, ability, token, true);
-            return f.Feature(token, "Confusion Curse", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature ErosionCurse(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "A construct within close range takes 1d6 damage per 2 wizard levels. A Reflex save halves the damage.";
-            var construct = f.Native<BlueprintFeature>("fd389783027d63343b4a5634bd81645f");
-            var damage = new ContextActionDealDamage {
-                DamageType = new DamageTypeDescription { Type = DamageType.Direct },
-                Value = new ContextDiceValue { DiceType = DiceType.D6, DiceCountValue = Rank(), BonusValue = 0 },
-                HalfIfSaved = true, IgnoreCritical = true, DisableSneakDamage = true
-            };
-            var ability = f.Ability(token + "Ability", "Erosion Curse", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Close,
-                PsychicAssets.Save(SavingThrowType.Reflex, damage),
-                WizardParams(wizard), Rank(wizard, "Div2"));
-            if (construct != null)
-            {
-                var gate = new AbilityTargetHasFact { Inverted = false };
-                Set(gate, "m_CheckedFacts", new[] { Ref<BlueprintUnitFactReference>(construct) });
-                ability.ComponentsArray = ability.ComponentsArray.Concat(new BlueprintComponent[] { gate }).ToArray();
-            }
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Erosion Curse", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static BlueprintFeature MistsShroud(Factory f, string token)
-        {
-            const string desc = "A willing creature gains blur concealment until an attack misses it because of that concealment, or for 1 minute. At 8th wizard level the mist lasts through one extra such miss, and at 16th through two.";
-            var donor = f.Native<BlueprintBuff>("dd3ad347240624d46a11a092b4dd4674");
-            if (donor == null) throw new InvalidOperationException("blur buff missing.");
-            var buff = (BlueprintBuff)f.Clone(donor, token + "Buff", "Mist's Shroud", desc);
-            buff.ComponentsArray = buff.ComponentsArray.Concat(new BlueprintComponent[] { new MistCharges0117() }).ToArray();
-            var ability = f.Ability(token + "Ability", "Mist's Shroud", desc, AbilityType.Supernatural,
-                UnitCommand.CommandType.Standard, AbilityRange.Touch, PsychicAssets.Run(PsychicAssets.Apply(buff, 1, DurationRate.Minutes)));
-            ability.CanTargetEnemies = false;
-            AddDayLock(f, ability, token, false);
-            return f.Feature(token, "Mist's Shroud", desc, PsychicAssets.Facts(ability));
-        }
-
-        private static ContextCalculateAbilityParamsBasedOnClass WizardParams(BlueprintCharacterClass wizard)
-        {
-            var p = new ContextCalculateAbilityParamsBasedOnClass { StatType = StatType.Intelligence };
-            Set(p, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(wizard));
-            return p;
-        }
 
         private static ContextRankConfig Rank(BlueprintCharacterClass wizard, string progression)
         {
@@ -1186,8 +1116,8 @@ namespace CallOfTheWild.Wrath.Prototype
                     var donor = reference?.Get() as BlueprintFeature;
                     bool summon = donor != null && donor.ComponentsArray.Any(c => c != null && c.GetType().Name == "SpontaneousSpellConversion");
                     if (!summon) { rewritten.Add(reference); index++; continue; }
-                    var clone = (BlueprintFeature)f.Clone(donor, token + "Summon" + index, donor.name + " (Spirit Whisperer)",
-                        "Spirit Whisperer spontaneous summon conversion uses Wizard spell slots.");
+                    var clone = (BlueprintFeature)f.Clone(donor, token + "Summon" + index, donor.name, string.Empty);
+                    Present(clone, donor);
                     foreach (var conversion in clone.ComponentsArray.Where(c => c != null && c.GetType().Name == "SpontaneousSpellConversion"))
                         Set(conversion, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(wizard));
                     rewritten.Add(Ref<BlueprintUnitFactReference>(clone));
@@ -1218,51 +1148,10 @@ namespace CallOfTheWild.Wrath.Prototype
             return apply;
         }
 
-        private static ContextRankConfig CharismaRounds()
-        {
-            var rank = new ContextRankConfig();
-            Set(rank, "m_BaseValueType", ContextRankBaseValueType.StatBonus);
-            Set(rank, "m_Stat", StatType.Charisma);
-            Set(rank, "m_UseMin", true);
-            Set(rank, "m_Min", 1);
-            SetEnum(rank, "m_Progression", "AsIs");
-            return rank;
-        }
-
         private static void SetEnum(object obj, string field, string name)
         {
             var target = AccessTools.Field(obj.GetType(), field) ?? throw new MissingFieldException(obj.GetType().FullName, field);
             target.SetValue(obj, Enum.Parse(target.FieldType, name));
-        }
-
-        // Life Sight: R5 pool, a free-action toggle that spends one point per new
-        // round (ActivatableAbilityResourceLogic.NewRound), gated at Wizard 12.
-        private static BlueprintFeature LifeSight(Factory f, BlueprintCharacterClass wizard, string token)
-        {
-            const string desc = "The spirit whisperer sees the life force of nearby creatures, gaining blindsight 30 feet and immunity to gaze attacks. This toggle spends one use per round while active.";
-            var resource = GetOrCreateResource(f, token + "R5", 0, null, true);
-            var gazeSpell = new Kingmaker.UnitLogic.FactLogic.SpellImmunityToSpellDescriptor { Descriptor = SpellDescriptor.GazeAttack };
-            var gazeBuff = new BuffDescriptorImmunity { Descriptor = SpellDescriptor.GazeAttack };
-            Set(gazeSpell, "m_CasterIgnoreImmunityFact", new BlueprintUnitFactReference());
-            Set(gazeBuff, "m_IgnoreFeature", new BlueprintUnitFactReference());
-            var buff = f.Buff(token + "Buff", "Life Sight", desc,
-                new Blindsense { Range = new Feet(30), Blindsight = true }, gazeSpell, gazeBuff);
-            var spend = new ActivatableAbilityResourceLogic { SpendType = ActivatableAbilityResourceLogic.ResourceSpendType.NewRound };
-            Set(spend, "m_RequiredResource", Ref<BlueprintAbilityResourceReference>(resource));
-            var toggle = f.Add(new BlueprintActivatableAbility
-            {
-                ActivationType = AbilityActivationType.WithUnitCommand,
-                Group = ActivatableAbilityGroup.None,
-                DeactivateIfCombatEnded = true,
-                ComponentsArray = new BlueprintComponent[] { spend }
-            }, token + "Toggle", "Life Sight", desc);
-            Set(toggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Free);
-            Set(toggle, "m_Buff", Ref<BlueprintBuffReference>(buff));
-            Icon(toggle, buff);
-            var gate = Component("PrerequisiteClassLevel", F("m_CharacterClass", Ref<BlueprintCharacterClassReference>(wizard)), F("Level", 12));
-            var components = new List<BlueprintComponent> { PsychicAssets.Facts(toggle), Grant(resource) };
-            if (gate != null) components.Add(gate);
-            return f.Feature(token, "Life Sight", desc, components.ToArray());
         }
 
         // D-F03: ending a Life Link refunds exactly one R5 point to the caster.
@@ -1284,8 +1173,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 {
                     var donor = f.Native<BlueprintBuff>(LifeLinkBuffId);
                     if (donor == null) continue;
-                    refund = (BlueprintBuff)f.Clone(donor, "LifeLinkRefundBuff", "Life Link",
-                        "When this link ends, one use of the spirit whisperer's Life Link pool is restored.");
+                    refund = (BlueprintBuff)f.Clone(donor, "LifeLinkRefundBuff", "Life Link", string.Empty);
+                    Present(refund, donor);
                     var restore = new ContextRestoreResource();
                     Set(restore, "Resource", Ref<BlueprintAbilityResourceReference>(resource));
                     Set(restore, "Value", new ContextValue { Value = 1 });
@@ -1306,69 +1195,6 @@ namespace CallOfTheWild.Wrath.Prototype
             var field = AccessTools.Field(type, "Action") ?? AccessTools.Field(type, "m_Action");
             if (field != null) field.SetValue(wrapper, action);
             return wrapper;
-        }
-    }
-
-    [TypeId("0117c0e1a1b24c5d8e9f001122334402")]
-    internal sealed class HeavensLeap0117 : AbilityCustomDimensionDoor
-    {
-        internal BlueprintBuff Mark;
-        internal BlueprintBuff DayLock;
-        public override System.Collections.Generic.IEnumerator<Kingmaker.UnitLogic.Abilities.Components.Base.AbilityDeliveryTarget> Deliver(AbilityExecutionContext context, TargetWrapper target)
-        {
-            var caster = context.MaybeCaster;
-            if (caster != null && Mark != null)
-            {
-                var ally = Marked(caster) ?? caster;
-                bool locked = DayLock != null && ally.Buffs.Enumerable.Any(b => b.Blueprint == DayLock);
-                if (!locked)
-                {
-                    ally.Position = target.Point;
-                    foreach (var buff in ally.Buffs.Enumerable.Where(b => b.Blueprint == Mark).ToArray()) buff.Remove();
-                    if (DayLock != null)
-                    {
-                        var added = ally.Buffs.AddBuff(DayLock, context, TimeSpan.FromDays(1));
-                        if (added != null) added.IsNotDispelable = true;
-                    }
-                }
-            }
-            yield break;
-        }
-        UnitEntityData Marked(UnitEntityData caster)
-        {
-            foreach (var unit in Candidates(caster))
-            {
-                if (unit?.Buffs == null) continue;
-                foreach (var buff in unit.Buffs.Enumerable)
-                {
-                    if (buff.Blueprint != Mark) continue;
-                    var from = buff.Context?.MaybeCaster;
-                    if (from == null || from == caster) return unit;
-                }
-            }
-            return null;
-        }
-        static IEnumerable<UnitEntityData> Candidates(UnitEntityData caster)
-        {
-            yield return caster;
-            var player = Game.Instance?.Player;
-            if (player == null) yield break;
-            object party = null;
-            foreach (var name in new[] { "Party", "PartyCharacters", "Characters", "Group" })
-            {
-                party = AccessTools.Property(player.GetType(), name)?.GetValue(player, null);
-                if (party != null) break;
-            }
-            if (party is System.Collections.IEnumerable items)
-                foreach (var item in items)
-                {
-                    if (item is UnitEntityData unit) yield return unit;
-                    else if (item != null)
-                    {
-                        var value = AccessTools.Property(item.GetType(), "Value")?.GetValue(item, null) as UnitEntityData;
-                        if (value != null) yield return value;
-                    }
-                }
         }
     }
 
@@ -1597,48 +1423,4 @@ namespace CallOfTheWild.Wrath.Prototype
         }
     }
 
-    [TypeId("0117c0e1a1b24c5d8e9f001122334409")]
-    internal sealed class MonsterLore0117 : ContextAction
-    {
-        public override string GetCaption() => "Monstrous Insight";
-        public override void RunAction()
-        {
-            var caster = Context?.MaybeCaster;
-            var target = Target?.Unit;
-            if (caster == null || target == null) return;
-            var skill = SkillFor(target);
-            int level = 0;
-            var wizard = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("ba34257984f4c41408ce1dc2004e342e");
-            if (wizard != null) level = caster.Progression.GetClassLevel(wizard);
-            var check = new RuleSkillCheck(caster, skill, InsightDC(target.Progression.CharacterLevel));
-            if (level > 0) check.AddTemporaryModifier(caster.Stats.GetStat(skill).AddModifier(level, ModifierDescriptor.Insight));
-            var result = Context.TriggerRule(check);
-            Reveal(caster, target, result.RollResult);
-        }
-        // Identification DC is the native baseline only; the wizard level is the insight bonus, not a DC reduction.
-        internal static int InsightDC(int targetCharacterLevel) => 10 + targetCharacterLevel;
-        static void Reveal(UnitEntityData caster, UnitEntityData target, int roll)
-        {
-            var manager = Game.Instance?.Player?.InspectUnitsManager;
-            if (manager == null) return;
-            var blueprint = target.BlueprintForInspection;
-            if (blueprint == null) return;
-            var info = manager.GetInfo(blueprint);
-            if (info == null || info.KnownPartsCount >= 4) return;
-            info.SetCheck(roll);
-            EventBus.RaiseEvent<IKnowledgeHandler>(h => h.HandleKnowledgeUpdated(info));
-        }
-        static StatType SkillFor(UnitEntityData unit)
-        {
-            var name = unit.Blueprint?.GetType().GetProperty("Type")?.GetValue(unit.Blueprint)?.ToString()
-                ?? unit.Blueprint?.name ?? "";
-            if (name.IndexOf("Undead", StringComparison.OrdinalIgnoreCase) >= 0) return StatType.SkillLoreReligion;
-            if (name.IndexOf("Animal", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Vermin", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                name.IndexOf("Plant", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Fey", StringComparison.OrdinalIgnoreCase) >= 0)
-                return StatType.SkillLoreNature;
-            if (name.IndexOf("Humanoid", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Construct", StringComparison.OrdinalIgnoreCase) >= 0)
-                return StatType.SkillKnowledgeWorld;
-            return StatType.SkillKnowledgeArcana;
-        }
-    }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -243,7 +243,7 @@ internal static class Howl01428Tests
         try {
             var ability = Asset<BlueprintAbility>(cache, "TerrifyingHowlAbility");
             bool hasFeedback = ability.ComponentsArray.Any(c => c.GetType().Name == "HowlCastFeedback");
-            var definition = AccessTools.Method(production.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition");
+            var definition = AccessTools.Method(production.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) });
             string beforeDefinition = (string)definition.Invoke(null, new object[] { ability.ComponentsArray });
             var shaken = PsychicExpansionTests.NativeCase<BlueprintBuff>("25ec6cb6ab1845c48a95f9c20b034220");
             var nativeFear = (BlueprintBuff)cache.Load(BlueprintGuid.Parse("f08a7239aa961f34c8301518e71d4cdf"));

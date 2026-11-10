@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -314,7 +314,7 @@ internal static class SpiritualGuardian01433Tests
         Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.SpiritWeaponAnimatedVisual"), "Swing"), nameof(Skip));
         Patch(AccessTools.Method(typeof(AbilityExecutionProcess), "SpawnFxs"), nameof(Skip));
         Patch(AccessTools.PropertyGetter(AccessTools.Inner(typeof(RulebookEvent), "Dice"), "D20"), nameof(FixedD20));
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(SpiritualGuardian01433Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(SpiritualGuardian01433Tests), nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(AbilityExecutionProcess), "DoApplyEffect"), transpiler: new HarmonyMethod(typeof(SpiritualGuardian01433Tests), nameof(FirstCastBoundary)));
         PsychicRuleTestBoundary.Patch(h, typeof(RuleSpellResistanceCheck), AccessTools.Method(typeof(SpiritualGuardian01433Tests), nameof(SR)));
         PsychicRuleTestBoundary.Patch(h, typeof(RuleAttackWithWeapon), AccessTools.Method(typeof(SpiritualGuardian01433Tests), nameof(Strike)));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -183,7 +183,7 @@ internal static class RegistrationFeatKi01432Tests
         for (int i = 0; i < pools.Length; i++) foreach (string field in new[] { "m_Features", "m_AllFeatures" }) Check(Refs(pools[i], field).Count(r => r.Guid == roots[i].AssetGuid) == 1, "actual optional refresh repairs one exact pool reference");
         var retryBefore = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();
         var retryHook = new Harmony("CotW01432.PublishedKiRetryRollback");
-        retryHook.Patch(AccessTools.Method(Module("T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(RegistrationFeatKi01432Tests), nameof(RetryAppendFault)));
+        retryHook.Patch(AccessTools.Method(Module("T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(RegistrationFeatKi01432Tests), nameof(RetryAppendFault)));
         try {
             retryAppendFault = true;
             Check(Rejected(() => Register(cache, "MonkKiPowers01427"), "01432 retry"), "published-row retry reaches actual second-pool append fault");
@@ -222,7 +222,7 @@ internal static class RegistrationFeatKi01432Tests
         var parentDaemon = (BlueprintFeature)parent.Load(BlueprintGuid.Parse("45102fd7aab96f94d81ec80768549e12"));
         var parentDaemonBasis = (BlueprintBuff)parent.Load(BlueprintGuid.Parse("a8957a1c6f212244d969645bc2fa7c25"));
         var parentDaemonArrays = new[] { parentDaemon.ComponentsArray, parentDaemonBasis.ComponentsArray };
-        var parentDaemonDefinitions = parentDaemonArrays.Select(x => (string)AccessTools.Method(Module("Migration01426"), "Definition").Invoke(null, new object[] { x })).ToArray();
+        var parentDaemonDefinitions = parentDaemonArrays.Select(x => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { x })).ToArray();
         var parentDaemonReferences = parentDaemonArrays.SelectMany(x => References(x, new HashSet<object>())).ToArray();
         var parentDaemonCached = parentDaemonReferences.Select(Cached).ToArray();
         var own = Loaded(parent).Where(x => x.name.StartsWith("CotW")).Select(x => x.AssetGuid).ToHashSet();
@@ -303,7 +303,7 @@ internal static class RegistrationFeatKi01432Tests
             h.UnpatchAll(h.Id);
             Check(ReferenceEquals(parent.Load(parentDaemon.AssetGuid), parentDaemon) && ReferenceEquals(parent.Load(parentDaemonBasis.AssetGuid), parentDaemonBasis), "actual caller keeps exact parent daemon blueprint identities");
             Check(ReferenceEquals(parentDaemon.ComponentsArray, parentDaemonArrays[0]) && ReferenceEquals(parentDaemonBasis.ComponentsArray, parentDaemonArrays[1]), "actual caller keeps exact parent daemon component arrays");
-            Check(parentDaemonArrays.Select(x => (string)AccessTools.Method(Module("Migration01426"), "Definition").Invoke(null, new object[] { x })).SequenceEqual(parentDaemonDefinitions), "actual caller leaves parent daemon authored definitions unchanged");
+            Check(parentDaemonArrays.Select(x => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { x })).SequenceEqual(parentDaemonDefinitions), "actual caller leaves parent daemon authored definitions unchanged");
             Check(parentDaemonReferences.Select(Cached).Zip(parentDaemonCached, ReferenceEquals).All(x => x), "actual caller leaves every parent daemon Cached pointer unchanged, including initially-null pointers");
         }
     }

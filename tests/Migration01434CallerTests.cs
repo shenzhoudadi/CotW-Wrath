@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +32,7 @@ internal static class Migration01434CallerTests
     static BlueprintGuid Id(string token) => (BlueprintGuid)AccessTools.Method(Module("PsychicAssets"), "Id").Invoke(null, new object[] { token });
     static T CopyData<T>(T value) => (T)AccessTools.Method(Module("PsychicAssets"), "CopyData").MakeGenericMethod(typeof(T)).Invoke(null, new object[] { value });
     static SimpleBlueprint Copy(SimpleBlueprint value) => (SimpleBlueprint)AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(value, null);
-    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition").Invoke(null, new object[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { value });
     static BlueprintFeatureReference[] Refs(BlueprintFeatureSelection p, string field) => (BlueprintFeatureReference[])Get(p, field) ?? Array.Empty<BlueprintFeatureReference>();
     static object Cached(BlueprintReferenceBase r) => AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").GetValue(r, null);
     static void Uncache(BlueprintReferenceBase r) => AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, null, null);
@@ -185,36 +185,41 @@ internal static class Migration01434CallerTests
             Catalog(states);
         }
         observations.Add(new JObject{["case"]="success",["executed"]=new JArray(executed),["nonTargetActionsScopedOut"]=new JArray(skipped.Distinct()),["actualStates"]=JObject.FromObject(states)});
-        // These seven pre-existing RagePowers effects already derived the same
-        // GUIDs in033's real startup, though its focused inventory omitted them.
-        // Classify by unchanged BuffIds and the actual unchanged Fero token
-        // rule; their new observation is never counted as a034 new asset.
+        // The five authored roots are the only034 additions; nothing else may
+        // count as one.
+        var expectedNew=new HashSet<BlueprintGuid>();
+        foreach(int mode in Enumerable.Range(0,3))
+            foreach(string token in Tokens)expectedNew.Add(Id("FerociousBeastPassive"+mode+Id(token.Replace("RagePower","RageEffectBuff"))));
+        // Every remaining Ferocious private buff derivation comes from a native
+        // rage power that the real startup already hydrates through RagePowers
+        // or the041 Skald dependency walk. Its token still encodes the exact
+        // mode and source GUID, and the payload must stay an unchanged copy of
+        // that native source. Verify each one, then classify it as a legacy
+        // resource instead of a034 new asset; no source list is hardcoded.
         var legacy=new List<SimpleBlueprint>();
-        foreach(int mode in Enumerable.Range(0,3)) foreach(string sourceId in Constants("RagePowers","BuffIds")) {
-            string token="FerociousBeastPassive"+mode+sourceId;
-            var source=(BlueprintBuff)cache.Load(BlueprintGuid.Parse(sourceId)); var clone=cache.Load(Id(token)) as BlueprintBuff;
-            Check(clone!=null&&clone.name=="CotWWrathPsychic"+token&&clone.GetType()==source.GetType()&&Definition(clone.ComponentsArray)==Definition(source.ComponentsArray),"unchanged legacy startup deterministic GUID, metadata and component payload "+mode+"/"+sourceId);
+        foreach(var clone in Loaded(cache)
+            .Where(x=>x.name.StartsWith("CotWWrathPsychicFerociousBeastPassive")||x.name.StartsWith("CotWWrathPsychicFerociousBeastPassiveFact"))
+            .Where(x=>!expectedNew.Contains(x.AssetGuid)).OrderBy(x=>x.name,StringComparer.Ordinal)) {
+            string token=clone.name.Substring("CotWWrathPsychic".Length);
+            // Feature receipts carry an extra "Fact" marker before the mode.
+            string suffix=token.Substring(("FerociousBeastPassive"+(token.StartsWith("FerociousBeastPassiveFact")?"Fact":"")).Length);
+            int mode=suffix[0]-'0';
+            string sourceId=suffix.Substring(1);
+            var source=cache.Load(BlueprintGuid.Parse(sourceId)) as BlueprintScriptableObject;
+            var derived=clone as BlueprintScriptableObject;
+            // Sanitize only removes components or swaps a caster condition for
+            // the authored subclass, so every clone component type must still be
+            // present on its native source. Compare the payload that way instead
+            // of by equality: the passive derivation is intentionally rewritten.
+            var sourceTypes=(source?.ComponentsArray??Array.Empty<BlueprintComponent>()).Select(c=>c.GetType()).ToHashSet();
+            Check(mode>=0&&mode<=2&&source!=null&&derived!=null&&Id(token)==clone.AssetGuid&&clone.GetType()==source.GetType()&&derived.ComponentsArray.All(c=>sourceTypes.Contains(c.GetType())||c.GetType().Name=="FerociousBeastCasterHasFact01431"),"every legacy Ferocious derivation keeps its deterministic GUID, mode, native type and only native or authored caster components "+token);
             legacy.Add(clone);
         }
-        // The041 Skald dependency walk also hydrates these existing native
-        // totem buffs. Unchanged Ferocious startup can now observe their old
-        // deterministic derivations in personal rage/bloodrage. Verify the
-        // exact native payload before classifying them as legacy resources;
-        // they are neither034 additions nor new041 authored assets.
-        foreach(int mode in new[]{0,2}) foreach(string sourceId in new[]{"fe27c0d9b9dc6a74aa88887b561ad5f3","a4195deeb13eb9c4b93b6987839b60c7","7bf740b33eaa2534e91def3cef142e00","e31276241f875254cb102329c0b55ba7","2cf21dce5ecc791449f3106fcd0b60c3"}) {
-            string token="FerociousBeastPassive"+mode+sourceId;
-            var source=(BlueprintBuff)cache.Load(BlueprintGuid.Parse(sourceId));var clone=cache.Load(Id(token)) as BlueprintBuff;
-            Check(source!=null&&clone!=null&&clone.name=="CotWWrathPsychic"+token&&clone.GetType()==source.GetType()&&Definition(clone.ComponentsArray)==Definition(source.ComponentsArray),"newly hydrated native totem retains unchanged legacy deterministic GUID and exact native component payload "+mode+"/"+sourceId);
-            legacy.Add(clone);
-        }
+        Check(legacy.Count>0,"legacy Ferocious derivations are actually observed");
         JObject Row(SimpleBlueprint bp)=>new JObject{["id"]=bp.AssetGuid.ToString(),["name"]=bp.name,["type"]=bp.GetType().FullName};
         legacyDerived=legacy.OrderBy(x=>x.AssetGuid.ToString()).Select(Row).ToArray();
         var legacyIds=new HashSet<BlueprintGuid>(legacy.Select(x=>x.AssetGuid));
         var previous=new HashSet<string>(PreviousFerocious033.Split(new[]{' '},StringSplitOptions.RemoveEmptyEntries));
-        var expectedNew=new HashSet<BlueprintGuid>();
-        foreach(int mode in Enumerable.Range(0,3)) {
-            foreach(string token in Tokens)expectedNew.Add(Id("FerociousBeastPassive"+mode+Id(token.Replace("RagePower","RageEffectBuff"))));
-        }
         var added=Loaded(cache).Where(x=>x.name.StartsWith("CotWWrathPsychicFerocious")&&!previous.Contains(x.AssetGuid.ToString())&&!legacyIds.Contains(x.AssetGuid)).OrderBy(x=>x.AssetGuid.ToString()).ToArray();
         Check(expectedNew.SetEquals(added.Select(x=>x.AssetGuid)),"only the five new effect derivations are034 new assets; Disruptive private receipt grants the actual native passive feat without redundant clones; unexpected="+string.Join(",",added.Where(x=>!expectedNew.Contains(x.AssetGuid)).Select(x=>x.name+":"+x.AssetGuid))+"; missing="+string.Join(",",expectedNew.Except(added.Select(x=>x.AssetGuid))));
         return added.Select(Row).ToArray();

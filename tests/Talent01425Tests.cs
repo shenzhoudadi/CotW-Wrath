@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -76,7 +76,7 @@ internal static class Talent01425Tests
         h.Patch(AccessTools.PropertyGetter(typeof(Game), "LevelUpController"), prefix: new HarmonyMethod(typeof(Talent01425Tests), nameof(NullController)));
         h.Patch(AccessTools.PropertyGetter(typeof(ItemEntity), "Wielder"), prefix: new HarmonyMethod(typeof(Talent01425Tests), nameof(Wielder)));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache), "AddCachedBlueprint"), postfix: new HarmonyMethod(typeof(Talent01425Tests), nameof(PublishFault)));
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(Talent01425Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(Talent01425Tests), nameof(AppendFault)));
         Provider01419Tests.PatchLabels(h);
         var pools = ((string[])AccessTools.Field(Module, "PoolIds").GetValue(null)).Select(id => (BlueprintFeatureSelection)cache.Load(BlueprintGuid.Parse(id))).ToArray();
         var before = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();

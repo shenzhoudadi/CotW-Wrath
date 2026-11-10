@@ -37,7 +37,8 @@ internal static class RegistrationWarmup01443Tests
     static void Set(object value, string field, object data) => AccessTools.Field(value.GetType(), field).SetValue(value, data);
     static BlueprintGuid Id(string token) => (BlueprintGuid)Call("PsychicAssets", "Id", token);
     static T Asset<T>(BlueprintsCache cache, string token) where T : SimpleBlueprint => (T)cache.Load(Id(token));
-    static string Definition(object value) => (string)Call("Migration01426", "Definition", value);
+    // Migration01426.Definition also has an (object, IEqualityComparer) overload.
+    static string Definition(object value) => (string)AccessTools.Method(Module("Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { value });
     static void Check(bool result, string reason) { if (!result) throw new Exception("RegistrationWarmup01443: " + reason); checks++; }
     static SimpleBlueprint Clone(SimpleBlueprint value) => (SimpleBlueprint)AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(value, null);
     static Exception Failure(Action action) { try { action(); return null; } catch (Exception e) { while (e is TargetInvocationException) e = e.InnerException; return e; } }

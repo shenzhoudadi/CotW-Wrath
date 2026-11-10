@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +63,7 @@ internal static class WizardSubschools01431Tests
     static bool Own(SimpleBlueprint b) => b.name != null && new[] { "UndeadSchool", "UndeadBolster", "UndeadCommand", "Prophecy" }.Any(prefix => b.name.StartsWith("CotWWrathPsychic" + prefix, StringComparison.Ordinal));
     static T Empty<T>() where T : class => (T)FormatterServices.GetUninitializedObject(typeof(T));
     static T Ref<T>(SimpleBlueprint b) where T : BlueprintReferenceBase, new() { var r = BlueprintReferenceBase.CreateTyped<T>(b); AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, b, null); return r; }
-    static string Definition(object o) => (string)Call(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", o);
+    static string Definition(object o) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { o });
     static void Check(bool value, string message) { checks++; if (!value) throw new Exception("Wizard01431: " + message); }
     static void Register(BlueprintsCache c) => Call(Module, "Register", c);
     static void Optional(BlueprintsCache c) => Call(Module, "Optional", c);
@@ -208,7 +208,7 @@ internal static class WizardSubschools01431Tests
         var componentSnapshots = componentDonors.Select(d => Definition(d.ComponentsArray)).ToArray();
         var savedAssets = ((IDictionary)Get(cache, "m_LoadedBlueprints")).Keys.Cast<BlueprintGuid>().Select(cache.Load).OfType<BlueprintScriptableObject>().Where(Own).ToArray();
         var poolBefore = new[] { Get(pool, "m_Features"), Get(pool, "m_AllFeatures") }; var oppositionBefore = oppositions.Select(o => o.ComponentsArray).ToArray();
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(WizardSubschools01431Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(WizardSubschools01431Tests), nameof(AppendFault)));
         try {
             foreach (var bp in savedAssets) cache.RemoveCachedBlueprint(bp.AssetGuid);
             foreach (string field in new[] { "m_Features", "m_AllFeatures" }) Set(pool, field, ((BlueprintFeatureReference[])Get(pool, field)).Where(r => r.Guid != Id("UndeadSchool") && r.Guid != Id("ProphecySchool")).ToArray());

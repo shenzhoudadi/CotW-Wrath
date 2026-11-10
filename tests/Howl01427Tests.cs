@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -168,7 +168,7 @@ internal static class Howl01427Tests
         var provider = new BlueprintFeatureSelection { AssetGuid = id, name = "PrimalistRagePowerSelection", Group = (FeatureGroup)Enum.Parse(typeof(FeatureGroup), (string)nativeRow["Group"]), Groups = Array.Empty<FeatureGroup>(), IsClassFeature = true, ComponentsArray = Array.Empty<BlueprintComponent>() };
         Set(provider, "m_Features", copied); Set(provider, "m_AllFeatures", copied); cache.AddCachedBlueprint(id, provider);
         var method = AccessTools.Method(Module, "Optional");
-        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(Howl01427Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(Howl01427Tests), nameof(AppendFault)));
         try {
             failAppend = true; bool threw = false; try { method.Invoke(null, new object[] { cache }); } catch (TargetInvocationException ex) { threw = ex.InnerException is InvalidOperationException; } finally { failAppend = false; }
             Check(threw && ReferenceEquals(Get(provider, "m_Features"), copied) && ReferenceEquals(Get(provider, "m_AllFeatures"), copied), "optional append failure restores exact TTT arrays");

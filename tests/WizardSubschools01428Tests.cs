@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +44,7 @@ internal static class WizardSubschools01428Tests
     static void Register(BlueprintsCache c) => AccessTools.Method(Module, "Register").Invoke(null, new object[] { c });
     static void Optional(BlueprintsCache c) => AccessTools.Method(Module, "Optional").Invoke(null, new object[] { c });
     static BlueprintFeatureReference[] Refs(BlueprintFeatureSelection p, string field) => (BlueprintFeatureReference[])Get(p, field) ?? Array.Empty<BlueprintFeatureReference>();
-    static string Definition(object o) => (string)AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { o });
+    static string Definition(object o) => (string)AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { o });
     static void AppendFault(BlueprintFeature[] feats) { if (failAppend && feats.Any(b => b.AssetGuid == Id("TeleportationSchool"))) throw new InvalidOperationException("01428 wizard transaction injection"); }
     static bool Reject(Action f) { try { f(); return false; } catch (Exception e) { while (e is TargetInvocationException) e = e.InnerException; return e is InvalidOperationException; } }
     static T Hydrate<T>(BlueprintsCache cache, string id, params string[] extra) where T : BlueprintScriptableObject, new() {
@@ -117,7 +117,7 @@ internal static class WizardSubschools01428Tests
         var snapshots = new[] { Definition(universalist.LevelEntries), Definition(conjuration.LevelEntries), Definition(baseFeature.ComponentsArray), Definition(door.ComponentsArray), Definition(Get(universalist, "m_Classes")), Definition(Get(conjuration, "m_Classes")) };
         var before = new[] { Get(school, "m_Features"), Get(school, "m_AllFeatures") };
         var initial = ((IDictionary)Get(cache, "m_LoadedBlueprints")).Keys.Cast<BlueprintGuid>().ToHashSet();
-        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(WizardSubschools01428Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(WizardSubschools01428Tests), nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(FeatureCollection), "CheckStatPrerequisitesAndUpdate"), prefix: new HarmonyMethod(typeof(Migration01426Tests), "Skip"));
         h.Patch(AccessTools.PropertyGetter(typeof(IgnorePrerequisites), "Ignore"), prefix: new HarmonyMethod(typeof(Migration01426Tests), "No"));
         h.Patch(AccessTools.Method(typeof(BlueprintFeatureSelection), "IsIgnorePrerequisites"), prefix: new HarmonyMethod(typeof(Migration01426Tests), "PoolIgnore"));

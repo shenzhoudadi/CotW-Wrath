@@ -5,6 +5,7 @@
 - 保留0.14.67的Havocker与Mimic内容；正式稳定版0.14.66不变。TEST交付不等于完整玩家验收。
 - COTW-0046 Speaker for the Past已完成A/C及B v2实现，D复查发现具体行为问题，**NEEDS_FIX，尚未新出包**：[issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。修复要求见docs/work-packages/COTW-0046/D-review.md，交既有B生产负责人修复后复查，不重复开发。0.14.69 TEST仍不包含Speaker。
 - COTW-0117 Spirit Whisperer：[issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)，A/C/B/D及最终整合复查完成，已纳入0.14.69 TEST，不重复开发。十魂域Wizard变体与唯一最小S-SPIRIT桥；沿用174条／37.59秒隔离记录，合并最新main后编译0警告／0错误、8.138秒。见docs/spirit-whisperer/README.md中的真实范围、已知选标边界及未测项；没有玩家游戏PASS，不开Spirit Guide，不覆盖Speaker修复。
+- 2026-11-10：**0117 后续修复已获玩家实机确认**（hex 专属列表、双 Touch of Flames、L20 Manifestation 三个不同超魔、开启超魔后法术全暗均正常）。两处根因是 Owlcat 原版数据缺陷，按用户决定连原生一起修；另一处是内置 MediumClass 的 AutoMetamagic 补丁异常。细节见 docs/spirit-whisperer/README.md「原生游戏缺陷修复」节与 CURRENT_RELEASE.md。**注意本页第3行主DLL SHA 仍是旧包 `A638DA2F…`**，最新本地包为 `d978d92e…`／SHA256 `0C1EDFCA…`（主DLL `0087FB88…`、MediumClass.dll `673C8045…`），尚未替换／上传 GitHub 附件；交付收尾与其余待办见 REMAINING.txt「下一步待做」。
 - 2026-11-09：sxl1216的Vindictive Bastard／Menacing [PR #5](https://github.com/shenzhoudadi/CotW-Wrath/pull/5)及Sacred Servant／Live On [PR #8](https://github.com/shenzhoudadi/CotW-Wrath/pull/8)已合入源码。用户认可贡献者测试，不重复实机／专项；仅解决冲突、合并编译与DLL／图标核对。此前源码阶段未出包；现已统一纳入0.14.69 TEST，旧0.14.68附件不变。见docs/contributions/20261109-integration.md。不要重新开发这些内容。
 - 接手先读AGENTS、CURRENT_RELEASE、WORK_STATUS；状态板优先于历史库存的旧进度描述，不重复已交付功能，不自动恢复排除项。
 - 出包包含commit/push、GitHub附件和一次下载核对；新内容先登记施工，完成必要验证与交付后归档并关闭认领issue。只做本轮必要检查，不启动游戏/UMM，不跑全量。

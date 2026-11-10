@@ -198,7 +198,7 @@ internal static partial class Feedback01449Tests
     }
     internal static int External01450(BlueprintsCache parent,Harmony h)
     {
-        int before=checks;nativeEnglish01450=(JObject)JObject.Parse(File.ReadAllText("D:/steam/steamapps/common/Pathfinder Second Adventure/Wrath_Data/StreamingAssets/Localization/enGB.json"))["strings"];
+        int before=checks;nativeEnglish01450=(JObject)JObject.Parse(File.ReadAllText(TestPaths.Game("Wrath_Data/StreamingAssets/Localization/enGB.json")))["strings"];
         Assembly.LoadFrom(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),".nuget/packages/dnlib/3.1.0/lib/net461/dnlib.dll"));
         Assembly.LoadFrom(Path.Combine(Root(),"work/modmenu-release/ModMenu.dll"));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache),"AddCachedBlueprint"),postfix:new HarmonyMethod(typeof(Feedback01449Tests),nameof(WarmComponents01450)));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +52,7 @@ internal static class FerociousBeast01431Tests
     static T Asset<T>(BlueprintsCache cache, string token) where T : SimpleBlueprint => (T)cache.Load(Id(token));
     static void Check(bool ok, string text) { if (!ok) throw new Exception("Ferocious01431: " + text); checks++; }
     static void Register(BlueprintsCache cache) => AccessTools.Method(Module, "Register").Invoke(null, new object[] { cache });
-    static string Definition(object value) => (string)AccessTools.Method(typeof(FerociousBeastHost01431).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(typeof(FerociousBeastHost01431).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
     static bool Skip() => false;
     static bool No(ref bool __result) { __result = false; return false; }
     static bool Clock(ref TimeSpan __result) { __result = TimeSpan.FromHours(1); return false; }
@@ -582,7 +582,7 @@ internal static class FerociousBeast01431Tests
         h.Patch(AccessTools.Method(typeof(EntityFact), "Attach"), prefix: new HarmonyMethod(typeof(FerociousBeast01431Tests), nameof(AttachId)));
         h.Patch(AccessTools.Method(typeof(RuleCanApplyBuff), "OnTrigger"), transpiler: new HarmonyMethod(typeof(Howl01428Tests), "DifficultyBoundary"));
         h.Patch(AccessTools.Method(typeof(RuleCalculateAbilityParams), "OnTrigger"), transpiler: new HarmonyMethod(typeof(Migration01426Tests), "DifficultyBoundary"));
-        h.Patch(AccessTools.Method(typeof(FerociousBeastHost01431).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(FerociousBeast01431Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(typeof(FerociousBeastHost01431).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(FerociousBeast01431Tests), nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(UnitAbilityResourceCollection), "Spend"), postfix: new HarmonyMethod(typeof(FerociousBeast01431Tests), nameof(Spent)));
         Provider01419Tests.PatchLabels(h);
         var buffHelper = AccessTools.Method(typeof(UnitHelper), "AddBuff", new[] { typeof(UnitDescriptor), typeof(BlueprintBuff), typeof(MechanicsContext), typeof(TimeSpan?) });

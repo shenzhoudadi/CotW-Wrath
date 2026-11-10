@@ -30,7 +30,7 @@ internal static class Feedback01450Tests
     static void Set(object o,string s,object v)=>AccessTools.Field(o.GetType(),s).SetValue(o,v);
     static int checks;
     static void Check(bool ok,string why){if(!ok)throw new Exception("Feedback01450: "+why);checks++;}
-    static string Root(){var p=new DirectoryInfo(Environment.CurrentDirectory);while(p!=null&&!File.Exists(Path.Combine(p.FullName,"HANDOFF.md")))p=p.Parent;return p.FullName;}
+    static string Root()=>TestPaths.EvidenceRoot;
     internal static void PatchOnce(Harmony harmony,Type type)
     {
         int Expected()=>type.Name=="NatureTargetScope01448Patch"?6:type.Name=="NaturePaidTarget01448Patch"?2:1;

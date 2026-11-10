@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -63,7 +63,7 @@ internal static class PurifyingFlames01428Tests
     static bool Dice(DiceFormula __0, ref int __result) { __result = __0.Dice == DiceType.D20 ? rawD20 : 0; return false; }
     static bool Roll(ref RuleRollD20 __result) { __result = NativeRule(new RuleRollD20(current.LastEvent<RulebookEvent>().Initiator)); return false; }
     static bool Expose(Exception __1) { throw new Exception("PurifyingFlames01428 native action error", __1); }
-    static string Definition(object value) => (string)AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
     static void AppendFault(BlueprintFeature[] feats) { if (failAppend && feats.Any(f => f.AssetGuid == Id("PurifyingFlamesWildTalent"))) throw new InvalidOperationException("01428 purify append injection"); }
     static bool Reject(Action action) { try { action(); return false; } catch (Exception e) { while (e is TargetInvocationException) e = e.InnerException; if (e is InvalidOperationException && e.Message.Contains("01428 purify append injection")) return true; throw; } }
     static bool Raise<T>(Action<T> action, bool unused) { return true; }
@@ -165,7 +165,7 @@ internal static class PurifyingFlames01428Tests
             AccessTools.Method(typeof(AbilityKineticist), "CalculateBurnCost", new[] { typeof(UnitDescriptor), typeof(BlueprintAbility) }), AccessTools.Method(typeof(AbilityKineticist), "Spend"),
             AccessTools.Method(typeof(UnitPartKineticist), "AcceptBurn"), AccessTools.Method(typeof(UnitPartKineticist), "ClearAcceptedBurn") }) Transpile(method);
         h.Patch(AccessTools.Method(typeof(RuleCalculateAbilityParams), "OnTrigger"), transpiler: new HarmonyMethod(typeof(Migration01426Tests), "DifficultyBoundary"));
-        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(PurifyingFlames01428Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(typeof(HowlShakenTarget).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(PurifyingFlames01428Tests), nameof(AppendFault)));
         try {
             var pool = Native<BlueprintFeatureSelection>(cache, "PoolId"); NativeClass = Native<BlueprintCharacterClass>(cache, "ClassId");
             var prior = ((IDictionary)Get(cache, "m_LoadedBlueprints")).Keys.Cast<BlueprintGuid>().Where(id => cache.Load(id).name.StartsWith("CotWWrathPsychicPurifyingFlames")).ToHashSet();

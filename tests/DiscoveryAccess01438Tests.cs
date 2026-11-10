@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -222,7 +222,7 @@ internal static class DiscoveryAccess01438Tests
         var stat = new PrerequisiteStatValue { Stat = StatType.Intelligence, Value = 20 }; p.ComponentsArray = actual.Concat(new BlueprintComponent[] { stat }).ToArray(); p.OnEnable();
         Check(!Choice(Unit(c, 20, 20), Native<BlueprintFeatureSelection>(c, Basic), p), "unrelated parent stat prerequisite still blocks both supported class branches"); p.ComponentsArray = actual; p.OnEnable();
         var fresh = Fresh(parent); var provider = Ttt(fresh, true); Ecm(fresh, provider); var before = new[] { Get(provider, "m_Features"), Get(provider, "m_AllFeatures"), provider.ComponentsArray };
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(DiscoveryAccess01438Tests), nameof(Fault))); fault = 1; Call(Module, "RegisterForest", fresh);
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(DiscoveryAccess01438Tests), nameof(Fault))); fault = 1; Call(Module, "RegisterForest", fresh);
         Check(fault == 0 && ReferenceEquals(Get(provider, "m_Features"), before[0]) && ReferenceEquals(Get(provider, "m_AllFeatures"), before[1]) && ReferenceEquals(provider.ComponentsArray, before[2]), "post-append exception restores exact real ECM parent arrays and components"); Register(fresh);
         Check(Roots(fresh).All(r => provider.Items.Any(x => ReferenceEquals(x.Feature, r))), "later optional retry reconnects all three roots after the isolated fault");
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -82,7 +82,7 @@ internal static class BardMasterpieces01435Tests
     static void Check(bool ok,string reason){if(!ok)throw new Exception("BardMasterpieces01435: "+reason);checks++;}
     static void Register(BlueprintsCache c,string method="Register")=>AccessTools.Method(Module,method).Invoke(null,new object[]{c});
     static T Ref<T>(SimpleBlueprint b)where T:BlueprintReferenceBase,new(){var r=BlueprintReferenceBase.CreateTyped<T>(b);AccessTools.Property(typeof(BlueprintReferenceBase),"Cached").SetValue(r,b,null);return r;}
-    static string Definition(object value)=>(string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"),"Definition").Invoke(null,new[]{value});
+    static string Definition(object value)=>(string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"),"Definition", new[] { typeof(object) }).Invoke(null,new[]{value});
     static bool Skip()=>false;
     static string DisplayName01436(BlueprintUnitFact bp)=>bp.name;
     static UnityEngine.Sprite DisplayIcon01436(BlueprintUnitFact bp)=>null;

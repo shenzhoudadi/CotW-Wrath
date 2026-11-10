@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -234,7 +234,7 @@ internal static class WizardDiscoveries01435Tests
             // parent adapter mutation, must restore all previous object arrays.
             provider = InstallProvider01436(cache, 0); Append(pools, roots); var previous = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();
             var providerBefore = new[] { Get(provider, "m_Features"), Get(provider, "m_AllFeatures") }; var providerComponents = provider.ComponentsArray;
-            h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(WizardDiscoveries01435Tests), nameof(AppendFault)));
+            h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(WizardDiscoveries01435Tests), nameof(AppendFault)));
             appendOptionalOnly = true; appendFault = 1; Register(cache, true); appendOptionalOnly = false;
             Check(pools.Select((p,i) => ReferenceEquals(Get(p,"m_Features"),previous[i][0]) && ReferenceEquals(Get(p,"m_AllFeatures"),previous[i][1])).All(x => x) && ReferenceEquals(provider.ComponentsArray,providerComponents) && ReferenceEquals(Get(provider,"m_Features"),providerBefore[0]) && ReferenceEquals(Get(provider,"m_AllFeatures"),providerBefore[1]), "real post-Append exception rolls back provider components and all pre-cleanup arrays exactly");
             Register(cache, true); Register(cache, false); Check(provider.GetComponent<WizardDiscoveryEntry01436>() != null && roots.All(r => Refs(provider,"m_AllFeatures").Count(x => x?.Guid == r.AssetGuid) == 1), "subsequent real retry rebuilds a single valid parent adapter and both leaves");

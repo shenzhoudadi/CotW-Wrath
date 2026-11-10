@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +63,7 @@ internal static class KineticInvocation01433Tests
     static T Native<T>(BlueprintsCache c, string id) where T : SimpleBlueprint => (T)c.Load(BlueprintGuid.Parse(id));
     static T Ref<T>(SimpleBlueprint b) where T : BlueprintReferenceBase, new() { var r = BlueprintReferenceBase.CreateTyped<T>(b); AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(r, b); return r; }
     static T Copy<T>(T value) => (T)AccessTools.Method(Factory, "CopyData").MakeGenericMethod(typeof(T)).Invoke(null, new object[] { value });
-    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new[] { value });
+    static string Definition(object value) => (string)AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new[] { value });
     static void Check(bool value, string reason) { if (!value) throw new Exception("KineticInvocation01433: " + reason); checks++; }
     static void Register(BlueprintsCache c) => AccessTools.Method(Module, "Register").Invoke(null, new object[] { c });
     static IEnumerable<SimpleBlueprint> Loaded(BlueprintsCache c) => ((IDictionary)Get(c, "m_LoadedBlueprints")).Keys.Cast<BlueprintGuid>().ToArray().Select(c.Load).Where(b => b != null);
@@ -439,7 +439,7 @@ internal static class KineticInvocation01433Tests
         Patch(AccessTools.Method(typeof(Kingmaker.Designers.GameHelper), "IsAttackingGreenNPC"), nameof(No));
         Patch(AccessTools.Method(AccessTools.Property(typeof(UnitEntityData), "CombatState").PropertyType, "ReturnToStartingPositionIfNeeded"), nameof(Skip)); Patch(AccessTools.Method(typeof(Buff), "Remove", Type.EmptyTypes), nameof(RemovalFault));
         h.Patch(AccessTools.Method(typeof(EntityFact), "Attach"), prefix:new HarmonyMethod(typeof(KineticInvocation01433Tests), nameof(UniqueId)));
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix:new HarmonyMethod(typeof(KineticInvocation01433Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix:new HarmonyMethod(typeof(KineticInvocation01433Tests), nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(RuleCanApplyBuff), "OnTrigger"), transpiler:new HarmonyMethod(typeof(Howl01428Tests), "DifficultyBoundary"));
         h.Patch(AccessTools.Method(typeof(RuleCalculateAbilityParams), "OnTrigger"), transpiler:new HarmonyMethod(typeof(Migration01426Tests), "DifficultyBoundary"));
         h.Patch(AccessTools.Method(typeof(AbilityData), "Spend"), transpiler:new HarmonyMethod(typeof(KineticInvocation01433Tests), nameof(SpendBoundary)));

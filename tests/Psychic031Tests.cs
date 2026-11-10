@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
@@ -73,7 +73,7 @@ internal static class Psychic031Tests {
   for(int cl=1;cl<=30;cl++)Check((int)AccessTools.Method(typeof(PsychicGreedWeapon),"Enhancement").Invoke(null,new object[]{cl})==(cl>=19?4:cl>=17?3:cl>=15?2:1),"glaive enhancement/burst threshold");
   var bab=new ModifiableValue(f.Unit.Stats,StatType.BaseAttackBonus);Set(f.Unit.Stats,"BaseAttackBonus",bab);f.Unit.Stats.AllStats.Add(bab);bab.BaseValue=9;var br=hosts[3].Components.Single(x=>x.SourceBlueprintComponent is PsychicGreedBAB);
   for(int cl=11;cl<=40;cl++){hosts[3].Context.Params.CasterLevel=cl;using(br.RequestEventContext())AccessTools.Method(typeof(PsychicGreedBAB),"OnTurnOn").Invoke(br.SourceBlueprintComponent,null);Check(bab.ModifiedValue==cl,"actual native BAB becomes CL including iterative threshold");using(br.RequestEventContext())AccessTools.Method(typeof(PsychicGreedBAB),"OnTurnOn").Invoke(br.SourceBlueprintComponent,null);Check(bab.ModifiedValue==cl,"repeated/restored turn-on cannot double BAB");var foreign=bab.AddModifier(2,(EntityFact)null,ModifierDescriptor.UntypedStackable);using(br.RequestEventContext())AccessTools.Method(typeof(PsychicGreedBAB),"OnTurnOff").Invoke(br.SourceBlueprintComponent,null);Check(bab.ModifiedValue==11,"ending removes own adjustment and preserves foreign BAB");foreign.Remove();}
-  var blade=Asset<BlueprintAbility>(cache,"SpiritBoundBlade");Check(blade.GetComponent<AbilityVariants>().Variants.Length==8,"four supported properties each main/offhand");foreach(var v in blade.GetComponent<AbilityVariants>().Variants){Check(v.Parent==blade&&v.GetComponent<PsychicWeaponTarget>()!=null,"blade child remains target-checked and grouped");}
+  var blade=Asset<BlueprintAbility>(cache,"SpiritBoundBlade");Check(blade.GetComponent<AbilityVariants>().Variants.Length==10,"five supported properties each main/offhand");foreach(var v in blade.GetComponent<AbilityVariants>().Variants){Check(v.Parent==blade&&v.GetComponent<PsychicWeaponTarget>()!=null,"blade child remains target-checked and grouped");}
  }finally{h.UnpatchAll(h.Id);}
  PsychicExpansionTests.Inventory["new031Assertions"]=n;Console.WriteLine("PASS: "+n+" storage threshold/ownership/arming/native-component/save-parameter/release-once and bound-weapon checks. Final cast and buff-removal endpoints captured.");return n;
  }

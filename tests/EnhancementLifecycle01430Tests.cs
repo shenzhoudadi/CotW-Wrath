@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -155,7 +155,7 @@ internal static class EnhancementLifecycle01430Tests
         var root = Asset<BlueprintProgression>(cache, "EnhancementSchool");
         // Exercise a genuinely fresh transaction with failure after pool append.
         // Exact prior assets/arrays are restored so later suites retain identity.
-        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(EnhancementLifecycle01430Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(Module.Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(EnhancementLifecycle01430Tests), nameof(AppendFault)));
         try {
             foreach (var bp in originalAssets) cache.RemoveCachedBlueprint(bp.AssetGuid);
             foreach (var field in new[] { "m_Features", "m_AllFeatures" }) Set(school, field, ((BlueprintFeatureReference[])Get(school, field)).Where(r => r.Guid != root.AssetGuid).ToArray());

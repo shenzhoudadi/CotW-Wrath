@@ -43,7 +43,7 @@ internal static partial class MagusBatch01454Tests
     static readonly List<string> Coverage=new List<string>();
     static readonly List<UnitEntityData> Actors=new List<UnitEntityData>();
     static void Check(bool ok,string why){if(!ok)throw new Exception("Magus01454: "+why);checks++;Coverage.Add(why);}
-    static string Root(){var p=new DirectoryInfo(Environment.CurrentDirectory);while(p!=null&&!File.Exists(Path.Combine(p.FullName,"HANDOFF.md")))p=p.Parent;return p.FullName;}
+    static string Root()=>TestPaths.EvidenceRoot;
     static SimpleBlueprint[] Loaded(BlueprintsCache c)=>(SimpleBlueprint[])H("Loaded",c);
     static BlueprintsCache active;
     static Dictionary<string,string> paths;

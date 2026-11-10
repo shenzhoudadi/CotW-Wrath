@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +62,7 @@ internal static class Inquisitions01428Tests
     static T Asset<T>(BlueprintsCache c, string token) where T : SimpleBlueprint => (T)c.Load(Id(token));
     static void Check(bool value, string reason) { if (!value) throw new Exception("Inquisitions01428: " + reason); checks++; }
     static void Register(BlueprintsCache c) => AccessTools.Method(Module, "Register").Invoke(null, new object[] { c });
-    static string Signature(BlueprintScriptableObject b) => (string)AccessTools.Method(typeof(HeresyWisdomChecks).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition").Invoke(null, new object[] { b.ComponentsArray });
+    static string Signature(BlueprintScriptableObject b) => (string)AccessTools.Method(typeof(HeresyWisdomChecks).Assembly.GetType("CallOfTheWild.Wrath.Prototype.Migration01426"), "Definition", new[] { typeof(object) }).Invoke(null, new object[] { b.ComponentsArray });
     static void AppendFault(BlueprintFeature[] feats) { if (failAppend && feats.Any(f => f.AssetGuid == Id("HeresyInquisition"))) throw new InvalidOperationException("01428 inquisition append injection"); }
     static void PublishFault(BlueprintGuid guid) { if (failPublish && guid == Id("ImprisonmentInquisition")) throw new InvalidOperationException("01428 inquisition publish injection"); }
     static bool Rejected(Action action, string text)
@@ -273,7 +273,7 @@ internal static class Inquisitions01428Tests
         var initial = ((IDictionary)Get(cache, "m_LoadedBlueprints")).Keys.Cast<BlueprintGuid>().ToHashSet();
         var before = pools.Select(p => new[] { Get(p, "m_Features"), Get(p, "m_AllFeatures") }).ToArray();
         var donorSignature = Signature(source);
-        h.Patch(AccessTools.Method(typeof(HeresyWisdomChecks).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append"), postfix: new HarmonyMethod(typeof(Inquisitions01428Tests), nameof(AppendFault)));
+        h.Patch(AccessTools.Method(typeof(HeresyWisdomChecks).Assembly.GetType("CallOfTheWild.Wrath.Prototype.T09CombatFeats"), "Append", new[] { typeof(IEnumerable<BlueprintFeatureSelection>), typeof(BlueprintFeature[]) }), postfix: new HarmonyMethod(typeof(Inquisitions01428Tests), nameof(AppendFault)));
         h.Patch(AccessTools.Method(typeof(BlueprintsCache), "AddCachedBlueprint"), postfix: new HarmonyMethod(typeof(Inquisitions01428Tests), nameof(PublishFault)));
         foreach (bool publish in new[] { true, false })
         {

@@ -73,7 +73,7 @@ internal static partial class Feedback01449Tests
     static bool Skip()=>false;
     static readonly List<string> traceMessages=new List<string>();static bool traceThrows;
     static bool TraceEndpoint(string __0){if(traceThrows)throw new IOException("01449 injected diagnostic sink failure");traceMessages.Add(__0);return false;}
-    static string Root(){var p=new DirectoryInfo(Environment.CurrentDirectory);while(p!=null&&!File.Exists(Path.Combine(p.FullName,"HANDOFF.md")))p=p.Parent;return p.FullName;}
+    static string Root()=>TestPaths.EvidenceRoot;
     static Assembly tome;
     static JObject tomeGuids;
     static int tomeFactoryCalls;
