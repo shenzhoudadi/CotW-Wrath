@@ -1,6 +1,6 @@
 # 工作状态：先认领，避免重复
 
-更新：2026-11-09。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
+更新：2026-11-10。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
 
 ## 🚧 施工中／已认领，请勿重复开发
 
@@ -12,6 +12,8 @@
   - **2026-11-10 后续修复（玩家实机确认，不重开开发队列）**：hex 专属列表、双 Touch of Flames、L20 Manifestation 超魔选项、开启超魔后法术全暗，四处均已恢复正常。查明两处是 Owlcat 原版数据缺陷（五魂域 `m_Variants` 填成 `[Extend, Bolster, Bolster]`、Flame L1 两个同名 `AddFacts`），按用户决定连原生一起修；另一处是内置模块 `MediumClass.Prowler.ShapeQuickenPatch` 的 `AutoMetamagic.Owner` 异常。本地包 `d978d92e…` SHA256 `0C1EDFCA…` 尚未替换／上传 GitHub 附件。详见 [交付说明「原生游戏缺陷修复」](docs/spirit-whisperer/README.md) 与 [CURRENT_RELEASE.md 2026-11-10 条](CURRENT_RELEASE.md)。当前待办见 [REMAINING.txt 下一步待做](docs/agent-handoff/REMAINING.txt)。
 
 ## 已完成开发／TEST交付
+
+- **COTW-0060 Spirit Guide** — [issue #10](https://github.com/shenzhoudadi/CotW-Wrath/issues/10)。已完成开发及D3复查；320条定向/15.00秒，[0.14.70 Spirit Guide TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.70-Spirit-Guide-TEST)已交付，4/4附件下载核对一致。四外部根原子门禁，缺失不激活；实机和控制器等未测。[交接与证据](docs/work-packages/COTW-0060/README.md)。不重复开发。
 
 - **COTW-0081 Esoteric Starseeker** — [0.14.68 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST)。完整10星座×9环、双星座、15级Major及来源/资源生命周期；D-F01闭环，隔离托管定向536条断言通过。5项外部能力需合法提供方，任一缺失不半注册。[内容与未测边界](docs/starseeker/README.md)。实机UI、完整存档/重训等未验收。
 - **COTW-0020 Havocker／S-KINETIC与Mimic展示更新** — [0.14.67 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.67-Havocker-Mimic-TEST)。已有TEST实现作为基线，不重复开发；仍有明确场景/提供方等HOLD，见docs/havocker/README.md。不能把TEST交付写成全部历史边界已通过。

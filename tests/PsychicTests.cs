@@ -90,6 +90,34 @@ internal static class PsychicTests
         var ids = (string[])AccessTools.Field(module, "OwnIds").GetValue(null);
         Check(ids.Distinct().Count() == ids.Length && !native.Any(j => ids.Contains((string)j["AssetId"])), "New identities unique and absent from native input");
         Console.WriteLine("Psychic: registration fixture"); var f = new Fixture(catalog); Register(f);
+        // D-F07: route the 0060 directed case directly after the shared fixture
+        // is registered. Nothing below (casting, expansion, historical toggles)
+        // belongs to this work package and must not run under its banner.
+        if (Environment.GetEnvironmentVariable("COTW_0060_CASE") == "spiritguide0060")
+        {
+            // Fresh() rebuilds registration dependencies from the reviewed native
+            // row fixture. Load only that data row set here; no historical
+            // behaviour suite is executed for this work package.
+            var nativeRows = JObject.Parse(File.ReadAllText(args[4]));
+            PsychicExpansionTests.LoadNativeRows(f.Cache, nativeRows, true);
+            PsychicExpansionTests.HydrateEmptyTables(f.Cache, nativeRows);
+            PsychicExpansionTests.HydrateCachedSpellbooks(f.Cache, nativeRows);
+            // Blueprint references resolve through the library cache, exactly as
+            // the production registration expects.
+            AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, f.Cache);
+            var guide = new Harmony("CotWSpiritGuide0060.Directed");
+            int count = SpiritGuide0060Tests.Run(f.Cache, guide);
+            var report = new JObject { ["case"] = "spiritguide0060", ["assertionsPassed"] = count,
+                ["scope"] = "Directed 0060 checks only; shared fixture registration, no historical Psychic behaviour suites." };
+            if (args[2] == "-") Console.WriteLine(report.ToString());
+            else {
+                var path = Path.GetFullPath(args[2]);
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                File.WriteAllText(path, report.ToString());
+            }
+            Console.WriteLine("PASS: " + count + " Spirit Guide 0060 directed assertions. Standalone managed verification, not a game test.");
+            return;
+        }
         var character = (BlueprintCharacterClass)f.Load(Const("ClassId")); var book = (BlueprintSpellbook)f.Load(Const("BookId"));
         Check(!character.IsArcaneCaster && !character.IsDivineCaster && !character.PrestigeClass && !character.HideInUI, "Visible independent psychic base class");
         Check(character.Spellbook == book && book.CharacterClass == character && book.CastingAttribute == StatType.Intelligence && book.Spontaneous && !book.IsArcane, "Intelligence spontaneous spellbook and reciprocal class links");

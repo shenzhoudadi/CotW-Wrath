@@ -1,0 +1,2 @@
+完整读取 C:\Users\xuenc\agent-tools\spirit-guide-next\HANDOFF-0060-ABCD-20261110.md，再读同目录A全部证据、C-frozen-contract.md、C-cases.json和最新GitHub issue #10／WORK_STATUS。跨机器入口为docs/work-packages/COTW-0060/README.md。
+只执行角色B。A/C已由Sol完成，合同C-0060-20261110-r1明确B可执行yes；不重做A/C。先做技能成对计数、来源安全与Cha/Wis差异，再完整接十族／39池／90项。你是共享生产唯一整合人；从最新main隔离分支开始，不复制带未审Speaker的整树。按全文约束做必要定向检查并保留失败原件，禁止全量／游戏／UMM／构建门禁改动。不自行替独立D宣告PASS，D前不出包、不关闭#10。

@@ -47,6 +47,20 @@ internal static class PsychicExpansionTests
     private static void Register(BlueprintsCache cache)=>AccessTools.Method(expansion,"Register").Invoke(null,new object[] { cache });
     private static string Signature(object obj)=>(string)AccessTools.Method(expansion,"Signature").Invoke(null,new object[] { obj });
     private static readonly Type[] GameTypes=typeof(Spellbook).Assembly.GetTypes();
+    // Real class/progression/spellbook links a production registration needs.
+    // The ability/buff graph edges are serialized on the blueprint, not inside a
+    // component: without m_Buff the host's activatable is a buff-less shell and no
+    // aura rank can be inspected at all.
+    private static readonly string[] ClassGraphFields={
+        "m_Progression","m_Spellbook","m_Archetypes","m_Classes","LevelEntries","UIGroups","m_UIDeterminatorsGroup",
+        "m_SpellsKnown","m_SpellsPerDay","Spontaneous","CastingAttribute","AllSpellsKnown","IsArcane","m_IsArcane",
+        "CharacterClass","m_SpellList","m_Spells","m_IsFullRoundAction","m_Flags","m_Buff","m_Parent","Levels",
+        // A parametrized feat's parameter type is serialized on the blueprint, not
+        // in a component. Without it every native parametrized feat reads back as
+        // ParameterType.Custom, and a custom-parameter grant resolves its parameter
+        // through ParamObject instead of the weapon category, so the granted feat
+        // ends up carrying no weapon at all.
+        "ParameterType","RequireProficiency","IgnoreParameterFeaturePrerequisites"};
     internal static JArray NativeRows;
     private static readonly List<string> learningLogs=new List<string>();
     private static bool CaptureLearning(string message){learningLogs.Add(message);return false;}
@@ -113,6 +127,85 @@ internal static class PsychicExpansionTests
         }
         return value.ToObject(target);
     }
+    // Shared fixture loading: the reviewed native row archive is materialised
+    // into the isolated cache. Both the historical psychic suite and the 0060
+    // directed case need exactly this data and nothing more.
+    internal static void LoadNativeRows(BlueprintsCache cache, JObject data)
+        => LoadNativeRows(cache, data, false);
+    // The class/progression graph is only materialised when the caller needs to
+    // run production registration against real class data (the 0060 directed
+    // case); the historical suite keeps its existing field set byte-identical.
+    internal static void LoadNativeRows(BlueprintsCache cache, JObject data, bool classGraph)
+    {
+        NativeRows=(JArray)data["requiredNative"];
+        foreach(var row in data["requiredNative"]) {
+            var bp=row["blueprint"]; var guid=BlueprintGuid.Parse((string)bp["AssetId"]);
+            if(cache.Load(guid)!=null) {
+                if (cache.Load(guid) is Kingmaker.Blueprints.Facts.BlueprintUnitFact knownFact) Set(knownFact,"m_Icon",Empty<UnityEngine.Sprite>());
+                if(guid.ToString()=="3c17035ec4717674cae2e841a190e757") {var known=(BlueprintScriptableObject)cache.Load(guid);known.ComponentsArray=((JArray)bp["Data"]["Components"]).Select(c=>(BlueprintComponent)Read(c,typeof(BlueprintComponent))).ToArray();known.OnEnable();}
+                continue;
+            }
+            string type=((string)bp["Data"]["$type"]).Split(',').Last().Trim();
+            var obj=(BlueprintScriptableObject)Activator.CreateInstance(GameTypes.Single(t=>t.Name==type));
+            obj.name=(string)row["name"];obj.AssetGuid=guid;
+            if (obj is Kingmaker.Blueprints.Facts.BlueprintUnitFact) Set(obj,"m_Icon",Empty<UnityEngine.Sprite>());
+            obj.ComponentsArray=((JArray)bp["Data"]["Components"]??new JArray()).Select(c=>(BlueprintComponent)Read(c,typeof(BlueprintComponent))).ToArray();
+            foreach(var property in ((JObject)bp["Data"]).Properties().Where(x=>(classGraph?ClassGraphFields.Concat(new[]{"m_AllFeatures","m_Features","Type","Range","ActionType","CanTargetSelf","CanTargetFriends","CanTargetEnemies","CanTargetPoint","SpellResistance","EffectOnEnemy","EffectOnAlly","AvailableMetamagic","SpellsByLevel","m_Type","m_Size","m_Enchantments","m_OverrideDamageDice","m_DamageDice","m_OverrideDamageType","m_DamageType","m_BaseDamage","m_CriticalRollEdge","m_CriticalModifier","m_VisualParameters","m_SecondWeapon","m_AttackType","m_IsLight","m_IsOneHanded","m_IsTwoHanded","m_IsUnarmed","m_IsNatural","m_OverrideAttackBonusStat","m_AttackBonusStatOverride","Prefab","m_Race","Category","DamageType","CriticalRollEdge","CriticalModifier","WeaponFxPrefab","MaterialComponent","Fx","Shape","Size"}):new[]{"m_AllFeatures","m_Features","Type","Range","ActionType","CanTargetSelf","CanTargetFriends","CanTargetEnemies","CanTargetPoint","SpellResistance","EffectOnEnemy","EffectOnAlly","AvailableMetamagic","SpellsByLevel","m_Type","m_Size","m_Enchantments","m_OverrideDamageDice","m_DamageDice","m_OverrideDamageType","m_DamageType","m_BaseDamage","m_CriticalRollEdge","m_CriticalModifier","m_VisualParameters","m_SecondWeapon","m_AttackType","m_IsLight","m_IsOneHanded","m_IsTwoHanded","m_IsUnarmed","m_IsNatural","m_OverrideAttackBonusStat","m_AttackBonusStatOverride","Prefab","m_Race","Category","DamageType","CriticalRollEdge","CriticalModifier","WeaponFxPrefab","MaterialComponent","Fx","Shape","Size"}).Contains(x.Name))) {
+                var field=AccessTools.Field(obj.GetType(),property.Name);if(field!=null)field.SetValue(obj,Read(property.Value,field.FieldType));
+            }
+            if(obj is BlueprintBuff visualBuff) {
+                visualBuff.FxOnStart=(Kingmaker.ResourceLinks.PrefabLink)Read(bp["Data"]["FxOnStart"],typeof(Kingmaker.ResourceLinks.PrefabLink));
+                visualBuff.FxOnRemove=(Kingmaker.ResourceLinks.PrefabLink)Read(bp["Data"]["FxOnRemove"],typeof(Kingmaker.ResourceLinks.PrefabLink));
+            }
+            // Summon equipment must come from the audited native unit, including
+            // the ghost's DisableHands flag. A default UnitBody hides that bug.
+            if(obj is BlueprintUnit nativeUnit) {
+                nativeUnit.Body=(BlueprintUnit.UnitBody)Read(bp["Data"]["Body"],typeof(BlueprintUnit.UnitBody));
+            }
+            obj.OnEnable();cache.AddCachedBlueprint(guid,obj);
+        }
+    }
+
+    // The shared registration fixture publishes skeleton blueprints at native
+    // GUIDs (for example an empty SorcererSpellsPerDayTable). The 0060 case needs
+    // the real archive content behind those identities, otherwise every spellbook
+    // reports MaxSpellLevel -1. Only empty tables are filled; identities and any
+    // already-loaded content are preserved.
+    internal static void HydrateEmptyTables(BlueprintsCache cache,JObject data)
+    {
+        foreach(var row in data["requiredNative"]) {
+            var bp=row["blueprint"];
+            if(!((string)bp["Data"]["$type"]).EndsWith(", BlueprintSpellsTable",StringComparison.Ordinal)) continue;
+            if(!(cache.Load(BlueprintGuid.Parse((string)bp["AssetId"])) is BlueprintSpellsTable table)) continue;
+            if(table.Levels!=null&&table.Levels.Length!=0) continue;
+            var levels=bp["Data"]["Levels"]; if(levels==null) continue;
+            table.Levels=(SpellsLevelEntry[])Read(levels,typeof(SpellsLevelEntry[]));table.OnEnable();
+        }
+    }
+
+    // D2-F02b. The shared fixture also pre-publishes a bare SorcererSpellbook at
+    // its native GUID. LoadNativeRows deliberately skips every identity already
+    // in the cache, so that shell never received the archived m_SpellList
+    // reference; a real Spellbook.AddBaseLevel then dereferences
+    // Blueprint.SpellList in LearnSpellsOnRaiseLevel and dies before it can be
+    // used as a replacement class book. Only missing class-graph links are
+    // filled, from the audited archive row, and only for cached spellbooks -
+    // identities, existing content and the historical suites are untouched.
+    internal static void HydrateCachedSpellbooks(BlueprintsCache cache,JObject data)
+    {
+        foreach(var row in data["requiredNative"]) {
+            var bp=row["blueprint"];
+            if(!((string)bp["Data"]["$type"]).EndsWith(", BlueprintSpellbook",StringComparison.Ordinal)) continue;
+            if(!(cache.Load(BlueprintGuid.Parse((string)bp["AssetId"])) is BlueprintSpellbook book)) continue;
+            foreach(var name in new[]{"m_SpellList","m_MythicSpellList","m_CharacterClass","m_SpellsKnown","m_SpellsPerDay"}) {
+                var field=AccessTools.Field(typeof(BlueprintSpellbook),name);
+                var value=bp["Data"][name];
+                if(field==null||value==null||value.Type==JTokenType.Null||field.GetValue(book)!=null) continue;
+                field.SetValue(book,Read(value,field.FieldType));
+            }
+        }
+    }
+
     public static int Run(Assembly assembly,BlueprintsCache cache,string evidence)
     {
         expansion=assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicExpansion",true); factory=assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicAssets",true);

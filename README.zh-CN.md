@@ -1,26 +1,26 @@
-0.14.69 Combined TEST（测试包，非正式版）
+0.14.70 Spirit Guide TEST（测试包，非正式版）
 
-0.14.69 Combined TEST / 测试包（非正式版）
+猫猫堡是猪猪
 
-本次将当前GitHub main的新增内容统一放进测试安装包：
-1. Spirit Whisperer：十魂域Wizard变体、魂域能力和巫术、仅魔宠Arcane Bond及独立属性／资源适配。
-2. sxl1216贡献的Vindictive Bastard独立职业和Spirit-Bound Blade的Menacing选项。
-3. sxl1216贡献的Sacred Servant及Live On复用原生Paladin mercies更新。
-保留已有Havocker、Mimic、Starseeker和内置Medium／Way of the Shield模块。
-尚未通过独立复查的Speaker for the Past不在本包内。
+本包新增 Spirit Guide（Oracle变体）：固定选择十魂域之一，3级巫术、4级起奖励法术、7级基础能力、15级高阶能力；含Oracle/Charisma与指定Wisdom分支、Mystery技能来源适配、Lore参数化选法及来源安全清理。
+保留0.14.69已交付的Spirit Whisperer、Havocker、Mimic、Starseeker、外部贡献以及Medium/Way of the Shield内置模块。Speaker for the Past仍未纳入。
 
-安装：备份现有模组目录和存档，退出游戏；将ZIP内完整的CallOfTheWildWrathPrototype文件夹替换到当前已经正常工作的Owlcat模组安装目录（沿用原安装位置）。不要只替换主DLL，保留Modules、资源和Localization目录。若已装同名旧版本，先移出旧文件夹再放入新文件夹。不要同时启用旧的独立Medium Class安装；本包没有替你安装UMM或第三方依赖，沿用现有合法依赖配置。
+重要：Spirit Guide需ExpandedContent的Wall of Fire、Hypnotic Pattern、Incendiary Cloud及CharacterOptionsPlus的Frostbite真实可用。任一缺失、停用或为空壳时，整个Spirit Guide不激活；其他已交付模块按各自条件工作。本包不包含或安装这些提供方，也不重新移植其法术。八个CotW本项目法术继续复用已有实现。
 
-验证范围：Spirit Whisperer沿用174条隔离结构／组件及有限真实回调记录（37.59秒）与独立D结论；外部贡献沿用用户认可的贡献者测试。本次仅版本／说明变更后重新编译、打包和核对包内DLL，没有重复跑全量或同内容专项，没有启动游戏／UMM。
+安装：退出游戏并备份模组目录与存档，将ZIP中的完整CallOfTheWildWrathPrototype文件夹放到现有Owlcat模组目录。默认路径为 %USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/。升级时替换同名旧目录，备份移到Modifications之外；保留Modules、Localization及空Blueprints/Bundles目录。不要只替换主DLL，不要同时启用旧独立Medium安装。沿用已有合法依赖；发布者未启动游戏或UMM。
 
-已知边界：Heaven's Leap若同时残留自己和队友标记，可能优先选中自己；完整位移／天气／支付／休息／重训／存档UI和完整战斗链不是本机玩家验收结果。原有Havocker、Starseeker的提供方和已知边界仍适用。具体见GitHub docs/spirit-whisperer/README.md、docs/havocker/README.md和docs/starseeker/README.md。可用模块仍受其提供方／依赖是否就绪影响。
+验证：本项320条隔离定向断言、15.00秒、exit0；D3独立复查通过。Life缺行受控反证在同一二进制下明确失败并保留原件。整合仅重编译、打包及包内DLL核对，不重跑同内容专项、全历史或全量测试。
 
-反馈：附Player.log或模组日志、职业／等级、具体能力及操作步骤；按实际问题定向修复。不要把离线检查记作玩家游戏全部PASS。
+未测：真实外部提供方执行、玩家实机、SaveManager/升级UI、完整休息重训、Life引导治疗/伤害结算等。Battle支付证据限于私有资源指向及Resources.Spend，不是variant完整CanUse/Spend链；内部18根归档重著、8根host暂存不算完整生产注册通过。旧模块已披露边界继续有效；0117旧Heaven's Leap选标边界不代表新0060使用同一实现。
 
-命名：本包与预发布标签均明确含TEST。正式版不带TEST；0.14.66正式版和旧TEST附件保留，不覆盖旧文件。
+反馈请附日志、职业/等级、所选魂域/巫术、提供方启用状态及操作步骤。命名中TEST/测试包表示预发布；正式版不带TEST。旧正式0.14.66与旧TEST附件保留。
+
+下载：https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.70-Spirit-Guide-TEST
+交接：docs/work-packages/COTW-0060/README.md、D-review.md、VALIDATION.json。
 
 
 以下为保留的旧版说明，仅供历史参考，不是本次全量验收要求：
+
 
 > 🚧 **[施工占用 / WORK STATUS](WORK_STATUS.md)**：COTW-0046 Speaker for the Past已认领，请勿重复开发。
 > Current preview: [0.14.68 Starseeker TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.68-Starseeker-TEST). Stable: 0.14.66.

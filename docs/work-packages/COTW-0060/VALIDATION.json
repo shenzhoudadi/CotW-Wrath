@@ -1,0 +1,49 @@
+{
+  "contract": "C-0060-20261110-r1",
+  "candidateCommit": "0ba589a03f08aee0859fe23bc9583ee9dae39860",
+  "reviewDecision": "REVIEW_PASS_D2_FIXES",
+  "directed": {
+    "assertions": 320,
+    "seconds": 15.0,
+    "exitCode": 0,
+    "wholeSuiteRun": false,
+    "hostLogCount": 0
+  },
+  "controlledNegative": {
+    "assertionsBeforeFailure": 142,
+    "seconds": 15.63,
+    "exitCode": 1,
+    "sameBinary": true,
+    "reason": "missing native Life UnitFact fixture row; original failure kept locally"
+  },
+  "fingerprints": {
+    "candidateDLL": "21D775E4034D32E15C353363BE5E6A21FA394D9BE93B21A84E0D62F4433BD04C",
+    "psychicTestsEXE": "F28FADE20D5550FB8508917C52FCB1239690585E6BAD677081DFC330FE61EBA0",
+    "engineAssemblyCSharp": "3A85EDDC5D21CE98779C54F549BDD471D3DEF061948AEE2E85988E9782B82E80",
+    "gameAssemblyCSharp": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+    "harmony": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5",
+    "nativeFixtureGreen": "0CE753666FAE00A56359C17375169652195EDBBF5D54DA77C565D04B0165C06D",
+    "nativeFixtureControlledNegative": "C2FF5EAC59913EDC6BF7D519358F3E348FEE3C51F90B23DBF81F7F6DA74F6FCA",
+    "finalLog": "D2CD60DEEA784349F47C3E4134A07CA2B9F1B6F6A5B4989AAD5D132C6324BA5F",
+    "baselineCandidateDLL": "88D51517CE1C6782F6EA27444754BDAC4730D5D0B54C7C066D3136614E864817",
+    "baselinePsychicTestsEXE": "85C5ED5BF8CC394DB478DB8BEFBBFC84E0BCECDEBDD63957054B24112F9B86E2",
+    "baselineNativeFixture": "422E757C3F50B2DBC8C521BB5BCD4506E22CC8D5DC6D22A7B2AAE3497FDF7534"
+  },
+  "sourceSHA256": {
+    "src/SpiritGuide0060.cs": "E747C6FE1AD3D5CFD65997D4DC73CE3D839CFE352D69A09AF1EFF5985DC7AAA9",
+    "src/SpiritGuideGraph0060.cs": "CE48F1953B6B5669C20AF77F4C5FCA02838053B5A68C6CD16EDCF56AD428E138",
+    "src/SpiritGuideKnowledge0060.cs": "B42470D443C4A68A1F9F1DF6297737B84FC8C7D5544197F59B0428604359E2FA",
+    "src/SpiritGuideSpirits0060.cs": "2DD98312BE4EC419874D9309A1E7EA0E180BF039C73BF4334990DDB62E680153"
+  },
+  "unprovenBoundaries": [
+    "Four external provider plugins are not installed; their roots are contract-shaped host inputs only",
+    "18 internal bonded roots re-authored from the reviewed archive and 8 host-staged after PsychicExpansion/TimeStop01438 hit SecurityException (ECall); not a production-registration PASS",
+    "Battle variant AbilityData CanUse/Spend chain not exercised; only the private pool's Resources.Spend and RequiredResource direction",
+    "No player game, UMM, SaveManager or level-up UI; Ward/Mist is a serializer round-trip of per-fact component data; parametrized pick driven by a real Feature fact",
+    "F2 fall moves m_BaseLevelInternal directly because native Spellbook has no RemoveLevelFromClass; book replacement uses real ClassData.Spellbook + m_Spellbooks + HandleUnitGainLevel but not a full respec/retrain controller",
+    "Player.UpdateCharacterLists skipped 60 times (no area); Life channel heal/harm rule settlement, rest events, retrain controllers and animal-only Friend targeting not run",
+    "The 8985-row fixture is a bounded subset of the full native dump; the isolated host has no Unity scene or BlueprintRoot"
+  ],
+  "fixtureDistribution": "No game assemblies, native blueprints, external mod DLLs, local work trees or private logs are distributed.",
+  "integration": "Version/manifest/docs plus packaging only; directed result reused, no historical/full suite or game/UMM launch."
+}
