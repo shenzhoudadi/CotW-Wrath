@@ -12,7 +12,7 @@ Historical blocker: HOLD_SHARED_REVELATIONS
 Original builds sixteen Ancestor/Time revelations with Shaman/Wisdom scaling and a private additional spell list. Current project has no shared revelation engine that preserves prerequisites, source-aware rerolls, class resources, initiative and cross-class isolation. Native Oracle identity alone does not establish these contracts.
 
 COTW-0060 Spirit Guide
-COMPLETED_DEVELOPMENT_TEST_PENDING_UPLOAD — 0.14.70 TEST，D3复查通过，320条本项定向/15.00秒。GitHub交付待完成；四外部根缺失则整包不激活，实机未测。见docs/work-packages/COTW-0060/README.md，不重复开发。
+COMPLETED_DEVELOPMENT_TEST — 0.14.70 TEST，D3复查通过，320条本项定向/15.00秒。GitHub交付已完成，4/4附件下载核对一致；四外部根缺失则整包不激活，实机未测。见docs/work-packages/COTW-0060/README.md，不重复开发。
 
 COTW-0068 Psychic Detective
 HOLD_PROVIDER_HA

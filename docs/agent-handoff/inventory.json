@@ -2698,12 +2698,12 @@
       "note": "C-0060-20261110-r1完整十魂域Oracle变体，90法术/39巫术池条目，3/4/7/15成长；来源、资源及Cha/Wis隔离；八个本包法术复用已有根，四外部根缺失整包不激活。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "已完成开发，D3复查通过；0.14.70 TEST待GitHub交付",
+      "status": "已完成开发／TEST交付：0.14.70 Spirit Guide TEST，D3通过，GitHub上传下载已核验",
       "importance": "中",
       "dependsOn": [
         "Oracle 主体与相关能力稳定"
       ],
-      "action": "不重复开发；GitHub交付核验后归档，后续仅按实际反馈定向修复",
+      "action": "不重复开发；已交付GitHub TEST，后续仅按实际反馈定向修复",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L29",
       "currentProfile": "320条定向/15.00秒；D3通过；真实提供方与玩家边界未测",
       "ecosystemProfile": "本项目已实现，外部依赖按冻结合同原子校验",

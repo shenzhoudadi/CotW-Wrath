@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0060 Spirit Guide** — [issue #10](https://github.com/shenzhoudadi/CotW-Wrath/issues/10)。已完成开发及D3复查；320条定向/15.00秒，0.14.70 TEST待GitHub交付。四外部根原子门禁，缺失不激活；实机和控制器等未测。[交接与证据](../work-packages/COTW-0060/README.md)。不重复开发。
+- **COTW-0060 Spirit Guide** — [issue #10](https://github.com/shenzhoudadi/CotW-Wrath/issues/10)。已完成开发及D3复查；320条定向/15.00秒，0.14.70 TEST已上传GitHub并完成4/4下载核对。四外部根原子门禁，缺失不激活；实机和控制器等未测。[交接与证据](../work-packages/COTW-0060/README.md)。不重复开发。
 
 - 当前预发布：[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)，含Spirit Whisperer和PR #5／#8外部贡献，保留此前功能。主DLL SHA256：`A638DA2FEC71B7E8915B600E60572A8CE280C987694DA1CB7CF31DD571D3E491`。旧附件与0.14.66正式版保留。
 - COTW-0081已完成开发、D-F01修复与独立复查，本项隔离定向536条断言通过。角色A旧星座命名与C文档部分名称错误，以生产目录和docs/starseeker/README.md勘误为准。

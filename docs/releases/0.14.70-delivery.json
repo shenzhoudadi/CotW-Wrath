@@ -1,0 +1,15 @@
+{
+  "version": "0.14.70",
+  "channel": "TEST",
+  "githubRelease": "https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.70-Spirit-Guide-TEST",
+  "sourceCommit": "014fc7d9c95b5eb0241fd55a1e8ea71247a57370",
+  "assetsVerified": 4,
+  "uploadSeconds": 5.99,
+  "downloadSeconds": 3.956,
+  "allHashesMatched": true,
+  "readmePhraseReadBack": true,
+  "fullSuiteRun": false,
+  "directedRerun": false,
+  "gameLaunched": false,
+  "ummLaunched": false
+}

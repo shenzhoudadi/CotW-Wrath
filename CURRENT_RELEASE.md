@@ -1,6 +1,6 @@
 # 当前开发与出包流程
 
-0.14.70 Spirit Guide TEST候选：D3复查通过，320条本项定向/15.00秒，GitHub交付待完成。正式0.14.66和旧TEST保留。见[本次说明](docs/releases/0.14.70-TEST.md)。只做常规编译/打包/包内DLL核对，复用同内容结果，不跑全量或历史专项。
+0.14.70 Spirit Guide TEST：D3复查通过，320条本项定向/15.00秒，GitHub交付已完成，4/4附件下载核对一致。正式0.14.66和旧TEST保留。见[本次说明](docs/releases/0.14.70-TEST.md)。只做常规编译/打包/包内DLL核对，复用同内容结果，不跑全量或历史专项。
 
 0.14.66正式稳定版保留。当前预发布为 **[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)**（程序集0.14.69.0）：Spirit Whisperer、Vindictive Bastard／Menacing、Sacred Servant／Live On统一测试包，保留已有Havocker／Mimic／Starseeker和内置模块；不含待修复的Speaker。编译29.737秒、常规包检查2.157秒，已有同内容专项未重跑。未测与已知边界见docs/releases/0.14.69-TEST.md。正常入口仍是build.ps1。
 
