@@ -1,3 +1,8 @@
+# 当前状态：D3通过，0.14.70 TEST待GitHub交付
+
+完整实现与D/D2修复均完成；最终候选`0ba589a`，320条隔离定向断言/15.00秒。见[D复查](D-review.md)、[证据摘要](VALIDATION.json)和[本包说明](../../releases/0.14.70-TEST.md)。真实提供方缺失时原子拒绝整包，不新移植替代法术。保留未测边界，不冒充玩家通过。原始A/C资料以下留作实现依据，不代表B仍未开始。
+
+---
 # Spirit Guide — 分工、A/C完成交接与B执行入口
 
 2026-11-10；COTW-0060；[施工issue #10](https://github.com/shenzhoudadi/CotW-Wrath/issues/10)。**本轮Sol已亲自完成A和C；B未实现，D未复查，不是TEST或功能PASS。** 冻结合同`C-0060-20261110-r1`，B可执行yes，无冻结blocker。

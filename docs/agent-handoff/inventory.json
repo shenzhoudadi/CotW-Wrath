@@ -2695,18 +2695,18 @@
           "external": []
         }
       ],
-      "note": "Sol已核对固定源码13份、十魂域90法术／39巫术池条目及38原生候选身份；C-0060-20261110-r1含Q01-Q10和24个NOT RUN场景。源码实际固定选择，Oracle与0117的属性／Lore／Waves不同；提供方缺项时原子拒绝。",
+      "note": "C-0060-20261110-r1完整十魂域Oracle变体，90法术/39巫术池条目，3/4/7/15成长；来源、资源及Cha/Wis隔离；八个本包法术复用已有根，四外部根缺失整包不激活。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "施工认领：A/C已完成，B可执行但未实现（2026-11-10，issue #10）",
+      "status": "已完成开发，D3复查通过；0.14.70 TEST待GitHub交付",
       "importance": "中",
       "dependsOn": [
         "Oracle 主体与相关能力稳定"
       ],
-      "action": "按docs/work-packages/COTW-0060冻结合同由单一B实现，再独立D；不要重做A/C或重复开发。",
+      "action": "不重复开发；GitHub交付核验后归档，后续仅按实际反馈定向修复",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L29",
-      "currentProfile": "A/C冻结完成，未实现／未运行检查／未交付",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "320条定向/15.00秒；D3通过；真实提供方与玩家边界未测",
+      "ecosystemProfile": "本项目已实现，外部依赖按冻结合同原子校验",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },

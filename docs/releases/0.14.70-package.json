@@ -1,0 +1,25 @@
+{
+  "version": "0.14.70",
+  "channel": "TEST",
+  "compileSeconds": 34.308,
+  "packageChecksSeconds": 2.076,
+  "zipSHA256": "93809B67B3A4A4A3FA5DD146988FBD8084E8904FA1D1E0859120540C7801DA7D",
+  "packagedDLLs": {
+    "Assemblies/CallOfTheWild.Wrath.Prototype.dll": "17BFDC2AB998553F93E7158E60CDCAD427E374C490D8D3D49260FD3B4D673E1F",
+    "Modules/Medium/MediumClass.dll": "20A885CE41661DE19AD7700340CB870393BC3F8F967EECD4915DBDC0790F5475",
+    "Modules/WayOfTheShield/Way of the shield.dll": "7F7E5D121722A7F54F9D8962407CBF0EA08952E940249AEB76CEA83466B77E86"
+  },
+  "directed": {
+    "assertions": 320,
+    "seconds": 15.0,
+    "exitCode": 0,
+    "review": "D3 passed D2 fixes",
+    "candidateSHA256": "21D775E4034D32E15C353363BE5E6A21FA394D9BE93B21A84E0D62F4433BD04C"
+  },
+  "directedRerun": false,
+  "fullSuiteRun": false,
+  "gameLaunched": false,
+  "ummLaunched": false,
+  "reviewedCodeCommit": "0ba589a03f08aee0859fe23bc9583ee9dae39860",
+  "catPhraseReadBack": true
+}
