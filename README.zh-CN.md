@@ -1,23 +1,20 @@
-0.14.70 Spirit Guide TEST（测试包，非正式版）
+# 0.14.71 Iroran Paladin TEST
 
 猫猫堡是猪猪
 
-本包新增 Spirit Guide（Oracle变体）：固定选择十魂域之一，3级巫术、4级起奖励法术、7级基础能力、15级高阶能力；含Oracle/Charisma与指定Wisdom分支、Mystery技能来源适配、Lore参数化选法及来源安全清理。
-保留0.14.69已交付的Spirit Whisperer、Havocker、Mimic、Starseeker、外部贡献以及Medium/Way of the Shield内置模块。Speaker for the Past仍未纳入。
+本包新增 Iroran Paladin（COTW-0109），使用原生圣武士职业和 Irori 信仰。可试 Personal Trial、徒手成长、Confident Defense、气池、Divine Body 和两道重掷光环。Personal Trial 的等级加值按圣武士等级计算。Divine Body 在自己的拳头更换时清理自己的附魔。
 
-重要：Spirit Guide需ExpandedContent的Wall of Fire、Hypnotic Pattern、Incendiary Cloud及CharacterOptionsPlus的Frostbite真实可用。任一缺失、停用或为空壳时，整个Spirit Guide不激活；其他已交付模块按各自条件工作。本包不包含或安装这些提供方，也不重新移植其法术。八个CotW本项目法术继续复用已有实现。
+退出游戏后，备份存档和旧模组目录。将 ZIP 内完整的 CallOfTheWildWrathPrototype 文件夹替换到现有 Owlcat 模组目录，保留所有子目录。将备份移到 Modifications 目录外。Windows 默认模组目录为 %USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/。不要同时启用旧独立 Medium 安装。
 
-安装：退出游戏并备份模组目录与存档，将ZIP中的完整CallOfTheWildWrathPrototype文件夹放到现有Owlcat模组目录。默认路径为 %USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/。升级时替换同名旧目录，备份移到Modifications之外；保留Modules、Localization及空Blueprints/Bundles目录。不要只替换主DLL，不要同时启用旧独立Medium安装。沿用已有合法依赖；发布者未启动游戏或UMM。
+沿用 0.14.70 的内容。Spirit Guide 仍需要 ExpandedContent 的 Wall of Fire、Hypnotic Pattern、Incendiary Cloud，以及 CharacterOptionsPlus 的 Frostbite。任一提供方能力不可用时，Spirit Guide 延后注册。
 
-验证：本项320条隔离定向断言、15.00秒、exit0；D3独立复查通过。Life缺行受控反证在同一二进制下明确失败并保留原件。整合仅重编译、打包及包内DLL核对，不重跑同内容专项、全历史或全量测试。
+D 独立复查通过。隔离宿主 105 条定向断言在 1.23 秒内通过，包含 31 条重掷与 74 条注册检查。此次复用该记录，进行整合编译和包内 DLL 核对。单位级攻击结算、实付资源、附魔存档、光环进出范围、升级界面与玩家实机仍未测。反馈请附职业等级、操作步骤与日志。
 
-未测：真实外部提供方执行、玩家实机、SaveManager/升级UI、完整休息重训、Life引导治疗/伤害结算等。Battle支付证据限于私有资源指向及Resources.Spend，不是variant完整CanUse/Spend链；内部18根归档重著、8根host暂存不算完整生产注册通过。旧模块已披露边界继续有效；0117旧Heaven's Leap选标边界不代表新0060使用同一实现。
+文件名带 TEST 的安装包属于预发布。正式稳定版为 0.14.66，旧测试附件仍可下载。
 
-反馈请附日志、职业/等级、所选魂域/巫术、提供方启用状态及操作步骤。命名中TEST/测试包表示预发布；正式版不带TEST。旧正式0.14.66与旧TEST附件保留。
+[GitHub 下载](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.71-Iroran-Paladin-TEST) · [Iroran 交接](https://github.com/shenzhoudadi/CotW-Wrath/tree/main/docs/work-packages/COTW-0109)
 
-下载：https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.70-Spirit-Guide-TEST
-交接：docs/work-packages/COTW-0060/README.md、D-review.md、VALIDATION.json。
-
+[0.14.70 Spirit Guide 测试说明](docs/releases/0.14.70-TEST.md)
 
 以下为保留的旧版说明，仅供历史参考，不是本次全量验收要求：
 

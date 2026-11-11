@@ -1,7 +1,7 @@
-> 本次测试包说明：[0.14.70 Spirit Guide TEST](docs/releases/0.14.70-TEST.md)。猫猫堡是猪猪
+> 本次测试包说明见 [0.14.71 Iroran Paladin TEST](docs/releases/0.14.71-TEST.md)。
 
 > 🚧 **[施工占用 / WORK STATUS](WORK_STATUS.md)**：COTW-0046 Speaker for the Past已认领，请勿重复开发。
-> Current preview: [0.14.70 Spirit Guide TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.70-Spirit-Guide-TEST). Stable: 0.14.66.
+> Current preview: [0.14.71 Iroran Paladin TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.71-Iroran-Paladin-TEST). Stable: 0.14.66.
 
 # Call of the Wild — Wrath
 
