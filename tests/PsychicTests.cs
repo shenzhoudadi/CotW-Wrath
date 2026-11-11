@@ -104,6 +104,30 @@ internal static class PsychicTests
         var ids = (string[])AccessTools.Field(module, "OwnIds").GetValue(null);
         Check(ids.Distinct().Count() == ids.Length && !native.Any(j => ids.Contains((string)j["AssetId"])), "New identities unique and absent from native input");
         Console.WriteLine("Psychic: registration fixture"); var f = new Fixture(catalog); Register(f);
+        // COTW-0068: route the directed detective case directly after the shared
+        // registration fixture. It materialises only the reviewed native row
+        // archive and stages the audited HA provider identities; no historical
+        // Psychic behaviour suite, full catalogue or game process is entered.
+        if (Environment.GetEnvironmentVariable("COTW_0068_CASE") == "psychicdetective0068")
+        {
+            var rows0068 = JObject.Parse(File.ReadAllText(args[4]));
+            PsychicExpansionTests.LoadNativeRows(f.Cache, rows0068, true);
+            PsychicExpansionTests.HydrateEmptyTables(f.Cache, rows0068);
+            PsychicExpansionTests.HydrateCachedSpellbooks(f.Cache, rows0068);
+            AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, f.Cache);
+            var directed0068 = new Harmony("CotWPsychicDetective0068.Directed");
+            int passed0068 = PsychicDetective0068Tests.Run(f.Cache, directed0068, rows0068);
+            var report0068 = new JObject { ["case"] = "psychicdetective0068", ["assertionsPassed"] = passed0068,
+                ["scope"] = "Directed 0068 checks only; shared fixture registration and staged HA provider fixture, no historical Psychic behaviour suites." };
+            if (args[2] == "-") Console.WriteLine(report0068.ToString());
+            else {
+                var path0068 = Path.GetFullPath(args[2]);
+                Directory.CreateDirectory(Path.GetDirectoryName(path0068));
+                File.WriteAllText(path0068, report0068.ToString());
+            }
+            Console.WriteLine("PASS: " + passed0068 + " Psychic Detective 0068 directed assertions. Standalone managed verification, not a game test.");
+            return;
+        }
         // D-F07: route the 0060 directed case directly after the shared fixture
         // is registered. Nothing below (casting, expansion, historical toggles)
         // belongs to this work package and must not run under its banner.

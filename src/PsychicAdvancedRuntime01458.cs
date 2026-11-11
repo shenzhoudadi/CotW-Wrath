@@ -33,22 +33,35 @@ namespace CallOfTheWild.Wrath.Prototype
     internal static class PsychicAdvancedRuntime01458
     {
         static readonly BlueprintGuid DualId=Id("DualAmplificationFeature01458");
-        internal static bool HasDual(UnitEntityData owner)=>owner?.Facts?.List?.Any(f=>f.Blueprint?.AssetGuid==DualId)==true;
+        internal static bool HasDual(UnitEntityData owner,BlueprintGuid scope)=>scope==PsychicAmplificationBinding.LegacyBookId&&owner?.Facts?.List?.Any(f=>f.Blueprint?.AssetGuid==DualId)==true;
+        internal static bool HasDual(UnitEntityData owner)=>HasDual(owner,PsychicAmplificationBinding.LegacyBookId);
         internal static string Key(BlueprintBuff b){var c=b.GetComponent<PsychicAmplificationComponent>();return c!=null?c.Kind.ToString():b.GetComponent<MimicMetamagic01458>()!=null?"Mimic":b.GetComponent<NaturesCommand01447>()!=null?"Nature":null;}
-        internal static bool CoordinateIfNeeded(UnitEntityData owner,EntityFact current)
+        internal static bool CoordinateIfNeeded(UnitEntityData owner,EntityFact current,BlueprintGuid? scope=null)
         {
-            if(!HasDual(owner)&&!owner.Buffs.Enumerable.Any(b=>b.Blueprint.GetComponent<MimicMetamagic01458>()!=null||b.Blueprint.GetComponent<PsychicAmplificationComponent>()?.Kind>=PsychicAmplificationKind.WillOfTheDead))return false;
-            Coordinate(owner,current);return true;
+            var book=scope??PsychicAmplificationBinding.ScopeOf(current);
+            // Dual and legacy advanced modes only coordinate their own book.
+            // Switching a detective mode never touches the Psychic book.
+            bool advanced=HasDual(owner,book)||owner.Buffs.Enumerable.Any(b=>
+                PsychicAmplificationBinding.InScope(b.Blueprint,book)&&
+                (b.Blueprint.GetComponent<MimicMetamagic01458>()!=null||
+                 b.Blueprint.GetComponent<PsychicAmplificationComponent>()?.Kind>=PsychicAmplificationKind.WillOfTheDead));
+            if(!advanced)return false;
+            Coordinate(owner,current,book);return true;
         }
-        internal static void Coordinate(UnitEntityData owner,EntityFact current=null)
+        internal static void Coordinate(UnitEntityData owner,EntityFact current=null,BlueprintGuid? scope=null)
         {
-            var keep=new List<Buff>();var keys=new HashSet<string>();int limit=HasDual(owner)?2:1;
-            var all=owner.Buffs.Enumerable.Where(b=>Key(b.Blueprint)!=null).ToArray();
+            var book=scope??PsychicAmplificationBinding.ScopeOf(current);
+            var keep=new List<Buff>();var keys=new HashSet<string>();int limit=HasDual(owner,book)?2:1;
+            var all=owner.Buffs.Enumerable.Where(b=>Key(b.Blueprint)!=null&&PsychicAmplificationBinding.InScope(b.Blueprint,book)).ToArray();
             foreach(var b in all.OrderByDescending(b=>ReferenceEquals(b,current)).ThenByDescending(b=>Array.IndexOf(all,b))){string key=Key(b.Blueprint);if(keep.Count<limit&&keys.Add(key))keep.Add(b);}
-            foreach(var ability in owner.Facts.List.OfType<ActivatableAbility>().Where(a=>a.Blueprint.Buff!=null&&Key(a.Blueprint.Buff)!=null&&!keep.Any(b=>b.Blueprint==a.Blueprint.Buff)).ToArray())ability.TurnOffImmediately();
+            foreach(var ability in owner.Facts.List.OfType<ActivatableAbility>().Where(a=>a.Blueprint.Buff!=null&&PsychicAmplificationBinding.InScope(a.Blueprint.Buff,book)&&Key(a.Blueprint.Buff)!=null&&!keep.Any(b=>b.Blueprint==a.Blueprint.Buff)).ToArray())ability.TurnOffImmediately();
             foreach(var b in all.Where(b=>!keep.Contains(b)&&b.IsAttached).ToArray())b.Remove();
         }
-        internal static bool Real(AbilityData a)=>a!=null&&a.SourceItem==null&&a.StickyTouch==null&&PsychicCasting.IsPsychic(a)&&a.Spellbook.Blueprint.AssetGuid==BlueprintGuid.Parse(PsychicClass.BookId)&&a.SpellLevel>0;
+        // Both the original Psychic book and the private six-circle detective
+        // book are real psychic sources for planning. Every consumer below
+        // still resolves the owning book before touching a pool or a mode.
+        internal static bool Real(AbilityData a)=>a!=null&&a.SourceItem==null&&a.StickyTouch==null&&PsychicCasting.IsPsychic(a)&&a.SpellLevel>0&&
+            (a.Spellbook?.Blueprint?.AssetGuid==PsychicAmplificationBinding.LegacyBookId||a.Spellbook?.Blueprint?.AssetGuid==PsychicDetective0068Ids.BookId);
         internal static bool AreaSpell(BlueprintAbility bp)=>bp.CanTargetPoint||bp.GetComponent<AbilityTargetsAround>()!=null||PsychicRemainingDisciplines01458.Graph(bp.ComponentsArray).OfType<ContextActionSpawnAreaEffect>().Any();
         internal static bool Eligible(PsychicAmplificationComponent c,RuleCastSpell e)
         {
@@ -62,7 +75,10 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         static bool Candidate(PsychicAmplificationComponent c,AbilityData a)
         {
-            if(!PsychicMajor01460.Allows(a.Caster.Unit,c))return false;
+            if(!PsychicAmplificationBinding.Owns(c,a))return false;
+            if(PsychicAmplificationBinding.IsBound(c)
+                ? PsychicAmplificationBinding.Level(c,a.Caster.Unit)<c.MinimumLevel
+                : !PsychicMajor01460.Allows(a.Caster.Unit,c))return false;
             var bp=a.Blueprint;var tags=a.SpellDescriptor;
             switch(c.Kind){
                 case PsychicAmplificationKind.BiokineticHealing:return bp.School==SpellSchool.Transmutation;
@@ -84,8 +100,15 @@ namespace CallOfTheWild.Wrath.Prototype
         static HashSet<string> Plan(AbilityData a)
         {
             var result=new HashSet<string>();if(!Real(a))return result;
-            var owner=a.Caster.Unit;var pool=PsychicDisciplineRuntime01458.Pool(owner);int points=pool==null?0:owner.Resources.GetResourceAmount(pool);int limit=HasDual(owner)?2:1;
-            foreach(var b in owner.Buffs.Enumerable.Where(b=>b.IsActive&&b.IsTurnedOn&&!b.IsSuppressed&&Key(b.Blueprint)!=null).Reverse()){
+            var owner=a.Caster.Unit;
+            // Budget, allowance and mode count are all resolved from the book
+            // that actually owns this cast. A mixed-class character never
+            // combines the two pools or the two mode sets.
+            var book=a.Spellbook?.Blueprint?.AssetGuid??PsychicAmplificationBinding.LegacyBookId;
+            var pool=PsychicAmplificationBinding.Pool(book,owner);
+            int points=pool==null?0:owner.Resources.GetResourceAmount(pool);int limit=book==PsychicAmplificationBinding.LegacyBookId&&HasDual(owner)?2:1;
+            foreach(var b in owner.Buffs.Enumerable.Where(b=>b.IsActive&&b.IsTurnedOn&&!b.IsSuppressed&&
+                PsychicAmplificationBinding.InScope(b.Blueprint,book)&&Key(b.Blueprint)!=null).Reverse()){
                 var c=b.Blueprint.GetComponent<PsychicAmplificationComponent>();var mimic=b.Blueprint.GetComponent<MimicMetamagic01458>();int cost;
                 if(c!=null){if(!Candidate(c,a))continue;cost=c.Cost;}
                 else if(mimic!=null){if(!MimicMetamagic01458.RawEligible(mimic,a))continue;cost=mimic.Price;}
@@ -102,10 +125,14 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if(!Plans.TryGetValue(e,out var plan)){
                 var owner=e.Initiator;
+                var book=e.Spell?.Spellbook?.Blueprint?.AssetGuid??PsychicAmplificationBinding.LegacyBookId;
                 // Preserve the original first-callback reservation when only
                 // legacy modes exist. Planning is needed for the new shared
-                // budget only after Dual or a new mode actually participates.
-                bool advanced=HasDual(owner)||owner?.Buffs?.Enumerable?.Any(b=>b.Blueprint.GetComponent<MimicMetamagic01458>()!=null||b.Blueprint.GetComponent<PsychicAmplificationComponent>()?.Kind>=PsychicAmplificationKind.WillOfTheDead)==true;
+                // budget only after Dual or a new mode of THIS book participates.
+                bool advanced=HasDual(owner,book)||owner?.Buffs?.Enumerable?.Any(b=>
+                    PsychicAmplificationBinding.InScope(b.Blueprint,book)&&
+                    (b.Blueprint.GetComponent<MimicMetamagic01458>()!=null||
+                     b.Blueprint.GetComponent<PsychicAmplificationComponent>()?.Kind>=PsychicAmplificationKind.WillOfTheDead))==true;
                 plan=new CastPlan{Allowed=advanced?Plan(e.Spell):new HashSet<string>{key}};Plans.Add(e,plan);
             }
             return plan.Allowed.Contains(key)&&plan.Claimed.Add(key);
@@ -125,8 +152,12 @@ namespace CallOfTheWild.Wrath.Prototype
             bool reducedOwnFamily=Real(a)&&high!=null&&a.SpellLevelInSpellbook>0&&a.SpellLevelInSpellbook<high.Circle;
             if(!conversion&&!reducedOwnFamily)return true;
             if(!SurgeShape(a,out int difference))return false;
-            var owner=a.Caster.Unit;var pool=PsychicDisciplineRuntime01458.Pool(owner);
-            if(!PsychicSurge01460.KnownVersion(a)||!owner.Buffs.Enumerable.Any(b=>b.IsActive&&b.IsTurnedOn&&!b.IsSuppressed&&b.Blueprint.GetComponents<PsychicAmplificationComponent>().Any(c=>c.Kind==PsychicAmplificationKind.UndercastSurge&&c.Strength==difference)))return false;
+            var owner=a.Caster.Unit;
+            var mode=owner.Buffs.Enumerable.Where(b=>b.IsActive&&b.IsTurnedOn&&!b.IsSuppressed)
+                .Select(b=>b.Blueprint.GetComponent<PsychicAmplificationComponent>())
+                .FirstOrDefault(c=>c?.Kind==PsychicAmplificationKind.UndercastSurge&&c.Strength==difference&&PsychicAmplificationBinding.Owns(c,a));
+            var pool=mode==null?PsychicDisciplineRuntime01458.Pool(owner):PsychicAmplificationBinding.Pool(mode,owner);
+            if(!PsychicSurge01460.KnownVersion(a)||mode==null)return false;
             context=context??(ReferenceEquals(NatureTargeting01448.CurrentCast?.Spell,a)?NatureTargeting01448.CurrentCast.Context:null);
             if(ReferenceEquals(context?.SourceAbilityContext?.Ability,a)&&PsychicAmplificationRuntime.TryReservation(context,PsychicAmplificationKind.UndercastSurge,out _))return true;
             return pool!=null&&owner.Resources.HasEnoughResource(pool,2*difference)&&Allowed(a,PsychicAmplificationKind.UndercastSurge.ToString());
@@ -134,7 +165,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static IEnumerable<AbilityData> SurgeConversions(AbilityData low)
         {
             if(!Real(low)||low.ConvertedFrom!=null||low.MetamagicData?.NotEmpty==true||low.Blueprint.GetComponent<PsychicUndercastFamily>()==null)yield break;
-            var owner=low.Caster.Unit;var mode=owner.Buffs.Enumerable.Where(b=>b.IsActive&&b.IsTurnedOn&&!b.IsSuppressed).Select(b=>b.Blueprint.GetComponent<PsychicAmplificationComponent>()).FirstOrDefault(c=>c?.Kind==PsychicAmplificationKind.UndercastSurge);if(mode==null)yield break;
+            var owner=low.Caster.Unit;var mode=owner.Buffs.Enumerable.Where(b=>b.IsActive&&b.IsTurnedOn&&!b.IsSuppressed).Select(b=>b.Blueprint.GetComponent<PsychicAmplificationComponent>()).FirstOrDefault(c=>c?.Kind==PsychicAmplificationKind.UndercastSurge&&PsychicAmplificationBinding.Owns(c,low));if(mode==null)yield break;
             foreach(var high in low.Spellbook.GetAllKnownSpells().Where(a=>a.MetamagicData?.NotEmpty!=true&&a.Blueprint.GetComponent<PsychicUndercastFamily>()?.LowerSpells?.Any(r=>r.Guid==low.Blueprint.AssetGuid)==true).GroupBy(a=>a.Blueprint.AssetGuid).Select(g=>g.First())){
                 int circle=high.Blueprint.GetComponent<PsychicUndercastFamily>().Circle;if(circle-low.SpellLevel!=mode.Strength)continue;
                 var converted=new AbilityData(high.Blueprint,low.Spellbook,low.SpellLevel){ConvertedFrom=low,OverrideSpellLevel=circle};if(SurgeValid(converted))yield return converted;
@@ -162,7 +193,9 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static void Restore(MechanicsContext context){var root=context?.SourceAbilityContext;if(root==null||context.Params==null||!Contexts.TryGetValue(root,out var mask)||(context.Params.Metamagic&mask.Value)==mask.Value)return;var copy=context.Params.Clone();copy.Metamagic|=mask.Value;context.SetParams(copy);}
         internal static bool RawEligible(MimicMetamagic01458 c,AbilityData a){
             if(a==null)return false;if(Checking==null)Checking=new HashSet<AbilityData>(ReferenceAbility.Instance);if(!Checking.Add(a))return false;
-            try{return PsychicAdvancedRuntime01458.Real(a)&&PsychicMajor01460.Has(a.Caster.Unit)&&(c.Metamagic==PsychicCasting.Logical||(c.Metamagic==TopplingSpell.Metamagic?TopplingSpell.Force(a.Blueprint):(a.Blueprint.AvailableMetamagic&c.Metamagic)!=0))&&a.MetamagicData?.Has(c.Metamagic)!=true&&a.SpellLevel+c.LevelCost<=a.Spellbook.MaxSpellLevel;}
+            try{return PsychicAdvancedRuntime01458.Real(a)&&
+                a.Spellbook?.Blueprint?.AssetGuid==PsychicAmplificationBinding.LegacyBookId&&
+                PsychicMajor01460.Has(a.Caster.Unit)&&(c.Metamagic==PsychicCasting.Logical||(c.Metamagic==TopplingSpell.Metamagic?TopplingSpell.Force(a.Blueprint):(a.Blueprint.AvailableMetamagic&c.Metamagic)!=0))&&a.MetamagicData?.Has(c.Metamagic)!=true&&a.SpellLevel+c.LevelCost<=a.Spellbook.MaxSpellLevel;}
             catch(Exception error){string key=a.Blueprint?.AssetGuid+"/"+c.Metamagic+"/"+error.GetType().FullName;lock(EligibilityFailures)if(EligibilityFailures.Add(key))ModEntry.LogSpellDiagnostic("Mimic eligibility failed for "+key+"; ordinary spell restrictions and casting remain in effect. "+error);return false;}
             finally{Checking.Remove(a);}
         }
