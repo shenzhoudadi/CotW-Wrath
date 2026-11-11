@@ -1,0 +1,167 @@
+{
+  "contract": "C-0070-20261112-r1",
+  "workPackage": "COTW-0070",
+  "status": "Frozen expectations, not executed tests",
+  "cases": [
+    {
+      "id": "C0070-01",
+      "contractSection": "Q01",
+      "title": "缺依赖与真实晚加载",
+      "inputs": "先缺 HA，再补齐受审 HA 与 native 根，通过正常 RegisterOptional；重复两次",
+      "expected": "第一次缺项且无私有根。HA 就绪后在根仍缺失时完成注册。职业、UI、授予各一份，重复无新增。",
+      "nativePath": "BlueprintRegistration.RegisterOptional → HA actual roots"
+    },
+    {
+      "id": "C0070-02",
+      "contractSection": "Q01",
+      "title": "冲突回滚",
+      "inputs": "错类型同 GUID、错误进展引用、缺少授予等级、私有 GUID 冲突",
+      "expected": "逐项拒绝或延后本包，原职业和原有事实无局部变更。输入恢复后可以成功重试。",
+      "nativePath": "native cache identity + atomic publication"
+    },
+    {
+      "id": "C0070-03",
+      "contractSection": "Q02",
+      "title": "HA 完整等级表",
+      "inputs": "普通与变体在 1/2/3/4/5/6/8/11/20 比较原生进展，查 4 到 20 全部偶数级",
+      "expected": "1 加 Lore、4 加 Advice/Strike，2/5/8 无毒抗、11 无毒免、4 无旧 Strike、4..20 偶数无旧 Combat，奇数天赋与原法书灵感均保留。",
+      "nativePath": "actual BlueprintArchetype.Add/RemoveFeatures + provider progression"
+    },
+    {
+      "id": "C0070-04",
+      "contractSection": "Q02",
+      "title": "四技能属性重算",
+      "inputs": "Int/Wis 修正 +3/+2，再换 -2/+4；取消事实；另有独立技能加值",
+      "expected": "Nature/Religion 只补 3→0；Arcana/World 只补 2→4；其他贡献保留，撤销本项只撤自己。",
+      "nativePath": "native stat bonus and attribute recalculation"
+    },
+    {
+      "id": "C0070-05",
+      "contractSection": "Q03",
+      "title": "学者自己的识怪检定",
+      "inputs": "图鉴已解锁、另一学者识怪成功、本人骰值分别 DC-1 和 DC；再重复有效分类",
+      "expected": "本人失败不会产生凭据或加值，即使图鉴齐全也如此。本人真实成功才记录，之后同分类可用。检定技能和 DC 由原生决定。",
+      "nativePath": "InspectUnitsManager.TryMakeKnowledgeCheck(target, inspector) → RuleSkillCheck"
+    },
+    {
+      "id": "C0070-06",
+      "contractSection": "Q03",
+      "title": "分类精确匹配",
+      "inputs": "两个不同物种的同类型同亚型目标；同类型少一个或多一个亚型；乱序或重复 fact",
+      "expected": "同类型和同集合命中，缺／多亚型均不命中。GUID 去重与顺序规范化结果相同。",
+      "nativePath": "native classification facts + exact category"
+    },
+    {
+      "id": "C0070-07",
+      "contractSection": "Q03",
+      "title": "伪类别反例",
+      "inputs": "仅 InstantEnemy、PlantTypeFake 或名字像怪物的未分类单位；普通人类对照已支持的巨人/哥布林/爬行类",
+      "expected": "通用或伪造标记不会获得类别；无数据时明确拒绝；原作未启用的普通类人组不加入。",
+      "nativePath": "FavoredEnemy.CheckedFacts evidence + live unit facts"
+    },
+    {
+      "id": "C0070-08",
+      "contractSection": "Q04",
+      "title": "24 小时独立时钟",
+      "inputs": "A/B 两个学者，两个分类；t=0、23:59、24:00，跨战斗并过原生休息",
+      "expected": "同源同类未到期需付费，另一学者／另一类首用免费。到期免费，战斗边界不清时钟，休息只随实际游戏时间。",
+      "nativePath": "TimeController.GameTime + owner/category receipt"
+    },
+    {
+      "id": "C0070-09",
+      "contractSection": "Q04",
+      "title": "实付、拒绝与重放",
+      "inputs": "真实 HA 余额 2，冷却内重用；再次重放同一事件；余额 0、取消、拒绝或失效",
+      "expected": "一次成功仅扣 1 点真实 HA Inspiration，Move 与授予同次。其他类别截止不变；失败没有额外扣费或改批次，若已预扣只返本次。",
+      "nativePath": "real Move cast → AbilityResourceLogic/native resource debit"
+    },
+    {
+      "id": "C0070-10",
+      "contractSection": "Q04",
+      "title": "团队范围与听觉",
+      "inputs": "近处、恰 30 ft、超过 30 ft、死亡／昏迷／静默目标，再静默学者",
+      "expected": "近处及边界有效盟友和符合条件的自己受益；无效接收者无 Buff；禁声或无人接收不产生资源／计时写入。",
+      "nativePath": "native target range + AudibleAbilityRestriction + applied buff"
+    },
+    {
+      "id": "C0070-11",
+      "contractSection": "Q04/Q05",
+      "title": "等级持续与覆盖",
+      "inputs": "L4/8/12/16/20，IntMod -1/+3；两学者向同盟友成功发出 Advice",
+      "expected": "等级加值 1/2/3/4/5，持续 1/3 轮。同一盟友只保留最后有效 Advice；失败或清退不误删另一源。",
+      "nativePath": "real applied buff/rank and source identity"
+    },
+    {
+      "id": "C0070-12",
+      "contractSection": "Q05",
+      "title": "实际 AC 和豁免来源",
+      "inputs": "匹配与不匹配的攻击者；Ex/Su/Sp、普通 Spell、无 source、已有 Insight；另含豁免替换",
+      "expected": "仅匹配攻击者获 Insight AC。Ex/Su/Sp 有匹配源时豁免获益，普通法术和未知不变。保留原生 Insight 不叠加和豁免比较。",
+      "nativePath": "RuleCalculateAC / RuleSavingThrow → actual resolved modifier"
+    },
+    {
+      "id": "C0070-13",
+      "contractSection": "Q06",
+      "title": "转换 Advice 批次",
+      "inputs": "两学者各有 Advice；一名受益者离开范围；学者 A 使用 Strike",
+      "expected": "仅结束 A 自有批次，并给仍在范围且可听的同源盟友一次 1 轮 Strike。B 源不动；无合格接收者时拒绝。",
+      "nativePath": "actual Move → same-caster Advice removal and Strike application"
+    },
+    {
+      "id": "C0070-14",
+      "contractSection": "Q06",
+      "title": "真实下一次武器命中",
+      "inputs": "先 miss、再命中不同类别，最后匹配目标；构造该次多个伤害包和重复事件",
+      "expected": "前两次未消费。匹配真实命中获得一次 1..5d6。副伤害包和重复没有第二次，原生普通武器伤害保留。",
+      "nativePath": "RulePrepareDamage.ParentRule.AttackRoll → native damage bundle"
+    },
+    {
+      "id": "C0070-15",
+      "contractSection": "Q06",
+      "title": "精准、暴击与隐蔽",
+      "inputs": "匹配目标的普通命中／暴击／隐蔽中命中／精准免疫／DisablePrecisionDamage，另查已有 Fortification",
+      "expected": "仅合格真实命中有独立 Precision 伤害且临界倍率为 1。隐蔽和免疫反例不提前消费，保留原生有效免疫与防护。",
+      "nativePath": "native attack outcome/concealment + precision calculation"
+    },
+    {
+      "id": "C0070-16",
+      "contractSection": "Q06",
+      "title": "武器类型和远程边界",
+      "inputs": "徒手、天生、持械、射线、远程 30 ft 与 >30 ft，非武器直伤",
+      "expected": "真正徒手、天生和普通武器可以触发，远程只在边界内，纯射线和独立法术伤害不触发。",
+      "nativePath": "actual DamageBundle.Weapon + native distance"
+    },
+    {
+      "id": "C0070-17",
+      "contractSection": "Q07",
+      "title": "实际天赋限制",
+      "inputs": "通过 HA 天赋、嵌套选项和 Extra Investigator Talent 选择原作九类；其他合法来源对照",
+      "expected": "本变体仅研究系禁项被阻止，Ranged Study 入口与派生覆盖。正常原生选择和真实独立来源可用。",
+      "nativePath": "BlueprintFeatureSelection.CanSelect + selection ancestry and submit"
+    },
+    {
+      "id": "C0070-18",
+      "contractSection": "Q07/Q02",
+      "title": "旧变体和普通 HA 对照",
+      "inputs": "同一 cache 中普通 HA、Psychic Detective、Cryptid Scholar；独立 HA 职业事实",
+      "expected": "普通 HA 的 Studied 进展与法书照旧；0068 的原有天赋路径仍有效。当前学者限制不扩张到其他来源。",
+      "nativePath": "actual ClassData / per-archetype eligibility"
+    },
+    {
+      "id": "C0070-19",
+      "contractSection": "Q08",
+      "title": "恢复与同源清退",
+      "inputs": "保存或组件数据回读学者与队友的类型键、Advice、Strike、剩余冷却；撤销自有变体",
+      "expected": "恢复不会补资源或重复授予。只清本学者的授权与批次，其他学者和独立 HA facts 保留。明确组件回读与完整控制器范围。",
+      "nativePath": "native component data/PostLoad + owner lifecycle"
+    },
+    {
+      "id": "C0070-20",
+      "contractSection": "Q08",
+      "title": "过期与换图",
+      "inputs": "越过 Advice/Strike 到期、跨图、发生休息，先后切换目标实际类型",
+      "expected": "已过期效果不能继续结算或重复转化。可恢复的截止基于游戏时间。原凭据只认原分类，变型后须匹配新分类或真实重新识怪。",
+      "nativePath": "native buff expiration / time and category scope"
+    }
+  ]
+}

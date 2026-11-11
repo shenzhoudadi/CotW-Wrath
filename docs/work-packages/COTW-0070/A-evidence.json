@@ -1,0 +1,761 @@
+{
+  "workPackage": "COTW-0070",
+  "contract": "C-0070-20261112-r1",
+  "date": "2026-11-12",
+  "issue": 13,
+  "base": "1c0f3b027d263e195d6e1ca2946d4a4a3f68aad6",
+  "baseline": "0.14.72 TEST",
+  "original": {
+    "repo": "Holic75/KingmakerRebalance",
+    "commit": "1332fb0db844b7863f484ca978bea2349fe49769",
+    "file": "CallOfTheWild/Classes/Investigator.cs",
+    "blob": "71c4c1bf91a87bed499a5abb139437d91316fb54",
+    "sha256": "d85476b71c6b98e2cdb53cd690b0c0731cd3447b957dec42d9c67601f1219f42"
+  },
+  "provider": {
+    "repository": "FrozenDervish/Homebrew-Archetypes",
+    "commit": "211e9b82e252705dfaa7e4aa7507d9819737e232",
+    "license": "MIT",
+    "assets": [
+      {
+        "path": "Blueprints/Investigator/InvestigatorClass.jbp",
+        "blob": "4e4626c936137316ab49174a3df78dd04d94d97f",
+        "sha256": "eceb42f24c1487c5a770aa4182a5400fdd12fcf6387281b45334f41b587da52c",
+        "guid": "adb9e138bee9ecc4db246b64d563f900",
+        "type": "BlueprintCharacterClass",
+        "components": [
+          "PrerequisiteNoClassLevel",
+          "PrerequisiteIsPet"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorProgression.jbp",
+        "blob": "026add253c2f6815ea33f02edafe5e727132c574",
+        "sha256": "87e5699ba2d51cfe63c97b4ab3791aee03248c8cde435eee3557531b5cf15c91",
+        "guid": "5eaea532547c7ce40a84563e15fd3440",
+        "type": "BlueprintProgression",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorSpellbook.jbp",
+        "blob": "4cad63b4d7a1c53313fb39d1db9daf6e3b65c4f0",
+        "sha256": "2113f65d5a9621dd30b8a56c7d45761e6192431c3a42db2e08d14c83cc6e09d3",
+        "guid": "961e6b4edd3c80e4a9fe4435deff6fe7",
+        "type": "BlueprintSpellbook",
+        "components": [
+          "IsAlchemistSpellbook"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorTalentSelection.jbp",
+        "blob": "55689fc2189555824645e175e158c7ffd547e565",
+        "sha256": "02f12334adc0abee3f276f8a462b15ca2b19119fb3f120fbe6ee4e856f01be1b",
+        "guid": "da89239cc5859a1478007cd5e6d44f67",
+        "type": "BlueprintFeatureSelection",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorPoisonResistance.jbp",
+        "blob": "e0d8d75763a6fd54df6bd272eccde0652f8f5df9",
+        "sha256": "6d7fd45eb272b8c794d1abfa2e8c793b66b49cc3f076d1e7280408fa5324f8bc",
+        "guid": "152ea6d8f279a73489c9dc0815e9e9b1",
+        "type": "BlueprintFeature",
+        "components": [
+          "SavingThrowBonusAgainstDescriptor"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorPoisonImmunity.jbp",
+        "blob": "e1ce6848f6fdcdf45a20c6133ce4f092f4d873bc",
+        "sha256": "0fa593e9a5456281cfb48c5202fd6301703f3bdd442c157fa3caef3bc021fb13",
+        "guid": "03d1877a5ffcbd34d9501b005434cb4f",
+        "type": "BlueprintFeature",
+        "components": [
+          "BuffDescriptorImmunity"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InspirationResource.jbp",
+        "blob": "41d30fad7f7f928ad1c764f6a78bd1678077e2e7",
+        "sha256": "b489c895e60944494892400a4a3f66fd345bb5ca8bca9617529a2cd5a6a23428",
+        "guid": "60b4629bd1e92194382ae6a754f738ac",
+        "type": "BlueprintAbilityResource",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorStudiedCombatFeature.jbp",
+        "blob": "6c877766eaa728780d4de258ed7a6dd33e4dae96",
+        "sha256": "ed661d6e3db6b52c87bf1d8ec483487636c987d4d881f524a2e3b71791ca3080",
+        "guid": "5a10de57f3d1a584c917f830c32742c9",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFeatureIfHasFact"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorStudiedCombatAbility.jbp",
+        "blob": "b80a81730704886f9325cdc977765030cec3ee6e",
+        "sha256": "03a34a52a6559a9ab6594886fec365b673a3b477bc111f084e6145de1f8d476e",
+        "guid": "5fac1d5652f7b3d418c5b0193cd00b3e",
+        "type": "BlueprintAbility",
+        "components": [
+          "AbilityEffectRunAction",
+          "AbilityTargetIsAlly",
+          "ContextRankConfig",
+          "AbilityTargetHasFact"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorStudiedCombatVariant.jbp",
+        "blob": "0d62e1c9e4623e90305dc953ea6f4bddbb121953",
+        "sha256": "6c1b418cebc336df9765da923ef81935f6ed831718bb45a5052ae3110ec22d43",
+        "guid": "3c8eda2092036e641b790a1861858d8c",
+        "type": "BlueprintAbility",
+        "components": [
+          "AbilityVariants"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorStudiedCombatBuff.jbp",
+        "blob": "6fa25765f29ea362861685ca7ba7d7861db2d48b",
+        "sha256": "6c11ab72f25d89b487f2ab2174657af9dc34936b2d4aa6c3e11d19ae0031377c",
+        "guid": "8cb75fe3f8443ee41bf38cb2c9084f5f",
+        "type": "BlueprintBuff",
+        "components": [
+          "AttackBonusAgainstTarget",
+          "DamageBonusAgainstTarget",
+          "RemoveBuffIfCasterIsMissing",
+          "ContextRankConfig",
+          "AddFactContextActions",
+          "UniqueBuff",
+          "ContextRankConfig"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorStudiedCombatBuffCooldown.jbp",
+        "blob": "92a995c95654793d0c7bd369fb0c5ce652b9df68",
+        "sha256": "317bec33439335f3b2a08c47a5bdbef171cc73c7aa4c4998e82b1cd1551da416",
+        "guid": "2d1dc72b1ba22f44a8a613213f2dc75c",
+        "type": "BlueprintBuff",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/StudiedStrikeFeature.jbp",
+        "blob": "64f41febe025f043f1eb2908e6a799b8fb782071",
+        "sha256": "e050f89422704ede501e74968fba8bd8152b7267defa0b219f85e6fec3178d59",
+        "guid": "0d545d60ed6aa1f48acd73c78676b94d",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/StudiedStrikeMainAbility.jbp",
+        "blob": "290823bf85d2e75775e26fdc64a9f35b7b3e3a05",
+        "sha256": "19560d0eaebd0429f807bff069cee70870d694eabcc6599af3362ffba3b6abc3",
+        "guid": "6c251011d6256cc44a638660fdd2b601",
+        "type": "BlueprintAbility",
+        "components": [
+          "AbilityEffectRunAction",
+          "AbilitySpawnFx"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InspirationStudiedCombat.jbp",
+        "blob": "b0bdc26302cf07e5e6e2c40db658e1ebaad82a7c",
+        "sha256": "b36c7305ccfd87088edf1701e56f49da4a8648a294830d1f35aef0dfa104877c",
+        "guid": "4d500a1bf57b06c4d8ef550d3cafa030",
+        "type": "BlueprintAbility",
+        "components": [
+          "AbilityEffectRunAction",
+          "AbilityTargetIsAlly",
+          "ContextRankConfig",
+          "AbilityResourceLogic",
+          "AbilityShowIfCasterHasFact"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/RangedStudy/RangedStudySelection.jbp",
+        "blob": "0891bbe56ea72920f72d4a6ae4efe64efec143d9",
+        "sha256": "5e5e5e57b12d1bf115575eaa36dae4d14280bbf87963926ec37a661ff93abfc3",
+        "guid": "6643e114543c16c4a921bdd381106f28",
+        "type": "BlueprintFeatureSelection",
+        "components": [
+          "NoSelectionIfAlreadyHasFeature",
+          "PrerequisiteNoFeature",
+          "PrerequisiteFeature",
+          "PrerequisiteFeature"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/RangedStudy/RangedStudyFeature.jbp",
+        "blob": "ab126a860417519b07cadd8d3eb8b273b1ccd091",
+        "sha256": "427429a7f11af936ea8aea4d45747c736cd21b924a10c790a9ddb556e97045e5",
+        "guid": "f0e7e42950661c6488fe214aaaa2375a",
+        "type": "BlueprintFeature",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/QuickStudyFeature.jbp",
+        "blob": "1f4a17179ef65068a17048885258dea6e81f11e6",
+        "sha256": "6f9139463b1e658df4eeb877e1bfdbed2486b0729104391b6a2953ee2fc9e989",
+        "guid": "4f497e31844a1004087cf1b97330ed72",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/ProlongedStudyFeature.jbp",
+        "blob": "a1eaf2e581c88156bb7db365eb55f855657940b9",
+        "sha256": "cb09e7e3654b52cd0926c880369f85e61af5f79c892bda8326abe94e6ba3d814",
+        "guid": "27ac309cb4aa14241a7d550991262084",
+        "type": "BlueprintFeature",
+        "components": [
+          "PrerequisiteClassLevel",
+          "AutoMetamagic"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/SappingOffensiveFeature.jbp",
+        "blob": "6be136a7a41232f07f9b612ea27428d2e00d7e5d",
+        "sha256": "05723e2f929b217ad71eae4e778a32ac323e21cc2ee5d35b073b97b971b1fa72",
+        "guid": "56323e0c3d28d9a428d30189e93b5e68",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/SickeningOffensiveFeature.jbp",
+        "blob": "88aa107c125674ea8c8fb76c50ccd07c87359c3a",
+        "sha256": "b7364b63886450d379a452341f5069d6538c0dd680b96f8dd034ff52d997d692",
+        "guid": "20c725db6c9c7f14d82ee7feb762a068",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/BlindingStrikeFeature.jbp",
+        "blob": "a29aefdf1ee47fbdba43176ca6dc3f298cdd01c1",
+        "sha256": "76b4f1653ef51e81a3450017a4a5622bed0e36d1f22c89ae34e23370b234b72d",
+        "guid": "80c3fd96e00c8364e8c24139d622c84b",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/ConfusingStrikeFeature.jbp",
+        "blob": "628ea51432cf1b8b8c39925d17a79d1669649e5c",
+        "sha256": "4884173329ed90a77daf7bfe2f8ca66b851c8270b50bfda8ffdb0b8b9f5976eb",
+        "guid": "2885cbaf40b531e45b17a06182b5536e",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/StudiedDefenseFeature.jbp",
+        "blob": "f13b59073b653b0fb24252cc0abf78a00ae4c103",
+        "sha256": "2e5d1e4d7503303feb460549391f383fee863f46a3dc1038cc4752813efb7f6f",
+        "guid": "01e76de8d3649374f8a21f54d4637b44",
+        "type": "BlueprintFeature",
+        "components": [
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/TopplingStrikeFeature.jbp",
+        "blob": "7cc657c03e4ea5c61f6e15f47de9a94b1787d37c",
+        "sha256": "3d73041f503d5aaf5f95ca79649269b20e2698ca97b130678138ce2e625dedfa",
+        "guid": "e3bc416aceb3d8445a89144b8f2d7a95",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/SlowingStrikeFeature.jbp",
+        "blob": "266ce5eb9653e2166cd208365b5a4223eb004f79",
+        "sha256": "61515dd0af2ff3004833125351aa5c0abfdad5628dbc900fb179a8383739763b",
+        "guid": "e706c839d139e6a4281fb5c3e316408e",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/RepositioningStrikeFeature.jbp",
+        "blob": "0653eb25777e3984a80a375af1ba183661381ab9",
+        "sha256": "cc0d971f4b3924b2aadded1e79412c120878f340e9257c85ab43062561b9d4c4",
+        "guid": "2e1ac887b2e3f384fae1f0875544281a",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "PrerequisiteClassLevel"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/InspirationFeature.jbp",
+        "blob": "ad4f5c113e56320b16d8d09ce394f7edbee34e0b",
+        "sha256": "eb5702852f466fcda78a02437bd7271eeee7b8dabd50f54b46060b76f17a6875",
+        "guid": "78681fd7849fd5c44ac67c0701d459ec",
+        "type": "BlueprintFeature",
+        "components": [
+          "AddFacts",
+          "AddAbilityResources"
+        ]
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/SlowingStrikeAbility.jbp",
+        "blob": "3b65e696f4f621e3a7f0650e982fb7be075b07a3",
+        "sha256": "d797c904d8bf28b25ec20388696e708dab1dcf460cd61b23ef180080e4282883",
+        "guid": "c8d9d743091ed604dabe15cd05c70b6c",
+        "type": "BlueprintActivatableAbility",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/RepositioningStrikeAbility.jbp",
+        "blob": "47d11cfcbd9a40960664cefe860ae554db0babf8",
+        "sha256": "3da8bac54c16bd9ecf1692ac425eb12f5dcdd5ae947737da87712f37100a0094",
+        "guid": "763d0c1cf00290e4aa5396b89dcb3a6e",
+        "type": "BlueprintActivatableAbility",
+        "components": []
+      },
+      {
+        "path": "Blueprints/Investigator/StudiedStrikeVariantMain.jbp",
+        "blob": "80d0c5d822009f51ffefe89abf0c803369052cd7",
+        "sha256": "b2a451e2e3bb2db56daa9f5cfd32854b7e28e2d51dae13e8867a26d06c542c05",
+        "guid": "25e910a74894eaa44beff34a72b4eaec",
+        "type": "BlueprintAbility",
+        "components": [
+          "AbilityVariants"
+        ]
+      }
+    ],
+    "progression": {
+      "removePoisonResistance": [
+        2,
+        5,
+        8
+      ],
+      "removePoisonImmunity": [
+        11
+      ],
+      "removeStudiedCombat": [
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20
+      ],
+      "removeStudiedStrike": [
+        4
+      ],
+      "retainTalent": [
+        3,
+        5,
+        7,
+        9,
+        11,
+        13,
+        15,
+        17,
+        19
+      ]
+    },
+    "excludedTalentIdentities": {
+      "QuickStudyFeature": "4f497e31844a1004087cf1b97330ed72",
+      "ProlongedStudyFeature": "27ac309cb4aa14241a7d550991262084",
+      "SappingOffensiveFeature": "56323e0c3d28d9a428d30189e93b5e68",
+      "SickeningOffensiveFeature": "20c725db6c9c7f14d82ee7feb762a068",
+      "BlindingStrikeFeature": "80c3fd96e00c8364e8c24139d622c84b",
+      "ConfusingStrikeFeature": "2885cbaf40b531e45b17a06182b5536e",
+      "StudiedDefenseFeature": "01e76de8d3649374f8a21f54d4637b44",
+      "TopplingStrikeFeature": "e3bc416aceb3d8445a89144b8f2d7a95",
+      "RangedStudySelection": "6643e114543c16c4a921bdd381106f28",
+      "RangedStudyFeature": "f0e7e42950661c6488fe214aaaa2375a"
+    },
+    "realLoadExecuted": false
+  },
+  "native": {
+    "broadTypeFacts": [
+      {
+        "name": "AberrationType",
+        "guid": "3bec99efd9a363242a6c8d9957b75e91",
+        "path": "Traits/Races/Common/AberrationType.jbp",
+        "sha256": "a3f36a5d5db13390f3459ab5e02de33c5a9e4d27ff77f6c7c227b47ee4efea79"
+      },
+      {
+        "name": "AnimalType",
+        "guid": "a95311b3dc996964cbaa30ff9965aaf6",
+        "path": "Traits/Races/Common/AnimalType.jbp",
+        "sha256": "c041f181b35253901fba24c1f8d595506016e62f1e0eab5c6ab16e15c523fa99"
+      },
+      {
+        "name": "ConstructType",
+        "guid": "fd389783027d63343b4a5634bd81645f",
+        "path": "Traits/Races/Common/ConstructType.jbp",
+        "sha256": "aea5af28206ef52cb30949651d75251780d74dbb94dd750f8cef15d636b271cb"
+      },
+      {
+        "name": "DragonType",
+        "guid": "455ac88e22f55804ab87c2467deff1d6",
+        "path": "Traits/Races/Common/DragonType.jbp",
+        "sha256": "cb868ac67e0b729f38ae0cd1926e4f2eb2b5c5fd5c9fae486892fa4f8667fd97"
+      },
+      {
+        "name": "FeyType",
+        "guid": "018af8005220ac94a9a4f47b3e9c2b4e",
+        "path": "Traits/Races/Common/FeyType.jbp",
+        "sha256": "8e9517a3aefb3a59df5e32a1e2b730087289201a3c407c5eb9aa2d678ef0c115"
+      },
+      {
+        "name": "MagicalBeastType",
+        "guid": "625827490ea69d84d8e599a33929fdc6",
+        "path": "Traits/Races/Common/MagicalBeastType.jbp",
+        "sha256": "a2998af92599e04573b536597f47432d4e4a5a0cd99e0e227b4f81809ba75ce2"
+      },
+      {
+        "name": "MonstrousHumanoidType",
+        "guid": "57614b50e8d86b24395931fffc5e409b",
+        "path": "Traits/Races/Common/MonstrousHumanoidType.jbp",
+        "sha256": "a4479371f3ecd1ee63c904dae411892d5821bb2f618d57aad4c9a183dc802f1f"
+      },
+      {
+        "name": "OutsiderType",
+        "guid": "9054d3988d491d944ac144e27b6bc318",
+        "path": "Traits/Races/Common/OutsiderType.jbp",
+        "sha256": "753d93b28e4823e57efe6aacba274345d9808e078c0871e3bbce4d707a21edd0"
+      },
+      {
+        "name": "PlantType",
+        "guid": "706e61781d692a042b35941f14bc41c5",
+        "path": "Traits/Races/Common/PlantType.jbp",
+        "sha256": "0ac7e8fc7afafc3e90ca5f4349b09bbdc51ee37413282333148d9af98292c54b"
+      },
+      {
+        "name": "UndeadType",
+        "guid": "734a29b693e9ec346ba2951b27987e33",
+        "path": "Traits/Races/Common/UndeadType.jbp",
+        "sha256": "bc549c98c317e14f564bcc68e11ce28c6666a0bce4c7a82d42212022332124ea"
+      },
+      {
+        "name": "VerminType",
+        "guid": "09478937695300944a179530664e42ec",
+        "path": "Traits/Races/Common/VerminType.jbp",
+        "sha256": "430d418f1cd3d8900e047ea2c8d0ea27918338c7609f3d60aa7ac20eb5bac9f1"
+      }
+    ],
+    "subtypeFacts": [
+      {
+        "name": "GiantSubtype",
+        "guid": "f9c388137f4faa74aac9065a68b56880",
+        "path": "Traits/Races/Common/GiantSubtype.jbp",
+        "sha256": "ad2c7a27d7930c4405074856f7e34303fd6ec43e2a57ec637381af0b27a0e1e0"
+      },
+      {
+        "name": "LycanthropeType",
+        "guid": "9a122a03b2548d94ba90546083d999c0",
+        "path": "Traits/Races/Common/LycanthropeType.jbp",
+        "sha256": "f08a8e29f32ac6e80d97e996af52029f3167e1b0ef027759daea1369f18b8142"
+      },
+      {
+        "name": "ReptilianSubtype",
+        "guid": "8b8809fd7f9039840ba2374310d7c634",
+        "path": "Traits/Races/Common/ReptilianSubtype.jbp",
+        "sha256": "46fc728ba4b62d094858c0044ea76b5b4b2da9ecbe1d710178673a0df6e50a52"
+      }
+    ],
+    "outsiderGroupingFacts": [
+      {
+        "name": "DemonOfMagicFeature",
+        "guid": "1b466705276e3124ab43f865e282c6e8",
+        "path": "Classes/Ranger/FavoriteEnemy/DemonOfMagicFeature.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "0a8088a5b5253128dacaf95d7cc6d929fa5881dd0e28a705dd03d63a9108c92d"
+      },
+      {
+        "name": "DemonOfSlaughterFeature",
+        "guid": "2fe24d538bbcea34cbe9e8600d92bdd2",
+        "path": "Classes/Ranger/FavoriteEnemy/DemonOfSlaughterFeature.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "ed92af87c6afe45cde1bd2b56f856ee54688ef6a1339443741c435bb52536ad7"
+      },
+      {
+        "name": "DemonOfStrengthFeature",
+        "guid": "561041cdb5887464883c55c75219a9dc",
+        "path": "Classes/Ranger/FavoriteEnemy/DemonOfStrengthFeature.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "e71572bb5a65ac1dec941359ff5829a633ac061b5027b9f628a1079fcea4a462"
+      },
+      {
+        "name": "NotADemonFeature",
+        "guid": "e2986f96fa1cd3b4f8d9dfd8a9907731",
+        "path": "Classes/Ranger/FavoriteEnemy/NotADemonFeature.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "abfe856eb8629426fe151b0d00d40e815780b7682f6a61eac0207c5dac3125ab"
+      }
+    ],
+    "raceEvidence": [
+      {
+        "name": "AasimarRace",
+        "guid": "b7f02ba92b363064fb873963bec275ee",
+        "path": "Races/AasimarRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "72e973925fe06a7a2cebd556c0ce1276d145bee6a4827c832638822fe1105524"
+      },
+      {
+        "name": "DwarfRace",
+        "guid": "c4faf439f0e70bd40b5e36ee80d06be7",
+        "path": "Races/DwarfRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "a266a2c829e3a59cbd687e728d3483ee60887575bd73970a3fface3de9fc649c"
+      },
+      {
+        "name": "ElfRace",
+        "guid": "25a5878d125338244896ebd3238226c8",
+        "path": "Races/ElfRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "f128da24a92e0a044085bf75ffdabf569b9ebcf611e19aa5b8ea308a01474246"
+      },
+      {
+        "name": "GnomeRace",
+        "guid": "ef35a22c9a27da345a4528f0d5889157",
+        "path": "Races/GnomeRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "966faf4fd88a91966a9e7f0c984be4237ed4ef751cc758d14cd51e70850dde18"
+      },
+      {
+        "name": "GoblinRace",
+        "guid": "9d168ca7100e9314385ce66852385451",
+        "path": "Races/GoblinRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "2a0c2d58d828a2be01c8f2c72f588441f5564d8c930c0ac7ca2e9cee2c59a9f9"
+      },
+      {
+        "name": "HalfElfRace",
+        "guid": "b3646842ffbd01643ab4dac7479b20b0",
+        "path": "Races/HalfElfRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "e8d5eeb33ca8f4fc3d3c97e1e99d0d3097f778d248d5da40db78e88c8852a84f"
+      },
+      {
+        "name": "HalflingRace",
+        "guid": "b0c3ef2729c498f47970bb50fa1acd30",
+        "path": "Races/HalflingRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "0260103a7ebc494c9d9f8c126a677f116d468b450912cf77504d732ebecdd5cb"
+      },
+      {
+        "name": "HalfOrcRace",
+        "guid": "1dc20e195581a804890ddc74218bfd8e",
+        "path": "Races/HalfOrcRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "c0248a65955f2d46e0911959a18467bfd608d3bbd1e11ea2d4a307557f9b2d96"
+      },
+      {
+        "name": "HumanRace",
+        "guid": "0a5d473ead98b0646b94495af250fdc4",
+        "path": "Races/HumanRace.jbp",
+        "type": "BlueprintRace",
+        "sha256": "b06e5bc6c412987367df165b69548af31f610b10b5cc7bea89de8fed7f3f14e4"
+      }
+    ],
+    "excludedClassificationFacts": [
+      {
+        "name": "InstantEnemyBuff",
+        "guid": "82574f7d14a28e64fab8867fbaa17715",
+        "path": "Spells/Level3/InstantEnemyBuff.jbp",
+        "type": "BlueprintBuff",
+        "sha256": "01ab883e9a0e0095dadd5b2651c7ffb89c57982410be502fc6bbf79224b9f175"
+      },
+      {
+        "name": "PlantTypeFake",
+        "guid": "b0efed5c0c814e3486fb8c8932af3bcc",
+        "path": "Traits/Races/Common/PlantTypeFake.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "8faaabf2e6c021a74d55b3accaaa955a80a5e509ff542387041318fb28373502"
+      }
+    ],
+    "audibilityDonors": [
+      {
+        "name": "ThrowingAxeOfSilenceBuff",
+        "guid": "e4b8a158e8aabfe41b5e0bd334d8c386",
+        "path": "Weapons/Items/UniquePF2/ThrowingAxeOfSilenceBuff.jbp",
+        "type": "BlueprintBuff",
+        "sha256": "3c8f0b3c54de510c9d9077679a77f4bfa3d7a69121af9f7431e9edd950356ced"
+      },
+      {
+        "name": "SlaughteringSilenceBuff",
+        "guid": "73e09d4c3e3a4d918988a0aae069f372",
+        "path": "Weapons/Items/UniquePF2/Chapter5/SlaughteringSilenceBuff.jbp",
+        "type": "BlueprintBuff",
+        "sha256": "babd58ca4c2a90a335db28b3d966923da958384299ddd1e7ec430fac2a5caf42"
+      }
+    ],
+    "favoriteEnemyDonors": [
+      {
+        "guid": "7081934ab5f8573429dbd26522adcc39",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyAberrations.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "1c99bd3d52b8d19f1b70ee632a922485e5dbb9f93988771a932712abe062e448",
+        "originalCategory": "Aberration"
+      },
+      {
+        "guid": "1ef8d7ab3ca4795498ff446cb027e2f3",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyAnimals.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "60d4ef8c68b1e40d16bc1720c1bb7e786cf35f38ad8ddb5d7e6534e27925a8f1",
+        "originalCategory": "Animal"
+      },
+      {
+        "guid": "6ea5a4a19ccb81a498e18a229cc5038a",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyConstructs.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "8d5519f1921a41d9faa0a3fde8f4f755076d18807c14926bd820bbdadce10dfc",
+        "originalCategory": "Construct"
+      },
+      {
+        "guid": "918555c021b3a2944beed35df53b4c56",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyDragons.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "e57ed714cf3cb81254025fee313f40ea400fe00266918c0815fff5aae61a18a1",
+        "originalCategory": "Dragon"
+      },
+      {
+        "guid": "be3d454ea70a8bb468b0a8a087e7e65b",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyFey.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "cf53a807efe66036575d90c168f11012095e329b4debc448c4f38d81151055a3",
+        "originalCategory": "Fey"
+      },
+      {
+        "guid": "bd59614d30bcadd46bd56aabe0de819f",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyGiants.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "95eae92aeced596eab005ac342c8da1891eeab8df7cfff278c7121bd19ed3529",
+        "originalCategory": "Giant Humanoid"
+      },
+      {
+        "guid": "c03dc59e2ce30484b82e7aead6d10471",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyGoblins.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "4f214676a883d2f42438e1d23ccd42457f7248a538726e675a25197619686832",
+        "originalCategory": "Goblin"
+      },
+      {
+        "guid": "f807fac786faa86438428c79f5629654",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyMagicalBeasts.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "507a12daca49606a15e0a594dbc3ec2ca4bcc6ae83bc5418ce56433c5ac31bcb",
+        "originalCategory": "Magical Beast"
+      },
+      {
+        "guid": "0fd21e10dff071e4580ef9f30a0334df",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyMonstrousHumanoid.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "d9271aeb7d41a12a2d22f77a9a04c8054fbcf3d9ebdeac4c3ab22018fa7178f1",
+        "originalCategory": "Monstrous Humanoid"
+      },
+      {
+        "guid": "f643b38acc23e8e42a3ed577daeb6949",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyOutsider.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "29704e00015beb55969b8c409921f6d91dc9fbd22e486d2523471cac923df817",
+        "originalCategory": "Outsider"
+      },
+      {
+        "guid": "4ae78c44858bc1942934efe7c149d039",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyPlant.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "7c70fb65c06bf0cc7f05364cd067f9520d6a485edf0119e5036fd1e37a136075",
+        "originalCategory": "Plant"
+      },
+      {
+        "guid": "3b0f03e24ad0b7243b5973c3d8ab7af5",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyReptilian.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "41626175535ed634eae34dd2ee536b387b1c253b238738e17ecb0f3b927bfa50",
+        "originalCategory": "Reptilian"
+      },
+      {
+        "guid": "5941963eae3e9864d91044ba771f2cc2",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyUndead.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "f751a4e1792ddc48a6c2ab74f4134a13eb908ae21576ed21a821773d5924bda5",
+        "originalCategory": "Undead"
+      },
+      {
+        "guid": "f6dac9009747b91408644fa834dd0d99",
+        "path": "Classes/Ranger/FavoriteEnemy/FavoriteEnemyVermin.jbp",
+        "type": "BlueprintFeature",
+        "sha256": "16bb3be710e1fc52d300561f557e984f35c43331c030f2f8d27a9cb84c5b7c3a",
+        "originalCategory": "Vermin"
+      }
+    ]
+  },
+  "nativeAPIs": {
+    "InspectUnitsManager.TryMakeKnowledgeCheck(UnitEntityData,UnitEntityData,StatType?)": "InspectUnitsManager.cs:190",
+    "AbilityResourceLogic.Spend": "AbilityResourceLogic.cs:88",
+    "FavoredEnemy.CheckedFacts": "FavoredEnemy.cs:19",
+    "UnitPartFavoredEnemy.OnEventAboutToTrigger": "UnitPartFavoredEnemy.cs:46",
+    "RuleCalculateAC.OnTrigger": "RuleCalculateAC.cs:38",
+    "RuleSavingThrow.OnTrigger": "RuleSavingThrow.cs:166",
+    "RulePrepareDamage.ParentRule / Add": "RulePrepareDamage.cs:13",
+    "RuleCalculateDamage.OnTrigger": "RuleCalculateDamage.cs:63",
+    "RuleConcealmentCheck.OnTrigger": "RuleConcealmentCheck.cs:39",
+    "BlueprintUnitType.KnowledgeStat": "BlueprintUnitType.cs:14"
+  },
+  "nativeDependencySHA256": {
+    "Assembly-CSharp.dll": "2cb7160b7154d4ffacc77b9c51b1eb26199e1294300f04fdfc073367b2ef8953",
+    "0Harmony.dll": "de50cd610ea22854c8930ec5433276713aee1bb0ecd785d6b15a0661c2fa9fd5"
+  },
+  "sourceReuse": {
+    "src/PsychicDetective0068Binding.cs": "451cc9e0c0cab89a235f3002ac5fc8f1bb306a007060ecfa392fd2bafca78ba3",
+    "src/PsychicDetective0068.cs": "8f5bff49cf35b5687f34f78c26bc3ef9ae166338812a93e3846bf0d84365ce64",
+    "src/ExtraInvestigatorTalent.cs": "72ae39778d515c36e051a49f573c982bb9af5b7602249dcf2644aa26c1d95543",
+    "src/MagusBatch01454.cs": "440d984ba3bdb6b55766edc963688f85247de905b300e9e68525d88afff55401",
+    "src/TerrifyingHowl.cs": "a1752ab54eac5361b81fb592871b2b173a74355fcc23c836adcb94430c22146d",
+    "src/CooperationRuntime.cs": "05fd77d9bda1aa965487889027b12993eaf45d9123e89a631892cb5b61a49814",
+    "src/CompanionSpellSharing.cs": "072f29f8cf2be6be155768438c724b5bf9d293e920cac6687bf2a19cda0c6a52",
+    "src/SpiritGuideSpirits0060.cs": "1d2cb2feaac44ed63aa0792c558d26a5097cf7bd2e91532e5bd2d3e16da2ad46",
+    "src/SpiritWhisperer0117.cs": "6960e711c22ec99006cb85513b6a1e3e16fa7c9fdba74cd9da012c1f2690c001",
+    "src/PsychicGhostbaneDirge.cs": "27f2cc5a8e3aea9594dd6bdb38e6c750ace0c6135c211d2bb41f72a559440094"
+  },
+  "duplicateCheck": {
+    "upstream": "shenzhoudadi/CotW-Wrath",
+    "priorPRs": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      8,
+      9
+    ],
+    "upstreamBranchesChecked": true,
+    "publicFork": "sxl1216/CotW-Wrath",
+    "forkMain": "04159f63b46d9ba67b65947cfdc84466bf1456b1",
+    "otherReservation": "Speaker for the Past #6",
+    "conflictFound": false
+  },
+  "execution": {
+    "compile": "未运行",
+    "directed": "未运行",
+    "package": "未运行",
+    "playerGame": "未运行"
+  }
+}

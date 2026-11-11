@@ -1,0 +1,11 @@
+你是 COTW-0070 Cryptid Scholar 的 B 实现负责人。先读 AGENTS.md、WORK_STATUS.md、CURRENT_RELEASE.md、HANDOFF 及 docs/work-packages/COTW-0070 下的 README、A-source-and-compat、A-evidence、C-frozen-contract、C-cases。施工 https://github.com/shenzhoudadi/CotW-Wrath/issues/13。基线 1c0f3b0 / 0.14.72 TEST，按最新 main 的隔离分支实施合同 C-0070-20261112-r1。游戏内文字用英文。
+
+B1 复用现有 HA 身份和来源检查，按真实 HA 等级表替换 2/5/8 毒抗、11 毒免、4 Studied Strike、4 到 20 每个偶数级 Studied Combat。保留 HA 灵感池和法书，接四技能 Intuitive Lore 与原作九类天赋排除。技能不重写原生属性，限制用 CanSelect 的实际来源。晚 HA 注册使用真实 RegisterOptional 入口，根尚未存在时也能放行。原子发布与回滚沿用现有工具。
+
+B2 使用指定学者的原生 InspectUnitsManager.TryMakeKnowledgeCheck，按 A 的已证实广义类型及完整可表示的亚型／种族集合形成稳定分类键。Instant Enemy、假 Plant、猜名与队友图鉴不参与。发出 Advice 在同一 Move 内按 30 ft 可听盟友授予，真实成功建立施放者／分类 24h。冷却内重用从 HA 原生灵感扣 1，正常复用的付费链不借其他池。连接原生 AC／豁免，保护事件与源身份。
+
+B3 只转换当前同源 Advice 批次为一次 Strike。接实际 RulePrepareDamage/AttackRoll，原生命中、类型、隐蔽、距离、精准免疫和 Fortification 的适用边界。只消费一次且不乘暴击。来源清退、休息、时间、存读档边界按 C，不改 HA 旧研究运行时。先跑契约反例，明确实际执行和结构证据。
+
+旗舰档负责真实事件、付费时序、分类、生命周期和生产整合。轻量档可按已冻结映射做机械接线、英文文本、图标和证据整理。只编译和运行本项必要定向检查，禁止全库、全历史、启动游戏／UMM 或另开已有施工。编译不等于人测，实际缺项如实报告。
+
+本机原件在 C:\Users\xuenc\agent-tools\cryptid-scholar-next，固定原作在项目 work/port01441/sources/Holic75__KingmakerRebalance/tree/CallOfTheWild。只读依赖。B 输出 B-progress.md、B-evidence.json、时间戳日志及失败原件到本机交接目录，记录候选提交、源/DLL/依赖指纹、实际命令和秒数。公开仓库只写证据摘要，原生反编译、游戏文件和提供方原件留本机。交独立 D，统一 TEST 发布按用户授权。
