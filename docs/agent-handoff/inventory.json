@@ -3019,18 +3019,18 @@
           "external": []
         }
       ],
-      "note": "A/C已核对固定CotW原作、HA@211e9b8公开职业与天赋蓝图；复用180行目录和现有11种增幅，真实初始化待B检查。",
+      "note": "合同C-0068-20261111-r1。同会话D2通过，发布核查修正HA晚加载。GitHub四个附件下载一致。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "施工中：A/C已完成，B待实现",
+      "status": "已完成开发／TEST交付：0.14.72 Psychic Detective TEST",
       "importance": "中",
       "dependsOn": [
         "Investigator 主体与相关能力稳定"
       ],
-      "action": "按docs/work-packages/COTW-0068交B实现与独立D复查，issue #12；不重建Investigator或外部法术",
+      "action": "按0.14.72 TEST继续收集反馈，见docs/work-packages/COTW-0068",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L30",
-      "currentProfile": "合同C-0068-20261111-r1与20项定向预期已冻结；尚未编译或功能检查",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "306条隔离定向／14.778秒；真实HA／TTT与实机未测",
+      "ecosystemProfile": "本项目新增 HA Investigator 的 Psychic Detective 变体",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },

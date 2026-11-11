@@ -15,9 +15,7 @@ COTW-0060 Spirit Guide
 COMPLETED_DEVELOPMENT_TEST — 0.14.70 TEST，D3复查通过，320条本项定向/15.00秒。GitHub交付已完成，4/4附件下载核对一致；四外部根缺失则整包不激活，实机未测。见docs/work-packages/COTW-0060/README.md，不重复开发。
 
 COTW-0068 Psychic Detective
-IN_PROGRESS_A_C_DONE — issue #12
-原作、HA公开蓝图和共享机制已核对；合同 C-0068-20261111-r1 冻结。B待实现六环换书、来源绑定和完整变体，D独立复查。见docs/work-packages/COTW-0068/README.md。
-提供方公开固定源码已定位；真实HA初始化及新绑定尚未运行，不再按旧的仅三身份锚点结论重复阻塞规划。
+COMPLETED_DEVELOPMENT_TEST — 0.14.72 TEST／issue #12。306 条定向／14.778 秒。四个附件下载一致；真实提供方与玩家边界未测。见docs/work-packages/COTW-0068/README.md。
 
 COTW-0070 Cryptid Scholar
 HOLD_PROVIDER_HA

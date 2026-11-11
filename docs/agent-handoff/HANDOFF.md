@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0068 Psychic Detective** — [issue #12](https://github.com/shenzhoudadi/CotW-Wrath/issues/12)。A/C已完成，合同 C-0068-20261111-r1 与20项定向预期已冻结，B待实现、D独立复查。基线56ff438 / 0.14.71 TEST。接入真实HA Investigator，复用180行法表与现有11种增幅。[ABCD交接](../work-packages/COTW-0068/README.md)。
+- **COTW-0068 Psychic Detective** — [issue #12](https://github.com/shenzhoudadi/CotW-Wrath/issues/12)。A/C/B 与同会话 D2 已完成，[0.14.72 Psychic Detective TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.72-Psychic-Detective-TEST)已交付。发布核查修正 HA 晚加载。306 条定向／14.778 秒，4/4 附件下载一致。真实 HA／TTT、实机、存读档和重训仍未测。[交接与证据](../work-packages/COTW-0068/README.md)。
 
 - **COTW-0109 Iroran Paladin** — [issue #11](https://github.com/shenzhoudadi/CotW-Wrath/issues/11)。A/C/B/D已完成，[0.14.71 Iroran Paladin TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.71-Iroran-Paladin-TEST)已交付。105条隔离定向／1.23秒，4/4附件下载核对一致。实机、存档和升级界面等未测。[交接与证据](../work-packages/COTW-0109/README.md)。不重复开发。
 
