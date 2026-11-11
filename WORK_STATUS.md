@@ -4,8 +4,6 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0109 Iroran Paladin** — [issue #11](https://github.com/shenzhoudadi/CotW-Wrath/issues/11)。A/C/B完成，D复查通过，可 TEST 交付。隔离分支 `feat/cotw-0109-iroran-paladin-b`。D-F01 标记等级与 D-F02 空手附魔已修，定向检查 105 条（31 重掷 + 74 注册），1.23 秒，exit 0。版本抬升、合并和 TEST 上传仍待出包。实机未测。[ABCD交接](docs/work-packages/COTW-0109/README.md)。
-
 - **COTW-0046 Speaker for the Past** — [认领issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。负责人：仓库维护者／本会话协调，B为单一生产整合负责人。阶段：A/C完成，B v2已实现；**D复查 NEEDS_FIX，尚未出包**。[复查及修复要求](docs/work-packages/COTW-0046/D-review.md)：Rewind Time扣费／一次性销毁、奖励法术来源清理、Blood of Heroes豁免范围、Sacred Council检定范围。已有175条蓝图／组件断言不能覆盖这些实际分支，未声称玩家验收。[A/C/B/D分工](docs/work-packages/COTW-0046/README.md)。保留施工占用，不另起重复实现；0.14.68 Starseeker原交付不受影响。
 
 ## 本次0.14.69 TEST交付
@@ -13,6 +11,8 @@
 - **COTW-0117 Spirit Whisperer** — [issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)。A/C/B/D和最终整合复查完成，十魂域Wizard变体及唯一隔离桥已合入源码；174条隔离检查37.59秒，合并后编译8.138秒、0警告／0错误。保留D报告的选标／控制器等边界，不宣称玩家游戏通过。[交付范围与未测](docs/spirit-whisperer/README.md)。已纳入[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)，GitHub上传下载核对后关闭issue，不重复开发。
 
 ## 已完成开发／TEST交付
+
+- **COTW-0109 Iroran Paladin** — [issue #11](https://github.com/shenzhoudadi/CotW-Wrath/issues/11)。A/C/B/D已完成，[0.14.71 Iroran Paladin TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.71-Iroran-Paladin-TEST)已交付。105条隔离定向／1.23秒，4/4附件下载核对一致。实机、存档和升级界面等未测。[交接与证据](docs/work-packages/COTW-0109/README.md)。不重复开发。
 
 - **COTW-0060 Spirit Guide** — [issue #10](https://github.com/shenzhoudadi/CotW-Wrath/issues/10)。已完成开发及D3复查；320条定向/15.00秒，[0.14.70 Spirit Guide TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.70-Spirit-Guide-TEST)已交付，4/4附件下载核对一致。四外部根原子门禁，缺失不激活；实机和控制器等未测。[交接与证据](docs/work-packages/COTW-0060/README.md)。不重复开发。
 

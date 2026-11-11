@@ -4887,18 +4887,18 @@
           "external": []
         }
       ],
-      "note": "原作六份固定blob与Wrath原生锚点已核对，C-0109-20261111-r1已冻结。施工issue #11。",
+      "note": "合同 C-0109-20261111-r1。Personal Trial等级、Divine Body附魔清理修复后完成D复查。GitHub 4/4附件核对一致。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "施工中：A/C已完成，B待实现",
+      "status": "已完成开发／TEST交付：0.14.71 Iroran Paladin TEST，D复查与GitHub附件核验完成",
       "importance": "中",
       "dependsOn": [
         "Paladin 主体与相关能力稳定"
       ],
-      "action": "按docs/work-packages/COTW-0109交B实现，交独立D复查；尚未编译或出包",
+      "action": "不重复开发；仅按实际测试反馈定向处理",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L39",
-      "currentProfile": "原生圣武士变体待实现，已完成原作与原生依赖核对",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "105条隔离定向／1.23秒；玩家实机及存档等未测",
+      "ecosystemProfile": "本项目已实现原生圣武士变体",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },
