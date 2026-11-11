@@ -391,10 +391,16 @@ namespace CallOfTheWild.Wrath.Prototype
 
         public void HandleUnitEmptyHandWeaponUpdated()
         {
-            // The native pool part does not watch empty-hand swaps; a fist
-            // change retires this package's enchants rather than migrating
-            // them to the new fist or any equipped weapon.
-            ClearOwn();
+            // The callback has no unit argument and this part is subscribed
+            // globally. Another character's fist change must not clear this
+            // paladin's enchants. Drop a tracked weapon only when it is no
+            // longer the weapon this owner would enhance.
+            if (base.Owner?.Body == null) return;
+            ItemEntityWeapon current = base.Owner.Body.PrimaryHand.HasWeapon
+                ? base.Owner.Body.PrimaryHand.MaybeWeapon
+                : base.Owner.Body.EmptyHandWeapon;
+            foreach (Tracked tracked in m_Tracked.ToArray())
+                if (tracked.ItemRef.Entity != current) Remove(tracked);
         }
 
         protected override void OnPreSave()

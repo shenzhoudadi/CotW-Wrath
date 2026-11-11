@@ -74,6 +74,52 @@ internal static class Iroran0109Tests
         return false;
     }
     private static void Expect(params int[] values) { rolls.Clear(); foreach (var v in values) rolls.Enqueue(v); draws = 0; }
+    private static UnitEntityData trialUnit;
+    private static UnitProgressionData trialProgression;
+    private static bool TrialCaster(ref UnitEntityData __result)
+    {
+        if (trialUnit == null) return true;
+        __result = trialUnit;
+        return false;
+    }
+    private static bool TrialProgression(ref UnitProgressionData __result)
+    {
+        if (trialProgression == null) return true;
+        __result = trialProgression;
+        return false;
+    }
+    private static int TrialInsight(BlueprintBuff mark, AttackBonusAgainstTarget attack, BlueprintCharacterClass paladin, int level)
+    {
+        trialUnit = Unit();
+        var descriptor = (UnitDescriptor)Get(trialUnit, "Descriptor");
+        trialProgression = new UnitProgressionData();
+        var classes = (List<ClassData>)Get(trialProgression, "Classes");
+        if (classes == null)
+        {
+            classes = new List<ClassData>();
+            Set(trialProgression, "Classes", classes);
+        }
+        classes.Add(new ClassData(paladin) { Level = level });
+        Set(descriptor, "Progression", trialProgression);
+        var harmony = new Harmony("cotw-0109-trial-rank");
+        harmony.Patch(AccessTools.PropertyGetter(typeof(MechanicsContext), "MaybeCaster"),
+            prefix: new HarmonyMethod(typeof(Iroran0109Tests), nameof(TrialCaster)));
+        harmony.Patch(AccessTools.PropertyGetter(typeof(UnitEntityData), "Progression"),
+            prefix: new HarmonyMethod(typeof(Iroran0109Tests), nameof(TrialProgression)));
+        try
+        {
+            var context = new MechanicsContext(trialUnit, descriptor, mark);
+            context.RecalculateRanks();
+            return attack.Value.Calculate(context);
+        }
+        finally
+        {
+            harmony.UnpatchAll("cotw-0109-trial-rank");
+            trialUnit = null;
+            trialProgression = null;
+        }
+    }
+
     private static UnitEntityData Unit(UnitLifeState life = UnitLifeState.Conscious)
     {
         var unit = Empty<UnitEntityData>();
@@ -540,8 +586,8 @@ internal static class Iroran0109Tests
               ((BlueprintAbilityResourceReference)Get(trialExtra.GetComponent<IncreaseResourceAmount>(), "m_Resource")).Guid == trialResource.AssetGuid,
             "C0109-03 trial extra uses rank up from the native donor and raise only this package's pool");
         Check(mark.Stacking == StackingType.Stack && (Convert.ToInt64(Get(mark, "m_Flags")) & 0x10) != 0 &&
-              mark.ComponentsArray.Length == 5,
-            "C0109-03 mark buff stacks per caster, is removed on rest and carries exactly the five contract components");
+              mark.ComponentsArray.Length == 6,
+            "C0109-03 mark buff stacks per caster, is removed on rest and carries the five contract components plus its rank");
         var attack = Component<AttackBonusAgainstTarget>(mark);
         var acBonus = Component<ACBonusAgainstTarget>(mark);
         var damage = Component<DamageBonusAgainstTarget>(mark);
@@ -563,6 +609,15 @@ internal static class Iroran0109Tests
               (int)Get(trialRank, "m_StepLevel") == 4 &&
               ((BlueprintCharacterClassReference[])Get(trialRank, "m_Class")).Select(r => r.Guid).SequenceEqual(new[] { paladin.AssetGuid }),
             "C0109-03 value rank is 1 + paladin level / 4 through the paladin class");
+        var markRank = mark.GetComponent<ContextRankConfig>();
+        Check(markRank != null &&
+              Enum.GetName(typeof(ContextRankProgression), Get(markRank, "m_Progression")) == "OnePlusDivStep" &&
+              (int)Get(markRank, "m_StepLevel") == 4 &&
+              ((BlueprintCharacterClassReference[])Get(markRank, "m_Class")).Select(r => r.Guid).SequenceEqual(new[] { paladin.AssetGuid }),
+            "D-F01 the mark buff itself carries the paladin 1 + level/4 rank");
+        foreach (int level in new[] { 1, 4, 20 })
+            Check(TrialInsight(mark, attack, paladin, level) == 1 + level / 4,
+                "D-F01 a real mark-buff context gives insight " + (1 + level / 4) + " at paladin level " + level);
         var trialApply = trialAbility.GetComponent<AbilityEffectRunAction>().Actions.Actions.OfType<ContextActionApplyBuff>().Single();
         Check(trialApply.Permanent && ((BlueprintBuffReference)Get(trialApply, "m_Buff")).Guid == mark.AssetGuid,
             "C0109-03 the cast applies this package's mark permanently to the selected target");

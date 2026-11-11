@@ -331,6 +331,13 @@ namespace CallOfTheWild.Wrath.Prototype
 
             var apply = new ContextActionApplyBuff { name = "IroranTrialApply0109", Permanent = true, IsFromSpell = false };
             Set(apply, "m_Buff", Ref<BlueprintBuffReference>(mark));
+            // The attack, AC and damage components live on the mark. Their rank
+            // is read from the buff context, so the class-level config has to
+            // be on the buff itself, not only on the casting ability.
+            var markRank = Rank(paladin, "OnePlusDivStep");
+            markRank.name = "IroranTrialMarkRank0109";
+            Set(markRank, "m_StepLevel", 4);
+            mark.ComponentsArray = mark.ComponentsArray.Concat(new BlueprintComponent[] { markRank }).ToArray();
             var rank = Rank(paladin, "OnePlusDivStep");
             rank.name = "IroranTrialRank0109";
             Set(rank, "m_StepLevel", 4);
