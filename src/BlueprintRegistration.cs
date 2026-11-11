@@ -100,6 +100,9 @@ namespace CallOfTheWild.Wrath.Prototype
             }, report);
             RegisterModule(VindictiveBastard0111.ModuleName, () => VindictiveBastard0111.Register(cache), report);
             RegisterModule(SacredServant0110.ModuleName, () => SacredServant0110.Register(cache), report);
+            // IroranRerolls0109's Harmony patches are installed by ModEntry's
+            // assembly-wide [HarmonyPatch] sweep; only the graph registers here.
+            RegisterModule(IroranPaladin0109.ModuleName, () => IroranPaladin0109.Register(cache), report);
             RegisterModule(PsychicExpansion.ModuleName, () => {
                 if(!PsychicCasting.RuntimePatchesAvailable) throw new InvalidOperationException("Psychic runtime patches are unavailable; registration skipped.");
                 PsychicExpansion.Register(cache);

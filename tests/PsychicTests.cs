@@ -69,7 +69,21 @@ internal static class PsychicTests
         // diagnostic logging must also avoid Unity's Application log callback.
         profiling.Patch(AccessTools.Method(typeof(Owlcat.Runtime.Core.Logging.LogChannel), "Error", new[] { typeof(string), typeof(object[]) }),
             prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests), nameof(SkipProfiling))));
-        var assembly = Assembly.LoadFrom(args[1]); module = assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicClass", true);
+        var assembly = Assembly.LoadFrom(args[1]);
+        // COTW-0109: route the directed Iroran case before any Psychic fixture or
+        // historical suite; the reroll primitive needs no blueprint cache. When the
+        // reviewed native row fixture is supplied, the B3 registration checks run
+        // in the same isolated host right after the B1 assertions.
+        if (Environment.GetEnvironmentVariable("COTW_0109_CASE") == "iroran0109")
+        {
+            Iroran0109Tests.Run(assembly, args[2]);
+            if (args[4] != "-")
+                Iroran0109Tests.RunRegistration(assembly,
+                    System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(args[2])), "iroran0109-registration-report.json"),
+                    args[4]);
+            return;
+        }
+        module = assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicClass", true);
         casting = assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicCasting", true);
         var native = JArray.Parse(File.ReadAllText(args[3]));
         var anchorEvidence = JObject.Parse(File.ReadAllText(args[4]))["requiredNative"];
