@@ -280,17 +280,39 @@ namespace CallOfTheWild.Wrath.Prototype
                 int minimum,BlueprintBuff effect=null,bool linked=false,int tiers=1)
             {
                 var granted=new List<BlueprintUnitFact>();
+                var components=new List<BlueprintComponent>();
                 for(int i=1;i<=tiers;i++)
                 {
-                    int tierCost=kind==PsychicAmplificationKind.OverpoweringMind?2*i:
-                        kind==PsychicAmplificationKind.UndercastSurge?2*i:cost;
-                    int tierStrength=kind==PsychicAmplificationKind.OverpoweringMind?i:
-                        kind==PsychicAmplificationKind.UndercastSurge?i:strength;
+                    // D-F02: Defensive Prognostication tier i costs i points for
+                    // +2*i AC through the real tier-i effect buff, exactly like
+                    // the existing Psychic implementation.
+                    int tierCost=kind==PsychicAmplificationKind.OverpoweringMind||
+                        kind==PsychicAmplificationKind.UndercastSurge||
+                        kind==PsychicAmplificationKind.DefensivePrognostication?
+                        (kind==PsychicAmplificationKind.DefensivePrognostication?i:2*i):cost;
+                    int tierStrength=kind==PsychicAmplificationKind.OverpoweringMind||
+                        kind==PsychicAmplificationKind.UndercastSurge?i:
+                        kind==PsychicAmplificationKind.DefensivePrognostication?2*i:strength;
                     int tierMinimum=kind==PsychicAmplificationKind.OverpoweringMind?(i==1?1:i==2?8:15):minimum;
-                    var toggle=Mode(token+i,kind,tierCost,tierStrength,tierMinimum,effect);
-                    granted.Add(toggle);
+                    var tierEffect=kind==PsychicAmplificationKind.DefensivePrognostication?(i==1?defense1:defense2):effect;
+                    var toggle=Mode(token+i,kind,tierCost,tierStrength,tierMinimum,tierEffect);
+                    // D-F03: only the first Overpowering Mind tier is granted
+                    // immediately; the 8/15 tiers arrive through the native
+                    // AddFeatureOnClassLevel against the real HA Investigator,
+                    // so a low-level toggle never exists to switch modes off.
+                    if(kind==PsychicAmplificationKind.OverpoweringMind&&i>1)
+                    {
+                        var tier=Feature(token+"Tier"+i,title+" +"+i,text,Facts(toggle));
+                        var add=new AddFeatureOnClassLevel{name="DetectiveMindTier"+i,Level=tierMinimum};
+                        Set(add,"m_Class",Ref<BlueprintCharacterClassReference>(cls));
+                        Set(add,"m_Feature",Ref<BlueprintFeatureReference>(tier));
+                        Set(add,"m_AdditionalClasses",Array.Empty<BlueprintCharacterClassReference>());
+                        Set(add,"m_Archetypes",Array.Empty<BlueprintArchetypeReference>());
+                        components.Add(add);
+                    }
+                    else granted.Add(toggle);
                 }
-                var components=new List<BlueprintComponent>{Facts(granted.ToArray())};
+                if(granted.Count>0)components.Insert(0,Facts(granted.ToArray()));
                 if(linked)components.Add(new PsychicLinkedSpellEffects{name="DetectivePaid"+token,Kind=kind});
                 var feature=Feature(token,title,text,components.ToArray());
                 features.Add(feature);
@@ -404,7 +426,10 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(selection,"m_AllFeatures",amplificationFeatures.Select(Ref<BlueprintFeatureReference>).ToArray());
             PsychicAmplificationMenu.BuildDetective(f,modes,casting);
 
-            var add=new[]{Entry(1,casting),Entry(2,meddler),Entry(3,dabbler,selection)};
+            // D-F01: level 1 grants the native Detect Magic feature itself, not
+            // just the provider progression's UI header. Never cloned.
+            var detect=cache.Load(BlueprintGuid.Parse(PsychicDetective0068Ids.DetectMagicId)) as BlueprintFeature;
+            var add=new[]{Entry(1,detect,casting),Entry(2,meddler),Entry(3,dabbler,selection)};
             var remove=new[]{Entry(2,poison),Entry(3,talents),Entry(5,poison),Entry(8,poison),Entry(11,immunity)};
             var root=SpellBatch01447.Archetype(f,cls,PsychicDetective0068Ids.ArchetypeToken,"Psychic Detective",Description,add,remove);
             root.ChangeCasterType=true;root.IsArcaneCaster=false;root.IsDivineCaster=false;
@@ -476,6 +501,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 root.ReplaceSpellbook.CharacterClass!=cls)throw new InvalidOperationException("0068 ReplaceSpellbook identity mismatch.");
             if(root.RemoveFeatures.Length!=5||root.AddFeatures.Length!=3)
                 throw new InvalidOperationException("0068 archetype progression entries incomplete.");
+            var level1=root.AddFeatures.FirstOrDefault(e=>e.Level==1);
+            if(level1==null||!level1.Features.Any(f=>f.AssetGuid==BlueprintGuid.Parse(PsychicDetective0068Ids.DetectMagicId))||
+                !level1.Features.Any(f=>f.AssetGuid==Id(PsychicDetective0068Ids.CastingToken)))
+                throw new InvalidOperationException("0068 level 1 must grant native Detect Magic and the private spellcasting feature.");
             var all=(BlueprintFeatureReference[])Get(talents,"m_AllFeatures")??Array.Empty<BlueprintFeatureReference>();
             foreach(var token in new[]{PsychicDetective0068Ids.ExpandedPoolTalentToken,PsychicDetective0068Ids.ExtraAmplificationTalentToken})
                 if(all.Count(r=>r?.Guid==Id(token))!=1)throw new InvalidOperationException("0068 talent link missing or duplicated: "+token);

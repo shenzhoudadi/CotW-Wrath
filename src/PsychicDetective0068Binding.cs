@@ -112,10 +112,11 @@ namespace CallOfTheWild.Wrath.Prototype
             if (cls == null || Owner == null) return;
             int bonus = BonusFor(Owner.Progression.GetClassLevel(cls), MaximumBonus);
             if (bonus <= 0) return;
-            var stats = Owner.Stats;
-            evt.AddTemporaryModifier(stats.SaveWill.AddModifier(bonus, Runtime, ModifierDescriptor.UntypedStackable));
-            evt.AddTemporaryModifier(stats.SaveReflex.AddModifier(bonus, Runtime, ModifierDescriptor.UntypedStackable));
-            evt.AddTemporaryModifier(stats.SaveFortitude.AddModifier(bonus, Runtime, ModifierDescriptor.UntypedStackable));
+            // D-F04: only the save this event actually rolls is adjusted, the
+            // same boundary as the existing Steadfast Personality handler.
+            var stat = Owner.Stats.GetStat(RuleSavingThrow.GetStatFromSavingThrow(evt.Type));
+            if (stat == null) return;
+            evt.AddTemporaryModifier(stat.AddModifier(bonus, Runtime, ModifierDescriptor.UntypedStackable));
         }
         public void OnEventDidTrigger(RuleSavingThrow evt) { }
     }

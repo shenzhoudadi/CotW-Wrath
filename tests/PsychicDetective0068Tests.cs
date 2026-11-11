@@ -29,6 +29,7 @@ using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.Utility;
 using CallOfTheWild.Wrath.Prototype;
 
 // COTW-0068 B-stage directed checks, contract C-0068-20261111-r1.
@@ -175,6 +176,11 @@ internal static class PsychicDetective0068Tests
         Set(player, "m_PartyAndPets", new List<UnitEntityData>());
         Set(player, "m_PartyAndPetsDetached", new List<UnitEntityData>());
         Set(player, "PartyCharacters", new List<UnitReference>());
+        // Declared host boundary (same as 0060): the isolated host has no area
+        // or scene entities, so the native character-list rebuild is marked
+        // valid instead of walking CrossSceneState. Unit fact attachment still
+        // runs the real native OnFactDidAttach path.
+        Set(player, "m_CharacterListsValid", true);
         AccessTools.Field(typeof(Kingmaker.Game), "TimeController").SetValue(game,
             FormatterServices.GetUninitializedObject(typeof(Kingmaker.Controllers.TimeController)));
         AccessTools.Field(typeof(Kingmaker.Game), "Rulebook").SetValue(game,
@@ -196,10 +202,26 @@ internal static class PsychicDetective0068Tests
             var value = new ModifiableValueAttributeStat(u.Stats, stat) { BaseValue = 10 };
             Set(u.Stats, stat.ToString(), value); all.Add(value);
         }
+        // D-F04: real native saving-throw stats, each bound to its real
+        // attribute base stat, so temporary save modifiers recalculate through
+        // the native ModifiableValueSavingThrow path.
+        foreach (var pair in new[] {
+            new[] { StatType.SaveFortitude, StatType.Constitution },
+            new[] { StatType.SaveReflex, StatType.Dexterity },
+            new[] { StatType.SaveWill, StatType.Wisdom } })
+        {
+            var attribute = new ModifiableValueAttributeStat(u.Stats, pair[1]) { BaseValue = 10 };
+            Set(u.Stats, pair[1].ToString(), attribute); all.Add(attribute);
+            var save = new ModifiableValueSavingThrow(u.Stats, attribute, pair[0]) { BaseValue = 0 };
+            Set(u.Stats, pair[0].ToString(), save); all.Add(save);
+        }
         var classData = new ClassData(cls) { Level = level };
         Set(classData, "Spellbook", cls.Spellbook);
         u.Progression.Classes.Clear(); u.Progression.Classes.Add(classData);
         Set(u.Progression, "Features", u.Facts.EnsureFactProcessor<FeatureCollection>());
+        // D-F03: granted amplification toggles are real activatable-ability
+        // facts; the native unit initialiser registers this processor too.
+        Set(u, "ActivatableAbilities", u.Facts.EnsureFactProcessor<ActivatableAbilityCollection>());
         Set(u.Descriptor, "Resources", new UnitAbilityResourceCollection(u.Descriptor));
         Set(u.Descriptor, "Proficiencies", new UnitProficiency());
         AccessTools.Field(typeof(UnitDescriptor), "m_Spellbooks").SetValue(u.Descriptor,
@@ -412,6 +434,14 @@ internal static class PsychicDetective0068Tests
         // ================= C0068-03/04: progression + real book ==========
         Check(root.AddFeatures.Length == 3 && root.AddFeatures.Select(e => e.Level).SequenceEqual(new[] { 1, 2, 3 }),
             "C03 add entries are exactly levels 1/2/3");
+        var levelOne = root.AddFeatures.Single(e => e.Level == 1).Features.ToArray();
+        Check(levelOne.Any(f => f.AssetGuid == P(DetectMagicId)) &&
+              levelOne.Any(f => f.AssetGuid == Id("PsychicDetective0068Spellcasting")),
+            "D-F01 level 1 grants both native Detect Magic and the private spellcasting feature");
+        Check(levelOne.Single(f => f.AssetGuid == P(DetectMagicId)).AssetGuid ==
+              ((BlueprintFeature)cache.Load(P(DetectMagicId))).AssetGuid &&
+              ReferenceEquals(levelOne.Single(f => f.AssetGuid == P(DetectMagicId)), cache.Load(P(DetectMagicId))),
+            "D-F01 the granted Detect Magic is the real native feature root, never a clone");
         Check(root.RemoveFeatures.Length == 5 && root.RemoveFeatures.Select(e => e.Level).SequenceEqual(new[] { 2, 3, 5, 8, 11 }),
             "C03 remove entries are exactly 2/3/5/8/11 poison-resistance, poison-immunity and level-3 talent");
         Check(root.AddFeatures.Single(e => e.Level == 3).Features.Count() == 2,
@@ -544,6 +574,9 @@ internal static class PsychicDetective0068Tests
                 .SequenceEqual(selection.AllFeatures.Select(f => f.AssetGuid)),
             "C18 Extra selection draws from the same eleven private options");
 
+        // ================= D-F02/D-F03: real tier costs, effects, gating =====
+        AmplificationTierChecks(cache, allPrivate);
+
         // ================= S-PSYCHIC-0068 binding positives/negatives =
         BindingChecks(cache, book, list);
 
@@ -561,6 +594,9 @@ internal static class PsychicDetective0068Tests
         Check(meddler.GetComponent<PsychicDetectiveMeddler0068>()?.MaximumBonus == 6 &&
               meddler.GetComponent<PsychicDetectiveMeddler0068>().CharacterClass?.Guid == haClass.AssetGuid,
             "C09 Meddler is a real fact component bound to the HA Investigator with a +6 cap");
+
+        // ================= D-F04: real RuleSavingThrow event path ======
+        MeddlerEventChecks(cache, meddler);
 
         // ================= C0068-17/19: talent source scope ============
         TalentChecks(cache, root);
@@ -812,6 +848,35 @@ internal static class PsychicDetective0068Tests
     private static BlueprintAbilityResource DetectivePoolOf(BlueprintsCache cache, UnitEntityData u) =>
         (BlueprintAbilityResource)Call("PsychicDetective0068Ids", "DetectivePool", u);
 
+    // A real native feature fact: the manager is already turned on, so Add
+    // activates the fact and turns its components on (same path as 0060).
+    private static Feature Fact(UnitEntityData u, BlueprintFeature bp)
+    {
+        var fact = new Feature(bp, u.Descriptor);
+        Set(fact, "UniqueId", Guid.NewGuid().ToString("N"));
+        u.Facts.Add(fact);
+        return fact;
+    }
+    private static bool HasFact(UnitEntityData u, SimpleBlueprint bp) =>
+        u.Facts.List.OfType<Feature>().Any(f => f.Blueprint == bp);
+
+    // The native level-up entry point for AddFeatureOnClassLevel components:
+    // raise the real class level, then let every runtime component of the
+    // granted source fact handle the gain inside its own event context.
+    private static void GainLevel(UnitEntityData u, Feature source, int level)
+    {
+        u.Progression.Classes[0].Level = level;
+        foreach (var runtime in (System.Collections.IEnumerable)Get(source, "Components"))
+        {
+            var component = Get(runtime, "SourceBlueprintComponent");
+            var method = AccessTools.Method(component.GetType(), "HandleUnitGainLevel", Type.EmptyTypes);
+            if (method == null) continue;
+            using ((IDisposable)AccessTools.Method(runtime.GetType(), "RequestEventContext", Type.EmptyTypes)
+                .Invoke(runtime, null))
+                method.Invoke(component, null);
+        }
+    }
+
     private static AbilityData Spell(UnitEntityData u, BlueprintSpellbook bp, int circle)
     {
         var blueprint = new BlueprintAbility { Type = AbilityType.Spell,
@@ -880,5 +945,208 @@ internal static class PsychicDetective0068Tests
             Check(extraFeat.AllFeatures.Length == ((BlueprintFeatureReference[])Get(extraFeat, "m_Features")).Length,
                 "C19 Extra entry m_Features and m_AllFeatures remain consistent");
         }
+    }
+
+    // ------------------------------------- D-F02 / D-F03 tier structure -----
+    private static void AmplificationTierChecks(BlueprintsCache cache, BlueprintScriptableObject[] allPrivate)
+    {
+        var defense1 = (BlueprintBuff)cache.Load(Id("DefensivePrognostication1Effect"));
+        var defense2 = (BlueprintBuff)cache.Load(Id("DefensivePrognostication2Effect"));
+        var defenseModes = allPrivate.OfType<BlueprintBuff>()
+            .Select(b => b.GetComponent<PsychicAmplificationComponent>())
+            .Where(c => c != null && c.Kind == PsychicAmplificationKind.DefensivePrognostication)
+            .OrderBy(c => c.Cost).ToArray();
+        Check(defenseModes.Length == 2, "D-F02 Defensive Prognostication publishes exactly two tiers");
+        Check(defenseModes[0].Cost == 1 && defenseModes[0].Strength == 2 &&
+              defenseModes[1].Cost == 2 && defenseModes[1].Strength == 4,
+            "D-F02 tier costs are 1/2 points and strengths +2/+4 AC, not two copies of tier 1");
+        Check(defenseModes[0].Defense?.Guid == defense1.AssetGuid &&
+              defenseModes[1].Defense?.Guid == defense2.AssetGuid &&
+              defense1.AssetGuid != defense2.AssetGuid,
+            "D-F02 the two tiers use the two distinct real effect buffs, never the same tier-1 buff twice");
+
+        var mindFeature = (BlueprintFeature)cache.Load(Id("PsychicDetective0068OverpoweringMind"));
+        Check(mindFeature != null, "D-F03 the private Overpowering Mind feature is published");
+        var immediate = mindFeature.GetComponent<AddFacts>();
+        var immediateFacts = immediate == null
+            ? Array.Empty<BlueprintUnitFact>()
+            : ((BlueprintUnitFactReference[])Get(immediate, "m_Facts")).Select(r => r.Get()).ToArray();
+        var immediateModes = immediateFacts.OfType<BlueprintActivatableAbility>()
+            .Select(t => t.Buff.GetComponent<PsychicAmplificationComponent>())
+            .Where(c => c != null && c.Kind == PsychicAmplificationKind.OverpoweringMind).ToArray();
+        Check(immediateModes.Length == 1 && immediateModes[0].Cost == 2 &&
+              immediateModes[0].Strength == 1 && immediateModes[0].MinimumLevel == 1,
+            "D-F03 only the 2-point/+1 tier is granted immediately");
+        var growth = mindFeature.GetComponents<Kingmaker.Designers.Mechanics.Facts.AddFeatureOnClassLevel>().ToArray();
+        Check(growth.Length == 2 && growth.Select(g => g.Level).OrderBy(l => l).SequenceEqual(new[] { 8, 15 }) &&
+              growth.All(g => g.Class == haClass),
+            "D-F03 tiers 2/3 are native AddFeatureOnClassLevel grants at HA Investigator 8 and 15");
+        foreach (var g in growth)
+        {
+            var tierToggle = g.Feature.GetComponent<AddFacts>();
+            var tierFacts = ((BlueprintUnitFactReference[])Get(tierToggle, "m_Facts")).Select(r => r.Get()).ToArray();
+            var c = tierFacts.OfType<BlueprintActivatableAbility>().Single()
+                .Buff.GetComponent<PsychicAmplificationComponent>();
+            Check(c.Kind == PsychicAmplificationKind.OverpoweringMind &&
+                  c.Cost == (g.Level == 8 ? 4 : 6) && c.Strength == (g.Level == 8 ? 2 : 3) &&
+                  c.MinimumLevel == g.Level,
+                "D-F03 the level-" + g.Level + " tier keeps its frozen cost/strength/minimum");
+        }
+
+        // Real runtime gating: the higher-tier toggles must not exist as
+        // activatable abilities before their class level, so a low-level
+        // detective has nothing to switch the usable +1 mode off with.
+        foreach (var level in new[] { 3, 7 })
+        {
+            var u = Unit(cache, haClass, level);
+            Fact(u, mindFeature);
+            var toggles = MindToggles(u);
+            Check(toggles.Length == 1 && toggles[0].Blueprint.Buff.GetComponent<PsychicAmplificationComponent>().Strength == 1,
+                "D-F03 a level-" + level + " detective owns only the +1 toggle; no higher toggle exists to switch modes off");
+        }
+        var grown = Unit(cache, haClass, 3);
+        var mindFact = Fact(grown, mindFeature);
+        var tier2 = growth.Single(g => g.Level == 8).Feature;
+        var tier3 = growth.Single(g => g.Level == 15).Feature;
+        GainLevel(grown, mindFact, 8);
+        Check(HasFact(grown, tier2) && !HasFact(grown, tier3),
+            "D-F03 reaching investigator level 8 grants exactly the +2 tier feature, never the +3 tier");
+        Check(MindToggles(grown).Length == 2,
+            "D-F03 at level 8 the +2 toggle exists but the +3 toggle still does not");
+        GainLevel(grown, mindFact, 15);
+        Check(HasFact(grown, tier2) && HasFact(grown, tier3),
+            "D-F03 reaching investigator level 15 grants the +3 tier alongside the earlier tiers");
+        // Starting each owned toggle really materialises its mode buff and the
+        // bound component with the frozen cost/strength.
+        var started = new List<PsychicAmplificationComponent>();
+        foreach (var toggle in MindToggles(grown))
+        {
+            toggle.IsOn = true; toggle.TryStart();
+            Check(toggle.IsStarted && toggle.AppliedBuff != null,
+                "D-F03 the level-15 toggle really starts with its applied mode buff: " + toggle.Blueprint.name);
+            started.Add(toggle.AppliedBuff.GetComponent<PsychicAmplificationComponent>());
+            toggle.TurnOffImmediately();
+        }
+        var ordered = started.OrderBy(c => c.Strength).ToArray();
+        Check(ordered.Length == 3 && ordered.Select(c => c.Cost).SequenceEqual(new[] { 2, 4, 6 }) &&
+              ordered.Select(c => c.Strength).SequenceEqual(new[] { 1, 2, 3 }),
+            "D-F03 a level-15 detective can start all three tiers with costs 2/4/6 and DC bonuses +1/+2/+3");
+    }
+
+    // The Overpowering Mind toggles the unit actually owns as activatable
+    // abilities. A tier that has not been granted yet has no toggle here.
+    private static Kingmaker.UnitLogic.ActivatableAbilities.ActivatableAbility[] MindToggles(UnitEntityData u) =>
+        u.ActivatableAbilities.Enumerable
+            .Where(a => a.Blueprint.Buff != null &&
+                        a.Blueprint.Buff.GetComponent<PsychicAmplificationComponent>()?.Kind ==
+                        PsychicAmplificationKind.OverpoweringMind)
+            .ToArray();
+
+    // ----------------------------------------- D-F04 real save event path ---
+    private static BlueprintAbility MindSpell(UnitEntityData u, AbilityType type, SpellDescriptor descriptor)
+    {
+        var bp = new BlueprintAbility { Type = type,
+            ComponentsArray = new BlueprintComponent[] {
+                new SpellComponent { School = SpellSchool.Enchantment },
+                new SpellDescriptorComponent { Descriptor = descriptor } } };
+        bp.OnEnable();
+        return bp;
+    }
+    private static RuleSavingThrow SaveEvent(UnitEntityData u, SavingThrowType type,
+        BlueprintAbility source, AbilityType abilityType, SpellDescriptor descriptor)
+    {
+        var ability = new AbilityData(source ?? MindSpell(u, abilityType, descriptor), u.Descriptor);
+        var context = new AbilityExecutionContext(ability,
+            new AbilityParams { CasterLevel = 10, SpellLevel = 3, DC = 20 }, new TargetWrapper(u));
+        return new RuleSavingThrow(u, type, 20) { Reason = new Kingmaker.RuleSystem.RuleReason(context) };
+    }
+    // Native boundary (decompiled RulebookEvent): AddTemporaryModifier only
+    // registers the stat-side modifier for OnDidTrigger cleanup; the bonus
+    // itself lands in the stat's ModifiedValue and never enters AllBonuses
+    // (m_ModifiableBonus). Observe the real stat delta, the same way the
+    // native temporary-modifier tests do.
+    private static int SaveDelta(UnitEntityData u, StatType stat, int baseline) =>
+        u.Stats.GetStat(stat).ModifiedValue - baseline;
+
+    private static void MeddlerEventChecks(BlueprintsCache cache, BlueprintFeature meddler)
+    {
+        // The real production fact is attached to a real unit; its native
+        // TurnOn subscribes the component to the rulebook event bus. No manual
+        // component call stands in for the dispatch.
+        foreach (var pair in new[] { new[] { 1, 0 }, new[] { 2, 1 }, new[] { 5, 2 }, new[] { 8, 3 },
+            new[] { 11, 4 }, new[] { 14, 5 }, new[] { 17, 6 }, new[] { 20, 6 } })
+        {
+            var u = Unit(cache, haClass, pair[0]);
+            var fact = Fact(u, meddler);
+            Check(fact.IsActive && fact.IsTurnedOn,
+                "D-F04 the Meddler fact really activates on the level-" + pair[0] + " unit");
+            foreach (var type in new[] { SavingThrowType.Will, SavingThrowType.Reflex, SavingThrowType.Fortitude })
+            {
+                var stat = RuleSavingThrow.GetStatFromSavingThrow(type);
+                var others = new[] { StatType.SaveWill, StatType.SaveReflex, StatType.SaveFortitude }
+                    .Where(s => s != stat).ToArray();
+                var before = others.ToDictionary(s => s, s => u.Stats.GetStat(s).Modifiers.Count());
+                var baseline = u.Stats.GetStat(stat).ModifiedValue;
+                var evt = SaveEvent(u, type, null, AbilityType.Spell, SpellDescriptor.MindAffecting);
+                Kingmaker.PubSubSystem.RulebookEventBus.OnEventAboutToTrigger(evt);
+                Check(SaveDelta(u, stat, baseline) == pair[1],
+                    "D-F04 real mind-affecting spell save at level " + pair[0] + " (" + type + ") gets +" + pair[1]);
+                Check(u.Stats.GetStat(stat).Modifiers.Count(m => m.Source == fact) == (pair[1] > 0 ? 1 : 0),
+                    "D-F04 the level-" + pair[0] + " " + type + " event adds exactly one temporary modifier to its own save stat");
+                foreach (var other in others)
+                    Check(u.Stats.GetStat(other).Modifiers.Count() == before[other],
+                        "D-F04 the level-" + pair[0] + " " + type + " event never touches " + other);
+                evt.OnDidTrigger();
+                Check(u.Stats.GetStat(stat).ModifiedValue == baseline &&
+                      u.Stats.GetStat(stat).Modifiers.All(m => m.Source != fact),
+                    "D-F04 the level-" + pair[0] + " " + type + " temporary modifier is removed when the event completes");
+            }
+            u.Facts.Remove(fact);
+        }
+
+        var unit = Unit(cache, haClass, 8);
+        var meddlerFact = Fact(unit, meddler);
+        // Unrelated descriptor: no bonus on any save.
+        foreach (var type in new[] { SavingThrowType.Will, SavingThrowType.Reflex, SavingThrowType.Fortitude })
+        {
+            var stat = RuleSavingThrow.GetStatFromSavingThrow(type);
+            var baseline = unit.Stats.GetStat(stat).ModifiedValue;
+            var evt = SaveEvent(unit, type, null, AbilityType.Spell, SpellDescriptor.Fire);
+            Kingmaker.PubSubSystem.RulebookEventBus.OnEventAboutToTrigger(evt);
+            Check(SaveDelta(unit, stat, baseline) == 0,
+                "D-F04 a non-mind-affecting spell save gets no Meddler bonus (" + type + ")");
+            evt.OnDidTrigger();
+        }
+        // Mind-affecting but not a spell/SLA source: no bonus.
+        foreach (var type in new[] { AbilityType.Supernatural, AbilityType.Extraordinary })
+        {
+            var baseline = unit.Stats.SaveWill.ModifiedValue;
+            var evt = SaveEvent(unit, SavingThrowType.Will, null, type, SpellDescriptor.MindAffecting);
+            Kingmaker.PubSubSystem.RulebookEventBus.OnEventAboutToTrigger(evt);
+            Check(SaveDelta(unit, StatType.SaveWill, baseline) == 0,
+                "D-F04 a mind-affecting " + type + " source gets no Meddler bonus");
+            evt.OnDidTrigger();
+        }
+        // No reason/context at all: no bonus.
+        var willBaseline = unit.Stats.SaveWill.ModifiedValue;
+        var bare = new RuleSavingThrow(unit, SavingThrowType.Will, 20);
+        Kingmaker.PubSubSystem.RulebookEventBus.OnEventAboutToTrigger(bare);
+        Check(SaveDelta(unit, StatType.SaveWill, willBaseline) == 0, "D-F04 a save without a spell reason gets no Meddler bonus");
+        bare.OnDidTrigger();
+        // Spell-like abilities DO qualify.
+        var slaBaseline = unit.Stats.SaveWill.ModifiedValue;
+        var sla = SaveEvent(unit, SavingThrowType.Will, null, AbilityType.SpellLike, SpellDescriptor.MindAffecting);
+        Kingmaker.PubSubSystem.RulebookEventBus.OnEventAboutToTrigger(sla);
+        Check(SaveDelta(unit, StatType.SaveWill, slaBaseline) == 3,
+            "D-F04 a mind-affecting spell-like ability save gets the level-8 +3 bonus");
+        sla.OnDidTrigger();
+        // Removing the fact unsubscribes it: later events are untouched.
+        unit.Facts.Remove(meddlerFact);
+        var removedBaseline = unit.Stats.SaveWill.ModifiedValue;
+        var removed = SaveEvent(unit, SavingThrowType.Will, null, AbilityType.Spell, SpellDescriptor.MindAffecting);
+        Kingmaker.PubSubSystem.RulebookEventBus.OnEventAboutToTrigger(removed);
+        Check(SaveDelta(unit, StatType.SaveWill, removedBaseline) == 0,
+            "D-F04 removing the Meddler fact stops the bonus on subsequent saves");
+        removed.OnDidTrigger();
     }
 }
