@@ -4,6 +4,8 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
+- **COTW-0070 Cryptid Scholar** — [施工 issue](https://github.com/shenzhoudadi/CotW-Wrath/issues/13)。本会话负责 A/C，B 尚未开始。基线 1c0f3b0 / 0.14.72 TEST。范围为 HA Investigator 变体、识怪、Opportune Advice、Knowledgeable Strike 与天赋来源隔离。
+
 - **COTW-0046 Speaker for the Past** — [认领issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。负责人：仓库维护者／本会话协调，B为单一生产整合负责人。阶段：A/C完成，B v2已实现；**D复查 NEEDS_FIX，尚未出包**。[复查及修复要求](docs/work-packages/COTW-0046/D-review.md)：Rewind Time扣费／一次性销毁、奖励法术来源清理、Blood of Heroes豁免范围、Sacred Council检定范围。已有175条蓝图／组件断言不能覆盖这些实际分支，未声称玩家验收。[A/C/B/D分工](docs/work-packages/COTW-0046/README.md)。保留施工占用，不另起重复实现；0.14.68 Starseeker原交付不受影响。
 
 ## 本次0.14.69 TEST交付
