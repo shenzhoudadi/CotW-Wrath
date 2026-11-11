@@ -1,5 +1,7 @@
 # 当前开发与出包流程
 
+0.14.72 Psychic Detective TEST。306 条本项隔离定向／14.778 秒。[测试说明](docs/releases/0.14.72-TEST.md)
+
 0.14.71 Iroran Paladin TEST 已在 GitHub 预发布，4/4附件下载核对一致。D复查通过，105条隔离定向／1.23秒。见[测试说明](docs/releases/0.14.71-TEST.md)。
 
 0.14.70 Spirit Guide TEST：D3复查通过，320条本项定向/15.00秒，GitHub交付已完成，4/4附件下载核对一致。正式0.14.66和旧TEST保留。见[本次说明](docs/releases/0.14.70-TEST.md)。只做常规编译/打包/包内DLL核对，复用同内容结果，不跑全量或历史专项。

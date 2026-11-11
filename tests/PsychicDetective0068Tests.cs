@@ -403,8 +403,18 @@ internal static class PsychicDetective0068Tests
             (missingBefore.Length == 0 ? "none" : string.Join("; ", missingBefore)));
         var publicAssetsBefore = PublicAssets(cache).Length;
 
-        // ================= C0068-01: real registration =================
-        Check(Register(cache), "C01 production PsychicDetective0068.Register succeeds against staged provider");
+        // The staged provider is ready while the private archetype is absent,
+        // as it would be after HA loads later than initial registration.
+        Check(DetectiveRoot(cache) == null, "C01 no detective root exists before the optional provider retry");
+        bool publishedOnRetry = false;
+        Action<string, bool, Exception> report = (name, succeeded, error) =>
+        {
+            if (name != "COTW-0068 Psychic Detective") return;
+            if (error != null) throw new InvalidOperationException("Detective optional publication failed", error);
+            publishedOnRetry = succeeded;
+        };
+        Call("BlueprintRegistration", "RegisterOptional", cache, report);
+        Check(publishedOnRetry, "C01 production RegisterOptional publishes the detective when HA becomes ready");
         Check(LastSummary().StartsWith("Registered", StringComparison.Ordinal), "C01 registration summary reports the real committed graph");
         var root = DetectiveRoot(cache);
         var book = DetectiveBook(cache);

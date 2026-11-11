@@ -1,7 +1,7 @@
-> 本次测试包说明见 [0.14.71 Iroran Paladin TEST](docs/releases/0.14.71-TEST.md)。
+> 本次测试包说明见 [0.14.72 Psychic Detective TEST](docs/releases/0.14.72-TEST.md)。
 
 > 🚧 **[施工占用 / WORK STATUS](WORK_STATUS.md)**：COTW-0046 Speaker for the Past已认领，请勿重复开发。
-> Current preview: [0.14.71 Iroran Paladin TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.71-Iroran-Paladin-TEST). Stable: 0.14.66.
+> Current preview: [0.14.72 Psychic Detective TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.72-Psychic-Detective-TEST). Stable: 0.14.66.
 
 # Call of the Wild — Wrath
 

@@ -1,20 +1,18 @@
-# 0.14.71 Iroran Paladin TEST
+# 0.14.72 Psychic Detective TEST
 
 猫猫堡是猪猪
 
-本包新增 Iroran Paladin（COTW-0109），使用原生圣武士职业和 Irori 信仰。可试 Personal Trial、徒手成长、Confident Defense、气池、Divine Body 和两道重掷光环。Personal Trial 的等级加值按圣武士等级计算。Divine Body 在自己的拳头更换时清理自己的附魔。
+本包新增 Psychic Detective（灵能侦探，COTW-0068）。在 Homebrew-Archetypes 的 Investigator 下选择此变体，即可使用智力自发六环法书、Psychic Meddler、Phrenic Dabbler 及两项专属侦探天赋。变体替换毒抗、毒免和 3 级普通天赋。混职的 Psychic 和侦探各用自己的法术书与资源池。
 
-退出游戏后，备份存档和旧模组目录。将 ZIP 内完整的 CallOfTheWildWrathPrototype 文件夹替换到现有 Owlcat 模组目录，保留所有子目录。将备份移到 Modifications 目录外。Windows 默认模组目录为 %USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/。不要同时启用旧独立 Medium 安装。
+此变体需要真实可用的 HA Investigator。HA 晚于 CotW 加载时，提供方就绪后可由重试入口注册。可选法术按已启用的提供方接入。缺少可选法术时，变体仍可注册。复用的其他模块各按其发布说明安装依赖。[HA 参考版本](https://github.com/FrozenDervish/Homebrew-Archetypes/tree/211e9b82e252705dfaa7e4aa7507d9819737e232)
 
-沿用 0.14.70 的内容。Spirit Guide 仍需要 ExpandedContent 的 Wall of Fire、Hypnotic Pattern、Incendiary Cloud，以及 CharacterOptionsPlus 的 Frostbite。任一提供方能力不可用时，Spirit Guide 延后注册。
+退出游戏并备份存档和旧模组目录。用 ZIP 中完整的 CallOfTheWildWrathPrototype 文件夹替换现有 Owlcat 模组目录中的同名文件夹，保留全部子目录。默认模组目录为 %USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/。把备份移到 Modifications 目录外。
 
-D 独立复查通过。隔离宿主 105 条定向断言在 1.23 秒内通过，包含 31 条重掷与 74 条注册检查。此次复用该记录，进行整合编译和包内 DLL 核对。单位级攻击结算、实付资源、附魔存档、光环进出范围、升级界面与玩家实机仍未测。反馈请附职业等级、操作步骤与日志。
+D2 同会话复查覆盖四项修复。本轮核查额外修正 HA 晚加载的注册入口。隔离宿主的 306 条定向断言通过，14.778 秒，包含实际 RegisterOptional 入口。真实 HA／TTT 插件加载、实机、实际施法支付与退款、降环账本、部分法术位转换、完整存读档和重训仍未验证。反馈请附职业等级、启用的提供方、操作步骤与日志。
 
-文件名带 TEST 的安装包属于预发布。正式稳定版为 0.14.66，旧测试附件仍可下载。
+[GitHub 测试包](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.72-Psychic-Detective-TEST) · [变体与验证说明](https://github.com/shenzhoudadi/CotW-Wrath/tree/main/docs/work-packages/COTW-0068)
 
-[GitHub 下载](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.71-Iroran-Paladin-TEST) · [Iroran 交接](https://github.com/shenzhoudadi/CotW-Wrath/tree/main/docs/work-packages/COTW-0109)
-
-[0.14.70 Spirit Guide 测试说明](docs/releases/0.14.70-TEST.md)
+[0.14.71 Iroran Paladin 测试说明](docs/releases/0.14.71-TEST.md)
 
 以下为保留的旧版说明，仅供历史参考，不是本次全量验收要求：
 
