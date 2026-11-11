@@ -1,0 +1,11 @@
+你是 COTW-0068 Psychic Detective 的 B 单一生产整合负责人。先读 AGENTS.md、docs/agent-handoff/HANDOFF.md、CURRENT_RELEASE.md、WORK_STATUS.md 和 docs/work-packages/COTW-0068 下的 README.md、A-source-and-compat.md、A-evidence.json、A-spell-map-audit.json、C-frozen-contract.md、C-cases.json。认领 https://github.com/shenzhoudadi/CotW-Wrath/issues/12。基线 56ff438 / 0.14.71 TEST，接手时在最新 main 的隔离分支开发，合同 C-0068-20261111-r1。游戏内文字用英文。
+
+先实现 S-PSYCHIC-0068。扩展现有增幅的书本／职业／资源 binding、支付协调和菜单解析，缺省 binding 保持旧 Psychic 组件语义。先用同书切换、双职业不同池、重复事件和失败返还的局部反例证明，再接完整 F-0068 变体。生产逻辑统一由你整合，不创建第二套费用系统。
+
+F-0068 复用 HA 的真实 Investigator。新增私人六环自发 Int 书并通过原生 ReplaceSpellbook 接入，显式绑定 HA class。HA 旧书自己的 m_CharacterClass 指向 Alchemist，不能盲目继承。移除 2/5/8 毒抗、11 毒免、3 级天赋，只在本变体补上合同进展。复用已有 11 种基础增幅的效果与支付，把必要 mutable 授权子图绑定侦探 class/book/resource。Phrenic Dabbler 为 floor(L/2)，Meddler 最高 +6。按实际来源处理天赋排除和独立 Alchemist 反例。
+
+原作 180 行目录已在 MindbladeSpellAnchors01454，不重抄。抽取现有单行解析并保持 Mindblade 调用语义；侦探使用 Find Traps 1 环、Banishment 6 环。旧表九项补充映射按 A-evidence 的 providerCorrections 复用既有链接或真实 TTT 根。遵守 Available 与可选提供方发布检查，缺失项记录并跳过，不能移植外部已实现法术补数字。复用 PsychicUndercasting、Center Self、SpellListCompatibility、ExtraInvestigatorTalent 和现有原子发布工具。原生根与其他正在施工范围保持各自所有权。
+
+轻量档可做冻结表的机械接线、图标供体核对、英文说明和日志索引。你亲自处理运行时 binding、支付、原生选择来源、生命周期、Harmony 范围和最终整合。只编译与本项最小必要检查，不运行整套 Psychic/wotr-testing/历史专项，不开游戏或 UMM，不改其他施工项，不做正式发布。
+
+本机读路径包括 D:\CodexProjects\CotW-Wrath、C:\Users\xuenc\agent-tools\psychic-detective-next 及合法本地 Wrath 依赖。原作本机路径和远端 pin 见 A。产出到 C:\Users\xuenc\agent-tools\psychic-detective-next\B-progress.md、B-evidence.json 与时间戳日志。提交精简来源摘要到本包 docs，原生反编译、游戏文件、提供方原件和私人日志只存本机。记录实际提交、GUID/TypeId、变动文件、命令秒数、源与 DLL/依赖 SHA256、失败原件、检查范围和未测边界，交独立 D。仅在证据确实冲突时标出具体 blocker。无需再次询问是否开工。

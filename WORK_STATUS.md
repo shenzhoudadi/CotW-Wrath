@@ -4,7 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0068 Psychic Detective** — [施工 issue](https://github.com/shenzhoudadi/CotW-Wrath/issues/12)。本会话负责 A/C，B 实现尚未开始。基线 56ff438 / 0.14.71 TEST。范围为接入 Homebrew-Archetypes Investigator 的完整灵能变体、六环换书、Psychic Meddler、Phrenic Dabbler 与天赋资格。
+- **COTW-0068 Psychic Detective** — [issue #12](https://github.com/shenzhoudadi/CotW-Wrath/issues/12)。A/C已完成，合同 C-0068-20261111-r1 与20项定向预期已冻结，B待实现、D独立复查。基线56ff438 / 0.14.71 TEST。接入真实HA Investigator，复用180行法表与现有11种增幅。[ABCD交接](docs/work-packages/COTW-0068/README.md)。
 
 - **COTW-0046 Speaker for the Past** — [认领issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。负责人：仓库维护者／本会话协调，B为单一生产整合负责人。阶段：A/C完成，B v2已实现；**D复查 NEEDS_FIX，尚未出包**。[复查及修复要求](docs/work-packages/COTW-0046/D-review.md)：Rewind Time扣费／一次性销毁、奖励法术来源清理、Blood of Heroes豁免范围、Sacred Council检定范围。已有175条蓝图／组件断言不能覆盖这些实际分支，未声称玩家验收。[A/C/B/D分工](docs/work-packages/COTW-0046/README.md)。保留施工占用，不另起重复实现；0.14.68 Starseeker原交付不受影响。
 
