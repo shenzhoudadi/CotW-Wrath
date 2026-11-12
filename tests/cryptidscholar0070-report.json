@@ -1,0 +1,5 @@
+{
+  "case": "cryptidscholar0070",
+  "assertionsPassed": 214,
+  "scope": "Directed 0070 checks only; shared fixture registration and staged HA provider fixture, no historical Psychic behaviour suites."
+}

@@ -1,10 +1,10 @@
 # 工作状态：先认领，避免重复
 
-更新：2026-11-11。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
+更新：2026-11-12。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0070 Cryptid Scholar** — [issue #13](https://github.com/shenzhoudadi/CotW-Wrath/issues/13)。A/C已完成，合同 C-0070-20261112-r1 与20项定向预期已冻结，B待实现、D待独立复查。基线1c0f3b0 / 0.14.72 TEST。HA Investigator 变体，复用原生识怪与真实灵感池。[ABCD交接](docs/work-packages/COTW-0070/README.md)。
+- **COTW-0070 Cryptid Scholar** — [issue #13](https://github.com/shenzhoudadi/CotW-Wrath/issues/13)。A/C/B已完成，合同 C-0070-20261112-r1；B隔离定向214条断言/14.69秒PASS（候选DLL CCFC6DE3…），D待独立复查，TEST交付待用户授权。基线1c0f3b0 / 0.14.72 TEST，分支 feat/cotw-0070-cryptid-scholar-b。HA Investigator 变体，复用原生识怪与真实灵感池。[ABCD交接](docs/work-packages/COTW-0070/README.md) · [B证据摘要](docs/work-packages/COTW-0070/B-summary.md)。
 
 - **COTW-0046 Speaker for the Past** — [认领issue #6](https://github.com/shenzhoudadi/CotW-Wrath/issues/6)。负责人：仓库维护者／本会话协调，B为单一生产整合负责人。阶段：A/C完成，B v2已实现；**D复查 NEEDS_FIX，尚未出包**。[复查及修复要求](docs/work-packages/COTW-0046/D-review.md)：Rewind Time扣费／一次性销毁、奖励法术来源清理、Blood of Heroes豁免范围、Sacred Council检定范围。已有175条蓝图／组件断言不能覆盖这些实际分支，未声称玩家验收。[A/C/B/D分工](docs/work-packages/COTW-0046/README.md)。保留施工占用，不另起重复实现；0.14.68 Starseeker原交付不受影响。
 

@@ -176,6 +176,7 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(SpiritWhisperer0117.ModuleName, () => SpiritWhisperer0117.Register(cache), report);
             RegisterAvailableModule(SpiritGuide0060.ModuleName, () => SpiritGuide0060.Register(cache), report);
             RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
+            RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -271,6 +272,9 @@ namespace CallOfTheWild.Wrath.Prototype
             // HA can publish its class after initial registration. Register
             // handles both first publication and refreshing our optional spells.
             RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
+            // HA can publish its class after initial registration; the scholar
+            // gate defers until the real provider roots are present.
+            RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)

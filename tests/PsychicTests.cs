@@ -128,6 +128,29 @@ internal static class PsychicTests
             Console.WriteLine("PASS: " + passed0068 + " Psychic Detective 0068 directed assertions. Standalone managed verification, not a game test.");
             return;
         }
+        // COTW-0070: route the directed Cryptid Scholar case directly after
+        // the shared registration fixture, exactly like the 0068 case. Only the
+        // reviewed native rows plus the audited 0070 classification rows load.
+        if (Environment.GetEnvironmentVariable("COTW_0070_CASE") == "cryptidscholar0070")
+        {
+            var rows0070 = JObject.Parse(File.ReadAllText(args[4]));
+            PsychicExpansionTests.LoadNativeRows(f.Cache, rows0070, true);
+            PsychicExpansionTests.HydrateEmptyTables(f.Cache, rows0070);
+            PsychicExpansionTests.HydrateCachedSpellbooks(f.Cache, rows0070);
+            AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, f.Cache);
+            var directed0070 = new Harmony("CotWCryptidScholar0070.Directed");
+            int passed0070 = CryptidScholar0070Tests.Run(f.Cache, directed0070, rows0070);
+            var report0070 = new JObject { ["case"] = "cryptidscholar0070", ["assertionsPassed"] = passed0070,
+                ["scope"] = "Directed 0070 checks only; shared fixture registration and staged HA provider fixture, no historical Psychic behaviour suites." };
+            if (args[2] == "-") Console.WriteLine(report0070.ToString());
+            else {
+                var path0070 = Path.GetFullPath(args[2]);
+                Directory.CreateDirectory(Path.GetDirectoryName(path0070));
+                File.WriteAllText(path0070, report0070.ToString());
+            }
+            Console.WriteLine("PASS: " + passed0070 + " Cryptid Scholar 0070 directed assertions. Standalone managed verification, not a game test.");
+            return;
+        }
         // D-F07: route the 0060 directed case directly after the shared fixture
         // is registered. Nothing below (casting, expansion, historical toggles)
         // belongs to this work package and must not run under its banner.

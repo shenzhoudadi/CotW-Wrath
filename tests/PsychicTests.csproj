@@ -20,7 +20,8 @@
     <Compile Include="PsychicSpace01458Tests.cs" />
     <Compile Include="MutationPolicy01458Tests.cs" />
     <Compile Include="AuraOfDoomCasting01444Tests.cs" />
-    <Compile Include="PsychicTests.cs" /><Compile Include="PsychicRuleTestBoundary.cs" /><Compile Include="TimeStopDismiss01440Tests.cs" /><Compile Include="WarDrummer01441Tests.cs" />
+    <Compile Include="PsychicTests.cs" />
+    <Compile Include="CryptidScholar0070Tests.cs" /><Compile Include="PsychicRuleTestBoundary.cs" /><Compile Include="TimeStopDismiss01440Tests.cs" /><Compile Include="WarDrummer01441Tests.cs" />
     <Compile Include="MagusFeedback01455Tests.cs" /><Compile Include="Skirnir01456Tests.cs" /><Compile Include="PsychicArchetypes01457Tests.cs" /><Compile Include="PsychicArchetypeMechanics01457Tests.cs" /><Compile Include="PsychicMarauderEffects01457Tests.cs" /><Compile Include="MutationBodies01457Tests.cs" /><Compile Include="PsychicArchetypeFaults01457Tests.cs" />
     <Compile Include="PsychicExpansionTests.cs" />
     <Compile Include="Feedback01449Tests.cs" />
