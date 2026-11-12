@@ -1,0 +1,7 @@
+你是 COTW-0109 Iroran Paladin 的 B 实现负责人。先读 AGENTS.md、docs/agent-handoff/HANDOFF.md、CURRENT_RELEASE.md、WORK_STATUS.md 和 docs/work-packages/COTW-0109/README.md、A-source-and-compat.md、A-native-anchors.json、C-frozen-contract.md、C-cases.json。认领为 https://github.com/shenzhoudadi/CotW-Wrath/issues/11。基线生产提交 a3f534625643b94cfa644e19c8a7fbcb7d6e528a / 0.14.70 TEST，在接手时最新 main 的隔离分支开始。固定原作 Holic75/KingmakerRebalance@1332fb0db844b7863f484ca978bea2349fe49769。其 IroranPaladin.cs、ShowRerolls.cs 与相关 helper 都有固定证据。
+
+按合同交付一个完整原生圣武士变体。先做可证明的 D20 重掷原语，再接实际 Irori 入职、完整加减等级、Personal Trial 与气池、徒手及 AC、Divine Body、两道光环。落实同一 source 的支付、撤销和来源隔离。复用 native 同一 Charisma 池的 retain/release、原生拳头持有、武器联结属性与本项目原子发布工具。全部生产接线由你串行整合。不要重复实现已交付模块、改他人施工范围、给外部配置做空壳、创建第二套资源账或改共享原生蓝图。游戏内文字用英文。
+
+用 C-cases.json 的高风险反例及原生调用点做最小定向检查。字段、测试宿主固定 RNG 与真实支付／掷骰／附魔的证据分开写。已有同内容结果复用。编译加受影响定向检查，禁止全历史、全量套件、游戏或 UMM。若实际原生接口与冻结证据相冲突，指出确切类型、方法、触发和最小反例，停在该分支并保留其他可交付工作。保持失败日志，不以删断言换绿。
+
+本机交付到 C:\Users\xuenc\agent-tools\iroran-paladin-next\B-progress.md 和 B-evidence.json，时间戳日志同目录。写明候选提交、必要路径、TypeId／GUID、命令秒数、源与 DLL 及依赖 SHA256、失败原件、未测边界，注明实际用哪个宿主与入口。完成后交独立 D。版本抬升、合并、TEST 附件上传和关闭 #11 留到复查通过后的统一交付。不要把工作目录、游戏程序集、预编译外模组 DLL 或私人日志加入仓库。

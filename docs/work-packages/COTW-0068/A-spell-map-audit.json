@@ -1,0 +1,75 @@
+{
+  "originalRows": 180,
+  "existingRows": 180,
+  "exactOrderAndRefMatch": true,
+  "existingCatalog": "src/MindbladeSpellAnchors01454.cs",
+  "catalogSHA256": "2bd389a36179a43b6d926c6c2f4f0317a05013c9406908e6a0516cd5d73b0752",
+  "byCircle": [
+    5,
+    26,
+    36,
+    29,
+    31,
+    24,
+    29
+  ],
+  "noCandidateRows": [
+    {
+      "originalRef": "Witch.hermean_potential.AssetGuid",
+      "level": 1
+    },
+    {
+      "originalRef": "NewSpells.long_arm.AssetGuid",
+      "level": 1
+    },
+    {
+      "originalRef": "NewSpells.hypnotic_pattern.AssetGuid",
+      "level": 2
+    },
+    {
+      "originalRef": "NewSpells.inflict_pain.AssetGuid",
+      "level": 2
+    },
+    {
+      "originalRef": "NewSpells.telekinetic_strikes.AssetGuid",
+      "level": 2
+    },
+    {
+      "originalRef": "NewSpells.resinous_skin.AssetGuid",
+      "level": 3
+    },
+    {
+      "originalRef": "NewSpells.sands_of_time.AssetGuid",
+      "level": 3
+    },
+    {
+      "originalRef": "NewSpells.stunning_barrier_greater.AssetGuid",
+      "level": 3
+    },
+    {
+      "originalRef": "NewSpells.inflict_pain_mass.AssetGuid",
+      "level": 6
+    }
+  ],
+  "specialOverrides": [
+    {
+      "guid": "4709274b2080b6444a3c11c6ebbe2404",
+      "name": "Find Traps",
+      "detectiveCircle": 1,
+      "regularPsychicCircle": 2
+    },
+    {
+      "guid": "d361391f645db984bbf58907711a146a",
+      "name": "Banishment",
+      "detectiveCircle": 6,
+      "regularPsychicCircle": 7
+    }
+  ],
+  "originalCodeVsPsychicLowList": {
+    "psychicOnly": [
+      "NewSpells.condensed_ether.AssetGuid@4",
+      "NewSpells.phantom_limbs.AssetGuid@6"
+    ],
+    "verdict": "Preserve original detective catalogue and reuse existing mapping table."
+  }
+}

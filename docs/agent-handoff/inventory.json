@@ -3019,18 +3019,18 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "合同C-0068-20261111-r1。同会话D2通过，发布核查修正HA晚加载。GitHub四个附件下载一致。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已完成开发／TEST交付：0.14.72 Psychic Detective TEST",
       "importance": "中",
       "dependsOn": [
         "Investigator 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "按0.14.72 TEST继续收集反馈，见docs/work-packages/COTW-0068",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L30",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "306条隔离定向／14.778秒；真实HA／TTT与实机未测",
+      "ecosystemProfile": "本项目新增 HA Investigator 的 Psychic Detective 变体",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },
@@ -3048,18 +3048,18 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "合同C-0070-20261112-r1。D3通过；GitHub四个附件下载一致。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已完成开发／TEST交付：0.14.73 Cryptid Scholar TEST",
       "importance": "中",
       "dependsOn": [
         "Investigator 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "按0.14.73 TEST收集反馈，见docs/work-packages/COTW-0070",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L30",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "244条隔离定向，D3复跑5/5；真实HA与实机、存档、重训未测",
+      "ecosystemProfile": "本项目新增 HA Investigator 的 Cryptid Scholar 变体",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },
@@ -4887,18 +4887,18 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "合同 C-0109-20261111-r1。Personal Trial等级、Divine Body附魔清理修复后完成D复查。GitHub 4/4附件核对一致。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已完成开发／TEST交付：0.14.71 Iroran Paladin TEST，D复查与GitHub附件核验完成",
       "importance": "中",
       "dependsOn": [
         "Paladin 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "不重复开发；仅按实际测试反馈定向处理",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L39",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "105条隔离定向／1.23秒；玩家实机及存档等未测",
+      "ecosystemProfile": "本项目已实现原生圣武士变体",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },

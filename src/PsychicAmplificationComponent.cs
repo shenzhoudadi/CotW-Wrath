@@ -31,15 +31,24 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintAbilityResourceReference WisdomPool, CharismaPool;
         public BlueprintCharacterClassReference CharacterClass;
         public BlueprintBuffReference Defense;
+        // S-PSYCHIC-0068: explicit book/class/pool binding. All three legacy
+        // fields above keep their original meaning when BoundBook is absent.
+        public BlueprintSpellbookReference BoundBook;
+        public BlueprintAbilityResourceReference BoundPool;
         protected override void OnTurnOn()
         {
-            if(PsychicAdvancedRuntime01458.CoordinateIfNeeded(Owner,Fact))return;
+            var scope = PsychicAmplificationBinding.BookId(this);
+            if(PsychicAdvancedRuntime01458.CoordinateIfNeeded(Owner,Fact,scope))return;
             foreach(var mode in Owner.Facts.List.OfType<ActivatableAbility>().ToArray())
-                if(mode.Blueprint.Buff?.GetComponent<PsychicAmplificationComponent>()!=null && mode.Blueprint.Buff!=Fact.Blueprint)
+                if(mode.Blueprint.Buff?.GetComponent<PsychicAmplificationComponent>() is PsychicAmplificationComponent otherMode &&
+                   PsychicAmplificationBinding.BookId(otherMode)==scope && mode.Blueprint.Buff!=Fact.Blueprint)
                     mode.IsOn=false;
-            // Also retire orphaned pre-update/restored mode buffs with no native toggle owner.
+            // Also retire orphaned pre-update/restored mode buffs with no native
+            // toggle owner. Only modes bound to the same book are retired.
             foreach(var buff in Owner.Buffs.Enumerable.ToArray())
-                if(buff!=Fact && buff.Blueprint!=Fact.Blueprint && buff.Blueprint.GetComponent<PsychicAmplificationComponent>()!=null)
+                if(buff!=Fact && buff.Blueprint!=Fact.Blueprint &&
+                   buff.Blueprint.GetComponent<PsychicAmplificationComponent>() is PsychicAmplificationComponent otherBuff &&
+                   PsychicAmplificationBinding.BookId(otherBuff)==scope)
                     buff.Remove();
         }
         private sealed class Reservation {
@@ -57,9 +66,13 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var spell=evt.Spell;
             if(evt.ForceFail || evt.IsDuplicateSpellApplied || evt.Context==null || evt.Context.IsDuplicateSpellApplied ||
-                spell==null || !PsychicCasting.IsPsychic(spell) || spell.Spellbook.Blueprint.AssetGuid!=BlueprintGuid.Parse(PsychicClass.BookId) ||
-                spell.StickyTouch!=null || evt.Context.Params.SpellLevel<=0 ||
-                !PsychicMajor01460.Allows(evt.Initiator,this)) return false;
+                spell==null || !PsychicAmplificationBinding.Owns(this,spell) ||
+                spell.StickyTouch!=null || evt.Context.Params.SpellLevel<=0) return false;
+            // Legacy components keep the original Psychic Major/level gate. A
+            // bound component reads the real level of its own class instead.
+            if(PsychicAmplificationBinding.IsBound(this)
+                ? PsychicAmplificationBinding.Level(this,evt.Initiator)<MinimumLevel
+                : !PsychicMajor01460.Allows(evt.Initiator,this)) return false;
             if(Kind>=PsychicAmplificationKind.WillOfTheDead)return PsychicAdvancedRuntime01458.Eligible(this,evt);
             if(Kind==PsychicAmplificationKind.RelentlessCasting) return spell.Blueprint.SpellResistance;
             if(Kind==PsychicAmplificationKind.OngoingDefense) return PsychicAmplificationRuntime.IsDefense(spell.Blueprint);
@@ -77,7 +90,11 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if((Casts.TryGetValue(evt,out var recorded)&&recorded.ContainsKey(Kind)) || !Eligible(evt)) return;
             var resources=evt.Initiator.Descriptor.Resources;
-            var pool=resources.ContainsResource(WisdomPool.Get()) ? WisdomPool.Get() : CharismaPool.Get();
+            // One pool per bound book; an unbound legacy component still uses
+            // the original Wisdom/Charisma resolution. No mixed payment.
+            var pool=PsychicAmplificationBinding.IsBound(this)
+                ? PsychicAmplificationBinding.Pool(this,evt.Initiator)
+                : (resources.ContainsResource(WisdomPool.Get()) ? WisdomPool.Get() : CharismaPool.Get());
             if(pool==null || !resources.HasEnoughResource(pool,Cost)) return;
             if(!PsychicAdvancedRuntime01458.Claim(evt,Kind.ToString()))return;
             int spent=Cost;

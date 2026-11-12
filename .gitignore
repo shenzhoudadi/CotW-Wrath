@@ -14,3 +14,6 @@ __pycache__/
 
 # Directed Spirit Guide outputs stay local; retain test source.
 tests/spiritguide0060*.json
+
+# Iroran directed reports are generated locally.
+tests/iroran0109-*.json

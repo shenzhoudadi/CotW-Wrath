@@ -1,0 +1,167 @@
+{
+  "contract": "C-0068-20261111-r1",
+  "workPackage": "COTW-0068",
+  "status": "Frozen expectations; not executed tests",
+  "cases": [
+    {
+      "id": "C0068-01",
+      "contractSection": "Q01",
+      "title": "HA 缺失、延后与重入",
+      "inputs": "空 cache；随后加载真实 HA 核心根和本项目 Psychic 根，重复注册两次",
+      "expected": "首次模块缺项明确且无半注册；就绪后 archetype 与两项天赋各连一次；再次调用不改变身份或返还已用资源。",
+      "nativePath": "BlueprintRegistration.RegisterOptional → actual class/selection roots"
+    },
+    {
+      "id": "C0068-02",
+      "contractSection": "Q01",
+      "title": "错误身份与回滚",
+      "inputs": "分别用同 GUID 错类型、错进展、未解析的 talent child 或外来同 GUID 根",
+      "expected": "每个反例拒绝本包，保留提供方资产与原引用；移除错误输入后能重试。",
+      "nativePath": "registration transaction + native references"
+    },
+    {
+      "id": "C0068-03",
+      "contractSection": "Q02",
+      "title": "逐级替换",
+      "inputs": "分别比较普通 Investigator 与侦探的 1/2/3/5/8/11/19 级实际进展",
+      "expected": "侦探只移除 2/5/8 毒抗、11 毒免和3级天赋；加入约定能力；5..19后续天赋保留。普通职业数据无变化。",
+      "nativePath": "native archetype add/remove level entries"
+    },
+    {
+      "id": "C0068-04",
+      "contractSection": "Q03",
+      "title": "真实换书和低阶表",
+      "inputs": "用真实 ClassData 加 archetype，再 DemandSpellbook；对 1/4/7/10/13/16/20级查询",
+      "expected": "取得侦探书且父职业为 HA Investigator；Bard原生对应表解锁至1/2/3/4/5/6/6环；Int施法；不能抄卷；未残留炼金术书组件。",
+      "nativePath": "ClassData.AddArchetype → Spellbook → DemandSpellbook"
+    },
+    {
+      "id": "C0068-05",
+      "contractSection": "Q03",
+      "title": "思考、情绪、零环与物品反例",
+      "inputs": "实际侦探书施法，分别带Center Self、fear、Logical；另取物品和原生法书",
+      "expected": "仅标记书适用既有 thought/emotion 判定；Center Self抵消-10；Logical绕过对应emotion限制；五个knacks走零环；物品和他书不套用。",
+      "nativePath": "PsychicCasting → native AbilityData/RuleCalculateAbilityParams"
+    },
+    {
+      "id": "C0068-06",
+      "contractSection": "Q04",
+      "title": "180行复用与特殊环位",
+      "inputs": "读取现有180行表并解析所有可用根，另生成Mindblade访问列表",
+      "expected": "侦探FindTraps仅1环、Banishment仅6环；7..10为空；候选去重。Mindblade保留原排除及FindTraps2环，原caller结果一致。",
+      "nativePath": "shared anchor row resolution + SpellListCompatibility"
+    },
+    {
+      "id": "C0068-07",
+      "contractSection": "Q04",
+      "title": "九项提供方正反例",
+      "inputs": "逐项载入九个补充身份，分别切为缺失、停用、错名、错school、未发布和真实发布",
+      "expected": "只接真实可用身份；需真实发布者的条目不被自有list伪证；缺项只影响该可选法术；无需重复构建法术。",
+      "nativePath": "PsychicSpellIntegration.Available + TTT published-list check"
+    },
+    {
+      "id": "C0068-08",
+      "contractSection": "Q04/Q08",
+      "title": "降环来源账本",
+      "inputs": "侦探书学MindThrust3，保留一项永久MindThrust1；另一书也有同系列，撤高阶来源",
+      "expected": "下位临时法术仅在同一书出现且不占选择配额；撤销清退自有临时条目；永久已学与另一书保留。",
+      "nativePath": "PsychicUndercasting + existing native temporary knowledge"
+    },
+    {
+      "id": "C0068-09",
+      "contractSection": "Q05",
+      "title": "Meddler真实上下文",
+      "inputs": "用真实fact及rank，L=1/2/5/8/11/14/17/20，mind-affecting spell/SLA触发真实豁免",
+      "expected": "获得能力后加值依次1/2/3/4/5/6/6；1级未授予；无关描述符及普通非spell/SLA能力没有修正。",
+      "nativePath": "real fact/context rank → RuleSavingThrow reason"
+    },
+    {
+      "id": "C0068-10",
+      "contractSection": "Q06",
+      "title": "池计级与天赋",
+      "inputs": "L=3/4/5/20，改变Int/Wis/Cha并加入无关职业等级，再授Expanded Pool",
+      "expected": "基础上限1/2/2/10，属性和无关等级不增加；天赋只给侦探池+2；重入及加载无凭空补点。",
+      "nativePath": "native resource amount/actual resource ledger"
+    },
+    {
+      "id": "C0068-11",
+      "contractSection": "Q06",
+      "title": "11种增幅授权闭包",
+      "inputs": "从私有Dabbler与Extra选择遍历到实际模式、效果和转换",
+      "expected": "恰好11种约定基础选项；无Major/discipline/Mastery授权；每条可变授权边绑定侦探书/职业/池；共享只读效果身份沿用。",
+      "nativePath": "actual granted feature/buff/toggle graph"
+    },
+    {
+      "id": "C0068-12",
+      "contractSection": "Q06",
+      "title": "旧组件与双职业隔离",
+      "inputs": "正常Psychic旧组件无binding；混职角色同时有两本书和不同余额",
+      "expected": "旧组件走既有Psychic语义；侦探只花侦探池，Psychic只花其原池；相同法术身份的两本书不串；不允许拼余额。",
+      "nativePath": "Eligible/Real/Plan/Claim + RuleCastSpell"
+    },
+    {
+      "id": "C0068-13",
+      "contractSection": "Q06",
+      "title": "真实支付和完成",
+      "inputs": "可增幅的侦探书施法及重复、子上下文、预览、失败、取消、欠费变体",
+      "expected": "成功只扣一次且效果来自支付事实；重复与预览不扣；失败按共享完成语义只返一次到原池；欠费正常施法且无增幅。",
+      "nativePath": "RuleCastSpell about/did → shared receipt/refund"
+    },
+    {
+      "id": "C0068-14",
+      "contractSection": "Q06",
+      "title": "模式和菜单作用域",
+      "inputs": "同一角色启用Psychic与侦探模式，切换其中一书，打开各自菜单",
+      "expected": "只关闭同书旧模式；另一书保留；各菜单只列本书真实可用转换。侦探不能继承Psychic Dual或Major数量。",
+      "nativePath": "mode OnTurnOn/Coordinate + actual menu conversions"
+    },
+    {
+      "id": "C0068-15",
+      "contractSection": "Q06",
+      "title": "侦探等级分档",
+      "inputs": "侦探L7/8/14/15并混入高等级其他职业，使用OverpoweringMind",
+      "expected": "额外档只按L8/L15出现，消耗2/4/6侦探点；独立Psychic档位按自身职业，不被侦探改变。",
+      "nativePath": "source-scoped AddFeatureOnClassLevel + native cast"
+    },
+    {
+      "id": "C0068-16",
+      "contractSection": "Q06",
+      "title": "Surge及Psychofeedback",
+      "inputs": "实际本书同族高低转换；Psychofeedback用2/4/6环与1/7环反例",
+      "expected": "Surge复用现有同族同书规则且最高6环；反馈2点加真实所用槽L，体能增强L持续每侦探级1分钟；1环及7环不提供该转换，不借其他书槽。",
+      "nativePath": "native SpontaneousSpellConversion → actual Spellbook spend"
+    },
+    {
+      "id": "C0068-17",
+      "contractSection": "Q07",
+      "title": "天赋实际来源限制",
+      "inputs": "侦探经Investigator Talent、AlchemistDiscovery及Extra Investigator Talent；同角色另从Alchemist选择",
+      "expected": "侦探天赋路径不可选四项；全无合法结果的嵌套选择不出现空UI；独立Alchemist路径按原前置仍可选。正常Investigator保持原样。",
+      "nativePath": "BlueprintFeatureSelection.CanSelect + SelectFeature.Check + FeatureSelectionState ancestry"
+    },
+    {
+      "id": "C0068-18",
+      "contractSection": "Q07",
+      "title": "两项天赋和专长资格",
+      "inputs": "侦探L2/L3/L5，经真实天赋选择补池/补增幅并重复；另混职真正Psychic",
+      "expected": "各私有天赋需侦探3级，池+2一次、额外增幅一次且去重；3级被替换的talent不被伪造；纯侦探不获得Psychic Extra Amplification资格；合法Psychic独立资格保持。",
+      "nativePath": "native prerequisites and selection submission"
+    },
+    {
+      "id": "C0068-19",
+      "contractSection": "Q07",
+      "title": "已有Extra Investigator同步",
+      "inputs": "本包前后分别注册ExtraInvestigatorTalent，再重复；测试已有等价外部专长",
+      "expected": "两个侦探天赋在真实Extra入口各一条；m_Features/m_AllFeatures一致；保留等价外部策略及旧普通职业候选。",
+      "nativePath": "ExtraInvestigatorTalent.Register"
+    },
+    {
+      "id": "C0068-20",
+      "contractSection": "Q08",
+      "title": "来源撤销和还原",
+      "inputs": "原生休息、level变化、fact移除/恢复、PostLoad；角色同时有另一职业书与池",
+      "expected": "只按自有来源维护资源/模式/转换/降环；保留其他职业；旧extracts不免费迁为已知；已有支付效果按本身来源寿命完成。完整控制器若没跑标未运行。",
+      "nativePath": "actual native lifecycle events/components, scope explicitly recorded"
+    }
+  ]
+}

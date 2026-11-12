@@ -107,6 +107,9 @@ namespace CallOfTheWild.Wrath.Prototype
             }, report);
             RegisterModule(VindictiveBastard0111.ModuleName, () => VindictiveBastard0111.Register(cache), report);
             RegisterModule(SacredServant0110.ModuleName, () => SacredServant0110.Register(cache), report);
+            // IroranRerolls0109's Harmony patches are installed by ModEntry's
+            // assembly-wide [HarmonyPatch] sweep; only the graph registers here.
+            RegisterModule(IroranPaladin0109.ModuleName, () => IroranPaladin0109.Register(cache), report);
             RegisterModule(PsychicExpansion.ModuleName, () => {
                 if(!PsychicCasting.RuntimePatchesAvailable) throw new InvalidOperationException("Psychic runtime patches are unavailable; registration skipped.");
                 PsychicExpansion.Register(cache);
@@ -183,6 +186,8 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(BattleMysteryBonusSpell0119.ModuleName, () => BattleMysteryBonusSpell0119.Register(cache), report);
             RegisterAvailableModule(SpiritWhisperer0117.ModuleName, () => SpiritWhisperer0117.Register(cache), report);
             RegisterAvailableModule(SpiritGuide0060.ModuleName, () => SpiritGuide0060.Register(cache), report);
+            RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
+            RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -279,6 +284,12 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(SpiritWhisperer0117.ModuleName, () => SpiritWhisperer0117.Register(cache), report);
             RegisterAvailableModule(SpiritGuide0060.ModuleName, () => SpiritGuide0060.Register(cache), report);
             if(cache.Load(PsychicAssets.Id(SacredServant0110.RootToken))!=null)RegisterAvailableModule(SacredServant0110.ReconcileModuleName, () => SacredServant0110.Reconcile(cache), report);
+            // HA can publish its class after initial registration. Register
+            // handles both first publication and refreshing our optional spells.
+            RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
+            // HA can publish its class after initial registration; the scholar
+            // gate defers until the real provider roots are present.
+            RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)

@@ -1,0 +1,9 @@
+你是 COTW-0070 Cryptid Scholar 独立 D，优先用与 B 不同的会话。先读本目录的 A 源证据、C 合同及 C-cases，再核对 B 候选提交、B-progress.md、B-evidence.json 和定向原始证据。合同 C-0070-20261112-r1，基线 1c0f3b0 / 0.14.72 TEST，施工 issue #13。保持生产代码只读。
+
+从真实入口复查。HA 晚加载时尚无变体根的 RegisterOptional；全部偶数级研究授予与正常 HA 对照；识怪必须由学者本人成功，完整图鉴不能绕过；分类不接受通用 Instant Enemy，实际亚型差异必须改变匹配；30 ft、静默和多学者来源。资源验证以实际余额和 Move 动作为准，查看同类 24h、到期边界、失败不付及重入去重。
+
+核查 Advice 的 AC/豁免真实来源，普通法术和不同类别反例。Strike 验证真实命中与伤害包，检查近远程、遮蔽、精准免疫、暴击倍率及同源消费。天赋检查必须经过真实选择入口和祖先链。确认失去本变体只移除自己的来源，普通 Investigator、Psychic Detective、独立 HA 灵感及其他来源保留。
+
+逐项区分结构、受控夹具、原生实跑和未测。只补实际改变或证据无效的本项路径，复用有效同内容结果。禁止全量或历史套件、游戏和 UMM。检查生产是否复制现有 HA、识怪、天赋来源或原生付费机制，禁止把证据缺口写成 PASS。
+
+报告写到 C:\Users\xuenc\agent-tools\cryptid-scholar-next\D-review.md。给 REVIEW_PASS 或 NEEDS_FIX，含精确文件、边界、断言和指纹。失败退原 B，交付后才关 #13。按用户授权发 TEST 预发布，保留中文 README 中独立一行“猫猫堡是猪猪”。

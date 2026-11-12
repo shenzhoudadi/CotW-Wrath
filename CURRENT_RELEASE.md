@@ -1,9 +1,16 @@
 # 当前开发与出包流程
 
+[0.14.73 Cryptid Scholar TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST)已在 GitHub 预发布，4/4 附件下载一致。版本提交 `5f1729b`，编译 26.062 秒、打包与 DLL 核对 1.816 秒、GitHub 上传 4.902 秒、分段下载回读 27.125 秒。复用 244 条定向和 D3 的 5/5，未重复跑同内容。[测试说明](docs/releases/0.14.73-TEST.md)
+
+0.14.72 Psychic Detective TEST 已在 GitHub 预发布，四个附件下载一致。306 条本项隔离定向／14.778 秒。[测试说明](docs/releases/0.14.72-TEST.md)
+
+0.14.71 Iroran Paladin TEST 已在 GitHub 预发布，4/4附件下载核对一致。D复查通过，105条隔离定向／1.23秒。见[测试说明](docs/releases/0.14.71-TEST.md)。
+
 2026-11-10（COTW-0117 后续修复：原版 Manifestation 缺陷 + 内置模块补丁，玩家实机确认）：三个症状的根因与前两轮的猜测不同。① Owlcat 原版数据缺陷：Flame/Frost/Stone/Waves/Wind 五个魂域 L20 `Manifestation` 的 `ActivatableAbilityVariants.m_Variants` 均为 `[Extend, Bolster, Bolster]`（Bolster 重复、Reach 缺失），而同层 `AddFacts` 实际授予 Extend/Bolster/Reach；普通萨满同样受影响，玩家实测确认。按用户决定**连原生一起修**：注册时从 `AddFacts` 重建父能力变体列表，幂等且带失败回滚，共享蓝图的全局改动不会在注册失败时残留。② 双 Touch of Flames 是原生 Flame L1 有两个同名 `AddFacts` 组件，游戏靠同名折叠，而 `UniqueNames()` 改名后两个都生效；改为在改名之前按「组件名 + fact GUID」去重组件。③ 开启超魔后所有法术变暗与 Spirit Whisperer 无关：内置模块 `MediumClass.Prowler.ShapeQuickenPatch` 无条件读 `AutoMetamagic.Owner`，在 UI／可用性计算的蓝图级上下文抛 `ComponentRuntime is unavailable`，经 `UnitPartSpecialMetamagic.GetMetamagic` → `AbilityData.CanBeCastByCaster` 污染全部法术判定；补丁整段加 try/catch 放行原生逻辑，Prowler 原语义不变。证据（两份独立原生导出、Player.log 堆栈、Kingmaker 原版 CotW `Flame.cs:375-389`）与影响面见 [Spirit Whisperer 交付说明](docs/spirit-whisperer/README.md) 的「原生游戏缺陷修复」节。编译 0 警告 0 错误 9 秒；打包编译 23.667 秒／包检查 0.602 秒／总 24.483 秒，0 警告 0 错误。本地包 `D:\clew\work\release-staging\0.14.69\d978d92e6608468dbe38460e65152a27\CallOfTheWildWrathPrototype-0.14.69-experimental.zip`，SHA256 `0C1EDFCA75E438661CC3BF1BC0570DA01EA799E9FC423BBE56EF73C46EB5D350`；主 DLL `0087FB88…`，MediumClass.dll `673C8045…`（与合并产物一致）。用户 2026-11-10 实机确认三处症状全部恢复正常；本机未启动游戏/UMM、未跑离线测试宿主、未 commit/push/上传。此项是定向玩家确认，不等于全魂域／全职业／完整存档验收；当前预发布仍为 0.14.69 Combined TEST，正式稳定版 0.14.66 不变。
+
 0.14.70 Spirit Guide TEST：D3复查通过，320条本项定向/15.00秒，GitHub交付已完成，4/4附件下载核对一致。正式0.14.66和旧TEST保留。见[本次说明](docs/releases/0.14.70-TEST.md)。只做常规编译/打包/包内DLL核对，复用同内容结果，不跑全量或历史专项。
 
-0.14.66正式稳定版保留。当前预发布为 **[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)**（程序集0.14.69.0）：Spirit Whisperer、Vindictive Bastard／Menacing、Sacred Servant／Live On统一测试包，保留已有Havocker／Mimic／Starseeker和内置模块；不含待修复的Speaker。编译29.737秒、常规包检查2.157秒，已有同内容专项未重跑。未测与已知边界见docs/releases/0.14.69-TEST.md。正常入口仍是build.ps1。
+0.14.66正式稳定版保留。历史预发布 **[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)**（程序集0.14.69.0）：Spirit Whisperer、Vindictive Bastard／Menacing、Sacred Servant／Live On统一测试包，保留已有Havocker／Mimic／Starseeker和内置模块；不含待修复的Speaker。编译29.737秒、常规包检查2.157秒，已有同内容专项未重跑。未测与已知边界见docs/releases/0.14.69-TEST.md。正常入口仍是build.ps1。
 
 历史源码阶段（现已纳入0.14.69）：Spirit Whisperer COTW-0117已完成A/C/B/D和最终源码整合，尚未发布新安装包。沿用174条／37.59秒隔离检查，合并编译8.138秒、0警告／0错误。未测及已知边界见docs/spirit-whisperer/README.md；当前GitHub安装包仍为原0.14.68。
 

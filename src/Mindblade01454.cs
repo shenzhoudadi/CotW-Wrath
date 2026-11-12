@@ -53,18 +53,30 @@ namespace CallOfTheWild.Wrath.Prototype
         {var c=new PrerequisiteArchetypeLevel{Level=level};Set(c,"m_CharacterClass",Ref<BlueprintCharacterClassReference>(cls));Set(c,"m_Archetype",Ref<BlueprintArchetypeReference>(root));return c;}
         static PrerequisiteNoArchetype Exclude(BlueprintCharacterClass cls,BlueprintArchetype root)
         {var c=new PrerequisiteNoArchetype{name="CotW01454MindbladePrerequisite"};Set(c,"m_CharacterClass",Ref<BlueprintCharacterClassReference>(cls));Set(c,"m_Archetype",Ref<BlueprintArchetypeReference>(root));return c;}
+        // S-PSYCHIC-0068: one shared, bounded single-row resolver. Mindblade
+        // keeps its own exclusions and its Find Traps 2nd-circle override; the
+        // detective consumes the same ordered candidates with its own rings.
+        internal static int RowLevel(string[] row)=>int.Parse(row[0]);
+        internal static BlueprintAbility ResolveRow(PsychicAssets f,string[] row)
+        {
+            if(row==null||row.Length<5)return null;
+            foreach(var candidates in new[]{row[2],row[3],row[4]}){
+                var matches=(candidates??"").Split(',').Where(s=>s.Length==32)
+                    .Select(s=>f.Cache.Load(BlueprintGuid.Parse(s))).OfType<BlueprintAbility>()
+                    .Where(a=>a.Type==AbilityType.Spell&&a.Parent==null)
+                    .GroupBy(a=>a.AssetGuid).Select(g=>g.First()).ToArray();
+                if(matches.Length>1)throw new InvalidOperationException("01454 ambiguous original Psychic Access spell: "+row[1]);
+                if(matches.Length==1)return matches[0];
+            }
+            return null;
+        }
         internal static BlueprintSpellList AccessList(PsychicAssets f,BlueprintSpellList magus)
         {
             var excluded=new HashSet<BlueprintGuid>(magus.SpellsByLevel.SelectMany(r=>r.Spells).Select(s=>s.AssetGuid)){BlueprintGuid.Parse("d361391f645db984bbf58907711a146a"),BlueprintGuid.Parse("4709274b2080b6444a3c11c6ebbe2404")};
             var spells=Enumerable.Range(0,10).Select(_=>new List<BlueprintAbility>()).ToArray();
             foreach(var row in MindbladeSpellAnchors01454.Rows){
-                int level=int.Parse(row[0]);if(level<0||level>6)continue;
-                BlueprintAbility spell=null;
-                foreach(var candidates in new[]{row[2],row[3],row[4]}){
-                    var matches=candidates.Split(',').Where(s=>s.Length==32).Select(s=>f.Cache.Load(BlueprintGuid.Parse(s))).OfType<BlueprintAbility>().Where(a=>a.Type==AbilityType.Spell&&a.Parent==null).GroupBy(a=>a.AssetGuid).Select(g=>g.First()).ToArray();
-                    if(matches.Length>1)throw new InvalidOperationException("01454 ambiguous original Psychic Access spell: "+row[1]);
-                    if(matches.Length==1){spell=matches[0];break;}
-                }
+                int level=RowLevel(row);if(level<0||level>6)continue;
+                var spell=ResolveRow(f,row);
                 // Unported spell roots are never synthesized by this archetype.
                 if(spell==null||excluded.Contains(spell.AssetGuid)||spells[level].Any(a=>a.AssetGuid==spell.AssetGuid))continue;
                 spells[level].Add(spell);

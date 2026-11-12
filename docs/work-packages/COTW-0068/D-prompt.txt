@@ -1,0 +1,9 @@
+你是 COTW-0068 Psychic Detective 的独立 D。先读同目录 README.md、A-source-and-compat.md、A-evidence.json、A-spell-map-audit.json、C-frozen-contract.md、C-cases.json，以及 B 的候选提交、B-progress.md、B-evidence.json、原始输出和指纹。合同 C-0068-20261111-r1，生产基线 56ff438 / 0.14.71 TEST，施工 issue #12。
+
+只读生产代码，核对 B 有没有重复制作现有 Investigator、Psychic 机制、180 行法表和外部已实现法术。重点看 HA 毒抗三次移除，真实 ClassData.ReplaceSpellbook/DemandSpellbook，显式 Int/Bard 六环表，五个零环与 Center Self，原作 Find Traps/Banishment 环位，九项补充映射和可用／停用提供方反例。
+
+共享绑定是本项最高风险。确认旧组件缺省语义、侦探与 Psychic 的书本／池／模式隔离，实际 RuleCastSpell 的一次支付与失败返还，Undercast Surge 和 Psychofeedback 的实际转换槽、双职业菜单、同一 source 清退。不能把 clone 后的字段一致当成运行时完成。Meddler 必须在真实 fact/reason/context 下计算，并有 +6 上限与无关效果反例。天赋检查必须走实际 CanSelect/SelectFeature 的来源祖先链，既排除侦探路径的四项，也保留独立 Alchemist 合法入口与真实 Psychic 专长资格。
+
+按本项最小必要正反例复查，复用同内容有效记录，只重跑受影响或证据失效的范围。不跑全历史、全库或整个专项，不开游戏／UMM，不为缺少旧夹具扩建环境。确认没有通过删断言或降低覆盖换绿；失败原件和未测边界必须保留。
+
+将 REVIEW_PASS 或 NEEDS_FIX、定位证据和最小修复要求写到 C:\Users\xuenc\agent-tools\psychic-detective-next\D-review.md，生产问题退原 B。D 通过后按用户出包授权统一 TEST 版本、GitHub 提交与附件下载核验，再将 #12 归档。完整玩家验收以实际人测记录为准。中文 TEST README 保留单独一行“猫猫堡是猪猪”。

@@ -1,0 +1,472 @@
+{
+  "workPackage": "COTW-0068",
+  "contract": "C-0068-20261111-r1",
+  "stage": "A/C completed; B not implemented",
+  "date": "2026-11-11",
+  "baseline": "56ff43852259e2a72a46a7d21d74893d2a904e48",
+  "baselinePreview": "0.14.71 TEST",
+  "issue": 12,
+  "original": {
+    "repository": "Holic75/KingmakerRebalance",
+    "commit": "1332fb0db844b7863f484ca978bea2349fe49769",
+    "files": [
+      {
+        "path": "CallOfTheWild/Classes/Investigator.cs",
+        "blob": "71c4c1bf91a87bed499a5abb139437d91316fb54",
+        "sha256": "d85476b71c6b98e2cdb53cd690b0c0731cd3447b957dec42d9c67601f1219f42"
+      },
+      {
+        "path": "CallOfTheWild/Classes/Psychic.cs",
+        "blob": "7f5001d570828023a1f33722af500f14b0fdd212",
+        "sha256": "068c3d8cfea3fbde93abd7f2b4c329cb18aece9760305c57b88d8b5733886348"
+      },
+      {
+        "path": "CallOfTheWild/Classes/PhrenicAmplifications.cs",
+        "blob": "cbc7f2afc1e23d6615b1d6e4c9fa66f6b0c69169",
+        "sha256": "a4327f502d5ddecf95350f7c2e8bc567439d6b41aa17d2419bf45f0fc4a01d61"
+      },
+      {
+        "path": "CallOfTheWild/Helpers.cs",
+        "blob": "fec3b4a7a6e958fb701bdf4614ff0a7ad99df8e4",
+        "sha256": "cbc4fffcdf6f1f63014ea023f9549c33a3bd602f3ad3ae045e490ba1e31203d9"
+      },
+      {
+        "path": "CallOfTheWild/NewMechanics/SpellbookMechanics.cs",
+        "blob": "c6ef29e0c5ffaa7c35435ef57261fc3105df2cab",
+        "sha256": "85a039fe20fc7cdcfaf5e0f4dda46c312550e920a273f01ffde9ddf8c6d15832"
+      }
+    ]
+  },
+  "provider": {
+    "repository": "FrozenDervish/Homebrew-Archetypes",
+    "commit": "211e9b82e252705dfaa7e4aa7507d9819737e232",
+    "license": "MIT",
+    "publicTreeTruncated": false,
+    "files": [
+      {
+        "path": "Blueprints/Investigator/InvestigatorClass.jbp",
+        "bytes": 4503,
+        "blob": "4e4626c936137316ab49174a3df78dd04d94d97f",
+        "sha256": "eceb42f24c1487c5a770aa4182a5400fdd12fcf6387281b45334f41b587da52c"
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorProgression.jbp",
+        "bytes": 5511,
+        "blob": "026add253c2f6815ea33f02edafe5e727132c574",
+        "sha256": "87e5699ba2d51cfe63c97b4ab3791aee03248c8cde435eee3557531b5cf15c91"
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorSpellbook.jbp",
+        "bytes": 1436,
+        "blob": "4cad63b4d7a1c53313fb39d1db9daf6e3b65c4f0",
+        "sha256": "2113f65d5a9621dd30b8a56c7d45761e6192431c3a42db2e08d14c83cc6e09d3"
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorTalentSelection.jbp",
+        "bytes": 2089,
+        "blob": "55689fc2189555824645e175e158c7ffd547e565",
+        "sha256": "02f12334adc0abee3f276f8a462b15ca2b19119fb3f120fbe6ee4e856f01be1b"
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorPoisonResistance.jbp",
+        "bytes": 1883,
+        "blob": "e0d8d75763a6fd54df6bd272eccde0652f8f5df9",
+        "sha256": "6d7fd45eb272b8c794d1abfa2e8c793b66b49cc3f076d1e7280408fa5324f8bc"
+      },
+      {
+        "path": "Blueprints/Investigator/InvestigatorPoisonImmunity.jbp",
+        "bytes": 1743,
+        "blob": "e1ce6848f6fdcdf45a20c6133ce4f092f4d873bc",
+        "sha256": "0fa593e9a5456281cfb48c5202fd6301703f3bdd442c157fa3caef3bc021fb13"
+      },
+      {
+        "path": "Blueprints/Investigator/Talents/AlchemistDiscovery.jbp",
+        "bytes": 1603,
+        "blob": "bc931fe3f5359578dc8e5f220bca3bbb7a33141f",
+        "sha256": "85887e548a1585bf36b25bd8c5d587985ce4f1654a27025a3228a22507418104"
+      },
+      {
+        "path": "LICENSE",
+        "bytes": 1071,
+        "blob": "ff856ffb8cd2a082c04531d3ab51e1c1e30ab213",
+        "sha256": "f138049e023fdcb9200316f7e67d1184665a6dcbbe0418f187e1ac8181ca7a51"
+      }
+    ],
+    "identities": {
+      "AlchemistDiscovery": {
+        "guid": "f68b959943348034d8469c165442e019",
+        "type": "BlueprintFeatureSelection",
+        "path": "Blueprints/Investigator/Talents/AlchemistDiscovery.jbp"
+      },
+      "InvestigatorClass": {
+        "guid": "adb9e138bee9ecc4db246b64d563f900",
+        "type": "BlueprintCharacterClass",
+        "path": "Blueprints/Investigator/InvestigatorClass.jbp"
+      },
+      "InvestigatorPoisonImmunity": {
+        "guid": "03d1877a5ffcbd34d9501b005434cb4f",
+        "type": "BlueprintFeature",
+        "path": "Blueprints/Investigator/InvestigatorPoisonImmunity.jbp"
+      },
+      "InvestigatorPoisonResistance": {
+        "guid": "152ea6d8f279a73489c9dc0815e9e9b1",
+        "type": "BlueprintFeature",
+        "path": "Blueprints/Investigator/InvestigatorPoisonResistance.jbp"
+      },
+      "InvestigatorProgression": {
+        "guid": "5eaea532547c7ce40a84563e15fd3440",
+        "type": "BlueprintProgression",
+        "path": "Blueprints/Investigator/InvestigatorProgression.jbp"
+      },
+      "InvestigatorSpellbook": {
+        "guid": "961e6b4edd3c80e4a9fe4435deff6fe7",
+        "type": "BlueprintSpellbook",
+        "path": "Blueprints/Investigator/InvestigatorSpellbook.jbp"
+      },
+      "InvestigatorTalentSelection": {
+        "guid": "da89239cc5859a1478007cd5e6d44f67",
+        "type": "BlueprintFeatureSelection",
+        "path": "Blueprints/Investigator/InvestigatorTalentSelection.jbp"
+      }
+    },
+    "runtimeInitializationExecuted": false,
+    "knownSourceDifference": "InvestigatorSpellbook.m_CharacterClass is native Alchemist; build the replacement with explicit Investigator owner.",
+    "poisonResistanceGrants": [
+      2,
+      5,
+      8
+    ],
+    "poisonImmunityGrant": 11
+  },
+  "sourceReuse": [
+    {
+      "path": "src/PsychicCasting.cs",
+      "sha256": "b0acd8f39768d4ecf3cd7a7c82aa088c02fc6f74c37d136cabd67bc24135091c"
+    },
+    {
+      "path": "src/PsychicUndercasting.cs",
+      "sha256": "be311d2ec7bdc1b7e2d1e43181564bf1db32c9584f4fe970b1dd3d833ab9fde6"
+    },
+    {
+      "path": "src/TemporaryKnowledge01464.cs",
+      "sha256": "49f0d59f6e9600f90dd0a9a491199a2439bb25b6df374b1bd4c102fabac0e843"
+    },
+    {
+      "path": "src/PsychicAmplificationComponent.cs",
+      "sha256": "5488bc23736e868a83eeaeb8be6b81d4ad9f14aaee9f670b73e22d80df97edd8"
+    },
+    {
+      "path": "src/PsychicAmplificationRuntime.cs",
+      "sha256": "dfe8f672269a0a36b302a5d77948588df17bbf69b86337def5a4992a2625315b"
+    },
+    {
+      "path": "src/PsychicAdvancedRuntime01458.cs",
+      "sha256": "7fecdc71fb35f517f51960463327ba8810b1efa3f518e7f64da4c2aae556de32"
+    },
+    {
+      "path": "src/PsychicAmplificationMenu.cs",
+      "sha256": "4b6d090de6cd367d8afc752c5315a65c1aba871ab8446ab6841de1500e16e37e"
+    },
+    {
+      "path": "src/PsychicAmplifications.cs",
+      "sha256": "8fbf85e6a6193fb2f08582f21e6737913a7c64501cb823db814e18357f817bc2"
+    },
+    {
+      "path": "src/PsychicCompletionAmplifications01458.cs",
+      "sha256": "9ac030d229f2697596082b42f60bd63c32d2a064cffafa4b820f65b9bc2c7cbd"
+    },
+    {
+      "path": "src/PsychicFurtherOptions.cs",
+      "sha256": "9b3f1ae16bd1d6ab74a5a7902f71ea7f2c11a0fd822a173092c6dc7034006a58"
+    },
+    {
+      "path": "src/PsychicMajor01460.cs",
+      "sha256": "415d4d87cba7caad170f5b3dd887c05fe7921abbff8670589fb971cd8ceba19e"
+    },
+    {
+      "path": "src/PsychicDisciplineRuntime01458.cs",
+      "sha256": "88df7f582f9a56d7690178032062481afb73d1b9c193976442457a9078d09f89"
+    },
+    {
+      "path": "src/MindbladeSpellAnchors01454.cs",
+      "sha256": "2bd389a36179a43b6d926c6c2f4f0317a05013c9406908e6a0516cd5d73b0752"
+    },
+    {
+      "path": "src/Mindblade01454.cs",
+      "sha256": "05e08bf0e0a50054fa8acef7cc96fd94b8d04f49da526aafd645edc48c1f0368"
+    },
+    {
+      "path": "src/PsychicSharedSpellCatalog.cs",
+      "sha256": "bfc84c3dee08c9d0a7169b680121215de1d3d34a4e5cc1fae543687f3e89b6ec"
+    },
+    {
+      "path": "src/PsychicSpellIntegration.cs",
+      "sha256": "88998e38992fa45d6a39a5d27e91d2086e98f349c6a07a16bef738c876ced093"
+    },
+    {
+      "path": "src/SpellListCompatibility.cs",
+      "sha256": "38ba548d1930e04ae920119b30602cfe2a5fd863ac5fb285dcbdd5a328575e4b"
+    },
+    {
+      "path": "src/ExtraInvestigatorTalent.cs",
+      "sha256": "72ae39778d515c36e051a49f573c982bb9af5b7602249dcf2644aa26c1d95543"
+    },
+    {
+      "path": "src/MagusBatch01454.cs",
+      "sha256": "440d984ba3bdb6b55766edc963688f85247de905b300e9e68525d88afff55401"
+    },
+    {
+      "path": "src/BlueprintRegistration.cs",
+      "sha256": "418ec055055790b4b3a702d0680e272218df8c344a30eccb5e90182a606b9f91"
+    }
+  ],
+  "nativeCoreIdentities": [
+    {
+      "guid": "ee0b69e90bac14446a4cf9a050f87f2e",
+      "path": "Classes/Basic/DetectMagic.jbp",
+      "type": "cb208b98ceacca84baee15dba53b1979, BlueprintFeature",
+      "sha256": "a7d522a6e885920c1f78192465be5edac09fe5b945da25e327100a929375d1ad"
+    },
+    {
+      "guid": "772c83a25e2268e448e841dcd548235f",
+      "path": "Classes/Bard/BardClass.jbp",
+      "type": "5f2bdd25f161a0d4c97bee89cf923d77, BlueprintCharacterClass",
+      "sha256": "7efd1e02ac9f99483eced5f92b69450a2792d7dcfcf55ac1e127a5282a3ed6bd"
+    },
+    {
+      "guid": "0937bec61c0dabc468428f496580c721",
+      "path": "Classes/Alchemist/AlchemistClass.jbp",
+      "type": "5f2bdd25f161a0d4c97bee89cf923d77, BlueprintCharacterClass",
+      "sha256": "7e5dc0876ee7dcbdb81c68d901a1bd0055dd7eb044ba33bb16989e7109723d22"
+    },
+    {
+      "guid": "cee8f65448ce71c4b8b8ca13751dd8ea",
+      "path": "Classes/Alchemist/Mutagens/MutagenFeature.jbp",
+      "type": "cb208b98ceacca84baee15dba53b1979, BlueprintFeature",
+      "sha256": "78567b8830c45b32dbef19cab25713b6c41309dcd64bdbba669532d876a0ed17"
+    },
+    {
+      "guid": "2673ccdd6df742d42a8c94977c76a984",
+      "path": "Classes/Alchemist/Discoveries/EnhancePotion.jbp",
+      "type": "cb208b98ceacca84baee15dba53b1979, BlueprintFeature",
+      "sha256": "a49b619874a7d920b81ac3532fa33229e68f78207aa50af24455858a1a525ecb"
+    },
+    {
+      "guid": "1db8e126b77e71d4d89dcfa50fe87e93",
+      "path": "Classes/Alchemist/Discoveries/ExtendPotion.jbp",
+      "type": "cb208b98ceacca84baee15dba53b1979, BlueprintFeature",
+      "sha256": "9d6b9ca6c1d1e2b95b174b6a1ab3de1259681111ff41e9711865e96dea6b662e"
+    },
+    {
+      "guid": "57d5077b301ade749b840b0ea9230bb9",
+      "path": "Classes/Alchemist/Discoveries/Infusion.jbp",
+      "type": "cb208b98ceacca84baee15dba53b1979, BlueprintFeature",
+      "sha256": "7dad588d900c0a68e34680815878ecea254b1c8f4c05abcf4ebe6e6053baf33b"
+    }
+  ],
+  "nativeLiteralSpellAudit": {
+    "expected": 109,
+    "found": 109,
+    "allFound": true,
+    "runtimeEffectsTested": false
+  },
+  "nativeBardBook": {
+    "guid": "bc04fc157a8801d41b877ad0d9af03dd",
+    "spellsPerDay": "0a8eec9ca5c0dc64795243ab3c55d924",
+    "spellsKnown": "90de6b4f591d1184497fbfbae6e16547",
+    "spellsPerLevel": 0
+  },
+  "nativeCallPaths": [
+    {
+      "type": "Kingmaker.UnitLogic.ClassData",
+      "method": "AddArchetype",
+      "evidence": "ClassData.cs:163-172",
+      "decision": "Use actual ReplaceSpellbook and ClassData.Spellbook."
+    },
+    {
+      "type": "Kingmaker.UnitLogic.FactLogic.SpontaneousSpellConversion",
+      "method": "OnTurnOn/OnTurnOff",
+      "evidence": "SpontaneousSpellConversion.cs",
+      "decision": "Use real class DemandSpellbook and source conversion Id."
+    },
+    {
+      "type": "Kingmaker.Blueprints.Classes.Selection.BlueprintFeatureSelection",
+      "method": "CanSelect",
+      "evidence": "BlueprintFeatureSelection.cs:63-103",
+      "decision": "Keep native membership and prerequisite checks; scope talent restrictions by actual selection ancestry."
+    },
+    {
+      "type": "Kingmaker.UnitLogic.Class.LevelUp.FeatureSelectionState",
+      "method": "Parent/Source/Selection",
+      "evidence": "FeatureSelectionState.cs:15-65",
+      "decision": "Resolve Investigator talent ancestry and preserve independent Alchemist paths."
+    },
+    {
+      "type": "Kingmaker.UnitLogic.Class.LevelUp.Actions.SelectFeature",
+      "method": "Check",
+      "evidence": "SelectFeature.cs:53-64",
+      "decision": "Submission uses the same CanSelect boundary."
+    },
+    {
+      "type": "Kingmaker.Designers.Mechanics.Facts.SavingThrowBonusAgainstDescriptor",
+      "method": "OnEventAboutToTrigger",
+      "evidence": "SavingThrowBonusAgainstDescriptor.cs:34-49",
+      "decision": "Real fact rank and reason context; enforce intended spell/SLA scope."
+    }
+  ],
+  "providerCorrections": [
+    {
+      "originalRef": "Witch.hermean_potential.AssetGuid",
+      "guid": "37853550902a4cadae16833c5f4c6b17",
+      "name": "NewSpell.UseHermeanPotential",
+      "provider": "PrestigePlus",
+      "school": "Enchantment",
+      "publishedListRequired": false,
+      "circle": 1,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.long_arm.AssetGuid",
+      "guid": "fde4d2da304345bca11a73eb8f06b755",
+      "name": "LongArmAbility",
+      "provider": "TabletopTweaks-Base",
+      "school": "Transmutation",
+      "publishedListRequired": true,
+      "circle": 1,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.hypnotic_pattern.AssetGuid",
+      "guid": "56b8f0304a704a67b3c35cbe8c774854",
+      "name": "HypnoticPatternAbility",
+      "provider": "ExpandedContent",
+      "school": "Illusion",
+      "publishedListRequired": true,
+      "circle": 2,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.inflict_pain.AssetGuid",
+      "guid": "e023af1af9c147549a8e7bd246967861",
+      "name": "InflictPainAbility",
+      "provider": "ExpandedContent",
+      "school": "Enchantment",
+      "publishedListRequired": true,
+      "circle": 2,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.telekinetic_strikes.AssetGuid",
+      "guid": "9c2f011a4c664dccb73a1426fb55050e",
+      "name": "TelekineticStrikesCast",
+      "provider": "TomeOfTheFirebird",
+      "school": "Evocation",
+      "publishedListRequired": true,
+      "circle": 2,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.resinous_skin.AssetGuid",
+      "guid": "4b8f3792a86e45f4b40a2c01805f1e5e",
+      "name": "NewSpell.UseResinousSkin",
+      "provider": "PrestigePlus",
+      "school": "Transmutation",
+      "publishedListRequired": false,
+      "circle": 3,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.sands_of_time.AssetGuid",
+      "guid": "da49f07e431b47abaad41ef28df487f7",
+      "name": "SandsOfTimeCast",
+      "provider": "TabletopTweaks-Base",
+      "school": "Necromancy",
+      "publishedListRequired": true,
+      "circle": 3,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.inflict_pain_mass.AssetGuid",
+      "guid": "ff31ae1abe3c418db7842dcc76eca7ee",
+      "name": "InflictPainMassAbility",
+      "provider": "ExpandedContent",
+      "school": "Enchantment",
+      "publishedListRequired": true,
+      "circle": 6,
+      "reuse": "PsychicSharedSpellCatalog.Entries + PsychicSpellIntegration.Available"
+    },
+    {
+      "originalRef": "NewSpells.stunning_barrier_greater.AssetGuid",
+      "guid": "9e33ed477ddd4fad9d90fb64b1a6f732",
+      "name": "StunningBarrierGreaterAbility",
+      "provider": "TabletopTweaks-Base",
+      "school": "Abjuration",
+      "circle": 3,
+      "publishedListRequired": true,
+      "sourcePin": "221decc02265c780685650ea987bca0a9eeaf49a",
+      "reuse": "External published spell root"
+    }
+  ],
+  "tttSource": {
+    "repository": "Vek17/TabletopTweaks-Base",
+    "commit": "221decc02265c780685650ea987bca0a9eeaf49a",
+    "files": [
+      {
+        "path": "TabletopTweaks-Base/NewContent/Spells/StunningBarrierGreater.cs",
+        "blob": "de009ff103690b4705d061554bad8d9ed1ed1e0a",
+        "sha256": "9a7d4ac56cf5f335ae57365ed97d87eaf9ab173ff3627b5c5467f410a8daa7db"
+      },
+      {
+        "path": "TabletopTweaks-Base/Config/Blueprints.json",
+        "blob": "a01616d5fd7fce36ec57d2e912867fe2af868bb0",
+        "sha256": "0600d6a4568785f42b9f9efc753b5c7930a93d28c79cbe8383be20ac296bfd45"
+      }
+    ],
+    "guid": "9e33ed477ddd4fad9d90fb64b1a6f732",
+    "name": "StunningBarrierGreaterAbility",
+    "circle": 3,
+    "requiresPublishedList": true
+  },
+  "nativeDependencySHA256": {
+    "Assembly-CSharp.dll": "2cb7160b7154d4ffacc77b9c51b1eb26199e1294300f04fdfc073367b2ef8953",
+    "0Harmony.dll": "de50cd610ea22854c8930ec5433276713aee1bb0ecd785d6b15a0661c2fa9fd5"
+  },
+  "duplicateCheck": {
+    "upstream": "shenzhoudadi/CotW-Wrath",
+    "main": "56ff438",
+    "pullRequestsChecked": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      8,
+      9
+    ],
+    "allPublicBranchesChecked": true,
+    "publicForks": [
+      "sxl1216/CotW-Wrath"
+    ],
+    "forkMain": "04159f63b46d9ba67b65947cfdc84466bf1456b1",
+    "overlapFound": false,
+    "reservedOtherPackage": "COTW-0046 issue #6"
+  },
+  "execution": {
+    "compile": "未运行",
+    "compileSeconds": null,
+    "directedChecks": "未运行",
+    "directedSeconds": null,
+    "package": "未运行",
+    "uploadPlayerPackage": "未运行",
+    "gameLaunched": false,
+    "ummLaunched": false
+  },
+  "localEvidenceDirectory": "C:\\Users\\xuenc\\agent-tools\\psychic-detective-next",
+  "unproven": [
+    "HA real registration",
+    "real unit resource spend",
+    "level-up UI",
+    "save/respec controllers",
+    "player playtest"
+  ]
+}
