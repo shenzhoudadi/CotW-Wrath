@@ -4,7 +4,7 @@ Homebrew-Archetypes Investigator 的职业变体。基线 `1c0f3b027d263e195d6e1
 
 - **A 原作与依赖**。固定原作、31 个 HA 蓝图、14 个原生天敌供体和 10 个原生入口。已定位实际的灵感扣费、识怪检定、AC、豁免和精准伤害路径。[来源核对](A-source-and-compat.md) · [身份与指纹](A-evidence.json)
 - **C 行为冻结**。完整职业替换、识怪凭据、怪物分类、24 小时与付费重用、团队 Advice、一次性 Strike、天赋与存档边界。[合同](C-frozen-contract.md) · [定向预期](C-cases.json)
-- **B 实现**。已完成：职业接入、识怪与 Advice、Strike 与清退、生产注册与共享入口。隔离定向 214 条断言/14.69 秒 PASS。[B prompt](B-prompt.txt) · [B 证据摘要](B-summary.md)
+- **B 实现**。已完成（含 D 退回修复轮）：职业接入、识怪与 Advice、Strike 与清退、生产注册与共享入口；D-F01…F04 已修复。隔离定向 236 条断言 PASS（原 214 + D 验收 22）。[B prompt](B-prompt.txt) · [B 证据摘要](B-summary.md)
 - **D 复查**。另一会话独立核对提交、正反例、共享机制复用和未测边界。缺陷退原 B。[D prompt](D-prompt.txt)
 
 ## 实施顺序

@@ -71,8 +71,11 @@ sources = ['src/CryptidScholar0070.cs', 'src/CryptidScholarRuntime0070.cs',
 env = {k: v for k, v in os.environ.items() if not k.startswith('COTW_')}
 env.update(COTW_ARCANE_01446_ONLY='1', COTW_0070_CASE='cryptidscholar0070')
 stamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-report = out / 'cryptidscholar0070-report.json'
-log = out / ('cryptidscholar0070-%s.log' % stamp)
+# Generated artifacts carry absolute local paths; per the B/D handoff convention
+# they stay in the local delivery directory, never in the public repository.
+delivery.mkdir(parents=True, exist_ok=True)
+report = delivery / 'B-report.json'
+log = delivery / ('B-directed-' + stamp + '.log')
 for p in (report, log):
     if p.exists():
         p.unlink()
@@ -133,9 +136,7 @@ result = {
 }
 result['verdict'] = ('PASS' if process.returncode == 0 and result['passedLine'] and
                      not result['failureLines'] and not result['hostLogLines'] else 'NEEDS_REVIEW')
-(out / 'cryptidscholar0070-result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-delivery.mkdir(parents=True, exist_ok=True)
-(delivery / ('B-directed-' + stamp + '.log')).write_bytes(log.read_bytes())
+(delivery / 'B-result.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 (delivery / 'B-evidence.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 print('exit=%s seconds=%.2f checks=%s verdict=%s' % (process.returncode, elapsed, result['checkCount'], result['verdict']))
 print('PASS lines:', result['passedLine'])

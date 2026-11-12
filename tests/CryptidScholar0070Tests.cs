@@ -460,6 +460,11 @@ internal static class CryptidScholar0070Tests
         combat = Stage(cache, new BlueprintFeature(), StudiedCombatFeatureId, "InvestigatorStudiedCombatFeature");
         strike = Stage(cache, new BlueprintFeature(), StudiedStrikeFeatureId, "StudiedStrikeFeature");
         haResource = Stage(cache, new BlueprintAbilityResource(), InspirationResourceId, "InspirationResource");
+        // The real HA pool has a level-based maximum; give the staged resource
+        // a fixed maximum so native Restore clamping behaves like the game.
+        var maxAmount = Get(haResource, "m_MaxAmount");
+        Set(maxAmount, "BaseValue", 10);
+        Set(haResource, "m_MaxAmount", maxAmount);
         inspiration = Stage(cache, new BlueprintFeature(), InspirationFeatureId, "InspirationFeature");
         var grant = new AddAbilityResources { name = "HAInspirationGrant", RestoreAmount = true };
         Set(grant, "m_Resource", Ref<BlueprintAbilityResourceReference>(haResource));
@@ -666,6 +671,16 @@ internal static class CryptidScholar0070Tests
             prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(EnemyModel))));
         // Real production talent prefix; no other production patch is installed.
         h.CreateClassProcessor(T("CryptidScholarTalent0070Patch")).Patch();
+        // Grant-boundary probes must be patched before the first advice cast:
+        // the JIT inlines the short AddBuff wrappers into RunAction, and later
+        // detours would not intercept the inlined copies. Flags gate behavior.
+        grants = new Harmony("cotw.b.0070.grants");
+        addBuffs = AdviceAddBuffMethods();
+        foreach (var m in addBuffs)
+        {
+            grants.Patch(m, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(RefuseAdviceGrant))));
+            grants.Patch(m, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(FailSecondAdviceGrant))));
+        }
 
         var cache = parent;
         AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, cache);
@@ -693,6 +708,7 @@ internal static class CryptidScholar0070Tests
         PlainHaAndOldVariant(cache);
         RestoreAndCleanup(cache);
         ExpiryAndTypeChange(cache);
+        DFixes(cache);
 
         Console.WriteLine("0070 RESULT: " + checks + " directed assertions passed; staged provider fixture, not player-game validation.");
         Console.WriteLine("0070 NOT RUN: game/UMM startup, full historical suites, real HA plugin load, SaveManager/retraining controller, whole-library matrix.");
@@ -1232,10 +1248,11 @@ internal static class CryptidScholar0070Tests
         var willBefore = scholar.Stats.SaveWill.ModifiedValue;
         var replaced = SaveEvent(scholar, SavingThrowType.Will, monster, AbilityType.Supernatural);
         RulebookEventBus.OnEventAboutToTrigger(replaced);
-        Check(SaveDelta(scholar, StatType.SaveReflex, reflexBefore) == 2 && scholar.Stats.SaveWill.ModifiedValue == willBefore,
-            "C12 native replacement candidate receives the bonus, original stat untouched");
+        Check(SaveDelta(scholar, StatType.SaveReflex, reflexBefore) == 2 && SaveDelta(scholar, StatType.SaveWill, willBefore) == 2,
+            "C12 both real replacement candidates carry the temporary insight for the native comparison");
         replaced.OnDidTrigger();
-        Check(scholar.Stats.SaveReflex.ModifiedValue == reflexBefore, "C12 replaced candidate bonus cleaned up");
+        Check(scholar.Stats.SaveReflex.ModifiedValue == reflexBefore && scholar.Stats.SaveWill.ModifiedValue == willBefore,
+            "C12 both candidate bonuses cleaned up with the event");
         scholar.Parts.Remove<UnitPartSavingThrowsReplace>();
         // Existing insight from another source does not stack.
         var insight = scholar.Stats.AC.AddModifier(5, (EntityFact)null, ModifierDescriptor.Insight);
@@ -1627,5 +1644,238 @@ internal static class CryptidScholar0070Tests
         forcedDice = null;
         Check(CredentialOf(scholar).Contains(newKey) && AdviceBatchOf(scholar).Key == newKey,
             "C20 a real successful re-identification records the new category");
+    }
+    // ---------------------------------------------------- D-fix acceptance ---
+    private static int addBuffCalls;
+    private static bool throwOnSecondAdvice;
+    private static bool refuseAdviceGrant;
+    private static Harmony grants;
+    private static MethodInfo[] addBuffs;
+    // Declared host boundary: the lightweight fact manager does not execute
+    // PrepareFactForAttach, so native buff refusal is injected at the AddBuff
+    // return boundary (null), exactly the outcome RuleCanApplyBuff produces in
+    // the full game. Production handles the null identically.
+    private static bool RefuseAdviceGrant(BlueprintBuff __0, ref Buff __result)
+    {
+        if (refuseAdviceGrant && __0 == AdviceBuff(MainCache)) { __result = null; return false; }
+        return true;
+    }
+    private static bool FailSecondAdviceGrant(BlueprintBuff __0)
+    {
+        if (__0 != AdviceBuff(MainCache)) return true;
+        addBuffCalls++;
+        if (throwOnSecondAdvice && addBuffCalls == 2)
+            throw new InvalidOperationException("simulated mid-commit grant failure");
+        return true;
+    }
+    private static MethodInfo[] AdviceAddBuffMethods()
+    {
+        return new[]
+        {
+            AccessTools.Method(typeof(BuffCollection), "AddBuff", new[] { typeof(BlueprintBuff), typeof(MechanicsContext), typeof(TimeSpan?) }),
+            AccessTools.Method(typeof(BuffCollection), "AddBuff", new[] { typeof(BlueprintBuff), typeof(UnitEntityData), typeof(TimeSpan?), typeof(AbilityParams) })
+        };
+    }
+
+    private static void DFixes(BlueprintsCache cache)
+    {
+        var animal = Enemy(cache, "dfix-animal", 1, AnimalType);
+        UnitEntityData Learner(string name)
+        {
+            var scholar = Scholar(cache, 8, name, intScore: 16);
+            scholar.Stats.GetStat(StatType.SkillLoreNature).BaseValue = 30;
+            return scholar;
+        }
+
+        // ===== D-F01: native grant refusal is transactional =====
+        SetGameTime(TimeSpan.FromDays(200));
+        var caster = Learner("dfix-rollback");
+        areaUnits = new[] { caster };
+        Resource(caster, haResource, 2);
+        CastAdvice(caster, animal);
+        var prior = AdviceBatchOf(caster);
+        var receiptBefore = ReceiptOf(caster, KeyOf(animal)).Expires;
+        Check(prior != null && HasAdvice(caster, caster) && ResourceAmount(caster, haResource) == 2,
+            "D-F01 baseline free advice in force");
+        SetGameTime(TimeSpan.FromDays(200) + TimeSpan.FromSeconds(6));
+        refuseAdviceGrant = true;
+        var ra2 = AccessTools.Method(Main.GetType("CallOfTheWild.Wrath.Prototype.CryptidAdviceAction0070"), "RunAction");
+        var rai2 = ra2.GetMethodBody().GetILAsByteArray();
+        for (int i = 0; i < rai2.Length - 4; i++)
+            if (rai2[i] == 0x28 || rai2[i] == 0x6F)
+            {
+                int token = BitConverter.ToInt32(rai2, i + 1);
+                i += 4;
+            }
+        try { CastAdvice(caster, animal); }
+        finally { refuseAdviceGrant = false; }
+        Check(ResourceAmount(caster, haResource) == 2 && ReferenceEquals(prior, AdviceBatchOf(caster)) &&
+              ReceiptOf(caster, KeyOf(animal)).Expires == receiptBefore && HasAdvice(caster, caster),
+            "D-F01 full native refusal refunds the debit and preserves batch, receipt and live token");
+
+        // Mid-commit failure: second grant throws after the first succeeded.
+        var ally = Learner("dfix-rollback-ally");
+        areaUnits = new[] { caster, ally };
+        CastAdvice(caster, animal);
+        var prior2 = AdviceBatchOf(caster);
+        var receipt2 = ReceiptOf(caster, KeyOf(animal)).Expires;
+        Check(HasAdvice(caster, caster) && HasAdvice(ally, caster), "D-F01 mid-commit baseline reaches both recipients");
+        SetGameTime(GameTime() + TimeSpan.FromSeconds(6));
+        var balanceBefore = ResourceAmount(caster, haResource);
+        addBuffCalls = 0; throwOnSecondAdvice = true;
+        try { CastAdvice(caster, animal); }
+        finally { throwOnSecondAdvice = false; }
+        // ActionList.Run natively reports and swallows action exceptions; the
+        // contract is the rolled-back state, not exception propagation.
+        Check(ResourceAmount(caster, haResource) == balanceBefore && ReferenceEquals(prior2, AdviceBatchOf(caster)) &&
+              ReceiptOf(caster, KeyOf(animal)).Expires == receipt2 && HasAdvice(caster, caster) && HasAdvice(ally, caster),
+            "D-F01 mid-commit failure rolls back new tokens, refunds only this debit, preserves prior batch and receipt");
+
+        // Two-scholar interleaving: B's refusal never touches A's live batch.
+        SetGameTime(TimeSpan.FromDays(201));
+        var a = Learner("dfix-interleave-a");
+        var b = Learner("dfix-interleave-b");
+        var allyA = Learner("dfix-interleave-ally");
+        areaUnits = new[] { a, allyA };
+        CastAdvice(a, animal);
+        var batchA = AdviceBatchOf(a);
+        areaUnits = new[] { b };
+        CastAdvice(b, animal);
+        var batchB = AdviceBatchOf(b);
+        var bBalance = ResourceAmount(b, haResource);
+        SetGameTime(GameTime() + TimeSpan.FromSeconds(6));
+        refuseAdviceGrant = true;
+        try { CastAdvice(b, animal); }
+        finally { refuseAdviceGrant = false; }
+        Check(ResourceAmount(b, haResource) == bBalance && ReferenceEquals(batchB, AdviceBatchOf(b)) &&
+              ReferenceEquals(batchA, AdviceBatchOf(a)) && HasAdvice(allyA, a) && HasAdvice(a, a),
+            "D-F01 interleaved refusal preserves both scholars' batches and A's live tokens");
+        CastAdvice(a, animal);
+        Check(ResourceAmount(a, haResource) == 2 && AdviceBatchOf(a).Id != batchA.Id,
+            "D-F01 successful paid reuse still debits exactly one after the refusal cases");
+
+        // ===== D-F02: save source scope and native replacement comparison =====
+        SetGameTime(TimeSpan.FromDays(202));
+        var defender = Learner("dfix-save");
+        areaUnits = new[] { defender };
+        CastAdvice(defender, animal);
+        var friendly = Enemy(cache, "dfix-friendly", 1, AnimalType);
+        Enemies.Remove(friendly);
+        var will = defender.Stats.SaveWill;
+        var willBase = will.ModifiedValue;
+        var fromFriend = SaveEvent(defender, SavingThrowType.Will, friendly, AbilityType.Supernatural);
+        RulebookEventBus.OnEventAboutToTrigger(fromFriend);
+        Check(will.ModifiedValue == willBase, "D-F02 same-category ally source grants no save bonus");
+        fromFriend.OnDidTrigger();
+
+        var itemAbilityBp = new BlueprintAbility { Type = AbilityType.Supernatural, ComponentsArray = Array.Empty<BlueprintComponent>() };
+        itemAbilityBp.OnEnable();
+        var itemAbility = new Ability(itemAbilityBp, animal.Descriptor);
+        var sourceItem = MakeWeapon("dfix-item-source", AttackType.Melee);
+        object itemCasterRef = default(EntityRef<UnitEntityData>);
+        Set(itemCasterRef, "m_Proxy", Get(animal, "<Proxy>k__BackingField"));
+        Set(itemAbility.Data, "m_CasterRef", itemCasterRef);
+        var itemContext = new AbilityExecutionContext(itemAbility.Data, new AbilityParams { CasterLevel = 10, DC = 20 }, new TargetWrapper(defender));
+        Set(itemAbility, "<SourceItem>k__BackingField", sourceItem);
+        var itemEvent = new RuleSavingThrow(defender, SavingThrowType.Will, 20) { Reason = new RuleReason(itemContext) };
+        var willBeforeItem = will.ModifiedValue;
+        RulebookEventBus.OnEventAboutToTrigger(itemEvent);
+        Check(itemAbility.Data.SourceItem == sourceItem && will.ModifiedValue == willBeforeItem,
+            "D-F02 item-source ability grants no save bonus");
+        itemEvent.OnDidTrigger();
+
+        var hostileWill = will.ModifiedValue;
+        var hostileEvent = SaveEvent(defender, SavingThrowType.Will, animal, AbilityType.Supernatural);
+        RulebookEventBus.OnEventAboutToTrigger(hostileEvent);
+        Check(will.ModifiedValue == hostileWill + 2, "D-F02 hostile same-category Su still grants the bonus");
+        hostileEvent.OnDidTrigger();
+
+        var replace = defender.Ensure<UnitPartSavingThrowsReplace>();
+        Set(replace, "SavingThrowStat", StatType.SaveWill);
+        Set(replace, "ReplaceToStat", StatType.SaveReflex);
+        will.BaseValue = 7;
+        var otherInsight = will.AddModifier(5, defender.Facts.List.OfType<Feature>().First(f => f.Blueprint.AssetGuid == Lore(cache).AssetGuid), ModifierDescriptor.Insight);
+        will.BaseValue += 12 - will.ModifiedValue;
+        defender.Stats.SaveReflex.BaseValue += 11 - defender.Stats.SaveReflex.ModifiedValue;
+        Check(will.ModifiedValue == 12 && defender.Stats.SaveReflex.ModifiedValue == 11,
+            "D-F02 replacement inputs are Will 12 (existing +5 insight) and Reflex 11");
+        var replaceEvent = SaveEvent(defender, SavingThrowType.Will, animal, AbilityType.Supernatural);
+        RulebookEventBus.OnEventAboutToTrigger(replaceEvent);
+        Check(will.ModifiedValue == 12 && defender.Stats.SaveReflex.ModifiedValue == 13,
+            "D-F02 insight non-stacking keeps Will 12 and lifts Reflex to 13 for the native choice");
+        replaceEvent.OnDidTrigger();
+        Check(will.ModifiedValue == 12 && defender.Stats.SaveReflex.ModifiedValue == 11,
+            "D-F02 both candidate modifiers restore after the event");
+        will.RemoveModifier(otherInsight);
+        defender.Parts.Remove<UnitPartSavingThrowsReplace>();
+
+        // ===== D-F03: real holder set, self overwritten, outside party =====
+        SetGameTime(TimeSpan.FromDays(203));
+        var sa = Learner("dfix-source-a");
+        var sb = Learner("dfix-source-b");
+        var holder = Learner("dfix-holder");
+        var farHolder = Learner("dfix-far-holder");
+        Set(sb, "m_Position", new Vector3(-8, 0, 0));
+        Set(holder, "m_Position", new Vector3(8, 0, 0));
+        Set(farHolder, "m_Position", new Vector3(8, 0, 0));
+        areaUnits = new[] { sa, sb, holder, farHolder };
+        CastAdvice(sa, animal);
+        var batchSa = AdviceBatchOf(sa);
+        CastAdvice(sb, animal);
+        var batchSb = AdviceBatchOf(sb);
+        Check(!HasAdvice(sa, sa) && HasAdvice(sa, sb) && HasAdvice(holder, sa) && HasAdvice(farHolder, sa),
+            "D-F03 B overwrites A's own token while both far holders keep A's batch");
+        Set(farHolder, "m_Position", new Vector3(20, 0, 0));
+        CastStrike(sa);
+        Check(HasStrike(holder) && !HasStrike(farHolder) && !HasAdvice(holder, sa) && !HasAdvice(farHolder, sa) &&
+              HasAdvice(sa, sb) && ReferenceEquals(batchSb, AdviceBatchOf(sb)) && AdviceBatchOf(sa) == null,
+            "D-F03 conversion uses the real holder set: near holder gains Strike, far holder retires, B untouched");
+        var holdersJson = JObject.FromObject(batchSa, JsonSerializer.Create(new JsonSerializerSettings { ContractResolver = new Kingmaker.EntitySystem.Persistence.JsonUtility.OptInContractResolver() }));
+        Check(holdersJson["Holders"] != null && holdersJson["Holders"].Count() == 4,
+            "D-F03 batch serializes its four real holders");
+
+        SetGameTime(TimeSpan.FromDays(204));
+        var outsideCaster = Learner("dfix-outside-caster");
+        var outsideHolder = Learner("dfix-outside-holder");
+        var party = (List<UnitEntityData>)Get(Kingmaker.Game.Instance.Player, "m_PartyAndPets");
+        party.Remove(outsideHolder);
+        areaUnits = new[] { outsideCaster, outsideHolder };
+        CastAdvice(outsideCaster, animal);
+        Check(HasAdvice(outsideHolder, outsideCaster), "D-F03 ally outside PartyAndPets still receives Advice");
+        CastStrike(outsideCaster);
+        Check(HasStrike(outsideHolder) && !HasAdvice(outsideHolder, outsideCaster),
+            "D-F03 outside holder converts to Strike and retires its Advice token");
+        var outsideLore = outsideCaster.Facts.List.OfType<Feature>().First(f => f.Blueprint.AssetGuid == Lore(cache).AssetGuid);
+        Remove(outsideLore);
+        Check(!HasStrike(outsideHolder), "D-F03 losing the source retires the outside holder's Strike");
+        party.Add(outsideHolder);
+
+        // ===== D-F04: ray and touch weapon shapes never consume =====
+        SetGameTime(TimeSpan.FromDays(205));
+        var attacker = Learner("dfix-ray");
+        areaUnits = new[] { attacker };
+        CastAdvice(attacker, animal);
+        CastStrike(attacker);
+        var rayWeapon = MakeWeapon("dfix-ray-weapon", AttackType.RangedTouch, WeaponCategory.Ray);
+        var ray = DamageEvent(attacker, animal, Attack(attacker, animal, rayWeapon, true), rayWeapon);
+        RulebookEventBus.OnEventAboutToTrigger(ray); RulebookEventBus.OnEventDidTrigger(ray);
+        Check(PrecisionPackages(ray) == 0 && HasStrike(attacker),
+            "D-F04 ray with a real native weapon object neither adds precision nor consumes");
+        var touchWeapon = MakeWeapon("dfix-touch-weapon", AttackType.Touch, WeaponCategory.Touch);
+        var touch = DamageEvent(attacker, animal, Attack(attacker, animal, touchWeapon, true), touchWeapon);
+        RulebookEventBus.OnEventAboutToTrigger(touch); RulebookEventBus.OnEventDidTrigger(touch);
+        Check(PrecisionPackages(touch) == 0 && HasStrike(attacker),
+            "D-F04 touch placeholder weapon neither adds precision nor consumes");
+        var melee = MeleeWeapon();
+        var hitRoll = Attack(attacker, animal, melee, true);
+        var hit = DamageEvent(attacker, animal, hitRoll, melee);
+        RulebookEventBus.OnEventAboutToTrigger(hit); RulebookEventBus.OnEventDidTrigger(hit);
+        Check(PrecisionPackages(hit) == 1 && !HasStrike(attacker),
+            "D-F04 the preserved opportunity settles exactly once on the next real weapon hit");
+        var rider = DamageEvent(attacker, animal, hitRoll, null);
+        RulebookEventBus.OnEventAboutToTrigger(rider); RulebookEventBus.OnEventDidTrigger(rider);
+        Check(PrecisionPackages(rider) == 0,
+            "D-F04 secondary spell bundle of the same attack adds nothing");
+        grants.UnpatchAll(grants.Id);
     }
 }

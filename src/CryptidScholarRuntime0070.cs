@@ -16,11 +16,14 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.Controllers.Combat;
 using Kingmaker.Designers;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.Enums.Damage;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
@@ -43,6 +46,10 @@ using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 
 namespace CallOfTheWild.Wrath.Prototype
 {
+    public sealed class CryptidGrant0070
+    {
+        [JsonProperty, JsonConverter(typeof(ChargeUnitReferenceConverter))] public UnitReference Unit;
+    }
     public sealed class CryptidCooldownReceipt0070
     {
         [JsonProperty] public string Key;
@@ -54,6 +61,9 @@ namespace CallOfTheWild.Wrath.Prototype
         [JsonProperty] public string Key;
         [JsonProperty] public int Bonus;
         [JsonProperty] public TimeSpan Expires;
+        // The real grant set of this batch, including allies outside the
+        // current party list. Conversion and retirement walk these holders.
+        [JsonProperty] public List<CryptidGrant0070> Holders = new List<CryptidGrant0070>();
     }
     public sealed class CryptidScholarLedgerData0070
     {
@@ -61,6 +71,7 @@ namespace CallOfTheWild.Wrath.Prototype
         [JsonProperty] public List<CryptidCooldownReceipt0070> Receipts = new List<CryptidCooldownReceipt0070>();
         [JsonProperty] public CryptidAdviceBatch0070 Batch;
         [JsonProperty] public int NextBatchId;
+        [JsonProperty] public List<CryptidGrant0070> StrikeHolders = new List<CryptidGrant0070>();
     }
     public sealed class CryptidAdviceToken0070
     {
@@ -147,9 +158,6 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static readonly TimeSpan Day = TimeSpan.FromHours(24);
         internal static TimeSpan GameTime => Game.Instance.TimeController.GameTime;
 
-        internal static BlueprintAbilityResource InspirationResource(BlueprintsCache cache)
-            => cache.Load(BlueprintGuid.Parse(CryptidScholar0070Ids.InspirationResourceId)) as BlueprintAbilityResource;
-
         internal static Feature LedgerFactOf(UnitEntityData unit)
             => unit?.Facts?.List?.OfType<Feature>().FirstOrDefault(f =>
                 f.Blueprint.AssetGuid == Id(CryptidScholar0070Ids.LoreToken) && f.IsActive && f.IsTurnedOn);
@@ -204,11 +212,27 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool LiveAdvice(Buff buff)
             => buff != null && !buff.IsDisposed && buff.IsActive && buff.IsTurnedOn && !buff.IsSuppressed;
 
+        // The batch's real grant set first, then the current party as a safety
+        // net. Allies outside PartyAndPets keep their tokens addressable.
+        internal static IEnumerable<UnitEntityData> BatchUnits(CryptidAdviceBatch0070 batch, UnitEntityData caster)
+        {
+            var seen = new HashSet<UnitEntityData>();
+            if (batch?.Holders != null)
+                foreach (var grant in batch.Holders)
+                {
+                    var unit = grant?.Unit.Value;
+                    if (unit != null && seen.Add(unit)) yield return unit;
+                }
+            foreach (var unit in PartyUnits().Concat(new[] { caster }))
+                if (unit != null && seen.Add(unit)) yield return unit;
+        }
+
         // Q08. Only this caster's own batches and strikes are retired; another
         // scholar's Advice and every independent HA fact stay untouched.
-        internal static void RemoveOwnBatch(UnitEntityData caster, int batchId)
+        internal static void RemoveBatchTokens(UnitEntityData caster, CryptidAdviceBatch0070 batch)
         {
-            foreach (var unit in PartyUnits().Concat(new[] { caster }).Distinct().ToArray())
+            if (batch == null) return;
+            foreach (var unit in BatchUnits(batch, caster).ToArray())
             {
                 if (unit?.Buffs == null) continue;
                 foreach (var buff in unit.Buffs.Enumerable.ToArray())
@@ -216,14 +240,22 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (buff.Blueprint.AssetGuid != Id(CryptidScholar0070Ids.AdviceBuffToken)) continue;
                     if (!ReferenceEquals(buff.Context?.MaybeCaster, caster)) continue;
                     var token = AdviceToken(buff);
-                    if (token != null && token.BatchId == batchId && !buff.IsDisposed) buff.Remove();
+                    if (token != null && token.BatchId == batch.Id && !buff.IsDisposed) buff.Remove();
                 }
             }
         }
 
-        internal static void RemoveOwnSource(UnitEntityData caster)
+        internal static void RemoveStrikeGrants(UnitEntityData caster, List<CryptidGrant0070> holders)
         {
-            foreach (var unit in PartyUnits().Concat(new[] { caster }).Distinct().ToArray())
+            var units = new HashSet<UnitEntityData>();
+            if (holders != null)
+                foreach (var grant in holders)
+                {
+                    var unit = grant?.Unit.Value;
+                    if (unit != null) units.Add(unit);
+                }
+            foreach (var unit in PartyUnits().Concat(new[] { caster })) if (unit != null) units.Add(unit);
+            foreach (var unit in units.ToArray())
             {
                 if (unit?.Buffs == null) continue;
                 foreach (var buff in unit.Buffs.Enumerable.ToArray())
@@ -255,10 +287,12 @@ namespace CallOfTheWild.Wrath.Prototype
         protected override void OnTurnOff()
         {
             var owner = Owner;
-            CryptidScholarRuntime0070.RemoveOwnSource(owner);
+            CryptidScholarRuntime0070.RemoveBatchTokens(owner, Data.Batch);
+            CryptidScholarRuntime0070.RemoveStrikeGrants(owner, Data.StrikeHolders);
             Data.Credentials.Clear();
             Data.Receipts.Clear();
             Data.Batch = null;
+            Data.StrikeHolders.Clear();
         }
 
         protected override void OnApplyPostLoadFixes()
@@ -266,13 +300,14 @@ namespace CallOfTheWild.Wrath.Prototype
             var now = CryptidScholarRuntime0070.GameTime;
             Data.Receipts.RemoveAll(r => r.Expires <= now);
             if (Data.Batch != null && Data.Batch.Expires <= now) Data.Batch = null;
+            Data.StrikeHolders.RemoveAll(g => g?.Unit.Value == null);
         }
     }
 
     // Q05. Insight AC against the matching category's attacks and Insight saves
-    // against that category's Extraordinary/Supernatural/SpellLike sources.
-    // The token resolves its batch from the issuing scholar's live ledger, so a
-    // retired, replaced or expired batch never keeps granting bonuses.
+    // against that category's hostile Extraordinary/Supernatural/SpellLike
+    // sources. The token resolves its batch from the issuing scholar's live
+    // ledger, so a retired, replaced or expired batch never keeps granting.
     [TypeId("fde554123fb240348f24f589ec2e7f8c")]
     public sealed class CryptidAdviceBuff0070 : UnitBuffComponentDelegate<CryptidAdviceToken0070>,
         ITargetRulebookHandler<RuleCalculateAC>, IInitiatorRulebookHandler<RuleSavingThrow>,
@@ -313,21 +348,26 @@ namespace CallOfTheWild.Wrath.Prototype
             if (ability == null && context is AbilityExecutionContext execution) ability = execution.Ability;
             var type = ability?.Blueprint?.Type;
             if (type != AbilityType.Extraordinary && type != AbilityType.Supernatural && type != AbilityType.SpellLike) return;
+            if (ability.SourceItem != null) return;
             var caster = context.MaybeCaster;
-            if (caster == null || caster == Owner) return;
+            if (caster == null || caster == Owner || !caster.IsEnemy(Owner)) return;
             var key = CryptidClassification0070.KeyOf(caster);
             if (key == null || key != batch.Key) return;
-            // The native replacement comparison still decides the rolled stat;
-            // the bonus joins the same real candidate the native event uses.
-            var stat = Owner.Stats.GetStat(RuleSavingThrow.GetStatFromSavingThrow(evt.Type));
-            if (stat == null) return;
+            // D-F02: the bonus joins every real candidate of this save, so the
+            // native replacement comparison in RuleSavingThrow.OnTrigger sees
+            // the same modified values it will actually roll. Insight
+            // non-stacking and the final choice stay native; both temporary
+            // modifiers are cleaned up with the event.
+            var original = Owner.Stats.GetStat(RuleSavingThrow.GetStatFromSavingThrow(evt.Type));
+            if (original == null) return;
+            evt.AddTemporaryModifier(original.AddModifier(batch.Bonus, Runtime, ModifierDescriptor.Insight));
             var replace = Owner.Get<UnitPartSavingThrowsReplace>();
-            if (replace != null && replace.SavingThrowStat == stat.Type)
+            if (replace != null && replace.SavingThrowStat == original.Type)
             {
                 var alternative = Owner.Stats.GetStat(replace.ReplaceToStat);
-                if (alternative != null && alternative.ModifiedValue > stat.ModifiedValue) stat = alternative;
+                if (alternative != null && alternative != original)
+                    evt.AddTemporaryModifier(alternative.AddModifier(batch.Bonus, Runtime, ModifierDescriptor.Insight));
             }
-            evt.AddTemporaryModifier(stat.AddModifier(batch.Bonus, Runtime, ModifierDescriptor.Insight));
         }
         public void OnEventDidTrigger(RuleSavingThrow evt) { }
 
@@ -339,8 +379,8 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // Q06. One-shot precision conversion of the scholar's current Advice batch.
     // Only a real, qualifying weapon hit on the exact category consumes it;
-    // concealment, precision immunity, DisablePrecisionDamage, misses, rays and
-    // out-of-range ranged attacks never consume the opportunity.
+    // concealment, precision immunity, DisablePrecisionDamage, misses, rays,
+    // touch placeholders and out-of-range ranged attacks never consume it.
     [TypeId("eda899552790413ca2325c0433456dcd")]
     public sealed class CryptidStrikeBuff0070 : UnitBuffComponentDelegate<CryptidStrikeToken0070>,
         IInitiatorRulebookHandler<RulePrepareDamage>, IInitiatorRulebookSubscriber
@@ -363,6 +403,11 @@ namespace CallOfTheWild.Wrath.Prototype
             if (evt.DamageBundle.Empty()) return;
             var weapon = evt.DamageBundle.Weapon;
             if (weapon == null) return;
+            // D-F04: projectile rays and touch placeholders carry a real weapon
+            // shape but are not weapon attacks; same exclusion as the existing
+            // precision-style components in this project.
+            var category = weapon.Blueprint.Category;
+            if (category == WeaponCategory.Ray || category == WeaponCategory.Touch) return;
             if (evt.Initiator != Owner || evt.Target == null || evt.Target.State.IsDead) return;
             var key = CryptidClassification0070.KeyOf(evt.Target);
             if (key == null || key != token.Key) return;
@@ -396,9 +441,10 @@ namespace CallOfTheWild.Wrath.Prototype
     // Q03/Q04. The whole Move chain: native personal knowledge check (or the
     // scholar's own persisted credential), exact classification, audible allies
     // within 30 feet, conditional 1-point debit from the real HA inspiration
-    // pool and one traceable batch. Rejections leave Advice, resources and
-    // receipts untouched; a failed application refunds only the point actually
-    // debited by this cast.
+    // pool and one traceable batch. The grant is transactional: native buff
+    // rejection (AddBuff returning null) or a mid-commit failure preserves the
+    // previous batch, receipts and every source's live effects, and refunds
+    // only the point actually debited by this cast.
     [TypeId("da6b0676f79445b8b2e90c5c4c4a1497")]
     public sealed class CryptidAdviceAction0070 : ContextAction
     {
@@ -446,32 +492,53 @@ namespace CallOfTheWild.Wrath.Prototype
                     caster.Resources.Spend(resource, 1);
                     paid = true;
                 }
+                int bonus = Math.Min(5, caster.Progression.GetClassLevel(cls) / 4);
+                int rounds = new ContextValue { ValueType = ContextValueType.Rank, ValueRank = AbilityRankType.Default }.Calculate(Context);
+                if (rounds < 1) rounds = 1;
+                var duration = TimeSpan.FromSeconds(rounds * 6);
+                var now = CryptidScholarRuntime0070.GameTime;
+                int id = data.NextBatchId + 1;
+                var applied = new List<KeyValuePair<UnitEntityData, Buff>>();
                 try
                 {
-                    if (data.Batch != null) CryptidScholarRuntime0070.RemoveOwnBatch(caster, data.Batch.Id);
-                    int bonus = Math.Min(5, caster.Progression.GetClassLevel(cls) / 4);
-                    int rounds = new ContextValue { ValueType = ContextValueType.Rank, ValueRank = AbilityRankType.Default }.Calculate(Context);
-                    if (rounds < 1) rounds = 1;
-                    var duration = TimeSpan.FromSeconds(rounds * 6);
-                    var now = CryptidScholarRuntime0070.GameTime;
-                    int id = ++data.NextBatchId;
-                    data.Batch = new CryptidAdviceBatch0070 { Id = id, Key = key, Bonus = bonus, Expires = now + duration };
+                    // Apply first; the previous batch stays live until every
+                    // native grant has succeeded. A null return is a native
+                    // refusal (RuleCanApplyBuff) and skips that recipient.
                     foreach (var unit in recipients)
                     {
-                        // One Advice per recipient: a valid new batch replaces
-                        // any earlier Advice, regardless of its source.
-                        foreach (var old in unit.Buffs.Enumerable.Where(b => b.Blueprint.AssetGuid == advice.AssetGuid && !b.IsDisposed).ToArray())
-                            old.Remove();
                         var buff = unit.AddBuff(advice, Context, duration);
-                        if (buff == null) continue;
-                        foreach (var runtime in buff.Components.Where(r => r.SourceBlueprintComponent is CryptidAdviceBuff0070))
+                        if (buff != null) applied.Add(new KeyValuePair<UnitEntityData, Buff>(unit, buff));
+                    }
+                    if (applied.Count == 0)
+                    {
+                        if (paid) caster.Resources.Restore(resource, 1);
+                        return;
+                    }
+                    foreach (var pair in applied)
+                        foreach (var runtime in pair.Value.Components.Where(r => r.SourceBlueprintComponent is CryptidAdviceBuff0070))
                             using (runtime.RequestEventContext())
                             {
                                 var token = ((CryptidAdviceBuff0070)runtime.SourceBlueprintComponent).Token;
                                 token.BatchId = id;
                                 token.Key = key;
                             }
-                    }
+                    var previous = data.Batch;
+                    data.NextBatchId = id;
+                    data.Batch = new CryptidAdviceBatch0070
+                    {
+                        Id = id,
+                        Key = key,
+                        Bonus = bonus,
+                        Expires = now + duration,
+                        Holders = applied.Select(p => new CryptidGrant0070 { Unit = p.Key }).ToList()
+                    };
+                    CryptidScholarRuntime0070.RemoveBatchTokens(caster, previous);
+                    // One Advice per recipient: the committed batch replaces any
+                    // earlier Advice on each recipient, regardless of its source.
+                    foreach (var pair in applied)
+                        foreach (var old in pair.Key.Buffs.Enumerable.Where(x =>
+                            x.Blueprint.AssetGuid == advice.AssetGuid && !ReferenceEquals(x, pair.Value) && !x.IsDisposed).ToArray())
+                            old.Remove();
                     var receipt = data.Receipts.FirstOrDefault(r => r.Key == key);
                     if (receipt == null) data.Receipts.Add(new CryptidCooldownReceipt0070 { Key = key, Expires = now + CryptidScholarRuntime0070.Day });
                     else receipt.Expires = now + CryptidScholarRuntime0070.Day;
@@ -479,6 +546,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 }
                 catch
                 {
+                    foreach (var pair in applied) if (!pair.Value.IsDisposed) pair.Value.Remove();
                     if (paid) caster.Resources.Restore(resource, 1);
                     throw;
                 }
@@ -486,9 +554,11 @@ namespace CallOfTheWild.Wrath.Prototype
         }
     }
 
-    // Q06. Convert the scholar's own current Advice batch into one round of
-    // Knowledgeable Strike for the same-source holders still in range and
-    // audible. Other scholars' batches are never touched.
+    // Q06. Convert the scholar's current Advice batch into one round of
+    // Knowledgeable Strike for the batch's real holders still in range and
+    // audible. The caster's own token may have been replaced by another
+    // scholar; the batch lives on its remaining holders. Other scholars'
+    // batches are never touched.
     [TypeId("850b39cae3d546d487ab6a21fb78369f")]
     public sealed class CryptidStrikeAction0070 : ContextAction
     {
@@ -514,18 +584,12 @@ namespace CallOfTheWild.Wrath.Prototype
                 var data = ((CryptidScholarLedger0070)ledgerFact.Components.First(r => r.SourceBlueprintComponent is CryptidScholarLedger0070).SourceBlueprintComponent).Ledger;
                 var batch = data.Batch;
                 if (batch == null || batch.Expires <= CryptidScholarRuntime0070.GameTime) return;
-                var own = caster.Buffs.Enumerable.FirstOrDefault(b =>
-                    b.Blueprint.AssetGuid == advice.AssetGuid && CryptidScholarRuntime0070.LiveAdvice(b) &&
-                    ReferenceEquals(b.Context?.MaybeCaster, caster) &&
-                    CryptidScholarRuntime0070.AdviceToken(b)?.BatchId == batch.Id);
-                if (own == null) return;
-                var holders = CryptidScholarRuntime0070.PartyUnits().Concat(new[] { caster }).Distinct()
-                    .Where(u => u?.Buffs != null)
-                    .SelectMany(u => u.Buffs.Enumerable.Where(b =>
+                var holders = CryptidScholarRuntime0070.BatchUnits(batch, caster)
+                    .Select(u => new { Unit = u, Buff = u.Buffs?.Enumerable.FirstOrDefault(b =>
                         b.Blueprint.AssetGuid == advice.AssetGuid && CryptidScholarRuntime0070.LiveAdvice(b) &&
                         ReferenceEquals(b.Context?.MaybeCaster, caster) &&
-                        CryptidScholarRuntime0070.AdviceToken(b)?.BatchId == batch.Id)
-                        .Select(b => new { Unit = u, Buff = b }))
+                        CryptidScholarRuntime0070.AdviceToken(b)?.BatchId == batch.Id) })
+                    .Where(x => x.Buff != null)
                     .ToArray();
                 var eligible = holders.Where(h =>
                     CryptidScholarRuntime0070.AudibleListener(h.Unit) &&
@@ -551,7 +615,16 @@ namespace CallOfTheWild.Wrath.Prototype
                             token.Dice = batch.Bonus;
                             token.Expires = expires;
                         }
+                    if (!data.StrikeHolders.Any(g => g?.Unit.Value == unit))
+                        data.StrikeHolders.Add(new CryptidGrant0070 { Unit = unit });
                 }
+                data.StrikeHolders.RemoveAll(g =>
+                {
+                    var unit = g?.Unit.Value;
+                    return unit == null || !unit.Buffs.Enumerable.Any(b =>
+                        b.Blueprint.AssetGuid == strike.AssetGuid && !b.IsDisposed &&
+                        ReferenceEquals(b.Context?.MaybeCaster, caster));
+                });
                 CryptidScholarRuntime0070.ProcessedCasts.Add(Context, new object());
             }
         }
