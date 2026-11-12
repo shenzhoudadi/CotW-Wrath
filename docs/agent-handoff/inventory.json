@@ -3048,18 +3048,18 @@
           "external": []
         }
       ],
-      "note": "已核对原作、HA@211e9b8的31个蓝图与原生识怪、付费、防御和精准伤害入口；当前无实跑证据。",
+      "note": "合同C-0070-20261112-r1。D3通过；GitHub四个附件下载一致。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "施工中：A/C已完成，B待实现",
+      "status": "已完成开发／TEST交付：0.14.73 Cryptid Scholar TEST",
       "importance": "中",
       "dependsOn": [
         "Investigator 主体与相关能力稳定"
       ],
-      "action": "按docs/work-packages/COTW-0070交B实现与独立D复查，issue #13；沿用真实HA Investigator和资源",
+      "action": "按0.14.73 TEST收集反馈，见docs/work-packages/COTW-0070",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L30",
-      "currentProfile": "合同C-0070-20261112-r1与20项定向预期已冻结；编译与功能检查未运行",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "244条隔离定向，D3复跑5/5；真实HA与实机、存档、重训未测",
+      "ecosystemProfile": "本项目新增 HA Investigator 的 Cryptid Scholar 变体",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西"
     },

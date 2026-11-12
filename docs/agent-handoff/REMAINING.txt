@@ -18,8 +18,7 @@ COTW-0068 Psychic Detective
 COMPLETED_DEVELOPMENT_TEST — 0.14.72 TEST／issue #12。306 条定向／14.778 秒。四个附件下载一致；真实提供方与玩家边界未测。见docs/work-packages/COTW-0068/README.md。
 
 COTW-0070 Cryptid Scholar
-IN_PROGRESS_A_C_DONE — issue #13
-HA提供方蓝图与原生识怪、灵感支付、AC/豁免和命中路径已静态核对。合同C-0070-20261112-r1冻结，B待实现。真实提供方初始化及功能测试未运行。见docs/work-packages/COTW-0070/README.md。
+COMPLETED_DEVELOPMENT_TEST — 0.14.73 TEST／issue #13。244条本项定向，D3复跑5/5。四个附件下载一致；真实HA与玩家边界未测。见docs/work-packages/COTW-0070/README.md。
 
 COTW-0081 Esoteric Starseeker
 COMPLETED_DEVELOPMENT_TEST — 0.14.68 TEST，536条定向断言与D复查已完成。90项目录及5项外部能力按当前合同原子校验；实机未测边界见docs/starseeker/README.md。不再进入新迁移队列。

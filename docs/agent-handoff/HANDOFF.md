@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0070 Cryptid Scholar** — [issue #13](https://github.com/shenzhoudadi/CotW-Wrath/issues/13)。A/C/B已完成（含D与D2两轮退回修复），合同 C-0070-20261112-r1；B隔离定向244条断言PASS（原214+D验收22+D2验收8，候选DLL 7957DCB8…），D-F01…F04与D2-F01…F03已修复，待D复查受影响范围，TEST交付待用户授权。基线1c0f3b0 / 0.14.72 TEST，分支 feat/cotw-0070-cryptid-scholar-b。[ABCD交接](../work-packages/COTW-0070/README.md) · [B证据摘要](../work-packages/COTW-0070/B-summary.md)。
+- **COTW-0070 Cryptid Scholar** — [0.14.73 Cryptid Scholar TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST)已交付，4/4附件下载一致。D3复查通过，244条本项定向及D3复跑5/5。真实HA、实机、存读档和重训未测。[交接](../work-packages/COTW-0070/README.md) · [验证](../work-packages/COTW-0070/RELEASE-VERIFY.md)。
 
 - **COTW-0068 Psychic Detective** — [issue #12](https://github.com/shenzhoudadi/CotW-Wrath/issues/12)。A/C/B 与同会话 D2 已完成，[0.14.72 Psychic Detective TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.72-Psychic-Detective-TEST)已交付。发布核查修正 HA 晚加载。306 条定向／14.778 秒，4/4 附件下载一致。真实 HA／TTT、实机、存读档和重训仍未测。[交接与证据](../work-packages/COTW-0068/README.md)。
 
