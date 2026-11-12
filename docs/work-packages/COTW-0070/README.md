@@ -1,6 +1,6 @@
 # COTW-0070 Cryptid Scholar 交接
 
-Homebrew-Archetypes Investigator 的职业变体。基线 `1c0f3b027d263e195d6e1ca2946d4a4a3f68aad6` / 0.14.72 TEST，冻结合同 `C-0070-20261112-r1`。A/C/B 已完成，D 待独立复查。[施工 issue #13](https://github.com/shenzhoudadi/CotW-Wrath/issues/13)
+Homebrew-Archetypes Investigator 的职业变体。基线 `1c0f3b027d263e195d6e1ca2946d4a4a3f68aad6` / 0.14.72 TEST，冻结合同 `C-0070-20261112-r1`。A/C/B/D3 已完成，候选 `49a6d31`。[验证记录](RELEASE-VERIFY.md) · [GitHub TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST) · [issue #13](https://github.com/shenzhoudadi/CotW-Wrath/issues/13)
 
 - **A 原作与依赖**。固定原作、31 个 HA 蓝图、14 个原生天敌供体和 10 个原生入口。已定位实际的灵感扣费、识怪检定、AC、豁免和精准伤害路径。[来源核对](A-source-and-compat.md) · [身份与指纹](A-evidence.json)
 - **C 行为冻结**。完整职业替换、识怪凭据、怪物分类、24 小时与付费重用、团队 Advice、一次性 Strike、天赋与存档边界。[合同](C-frozen-contract.md) · [定向预期](C-cases.json)

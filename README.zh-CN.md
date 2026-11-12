@@ -1,16 +1,23 @@
-# 0.14.72 Psychic Detective TEST
+# 0.14.73 Cryptid Scholar TEST
 
 猫猫堡是猪猪
 
-本包新增 Psychic Detective（灵能侦探，COTW-0068）。在 Homebrew-Archetypes 的 Investigator 下选择此变体，即可使用智力自发六环法书、Psychic Meddler、Phrenic Dabbler 及两项专属侦探天赋。变体替换毒抗、毒免和 3 级普通天赋。混职的 Psychic 和侦探各用自己的法术书与资源池。
+猫猫堡别玩哈基米了快测试
 
-此变体需要真实可用的 HA Investigator。HA 晚于 CotW 加载时，提供方就绪后可由重试入口注册。可选法术按已启用的提供方接入。缺少可选法术时，变体仍可注册。复用的其他模块各按其发布说明安装依赖。[HA 参考版本](https://github.com/FrozenDervish/Homebrew-Archetypes/tree/211e9b82e252705dfaa7e4aa7507d9819737e232)
+本包新增 Cryptid Scholar（COTW-0070），是 Homebrew-Archetypes 的 Investigator 变体，保留该职业的法术书和灵感池。1 级获得 Intuitive Lore，4 级获得 Opportune Advice 和 Knowledgeable Strike，替换毒抗、毒免和 Studied Combat／Strike。
 
-退出游戏并备份存档和旧模组目录。用 ZIP 中完整的 CallOfTheWildWrathPrototype 文件夹替换现有 Owlcat 模组目录中的同名文件夹，保留全部子目录。默认模组目录为 %USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/。把备份移到 Modifications 目录外。
+- **Opportune Advice**：学者本人通过识怪检定后，给 30 英尺内能听见的盟友对该怪物类别的洞察防御加值。同类在 24 小时内再次使用需消耗 1 点灵感。
+- **Knowledgeable Strike**：结束自己的 Advice 批次，让仍在范围内的同源盟友在下一次合格武器命中时造成一次精准伤害。重点可测两名学者交错施放、授予失败后的旧效果和灵感余额，以及法术伤害与主武器命中先后结算。
 
-D2 同会话复查覆盖四项修复。本轮核查额外修正 HA 晚加载的注册入口。隔离宿主的 306 条定向断言通过，14.778 秒，包含实际 RegisterOptional 入口。真实 HA／TTT 插件加载、实机、实际施法支付与退款、降环账本、部分法术位转换、完整存读档和重训仍未验证。反馈请附职业等级、启用的提供方、操作步骤与日志。
+此变体需要真实可用的 Homebrew-Archetypes Investigator。缺少提供方时，本变体会延后注册。[HA 参考版本](https://github.com/FrozenDervish/Homebrew-Archetypes/tree/211e9b82e252705dfaa7e4aa7507d9819737e232)
 
-[GitHub 测试包](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.72-Psychic-Detective-TEST) · [变体与验证说明](https://github.com/shenzhoudadi/CotW-Wrath/tree/main/docs/work-packages/COTW-0068)
+退出游戏，备份存档和旧模组目录。用 ZIP 内的完整 `CallOfTheWildWrathPrototype` 文件夹替换 Owlcat 模组目录中的同名文件夹。默认位置为 `%USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/`。备份放在该目录外。
+
+本项隔离定向 244 条通过，D3 独立复跑 5/5。真实 HA 插件启动、玩家实机、完整存读档和重训仍待验证。反馈请附职业等级、启用的提供方、操作步骤与日志。
+
+[GitHub 测试包](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST) · [变体与验证说明](https://github.com/shenzhoudadi/CotW-Wrath/tree/main/docs/work-packages/COTW-0070)
+
+[0.14.72 Psychic Detective 测试说明](docs/releases/0.14.72-TEST.md)
 
 [0.14.71 Iroran Paladin 测试说明](docs/releases/0.14.71-TEST.md)
 
