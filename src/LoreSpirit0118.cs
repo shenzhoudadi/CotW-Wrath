@@ -386,18 +386,20 @@ namespace CallOfTheWild.Wrath.Prototype
         static Dictionary<FieldInfo, object> SnapshotReferences(BlueprintScriptableObject bp) => ReferenceFields(bp).ToDictionary(f => f, f => f.GetValue(bp));
         static void RestoreReferences(BlueprintScriptableObject bp, Dictionary<FieldInfo, object> snapshot) { foreach (var pair in snapshot) pair.Key.SetValue(bp, pair.Value); }
         static FieldInfo[] ReferenceFields(BlueprintScriptableObject bp) => bp.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(f => f.FieldType.IsArray && typeof(BlueprintReferenceBase).IsAssignableFrom(f.FieldType.GetElementType())).ToArray();
+        // SpiritTools' wandering pools are BlueprintAbility assets whose granted
+        // list lives in the AbilityApplyFact component's m_Facts, not in an array
+        // field on the blueprint. Scanning only ReferenceFields(bp) matched
+        // nothing, so Lore's hexes (and the Lore wandering spirit) were never
+        // offered by Wandering Hex. AppendFacts writes that component list, the
+        // same target SpiritTools.RegisterShamanHex / RegisterWanderingSpirit use.
         static void ConnectExternal(BlueprintScriptableObject[] external, BlueprintProgression root, BlueprintFeature[] hexes)
         {
             foreach (var bp in external)
             {
-                foreach (var field in ReferenceFields(bp))
-                {
-                    var array = (Array)field.GetValue(bp) ?? Array.CreateInstance(field.FieldType.GetElementType(), 0);
-                    var targets = ApplyFactPoolIds.Contains(bp.AssetGuid.ToString()) ? hexes.Cast<SimpleBlueprint>() : new SimpleBlueprint[] { root };
-                    var list = array.Cast<BlueprintReferenceBase>().ToList();
-                    foreach (var target in targets) if (!list.Any(r => r != null && r.Guid == target.AssetGuid)) list.Add((BlueprintReferenceBase)typeof(BlueprintReferenceBase).GetMethod("CreateTyped", BindingFlags.Static | BindingFlags.Public).MakeGenericMethod(field.FieldType.GetElementType()).Invoke(null, new object[] { target }));
-                    var next = Array.CreateInstance(field.FieldType.GetElementType(), list.Count); for (int i = 0; i < list.Count; i++) next.SetValue(list[i], i); field.SetValue(bp, next);
-                }
+                var targets = ApplyFactPoolIds.Contains(bp.AssetGuid.ToString())
+                    ? hexes.Cast<SimpleBlueprint>().ToArray()
+                    : new SimpleBlueprint[] { root };
+                PsychicAssets.AppendFacts(bp, targets);
             }
         }
         static void Reconcile(BlueprintsCache cache, BlueprintProgression root)

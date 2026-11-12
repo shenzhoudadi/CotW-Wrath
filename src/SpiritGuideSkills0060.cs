@@ -28,30 +28,34 @@ namespace CallOfTheWild.Wrath.Prototype
         private static readonly BlueprintGuid SpiritGuideId = SpiritGuideBridge0060.Id(SpiritGuideBridge0060.RootToken);
         private static readonly BlueprintGuid OracleId = BlueprintGuid.Parse(SpiritGuideBridge0060.OracleClassId);
 
-        // Read-only whitelist: the actual members of OracleMysterySelection
-        // (5531b975dcdf0e24c98f1ff7e017e741), audited offline against the game's
-        // own blueprint archive. Each carries its AddClassSkill components
-        // directly; skills are distinct within a member so (guid,skill,name) is
-        // a stable unique source key. See A-mystery-skill-whitelist.json.
-        internal static readonly HashSet<BlueprintGuid> MysteryMembers = new HashSet<BlueprintGuid>
+        // Read-only recognition of "this fact is an oracle mystery". Membership is
+        // decided by the OracleMystery feature group, which every mystery carries -
+        // Owlcat's nine and any mystery another mod registers - instead of a frozen
+        // GUID list. That list is why a modded mystery still handed out its extra
+        // class skills: it simply was not in it.
+        internal static bool IsMystery(SimpleBlueprint bp)
         {
-            BlueprintGuid.Parse("9936554e9372dab4a874c1dd165fb6f8"), // Ancestors
-            BlueprintGuid.Parse("6b8e676943cb91648b21b7ca72fbb833"), // Battle
-            BlueprintGuid.Parse("067b175d3df0d1a408efd7eee2b36b9b"), // Bones
-            BlueprintGuid.Parse("3b68909df737cd4458509d7f3a9c3706"), // Flame
-            BlueprintGuid.Parse("a5458a1c316d1f24e8d9770f4fc179fa"), // Life
-            BlueprintGuid.Parse("69579bfe28e15b942af0722021d8725c"), // Nature
-            BlueprintGuid.Parse("7bb4bb3e7fd26f34e8ca035a27e03e85"), // Stone
-            BlueprintGuid.Parse("e2f8bd7c45dfb954c8c42b168505c783"), // Waves
-            BlueprintGuid.Parse("7c1fdd831af747b47bb2cce0051f309b"), // Wind
-        };
+            if (bp == null) return false;
+            object raw;
+            try { raw = PsychicAssets.Get(bp, "Groups"); }
+            catch (MissingFieldException)
+            {
+                var property = AccessTools.Property(bp.GetType(), "Groups");
+                if (property == null) return false;
+                raw = property.GetValue(bp, null);
+            }
+            if (!(raw is System.Collections.IEnumerable items)) return false;
+            foreach (var item in items)
+                if (item != null && item.ToString() == "OracleMystery") return true;
+            return false;
+        }
 
         internal static bool IsSpiritGuide(UnitEntityData unit) => unit?.Progression?.Classes != null &&
             unit.Progression.Classes.Any(c => c.Level > 0 && c.CharacterClass != null &&
                 c.CharacterClass.AssetGuid == OracleId && c.Archetypes.Any(a => a != null && a.AssetGuid == SpiritGuideId));
 
         internal static bool InScope(UnitEntityData unit, EntityFact fact) =>
-            fact?.Blueprint != null && IsSpiritGuide(unit) && MysteryMembers.Contains(fact.Blueprint.AssetGuid);
+            fact?.Blueprint != null && IsSpiritGuide(unit) && IsMystery(fact.Blueprint);
 
         // Stable source key: source-fact blueprint identity + skill + the native
         // runtime component name (SourceBlueprintComponentName). The name is
@@ -147,7 +151,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 // re-gate on progression order (archetype may register late).
                 if (unit == null) return;
                 var ledger = unit.Ensure<Ledger>();
-                foreach (var fact in unit.Facts.List.Where(f => f.IsActive && f.IsTurnedOn && f.Blueprint != null && MysteryMembers.Contains(f.Blueprint.AssetGuid)).ToArray())
+                foreach (var fact in unit.Facts.List.Where(f => f.IsActive && f.IsTurnedOn && f.Blueprint != null && IsMystery(f.Blueprint)).ToArray())
                     foreach (var rc in fact.Components.Where(c => c.SourceBlueprintComponent is AddClassSkill && c.IsTurnedOn).ToArray())
                     {
                         var skill = ((AddClassSkill)rc.SourceBlueprintComponent).Skill;
@@ -168,7 +172,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 // Restore exactly one Retain for each suppressed source that is
                 // still alive; drop phantom keys whose source fact is gone.
                 var living = new HashSet<string>();
-                foreach (var fact in unit.Facts.List.Where(f => f.IsActive && f.IsTurnedOn && f.Blueprint != null && MysteryMembers.Contains(f.Blueprint.AssetGuid)).ToArray())
+                foreach (var fact in unit.Facts.List.Where(f => f.IsActive && f.IsTurnedOn && f.Blueprint != null && IsMystery(f.Blueprint)).ToArray())
                     foreach (var rc in fact.Components.Where(c => c.SourceBlueprintComponent is AddClassSkill && c.IsTurnedOn).ToArray())
                     {
                         var skill = ((AddClassSkill)rc.SourceBlueprintComponent).Skill;

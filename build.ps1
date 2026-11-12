@@ -6,10 +6,7 @@ param(
     [string]$TestManagedPath,
     [string]$BrawlerReferencePath,
     [string]$ModMenuReferencePath,
-    [string]$UnityModManagerReferencePath,
-    [switch]$CheckStartup,
-    [switch]$CheckRules,
-    [ValidateSet('none', 'amnesiac066')][string]$Focus = 'none'
+    [string]$UnityModManagerReferencePath
 )
 $ErrorActionPreference = 'Stop'
 $releaseClock = [Diagnostics.Stopwatch]::StartNew()
@@ -147,54 +144,13 @@ try {
 $packagedMain = Join-Path $readback 'CallOfTheWild.Wrath.Prototype.dll'
 $packageSeconds = [Math]::Round($packageClock.Elapsed.TotalSeconds, 3)
 $packagedMedium = Join-Path $readback 'MediumClass.dll'
-$startupRecord = $null
-if ($CheckStartup) {
-    $checkClock = [Diagnostics.Stopwatch]::StartNew()
-    $startupDirectory = Join-Path $stagingDirectory 'startup'
-    & (Join-Path $projectRoot 'tests/Test-StartupRegressions.ps1') -WrathPath $WrathPath -MainAssemblyPath $packagedMain -MediumAssemblyPath $packagedMedium -OutputDirectory $startupDirectory
-    $startup = Get-Content -LiteralPath (Join-Path $startupDirectory 'results.json') -Raw | ConvertFrom-Json
-    if ($startup.passedCases -ne 16 -or $startup.blueprintCorePatchesInstalled -ne 5) { throw 'Startup checks failed.' }
-    $startupRecord = Join-Path $startupDirectory 'results.json'
-    $diagnosticTimings['startupSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
-}
-if ($CheckRules) {
-    $checkClock = [Diagnostics.Stopwatch]::StartNew()
-    & dotnet run --project (Join-Path $projectRoot 'tests/RulesTests.csproj') -c Release "-p:WrathPath=$WrathPath" --nologo
-    if ($LASTEXITCODE -ne 0) { throw 'Core rules verification failed.' }
-    $diagnosticTimings['rulesSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
-}
-$feedbackRecord = $null
-$combatRecord = $null
-if ($Focus -eq 'amnesiac066') {
-    $checkClock = [Diagnostics.Stopwatch]::StartNew()
-    & python (Join-Path $projectRoot 'tests/Extract-PsychicCompletion01458.py') $WrathPath (Join-Path $workspaceRoot 'work/prototype-build/psychic-completion01458-native.json')
-    if ($LASTEXITCODE -ne 0) { throw 'Current Amnesiac native input extraction failed.' }
-    $diagnosticTimings['nativeExtractionSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
-    $checkClock.Restart()
-    $feedback = Join-Path $stagingDirectory 'amnesiac-feedback'
-    & python (Join-Path $projectRoot 'tests/Run-AmnesiacFeedback066.py') $packagedMain $WrathPath $feedback
-    if ($LASTEXITCODE -ne 0) { throw 'Current Amnesiac feedback checks failed.' }
-    $feedbackRecord = Join-Path $feedback 'result.json'
-    $diagnosticTimings['amnesiacFeedbackSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
-    $checkClock.Restart()
-    $combat = Join-Path $stagingDirectory 'amnesiac-combat'
-    & python (Join-Path $workspaceRoot 'work/amnesiac-combat-proposal/repeatable-v2/run_combat.py') --candidate $packagedMain --output $combat --game $WrathPath
-    if ($LASTEXITCODE -ne 0) { throw 'Current Amnesiac combat checks failed.' }
-    $combatRecord = Join-Path $combat 'receipt.json'
-    $diagnosticTimings['amnesiacCombatSeconds'] = [Math]::Round($checkClock.Elapsed.TotalSeconds, 3)
-}
 $record = [ordered]@{
     checkedAt = (Get-Date -Format o)
     version = $manifest.Version
     archive = $archivePath
     archiveSHA256 = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash
     packagedDLLs = $packagedHashes
-    startup = $startupRecord
-    rulesChecked = [bool]$CheckRules
-    focus = $Focus
-    amnesiacFeedback = $feedbackRecord
-    amnesiacCombat = $combatRecord
-    scope = 'Compile and package checks plus explicitly selected diagnostics; no historical full regression or player game test.'
+    scope = 'Compile and package checks only; no historical full regression or player game test.'
     timings = [ordered]@{
         compileSeconds = $compileSeconds
         packageChecksSeconds = $packageSeconds

@@ -217,9 +217,13 @@ namespace CallOfTheWild.Wrath.Prototype
     [TypeId("f28be72b3fed45c2a0275401dd2bfaa1")]
     public sealed class KineticWindsight01433 : UnitFactComponentDelegate
     {
-        static readonly BlueprintGuid FeatureId = Id(KineticUtility01433.WindsightToken);
+        // Marker component: any live fact carrying it (Windsight, or the
+        // 10th-level Stormwalker fog feature) sees through fog. The project's
+        // UnitPartConcealment.Calculate patch calls Filter for the initiator,
+        // which removes only ConcealmentDescriptor.Fog entries and restores them
+        // afterwards, leaving invisibility/blur/displacement intact.
         internal static bool Active(UnitEntityData unit) => unit?.Facts?.List.Any(f => f.IsTurnedOn && !f.IsDisposed &&
-            f.Blueprint.AssetGuid == FeatureId) == true;
+            f.Blueprint.GetComponent<KineticWindsight01433>() != null) == true;
         sealed class FogScope : IDisposable
         {
             readonly List<UnitPartConcealment.ConcealmentEntry> list;

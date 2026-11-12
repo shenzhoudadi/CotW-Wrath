@@ -71,7 +71,7 @@ namespace CallOfTheWild.Wrath.Prototype
         static void Connect(BlueprintCharacterClass rogue, BlueprintProgression progression, Receipt receipt, BlueprintFeatureSelection trick, BlueprintFeatureSelection pool)
         {
             var second = (BlueprintFeatureSelection)receipt.Assets[3]; bool once = OnceOnly(trick);
-            if (receipt.FirstRefs != null && (!Signature(second, "m_Features").SequenceEqual(receipt.FirstRefs) || !Signature(second, "m_AllFeatures").SequenceEqual(receipt.AllRefs))) throw new InvalidOperationException("Rogue Swashbuckler second Combat Trick child references changed.");
+            if (BlueprintRegistration.StrictPublishedGraphChecks && receipt.FirstRefs != null && (!Signature(second, "m_Features").SequenceEqual(receipt.FirstRefs) || !Signature(second, "m_AllFeatures").SequenceEqual(receipt.AllRefs))) throw new InvalidOperationException("Rogue Swashbuckler second Combat Trick child references changed.");
             var children = new[] { Refs(trick, "m_Features"), Refs(trick, "m_AllFeatures") }.Select(a => a.GroupBy(r => r?.Guid ?? default(BlueprintGuid)).Select(g => g.First()).ToArray()).ToArray();
             if (children.Any(a => a.Any(r => r == null || r.Guid == default(BlueprintGuid) || r.Guid == second.AssetGuid || r.Guid == receipt.Assets[0].AssetGuid))) throw new InvalidOperationException("Rogue Swashbuckler Combat Trick contains an invalid or recursive reference.");
             var archetypes = Get(rogue, "m_Archetypes"); var groups = progression.UIGroups; var oldChildren = new[] { Get(second, "m_Features"), Get(second, "m_AllFeatures") }; var oldPools = new[] { Get(pool, "m_Features"), Get(pool, "m_AllFeatures") };
@@ -100,8 +100,8 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (!ReferenceEquals(rogue, receipt.Class) || !ReferenceEquals(progression, receipt.Progression)) throw new InvalidOperationException("Rogue Swashbuckler parent identity changed.");
                     for (int i = 0; i < receipt.Assets.Length; i++) {
                         if (!ReferenceEquals(cache.Load(receipt.Assets[i].AssetGuid), receipt.Assets[i])) throw new InvalidOperationException("Rogue Swashbuckler published identity changed: " + receipt.Assets[i].name);
-                        if (receipt.Assets[i].ComponentsArray.Any(c => c == null || !ReferenceEquals(c.OwnerBlueprint, receipt.Assets[i]))) throw new InvalidOperationException("Rogue Swashbuckler published component ownership changed: " + receipt.Assets[i].name);
-                        var actual = Definition(receipt.Assets[i]); if (actual != receipt.Definitions[i]) throw new InvalidOperationException("Rogue Swashbuckler published asset changed: " + receipt.Assets[i].name + "; " + Migration01426.Difference(receipt.Definitions[i], actual));
+                        if (BlueprintRegistration.StrictPublishedGraphChecks && receipt.Assets[i].ComponentsArray.Any(c => c == null || !ReferenceEquals(c.OwnerBlueprint, receipt.Assets[i]))) throw new InvalidOperationException("Rogue Swashbuckler published component ownership changed: " + receipt.Assets[i].name);
+                        var actual = Definition(receipt.Assets[i]); if (BlueprintRegistration.StrictPublishedGraphChecks && actual != receipt.Definitions[i]) throw new InvalidOperationException("Rogue Swashbuckler published asset changed: " + receipt.Assets[i].name + "; " + Migration01426.Difference(receipt.Definitions[i], actual));
                     }
                     var previous = new LinkSnapshot(rogue, progression, (BlueprintFeatureSelection)receipt.Assets[3], pool, receipt);
                     try { Connect(rogue, progression, receipt, trick, pool); } catch { previous.Restore(); throw; } return;

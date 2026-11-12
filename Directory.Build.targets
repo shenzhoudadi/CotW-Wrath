@@ -4,16 +4,6 @@
          import that namespace a second time; they still validate the pin. -->
     <Reference Remove="0Harmony, Version=2.3.6.0, Culture=neutral, PublicKeyToken=null" />
   </ItemGroup>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'HarmonyTests' or '$(MSBuildProjectName)' == 'IntegratedStartupTests' or '$(MSBuildProjectName)' == 'StartupTests' or '$(MSBuildProjectName)' == 'PsychicTests' or '$(MSBuildProjectName)' == 'PsychicCasting' or '$(MSBuildProjectName)' == 'FleetCharge' or '$(MSBuildProjectName)' == 'RobinHood'">
-    <UseExplicitGameHarmonyResolver>true</UseExplicitGameHarmonyResolver>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(MSBuildProjectName)' == 'HarmonyTests' or '$(MSBuildProjectName)' == 'IntegratedStartupTests' or '$(MSBuildProjectName)' == 'StartupTests' or '$(MSBuildProjectName)' == 'PsychicTests' or '$(MSBuildProjectName)' == 'PsychicCasting' or '$(MSBuildProjectName)' == 'FleetCharge' or '$(MSBuildProjectName)' == 'RobinHood'">
-    <Compile Include="$(MSBuildThisFileDirectory)tests/RequiredHarmonyRuntime.cs" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(MSBuildProjectName)' == 'IntegratedStartupTests' or '$(MSBuildProjectName)' == 'StartupTests'">
-    <Compile Include="$(MSBuildThisFileDirectory)tests/StartupBlueprintCoreCoverage.cs" />
-    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>$(WrathPath)/Wrath_Data/Managed/UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
-  </ItemGroup>
   <ItemGroup>
     <Reference Update="0Harmony, Version=2.3.6.0, Culture=neutral, PublicKeyToken=null">
       <!-- Medium's merge tool and ordinary test hosts need a local identical

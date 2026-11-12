@@ -78,9 +78,17 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var ids = lists.Select(l => l.AssetGuid).ToArray();
             var existing = root.GetComponents<SpellListComponent>().ToArray();
-            if (existing.Any(c => !ReferenceEquals(c.OwnerBlueprint, root)))
+            // TTT and other mods legitimately append reciprocal SpellListComponents
+            // for their own specialist/Thassilonian tables. Those are validated
+            // below and never belong to our private root, so only enforce the
+            // ownership invariant during the strict first publication pass.
+            if (BlueprintRegistration.StrictPublishedGraphChecks && existing.Any(c => !ReferenceEquals(c.OwnerBlueprint, root)))
                 throw new InvalidOperationException("Time Stop published spell-list metadata has foreign component ownership.");
             foreach (var component in existing) {
+                // Late additions from other mods do not belong to our graph;
+                // the append logic below still sees them, but the strict
+                // publication audit only applies during the first pass.
+                if (!BlueprintRegistration.StrictPublishedGraphChecks && !ReferenceEquals(component.OwnerBlueprint, root)) continue;
                 if (component.GetType() != typeof(SpellListComponent))
                     throw new InvalidOperationException("Time Stop published spell-list metadata component type changed: " + component.GetType().FullName);
                 var reference = (BlueprintSpellListReference)Get(component, "m_SpellList");
@@ -106,7 +114,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (reciprocal == null || reciprocal.Length != 1 || !ReferenceEquals(reciprocal[0].Get(), root))
                     throw new InvalidOperationException("Time Stop external spell-list metadata is not uniquely reciprocal; " + detail);
             }
-            if (existing.GroupBy(c => ((BlueprintSpellListReference)Get(c, "m_SpellList")).Guid).Any(g => g.Count() != 1))
+            // During reconciliation another mod may have appended a second entry
+            // for one of its own lists; that is not a change to our private graph.
+            if (BlueprintRegistration.StrictPublishedGraphChecks && existing.GroupBy(c => ((BlueprintSpellListReference)Get(c, "m_SpellList")).Guid).Any(g => g.Count() != 1))
                 throw new InvalidOperationException("Time Stop published spell-list metadata has duplicate or foreign component ownership.");
             if (lists.Any(list => ((List<BlueprintAbilityReference>)Get(list.SpellsByLevel[9], "m_Spells")).Count(r => r?.Guid == root.AssetGuid) > 1))
                 throw new InvalidOperationException("Time Stop has duplicate own references in a published level-9 row; external row contents are preserved.");
@@ -151,8 +161,11 @@ namespace CallOfTheWild.Wrath.Prototype
             lock (state) {
                 if (state.Root != null) {
                     for (int i = 0; i < state.Assets.Length; i++)
-                        if (!ReferenceEquals(cache.Load(state.Assets[i].AssetGuid), state.Assets[i]) || Definition(state.Assets[i]) != state.Definitions[i] ||
-                            state.Assets[i].ComponentsArray.Any(c => !ReferenceEquals(c.OwnerBlueprint, state.Assets[i])) || state.Assets[i].ElementsArray.Any(e => !ReferenceEquals(e.Owner, state.Assets[i])))
+                        if (!ReferenceEquals(cache.Load(state.Assets[i].AssetGuid), state.Assets[i]) ||
+                            (BlueprintRegistration.StrictPublishedGraphChecks &&
+                             (Definition(state.Assets[i]) != state.Definitions[i] ||
+                              state.Assets[i].ComponentsArray.Any(c => !ReferenceEquals(c.OwnerBlueprint, state.Assets[i])) ||
+                              state.Assets[i].ElementsArray.Any(e => !ReferenceEquals(e.Owner, state.Assets[i])))))
                             throw new InvalidOperationException("Time Stop published graph changed: " + state.Assets[i].name);
                     TimeStopEngine01438.RegisterGraph(cache, (BlueprintAbilityAreaEffect)cache.Load(Id(AreaToken)), (BlueprintBuff)cache.Load(Id(EffectToken)));
                     ReconcileLists(cache, state.Root, Lists(cache)); return;

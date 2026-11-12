@@ -1,2 +1,0 @@
-先完整读取 C:\Users\xuenc\agent-tools\spirit-whisperer-next\HANDOFF-0117-ABCD-20261108.md（跨机器可读 GitHub docs/work-packages/COTW-0117/README.md），以及最新 WORK_STATUS、issue #7 和 A 三份产物。
-只执行其中角色 C：冻结F-0117与最小S-SPIRIT职业／Int／次要Cha、图所有权、支付／来源清理等合同，生产只读，不实现、不push、不启游戏／UMM、不跑全量。写 C-frozen-contract.md、C-cases.json，关键冲突无空白才明确B可执行。按全文范围，不改Speaker合同或生产。

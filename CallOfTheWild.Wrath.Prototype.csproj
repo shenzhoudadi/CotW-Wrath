@@ -64,6 +64,7 @@
     <Error Condition="!Exists('$(GameManaged)\Assembly-CSharp.dll')" Text="Set WOTR_GAME_PATH or pass -p:WrathPath=... to the installed Wrath game directory." />
   </Target>
   <ItemGroup><EmbeddedResource Include="assets/SleetStorm.png" LogicalName="CotW.SleetStorm.png" /></ItemGroup>
+<ItemGroup><EmbeddedResource Include="assets/StormStep.png" LogicalName="CotW.StormStep.png" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="assets/FogCloud.png" LogicalName="CotW.FogCloud.png" /><EmbeddedResource Include="assets/BowSpirit.png" LogicalName="CotW.BowSpirit.png" /><EmbeddedResource Include="assets/Fly.png" LogicalName="CotW.Fly.png" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="assets/SpiritualWeapon.png" LogicalName="CotW.SpiritualWeapon.png" /><EmbeddedResource Include="assets/SpiritualAlly.png" LogicalName="CotW.SpiritualAlly.png" /></ItemGroup>
 <ItemGroup><EmbeddedResource Include="assets/MagesSword.png" LogicalName="CotW.MagesSword.png" /></ItemGroup>

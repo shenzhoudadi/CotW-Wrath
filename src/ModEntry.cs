@@ -110,6 +110,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     state.InitialDispatchCompleted = true;
                 } else if (state.PendingCount != 0) BlueprintRegistration.RetryInitial(state, ReportModule);
                 registrationCompleted = true;
+                BlueprintRegistration.PublishedGraphChecksRelaxed = true;
                 WriteDiagnostics(state.PendingCount == 0 ? "Initial registration complete." : "Initial registration completed with pending modules; later ready/settings callbacks can retry them.");
                 TryMenu();
             } catch (Exception exception) {

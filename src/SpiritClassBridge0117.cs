@@ -8,6 +8,7 @@ using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -68,6 +69,10 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             internal readonly BlueprintsCache Cache;
             internal readonly Dictionary<string, BlueprintScriptableObject> Assets = new Dictionary<string, BlueprintScriptableObject>();
+            // Non-blueprint scratch space: shared helper results (option lists,
+            // candidate spell tables) that must be built once per cache but are
+            // not themselves published blueprints.
+            internal readonly Dictionary<string, object> Scratch = new Dictionary<string, object>();
             internal readonly List<string> Diagnostics = new List<string>();
             internal Factory(BlueprintsCache cache) { Cache = cache; }
 
@@ -121,6 +126,11 @@ namespace CallOfTheWild.Wrath.Prototype
 
             internal BlueprintProgression Progression(string token, string name, string description, LevelEntry[] entries, UIGroup[] groups)
                 => Add(new BlueprintProgression { LevelEntries = entries, UIGroups = groups, Ranks = 1 }, token, name, description);
+
+            // Adapter for helpers that construct a blueprint themselves and only
+            // need this package's identity namespace and salt.
+            internal BlueprintSpellList NextList(BlueprintSpellList list, string token, string name, string description)
+                => Add(list, token, name, description);
 
             internal void Enable() { foreach (var bp in Assets.Values) bp.OnEnable(); }
         }

@@ -78,7 +78,7 @@ namespace CallOfTheWild.Wrath.Prototype
             internal string Name;                 // localized spirit name, used for display only
             internal string Token;                // stable progression GUID, used for private identities
             internal BlueprintProgression Progression;
-            internal BlueprintFeature[] Tiers;    // L1, L8, L20 donor features
+            internal BlueprintFeature[] Tiers;    // L1, L8, L20 donor features (null when the donor has none)
             internal List<BlueprintFeature> Hexes = new List<BlueprintFeature>();
             // Per-tier resource shape copied from the donor itself.
             internal bool[] HasPool = new bool[3];
@@ -86,6 +86,11 @@ namespace CallOfTheWild.Wrath.Prototype
             internal StatType?[] PoolStat = new StatType?[3];
             internal bool[] PoolPerLevel = new bool[3];
             internal string[] TierNames = new string[3];
+            // Powers the donor grants beyond its 1/8/20 axis (Lore's repeatable
+            // Arcane Enlightenment picks at 10/12/14/16/18 and the second pick
+            // at 8). Cloned by the same donors, published on the wizard axis.
+            internal SortedDictionary<int, List<BlueprintFeatureBase>> Extra =
+                new SortedDictionary<int, List<BlueprintFeatureBase>>();
         }
 
         // A shaman hex is a spirit's own when one of its Any-group
@@ -129,17 +134,30 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (!HasGroup(progression, "ShamanSpirit")) continue;
                 var entries = progression.LevelEntries;
                 var l1 = Features(entries, 1);
+                var l8 = Features(entries, 8);
                 var l20 = Features(entries, 20);
                 if (l1.Count == 0 || l20.Count == 0) continue;
 
+                // A "repeatable choice" power (Lore's Arcane Enlightenment) is a
+                // feature selection of parametrized spell options, not a plain
+                // spirit power. Cloning it as a tier would keep the donor's own
+                // class binding, which is exactly why the pick never worked, so
+                // it is routed through the rebinding path below instead. The
+                // manifestation is the last plain feature of level 20 - Lore
+                // lists its eighth enlightenment pick before it.
                 var row = new Row
                 {
                     Name = Name(progression),
                     Token = progression.AssetGuid.ToString().Replace("-", ""),
                     Progression = progression,
-                    Tiers = new[] { l1[0], Features(entries, 8).FirstOrDefault(), l20[0] }
+                    Tiers = new[]
+                    {
+                        l1.FirstOrDefault(f => Usable(f)),
+                        l8.FirstOrDefault(f => Usable(f)),
+                        l20.LastOrDefault(f => Usable(f))
+                    }
                 };
-                if (row.Tiers[1] == null) continue;
+                if (row.Tiers[0] == null || row.Tiers[2] == null) continue;
 
                 // Any-group prerequisite pointing at the spirit, its L1 feature or
                 // the spirit's wandering wrapper (a progression that re-grants L1).
@@ -153,6 +171,22 @@ namespace CallOfTheWild.Wrath.Prototype
                             if (fact is BlueprintFeature feature) keys.Add(feature.AssetGuid);
                 }
                 row.Hexes.AddRange(hexes.Where(h => Owned(h, keys, row.Name)));
+                // Only the donor's repeatable spell choices travel as extras. The
+                // shaman true spirit ability (16th) is explicitly NOT part of this
+                // archetype's trade, and the manifestation already arrives as the
+                // level-20 tier, so neither is picked up here.
+                var taken = new HashSet<BlueprintGuid>(row.Tiers.Where(t => t != null).Select(t => t.AssetGuid));
+                foreach (var entry in entries ?? Array.Empty<LevelEntry>())
+                {
+                    var facts = ((IEnumerable<BlueprintFeatureBase>)entry?.Features ?? Array.Empty<BlueprintFeatureBase>())
+                        .OfType<BlueprintFeature>()
+                        .Where(f => IsRebadged(f) && !taken.Contains(f.AssetGuid))
+                        .ToList();
+                    if (facts.Count == 0) continue;
+                    if (!row.Extra.TryGetValue(entry.Level, out var bucket))
+                        row.Extra[entry.Level] = bucket = new List<BlueprintFeatureBase>();
+                    bucket.AddRange(facts);
+                }
                 rows.Add(row);
             }
             return rows.ToArray();
@@ -161,6 +195,34 @@ namespace CallOfTheWild.Wrath.Prototype
         private static List<BlueprintFeature> Features(LevelEntry[] entries, int level)
             => (entries ?? Array.Empty<LevelEntry>()).Where(e => e != null && e.Level == level)
                 .SelectMany(e => e.Features).OfType<BlueprintFeature>().ToList();
+
+        // A "repeatable choice" power is a feature selection whose options are
+        // parametrized spell picks (Lore's Arcane Enlightenment). It must travel
+        // through the rebinding path: a plain memberwise clone would keep the
+        // shaman class binding and the pick could never resolve.
+        private static bool IsRebadged(BlueprintFeature feature)
+        {
+            if (!(feature is BlueprintFeatureSelection selection)) return false;
+            var options = ((BlueprintFeatureReference[])Get(selection, "m_AllFeatures")
+                ?? Array.Empty<BlueprintFeatureReference>())
+                .Select(r => r?.Get()).OfType<BlueprintParametrizedFeature>().ToArray();
+            return options.Length > 0 && options.Any(o => o.ParameterType == FeatureParameterType.LearnSpell);
+        }
+
+        // The native hidden "spirit magic" feature only carries the bonus-spell
+        // list. A whisperer trade is exactly that: no spirit magic, so the
+        // feature is skipped instead of being cloned onto the wizard axis.
+        private static bool CarriesSpellList(BlueprintFeatureBase fact)
+        {
+            if (!(fact is BlueprintScriptableObject bp) || bp.ComponentsArray == null) return false;
+            return bp.ComponentsArray.Any(c => c != null && c.GetType().Name.Contains("AddSpecialSpellList"));
+        }
+
+        // A tier slot must be a plain spirit power: not a repeatable spell choice
+        // (those are rebound separately) and not the hidden bonus-spell carrier,
+        // which the whisperer never receives.
+        private static bool Usable(BlueprintFeature feature) =>
+            !IsRebadged(feature) && !CarriesSpellList(feature);
 
         private static T[] BlueprintSnapshot<T>(BlueprintsCache cache) where T : BlueprintScriptableObject
         {
@@ -270,8 +332,10 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             for (int tier = 0; tier < 3; tier++)
             {
-                row.TierNames[tier] = Name(row.Tiers[tier]);
-                ReadPoolShape(row.Tiers[tier], out row.HasPool[tier], out row.PoolBase[tier],
+                var donor = row.Tiers[tier];
+                row.TierNames[tier] = donor == null ? string.Empty : Name(donor);
+                if (donor == null) continue;
+                ReadPoolShape(donor, out row.HasPool[tier], out row.PoolBase[tier],
                     out row.PoolStat[tier], out row.PoolPerLevel[tier]);
             }
         }
@@ -324,6 +388,10 @@ namespace CallOfTheWild.Wrath.Prototype
             yield return WizardId; yield return SchoolId; yield return BondId; yield return WizardFeatId;
             yield return FamiliarId; yield return ExtraChannelId;
             yield return ShamanSpiritSelectionId; yield return ShamanHexSelectionId;
+            // The Arcane Enlightenment rewrite reads the shaman class (for its
+            // spell list) and the wizard list it excludes; both must exist before
+            // anything is staged.
+            yield return LoreArcane0119.ShamanId; yield return LoreArcane0119.WizardListId;
             foreach (var p in PoolIds) yield return p;
         }
 
@@ -369,7 +437,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     throw new InvalidOperationException("0117 published archetype identity changed.");
                 for (int i = 0; i < state.Assets.Length; i++)
                     if (!ReferenceEquals(cache.Load(state.Assets[i].AssetGuid), state.Assets[i]) ||
-                        ArchetypeBatch01445.Definition(state.Assets[i]) != state.Definitions[i])
+                        (BlueprintRegistration.StrictPublishedGraphChecks && ArchetypeBatch01445.Definition(state.Assets[i]) != state.Definitions[i]))
                         throw new InvalidOperationException("0117 published private blueprint changed: " + state.Assets[i].name);
                 var refs = (BlueprintArchetypeReference[])Get(state.Wizard, "m_Archetypes") ?? Array.Empty<BlueprintArchetypeReference>();
                 if (refs.Count(r => r != null && r.Guid == state.Root) != 1)
@@ -516,6 +584,18 @@ namespace CallOfTheWild.Wrath.Prototype
             var bond = f.Native<BlueprintFeatureSelection>(BondId);
             var wizardFeat = f.Native<BlueprintFeatureSelection>(WizardFeatId);
 
+            // The exclusive Arcane Enlightenment rewrite: candidate spells are
+            // the *shaman* list minus what the wizard list already offers, the
+            // gates are Wisdom and Charisma (10 + circle each), and the pick is
+            // written into the wizard spellbook. Built once per cache and shared
+            // by every cloned option of this package.
+            var shaman = f.Native<BlueprintCharacterClass>(LoreArcane0119.ShamanId);
+            var shamanList = shaman?.Spellbook?.SpellList;
+            var wizardList = f.Native<BlueprintSpellList>(LoreArcane0119.WizardListId);
+            var arcane = shamanList == null || wizardList == null
+                ? null
+                : LoreArcane0119.Candidate(f.NextList, "ArcaneEnlightenmentList", shamanList, wizardList);
+
             // Spirit Link: exactly one spirit progression, never a second or
             // wandering spirit and no daily switching.
             var link = Selection(f, "SpiritLink", "Spirit Link",
@@ -554,9 +634,33 @@ namespace CallOfTheWild.Wrath.Prototype
                 for (int tier = 0; tier < 3; tier++)
                     features[tier] = Tier(f, cache, wizard, row, tier);
 
+                // Off-axis donor powers (Lore's eight Arcane Enlightenment picks
+                // and its 20th-level manifestation) are cloned onto the same
+                // wizard axis instead of being dropped. Entries are merged per
+                // level so a donor's second level-8 pick stays a second choice.
+                var entries = new SortedDictionary<int, List<BlueprintFeatureBase>>();
+                for (int tier = 0; tier < 3; tier++)
+                    if (features[tier] != null)
+                        entries[new[] { 1, 8, 20 }[tier]] = new List<BlueprintFeatureBase> { features[tier] };
+                foreach (var pair in row.Extra)
+                {
+                    if (!entries.TryGetValue(pair.Key, out var bucket))
+                        entries[pair.Key] = bucket = new List<BlueprintFeatureBase>();
+                    int index = 0;
+                    foreach (var donor in pair.Value)
+                    {
+                        var extra = ExtraFact(f, cache, wizard, row, donor, pair.Key, arcane, index);
+                        if (extra != null) bucket.Add(extra);
+                        index++;
+                    }
+                }
+
+                var levelEntries = entries
+                    .Where(p => p.Value.Count > 0)
+                    .Select(p => Entry(p.Key, p.Value.ToArray())).ToArray();
                 var prog = f.Progression(row.Token + "Progression", row.Name, string.Empty,
-                    new[] { Entry(1, features[0]), Entry(8, features[1]), Entry(20, features[2]) },
-                    new[] { Group(features[0], features[1], features[2]) });
+                    levelEntries,
+                    new[] { Group(levelEntries.SelectMany(e => e.Features).ToArray()) });
                 SetClasses(prog, wizard);
                 // The spirit entry reuses the shaman spirit's own text and icon.
                 Present(prog, row.Progression);
@@ -713,7 +817,10 @@ namespace CallOfTheWild.Wrath.Prototype
             string display = row.TierNames[tier];
 
             var donorFeature = row.Tiers[tier];
-            if (donorFeature == null) throw new InvalidOperationException("tier donor missing: " + row.Name + " L" + new[] { 1, 8, 20 }[tier]);
+            // A spirit may have no plain power on one tier slot (Lore's level 8
+            // and 20 both carry repeatable spell picks); those slots are filled
+            // by the rebinding path instead.
+            if (donorFeature == null) return null;
             var feature = (BlueprintFeature)f.Clone(donorFeature, token, display, string.Empty);
             StripSpellLists(feature);
             // Keep the spirit power's own wording and icon.
@@ -742,6 +849,78 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (f.Assets.TryGetValue(token, out var existing)) return (BlueprintAbilityResource)existing;
             return Resource(f, token, baseValue, stat, perLevel);
+        }
+
+        // One donor fact that is not on the archetype's 1/8/20 axis. A repeatable
+        // spell choice is rebuilt as a private selection over rebinding cloning of
+        // the donor's own parametrized options, so the whisperer's version asks for
+        // Wisdom and Charisma and writes into the wizard book. Anything else is a
+        // plain spirit power and takes the ordinary clone path.
+        private static BlueprintFeatureBase ExtraFact(Factory f, BlueprintsCache cache, BlueprintCharacterClass wizard,
+            Row row, BlueprintFeatureBase donor, int level, BlueprintSpellList arcane, int index)
+        {
+            if (donor is BlueprintFeatureSelection selection && IsRebadged(selection))
+                return ArcaneSelection(f, wizard, row, selection, level, index, arcane);
+
+            if (!(donor is BlueprintFeature feature)) return null;
+            string token = row.Token + "Extra" + level + "Feature" + f.Assets.Count;
+            var clone = (BlueprintFeature)f.Clone(feature, token, Name(feature), string.Empty);
+            StripSpellLists(clone);
+            Present(clone, feature);
+            clone.ComponentsArray = clone.ComponentsArray
+                .Where(c => c != null && c.GetType().Name != "AddAbilityResources").ToArray();
+            var resource = HasConsumption(clone) ? GetOrCreateResource(f, token + "R1", 3, StatType.Charisma, false) : null;
+            Rebind(clone, wizard, DcStat, _ => resource);
+            CloneDirectAbilities(f, wizard, clone, token, DcStat, resource);
+            if (resource != null)
+                clone.ComponentsArray = clone.ComponentsArray.Concat(new BlueprintComponent[] { Grant(resource) }).ToArray();
+            return clone;
+        }
+
+        // The nine parametrized options are cloned once per spirit and shared by
+        // every selection of that spirit: a player sees the same 1..9 circle menu
+        // at every Arcane Enlightenment step, whichever level granted it.
+        private static List<BlueprintFeature> ArcaneOptions(Factory f, BlueprintCharacterClass wizard, Row row,
+            BlueprintFeatureSelection donor, BlueprintSpellList arcane)
+        {
+            string token = row.Token + "ArcaneOptions";
+            if (f.Scratch.TryGetValue(token, out var cached))
+                return (List<BlueprintFeature>)cached;
+
+            var options = ((BlueprintFeatureReference[])Get(donor, "m_AllFeatures")
+                ?? Array.Empty<BlueprintFeatureReference>())
+                .Select(r => r?.Get()).OfType<BlueprintParametrizedFeature>().ToArray();
+            var clones = new List<BlueprintFeature>();
+            for (int i = 0; i < options.Length; i++)
+            {
+                var source = options[i];
+                int circle = source.SpellLevel > 0 ? source.SpellLevel : i + 1;
+                var clone = (BlueprintParametrizedFeature)f.Clone(source,
+                    token + circle, source.Name, source.Description);
+                // Wisdom gates the shaman-list pick the whisperer is allowed to
+                // take; Charisma stays the secondary requirement of the original.
+                LoreArcane0119.Rebind(clone, wizard, arcane, StatType.Wisdom, StatType.Charisma, circle);
+                clones.Add(clone);
+            }
+            f.Scratch[token] = clones;
+            return clones;
+        }
+
+        // One selection per granted step. Two picks on the same level need two
+        // distinct blueprints: Wrath folds identical references in one LevelEntry
+        // into a single choice, which is what made the 8th-level pick count as one.
+        private static BlueprintFeatureSelection ArcaneSelection(Factory f, BlueprintCharacterClass wizard, Row row,
+            BlueprintFeatureSelection donor, int level, int index, BlueprintSpellList arcane)
+        {
+            var options = ArcaneOptions(f, wizard, row, donor, arcane);
+            string token = row.Token + "Arcane" + level + "x" + index;
+            if (f.Assets.TryGetValue(token, out var cached)) return (BlueprintFeatureSelection)cached;
+            var result = f.Add(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true },
+                token, donor.Name, donor.Description);
+            Set(result, "m_Features", options.Select(Ref<BlueprintFeatureReference>).ToArray());
+            Set(result, "m_AllFeatures", options.Select(Ref<BlueprintFeatureReference>).ToArray());
+            Icon(result, donor);
+            return result;
         }
 
         private static KeyValuePair<string, object> F(string key, object value) => new KeyValuePair<string, object>(key, value);
@@ -1212,73 +1391,6 @@ namespace CallOfTheWild.Wrath.Prototype
         public void OnEventDidTrigger(RuleDealDamage evt) { }
     }
 
-    [TypeId("0117c0e1a1b24c5d8e9f001122334403")]
-    internal sealed class DeathlyHealing0117 : UnitFactComponentDelegate, ITargetRulebookHandler<RuleHealDamage>, ITargetRulebookHandler<RuleDealDamage>
-    {
-        public void OnEventAboutToTrigger(RuleHealDamage evt)
-        {
-            if (evt.Target != Owner || evt.IsFake || evt.Interrupted) return;
-            if (!HarmsAsPositive(DescriptorOf(evt.SourceFact), SourceName(evt), evt.SourceFact != null || evt.Reason?.Context?.SourceAbility != null)) return;
-            int amount = Math.Max(0, evt.ValueWithoutReduction);
-            evt.Interrupted = true;
-            if (amount <= 0) return;
-            var damage = new DirectDamage(new DiceFormula(0, DiceType.Zero), amount) { IgnoreReduction = true };
-            Rulebook.Trigger(new RuleDealDamage(evt.Initiator, Owner, new DamageBundle(new BaseDamage[] { damage })));
-        }
-        public void OnEventDidTrigger(RuleHealDamage evt) { }
-        public void OnEventAboutToTrigger(RuleDealDamage evt)
-        {
-            if (evt.Target != Owner || evt.IsFake || evt.DamageBundle?.First == null) return;
-            if (evt.DamageBundle.First.Type != DamageType.Energy) return;
-            var energy = evt.DamageBundle.First as EnergyDamage;
-            if (energy == null || energy.EnergyType != DamageEnergyType.NegativeEnergy) return;
-            int amount = Math.Max(0, evt.DamageWithoutReduction);
-            evt.DamageBundle.First.AddModifier(new Kingmaker.RuleSystem.Rules.Modifier(-amount, ModifierDescriptor.UntypedStackable));
-            if (amount > 0) Rulebook.Trigger(new RuleHealDamage(evt.Initiator, Owner, amount));
-        }
-        public void OnEventDidTrigger(RuleDealDamage evt) { }
-        internal static bool HarmsAsPositive(SpellDescriptor descriptor, string sourceName, bool sourced)
-        {
-            if ((descriptor & SpellDescriptor.ChannelNegativeHeal) != 0) return false;
-            if ((descriptor & (SpellDescriptor.ChannelPositiveHeal | SpellDescriptor.ChannelPositiveHarm)) != 0) return true;
-            if (!sourced) return false;
-            var name = sourceName ?? "";
-            if (name.IndexOf("Negative", StringComparison.OrdinalIgnoreCase) >= 0) return false;
-            if (name.IndexOf("Inflict", StringComparison.OrdinalIgnoreCase) >= 0) return false;
-            return true;
-        }
-        static string SourceName(RuleHealDamage evt) =>
-            evt.SourceFact?.Blueprint?.name ?? evt.Reason?.Context?.SourceAbility?.name ?? "";
-        static SpellDescriptor DescriptorOf(Kingmaker.EntitySystem.EntityFact fact)
-        {
-            var component = fact?.Blueprint?.GetComponent<SpellDescriptorComponent>();
-            return component == null ? SpellDescriptor.None : component.Descriptor;
-        }
-    }
-
-    [TypeId("0117c0e1a1b24c5d8e9f001122334404")]
-    internal sealed class FogConcealment0117 : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleConcealmentCheck>
-    {
-        public void OnEventAboutToTrigger(RuleConcealmentCheck evt)
-        {
-            if (evt.Initiator != Owner || evt.Target == null) return;
-            var part = evt.Target.Get<Kingmaker.UnitLogic.Parts.UnitPartConcealment>();
-            if (part == null) return;
-            var field = AccessTools.Field(part.GetType(), "m_Concealments");
-            var entries = field?.GetValue(part) as System.Collections.IEnumerable;
-            if (entries == null) return;
-            bool any = false, onlyFog = true;
-            foreach (var entry in entries)
-            {
-                any = true;
-                var desc = AccessTools.Field(entry.GetType(), "Descriptor")?.GetValue(entry);
-                if (desc == null || desc.ToString() != "Fog") onlyFog = false;
-            }
-            if (any && onlyFog) AccessTools.Property(evt.GetType(), "ConcealmentValue")?.SetValue(evt, 0);
-        }
-        public void OnEventDidTrigger(RuleConcealmentCheck evt) { }
-    }
-
     [TypeId("0117c0e1a1b24c5d8e9f001122334405")]
     internal sealed class WeatherSpeed0117 : UnitFactComponentDelegate, Kingmaker.Controllers.Units.ITickEachRound, IGlobalSubscriber
     {
@@ -1314,113 +1426,4 @@ namespace CallOfTheWild.Wrath.Prototype
             return actual != null && Convert.ToInt32(actual) >= 2;
         }
     }
-
-    [TypeId("0117c0e1a1b24c5d8e9f001122334406")]
-    internal sealed class CrashingWaves0117 : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleCalculateAbilityParams>, IInitiatorRulebookHandler<RuleDealDamage>
-    {
-        public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
-        {
-            var spell = evt.Spell;
-            if (spell == null) return;
-            int level = WizardLevel();
-            if (Water(spell)) evt.AddBonusCasterLevel(level >= 8 ? 2 : 1);
-            else if (Cold(spell) && level >= 8) evt.AddBonusCasterLevel(2);
-        }
-        public void OnEventDidTrigger(RuleCalculateAbilityParams evt) { }
-        public void OnEventAboutToTrigger(RuleDealDamage evt)
-        {
-            if (evt.Initiator != Owner || evt.Target == null) return;
-            var spell = evt.SourceAbility;
-            if (spell == null) return;
-            int level = WizardLevel();
-            if (level < 16 && !Water(spell)) return;
-            int dc = 10 + level / 2 + Math.Max(0, Owner.Stats.Intelligence.Bonus);
-            var save = Rulebook.Trigger(new RuleSavingThrow(evt.Target, SavingThrowType.Fortitude, dc));
-            if (save.IsPassed) return;
-            evt.Target.Descriptor.State.AddCondition(UnitCondition.Prone);
-        }
-        public void OnEventDidTrigger(RuleDealDamage evt) { }
-        int WizardLevel()
-        {
-            var wizard = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("ba34257984f4c41408ce1dc2004e342e");
-            return wizard == null ? 0 : Owner.Progression.GetClassLevel(wizard);
-        }
-        static bool Cold(BlueprintAbility spell)
-        {
-            var desc = spell.GetComponent<SpellDescriptorComponent>()?.Descriptor ?? SpellDescriptor.None;
-            return (desc & SpellDescriptor.Cold) != 0;
-        }
-        static bool Water(BlueprintAbility spell)
-        {
-            var name = spell.name ?? "";
-            return name.IndexOf("Water", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Wave", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                   name.IndexOf("Hydraulic", StringComparison.OrdinalIgnoreCase) >= 0 || name.IndexOf("Tsunami", StringComparison.OrdinalIgnoreCase) >= 0;
-        }
-    }
-
-    [TypeId("0117c0e1a1b24c5d8e9f001122334407")]
-    internal sealed class SparklingAura0117 : UnitFactComponentDelegate, ITargetRulebookHandler<RuleAttackWithWeapon>
-    {
-        public void OnEventAboutToTrigger(RuleAttackWithWeapon evt) { }
-        // Shock the attacker only after a real hit with a metal weapon; the native metal test is Category.HasSubCategory(Metal).
-        public void OnEventDidTrigger(RuleAttackWithWeapon evt)
-        {
-            if (evt.Target != Owner || evt.AttackRoll == null || !evt.AttackRoll.IsHit || evt.AttackRoll.IsFake) return;
-            var type = evt.Weapon?.Blueprint?.Type;
-            if (type == null || !type.Category.HasSubCategory(WeaponSubCategory.Metal)) return;
-            var caster = Fact?.MaybeContext?.MaybeCaster ?? Owner;
-            int cha = caster.Stats.Charisma.Bonus;
-            if (cha <= 0) return;
-            var damage = new EnergyDamage(new DiceFormula(0, DiceType.Zero), cha, DamageEnergyType.Electricity);
-            Rulebook.Trigger(new RuleDealDamage(caster, Owner, new DamageBundle(new BaseDamage[] { damage })));
-        }
-    }
-
-    static class ChargeMemory0117
-    {
-        sealed class State { internal int Left; internal bool Ready; }
-        static readonly ConditionalWeakTable<Kingmaker.UnitLogic.Buffs.Buff, State> Table =
-            new ConditionalWeakTable<Kingmaker.UnitLogic.Buffs.Buff, State>();
-        internal static bool Spend(Kingmaker.UnitLogic.Buffs.Buff buff, int charges)
-        {
-            var state = Table.GetOrCreateValue(buff);
-            if (!state.Ready) { state.Left = charges; state.Ready = true; }
-            return --state.Left <= 0;
-        }
-        internal static int For(EntityFact fact)
-        {
-            var caster = fact?.MaybeContext?.MaybeCaster;
-            var wizard = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>("ba34257984f4c41408ce1dc2004e342e");
-            int level = caster == null || wizard == null ? 0 : caster.Progression.GetClassLevel(wizard);
-            if (level >= 16) return 3;
-            if (level >= 8) return 2;
-            return 1;
-        }
-    }
-
-    [TypeId("0117c0e1a1b24c5d8e9f001122334408")]
-    internal sealed class WardCharges0117 : UnitFactComponentDelegate, ITargetRulebookHandler<RuleAttackWithWeapon>
-    {
-        public void OnEventAboutToTrigger(RuleAttackWithWeapon evt) { }
-        public void OnEventDidTrigger(RuleAttackWithWeapon evt)
-        {
-            if (evt.Target != Owner || evt.AttackRoll == null || !evt.AttackRoll.IsHit || evt.AttackRoll.IsFake) return;
-            var buff = Fact as Kingmaker.UnitLogic.Buffs.Buff;
-            if (buff != null && ChargeMemory0117.Spend(buff, ChargeMemory0117.For(Fact))) buff.Remove();
-        }
-    }
-
-    [TypeId("0117c0e1a1b24c5d8e9f00112233440a")]
-    internal sealed class MistCharges0117 : UnitFactComponentDelegate, ITargetRulebookHandler<RuleAttackWithWeapon>
-    {
-        public void OnEventAboutToTrigger(RuleAttackWithWeapon evt) { }
-        public void OnEventDidTrigger(RuleAttackWithWeapon evt)
-        {
-            if (evt.Target != Owner || evt.AttackRoll == null || evt.AttackRoll.IsHit || evt.AttackRoll.IsFake) return;
-            if (evt.AttackRoll.Result.ToString().IndexOf("Conceal", StringComparison.Ordinal) < 0) return;
-            var buff = Fact as Kingmaker.UnitLogic.Buffs.Buff;
-            if (buff != null && ChargeMemory0117.Spend(buff, ChargeMemory0117.For(Fact))) buff.Remove();
-        }
-    }
-
 }

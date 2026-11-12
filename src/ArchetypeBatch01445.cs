@@ -103,7 +103,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var states=Published.GetValue(cache,_=>new Dictionary<string,Receipt>());
             if(!states.TryGetValue(root,out var r))return false;
             if(!ReferenceEquals(cls,r.Class)||!ReferenceEquals(cls.Progression,r.Progression))throw new InvalidOperationException("01445 native parent identity changed.");
-            for(int i=0;i<r.Assets.Length;i++)if(!ReferenceEquals(cache.Load(r.Assets[i].AssetGuid),r.Assets[i])||Definition(r.Assets[i])!=r.Definitions[i])throw new InvalidOperationException("01445 published private resource changed: "+r.Assets[i].name);
+            for(int i=0;i<r.Assets.Length;i++)if(!ReferenceEquals(cache.Load(r.Assets[i].AssetGuid),r.Assets[i])||(BlueprintRegistration.StrictPublishedGraphChecks&&Definition(r.Assets[i])!=r.Definitions[i]))throw new InvalidOperationException("01445 published private resource changed: "+r.Assets[i].name);
             Connect(r);return true;
         }
         // Incremental publication is used only by Drill Sergeant's late pool.

@@ -45,8 +45,11 @@ namespace CallOfTheWild.Wrath.Prototype
             Add(f,"Screech",3,"e17df9977b879b64e8a8cbb4b3569f19");
             Add(f,"CurseMajor",5,"8443ce803d2d31347897a3d85cc32f53");
             Add(f,"CurseMajor",6,"ba0401fdeb4062f40a7aa95b6f07fe89");
-            Add(f,"ObscuringMist",1,"bad8638d40639d04fa2f80a1cac67d6b","8443ce803d2d31347897a3d85cc32f53","4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89");
-            Add(f,"FogCloud",2,"bad8638d40639d04fa2f80a1cac67d6b","8443ce803d2d31347897a3d85cc32f53","4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89");
+            // The original four lists were Druid / Cleric / Magus / Wizard; add
+            // Shaman (c0c40e42), Witch (e17df997) and Hunter (d090b791) so both
+            // fog spells show up for Shaman, Witch, Magus and Hunter.
+            Add(f,"ObscuringMist",1,"bad8638d40639d04fa2f80a1cac67d6b","8443ce803d2d31347897a3d85cc32f53","4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89","c0c40e42f07ff104fa85492da464ac69","e17df9977b879b64e8a8cbb4b3569f19","d090b791bfe381740b98ed4ff909b1cf");
+            Add(f,"FogCloud",2,"bad8638d40639d04fa2f80a1cac67d6b","8443ce803d2d31347897a3d85cc32f53","4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89","c0c40e42f07ff104fa85492da464ac69","e17df9977b879b64e8a8cbb4b3569f19","d090b791bfe381740b98ed4ff909b1cf");
             Add(f,"SolidFog",4,"4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89");
             Add(f,"SleetStorm",3,"bad8638d40639d04fa2f80a1cac67d6b","4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89");
             Add(f,"RiverOfWind",4,"bad8638d40639d04fa2f80a1cac67d6b","4d72e1e7bd6bc4f4caaea7aa43a14639","ba0401fdeb4062f40a7aa95b6f07fe89");

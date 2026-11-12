@@ -16,6 +16,7 @@ using Kingmaker.RuleSystem;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
@@ -140,7 +141,94 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static AddFacts Facts(params BlueprintUnitFact[] facts) {
             var component = new AddFacts { name = "PsychicGrantedFacts" }; Set(component, "m_Facts", facts.Select(Ref<BlueprintUnitFactReference>).ToArray()); return component;
         }
-        internal void Enable() { foreach (var bp in Assets.Values) bp.OnEnable(); }
+        internal void Enable() { foreach (var bp in Assets.Values) bp.OnEnable(); PublishHexBridges(); }
         internal static void ApplyQLLocalization()=>QlTexts01460.Apply(Strings);
+
+        // Hex Vulnerability and Amplified Hex identify native hexes through frozen
+        // GUID tables. Hexes this project authors carry deterministic token GUIDs,
+        // so they are published from the built graph instead: a ShamanHex feature
+        // grants abilities through AddFacts, and an inverted single-fact
+        // AbilityTargetHasFact on one of those abilities is the 24-hour target
+        // lock that Hex Vulnerability may bypass. Enable() is the last step of a
+        // successful transaction, so a rolled-back module publishes nothing and a
+        // future hex is picked up without another GUID list.
+        internal void PublishHexBridges()
+        {
+            var abilities = Assets.Values.OfType<BlueprintAbility>()
+                .GroupBy(a => a.AssetGuid).ToDictionary(g => g.Key, g => g.First());
+            var buffs = Assets.Values.OfType<BlueprintBuff>()
+                .GroupBy(b => b.AssetGuid).ToDictionary(g => g.Key, g => g.First());
+            foreach (var feature in Assets.Values.OfType<BlueprintFeature>())
+            {
+                if (feature.Groups == null || !feature.Groups.Contains(FeatureGroup.ShamanHex)) continue;
+                foreach (var facts in (feature.ComponentsArray ?? Array.Empty<BlueprintComponent>()).OfType<AddFacts>())
+                {
+                    var granted = Get(facts, "m_Facts") as BlueprintUnitFactReference[];
+                    if (granted == null) continue;
+                    foreach (var reference in granted)
+                    {
+                        if (reference == null || !abilities.TryGetValue(reference.Guid, out var ability)) continue;
+                        SpellResourceFeats.PublishHex(ability);
+                        foreach (var check in (ability.ComponentsArray ?? Array.Empty<BlueprintComponent>()).OfType<AbilityTargetHasFact>())
+                        {
+                            if (!check.Inverted) continue;
+                            var locked = Get(check, "m_CheckedFacts") as BlueprintUnitFactReference[];
+                            if (locked == null || locked.Length != 1 || locked[0] == null) continue;
+                            if (buffs.TryGetValue(locked[0].Guid, out var cooldown))
+                                PsychicHexVulnerability.Publish(ability, cooldown);
+                        }
+                    }
+                }
+            }
+        }
+
+        // The SpiritTools wandering/unsworn pools are AbilityApplyFact components
+        // whose granted list lives inside the component (m_Facts), not in an array
+        // field on the blueprint. Writing only the blueprint's own reference fields
+        // silently matched nothing, which is why authored hexes never appeared in
+        // Wandering Hex and why Lore's hexes were missing from the same pools.
+        // This appends to every fact list a blueprint actually carries.
+        internal static int AppendFacts(BlueprintScriptableObject bp, IEnumerable<SimpleBlueprint> facts)
+        {
+            if (bp == null || facts == null) return 0;
+            var wanted = facts.Where(f => f != null).ToArray();
+            if (wanted.Length == 0) return 0;
+            int added = 0;
+            foreach (var component in bp.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+            {
+                if (component == null) continue;
+                var field = AccessTools.Field(component.GetType(), "m_Facts");
+                if (field == null || !field.FieldType.IsArray) continue;
+                var element = field.FieldType.GetElementType();
+                if (element == null || !typeof(BlueprintReferenceBase).IsAssignableFrom(element)) continue;
+                var current = (field.GetValue(component) as Array) ?? Array.CreateInstance(element, 0);
+                var list = current.Cast<BlueprintReferenceBase>().Where(r => r != null).ToList();
+                foreach (var fact in wanted)
+                {
+                    if (list.Any(r => r.Guid == fact.AssetGuid)) continue;
+                    list.Add(BlueprintReferenceBase.CreateTyped<BlueprintUnitFactReference>(fact));
+                    added++;
+                }
+                var next = Array.CreateInstance(element, list.Count);
+                for (int i = 0; i < list.Count; i++) next.SetValue(list[i], i);
+                field.SetValue(component, next);
+            }
+            return added;
+        }
+
+        // Read back the fact list a blueprint grants, for verification.
+        internal static HashSet<BlueprintGuid> GrantedFacts(BlueprintScriptableObject bp)
+        {
+            var result = new HashSet<BlueprintGuid>();
+            foreach (var component in bp?.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+            {
+                if (component == null) continue;
+                var field = AccessTools.Field(component.GetType(), "m_Facts");
+                if (field?.GetValue(component) is Array array)
+                    foreach (var item in array)
+                        if (item is BlueprintReferenceBase reference) result.Add(reference.Guid);
+            }
+            return result;
+        }
     }
 }

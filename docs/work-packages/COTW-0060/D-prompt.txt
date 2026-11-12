@@ -1,2 +1,0 @@
-完整读取 C:\Users\xuenc\agent-tools\spirit-guide-next\HANDOFF-0060-ABCD-20261110.md，再读同目录A/C/B产物与实际候选diff／DLL指纹，核对最新issue #10／WORK_STATUS。跨机器入口为docs/work-packages/COTW-0060/README.md。
-只执行独立角色D：生产只读，写D-review.md，重点查技能计数配对、来源撤销、Cha/Wis、Lore/Waves例外、原子门禁及证据层级；不以字段存在判支付／清理PASS。只列具体可定位问题退原B修复，同内容不重跑、不追加全量／全历史／游戏／UMM或完整存档UI门槛。通过后才由B统一TEST和GitHub交付。
