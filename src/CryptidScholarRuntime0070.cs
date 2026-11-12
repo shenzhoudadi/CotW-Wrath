@@ -401,6 +401,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (evt.ParentRule.DisablePrecisionDamage || roll.ImmuneToSneakAttack) return;
             if (roll.ConcealmentCheck != null && roll.ConcealmentCheck.Concealment != Concealment.None) return;
             if (evt.DamageBundle.Empty()) return;
+            // D2-F03: ability damage (ContextActionDealDamage) copies the
+            // attack's weapon and AttackRoll but sets SourceAbility; native
+            // weapon damage leaves SourceAbility null. Only weapon damage qualifies.
+            if (evt.ParentRule.SourceAbility != null) return;
             var weapon = evt.DamageBundle.Weapon;
             if (weapon == null) return;
             // D-F04: projectile rays and touch placeholders carry a real weapon
@@ -602,9 +606,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 var expires = CryptidScholarRuntime0070.GameTime + duration;
                 foreach (var unit in eligible)
                 {
-                    // One Strike per beneficiary: a new grant replaces the old.
-                    foreach (var old in unit.Buffs.Enumerable.Where(b => b.Blueprint.AssetGuid == strike.AssetGuid && !b.IsDisposed).ToArray())
-                        old.Remove();
+                    // D2-F02: grant first; a native refusal keeps the existing
+                    // opportunity. Only a successful new grant replaces the old.
                     var buff = unit.AddBuff(strike, Context, duration);
                     if (buff == null) continue;
                     foreach (var runtime in buff.Components.Where(r => r.SourceBlueprintComponent is CryptidStrikeBuff0070))
@@ -615,6 +618,8 @@ namespace CallOfTheWild.Wrath.Prototype
                             token.Dice = batch.Bonus;
                             token.Expires = expires;
                         }
+                    foreach (var old in unit.Buffs.Enumerable.Where(b => b.Blueprint.AssetGuid == strike.AssetGuid && !ReferenceEquals(b, buff) && !b.IsDisposed).ToArray())
+                        old.Remove();
                     if (!data.StrikeHolders.Any(g => g?.Unit.Value == unit))
                         data.StrikeHolders.Add(new CryptidGrant0070 { Unit = unit });
                 }

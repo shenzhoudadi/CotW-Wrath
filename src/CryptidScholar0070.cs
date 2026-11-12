@@ -200,6 +200,11 @@ namespace CallOfTheWild.Wrath.Prototype
             var strikeBuff = f.Buff(CryptidScholar0070Ids.StrikeBuffToken, "Knowledgeable Strike",
                 "The next successful unarmed, natural or weapon attack against the identified monster category deals additional precision damage. Ranged attacks qualify only within 30 feet. The opportunity ends after one qualifying hit or one round.",
                 new CryptidStrikeBuff0070 { name = "CryptidStrikeRules0070" });
+            // D2-F01/F02: staging must coexist with old tokens. Native Replace
+            // would remove another source's live buff during AddBuff, before
+            // the grant transaction commits; retirement is explicit on commit.
+            adviceBuff.Stacking = StackingType.Stack;
+            strikeBuff.Stacking = StackingType.Stack;
 
             var adviceAction = new CryptidAdviceAction0070
             {

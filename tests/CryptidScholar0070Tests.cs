@@ -16,6 +16,7 @@ using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Combat;
+using Kingmaker.Controllers.Units;
 using Kingmaker.Designers;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem;
@@ -285,11 +286,8 @@ internal static class CryptidScholar0070Tests
 
     private static bool ReportElementError(object __instance)
     {
-        Console.WriteLine("0070 ACTION EXCEPTION: " + __instance);
-        foreach (var prop in __instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-        {
-            try { Console.WriteLine("0070 ACTION PROP " + prop.Name + ": " + prop.GetValue(__instance)); } catch { }
-        }
+        // Expected injected failures are reported natively by ActionList; the
+        // host has no QA report window, so skip the report without noise.
         return false;
     }
     private static bool ReportException(object __0, Exception __1)
@@ -306,7 +304,9 @@ internal static class CryptidScholar0070Tests
         var caster = new Psychic070Tests.Caster(cache);
         var u = caster.Unit;
         var facts = new EntityFactsManager(u); Set(u, "Facts", facts);
-        var buffs = new BuffCollection(); buffs.Initialize(facts); Set(u, "Buffs", buffs);
+        // Game-faithful initialization: registering the fact processor makes
+        // the manager execute PrepareFactForAttach (native CanApply + stacking).
+        Set(u, "Buffs", facts.EnsureFactProcessor<BuffCollection>());
         var all = (List<ModifiableValue>)Get(u.Stats, "<AllStats>k__BackingField");
         foreach (var stat in new[] { StatType.Intelligence, StatType.Wisdom, StatType.Charisma, StatType.Strength, StatType.Dexterity, StatType.Constitution })
         {
@@ -671,16 +671,33 @@ internal static class CryptidScholar0070Tests
             prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(EnemyModel))));
         // Real production talent prefix; no other production patch is installed.
         h.CreateClassProcessor(T("CryptidScholarTalent0070Patch")).Patch();
-        // Grant-boundary probes must be patched before the first advice cast:
-        // the JIT inlines the short AddBuff wrappers into RunAction, and later
-        // detours would not intercept the inlined copies. Flags gate behavior.
+        // Grant probes must be patched before the first advice cast: the JIT
+        // inlines short wrappers into RunAction, and later detours would not
+        // intercept the inlined copies. Flags gate behavior. Refusal goes
+        // through the native RuleCanApplyBuff input (the fact processor is
+        // registered, so PrepareFactForAttach really executes); the mid-commit
+        // failure is injected at the AddBuff boundary after a native grant.
         grants = new Harmony("cotw.b.0070.grants");
         addBuffs = AdviceAddBuffMethods();
         foreach (var m in addBuffs)
-        {
-            grants.Patch(m, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(RefuseAdviceGrant))));
             grants.Patch(m, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(FailSecondAdviceGrant))));
-        }
+        var cab = AccessTools.Method(typeof(RuleCanApplyBuff), "OnTrigger", new[] { typeof(RulebookEventContext) });
+        grants.Patch(cab, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(NativeCanApply))));
+        grants.Patch(cab, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(CanApplyScene))));
+        h.Patch(AccessTools.Method(AccessTools.TypeByName("TurnBased.Controllers.CombatController"), "IsInTurnBasedCombat"),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(NoTurnBased))));
+        // Declared scene/settings boundaries for the native RuleCanApplyBuff path.
+        h.Patch(AccessTools.Method(typeof(GameHelper), "IsAttackingGreenNPC", new[] { typeof(UnitEntityData), typeof(UnitEntityData) }),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(NotGreenNpc))));
+        h.Patch(AccessTools.PropertyGetter(typeof(Kingmaker.Settings.SettingsRoot), "Difficulty"),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(NormalDifficulty))));
+        foreach (var init in typeof(Kingmaker.Settings.SettingsRoot).GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.Name == "Initialize"))
+            h.Patch(init, prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(SkipSettingsInit))));
+        var shadowType = AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => { try { return a.GetTypes(); } catch { return Array.Empty<Type>(); } })
+            .FirstOrDefault(x => x.Name == "ShadowSpellLogicExtension");
+        if (shadowType != null)
+            h.Patch(AccessTools.Method(shadowType, "SkipBecauseOfShadow"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(CryptidScholar0070Tests), nameof(NoShadowSkip))));
 
         var cache = parent;
         AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, cache);
@@ -1649,16 +1666,53 @@ internal static class CryptidScholar0070Tests
     private static int addBuffCalls;
     private static bool throwOnSecondAdvice;
     private static bool refuseAdviceGrant;
+    private static bool refuseStrikeGrant;
+    private static UnitEntityData refuseRecipient;
     private static Harmony grants;
     private static MethodInfo[] addBuffs;
-    // Declared host boundary: the lightweight fact manager does not execute
-    // PrepareFactForAttach, so native buff refusal is injected at the AddBuff
-    // return boundary (null), exactly the outcome RuleCanApplyBuff produces in
-    // the full game. Production handles the null identically.
-    private static bool RefuseAdviceGrant(BlueprintBuff __0, ref Buff __result)
+    private static bool NoTurnBased(ref bool __result) { __result = false; return false; }
+    private static bool NotGreenNpc(ref bool __result) { __result = false; return false; }
+    private static bool SkipSettingsInit() => false;
+    private static Kingmaker.Settings.DifficultySettings normalDifficulty;
+    private static bool NormalDifficulty(ref Kingmaker.Settings.DifficultySettings __result)
     {
-        if (refuseAdviceGrant && __0 == AdviceBuff(MainCache)) { __result = null; return false; }
-        return true;
+        if (normalDifficulty == null)
+        {
+            normalDifficulty = (Kingmaker.Settings.DifficultySettings)FormatterServices.GetUninitializedObject(typeof(Kingmaker.Settings.DifficultySettings));
+            var saField = typeof(Kingmaker.Settings.DifficultySettings).GetField("StatsAdjustments");
+            if (saField != null && !saField.FieldType.IsValueType)
+            {
+                var entity = FormatterServices.GetUninitializedObject(saField.FieldType);
+                foreach (var f in saField.FieldType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+                    if (f.FieldType.IsEnum || f.FieldType == typeof(int)) { f.SetValue(entity, 0); break; }
+                saField.SetValue(normalDifficulty, entity);
+            }
+        }
+        __result = normalDifficulty;
+        return false;
+    }
+    private static bool NoShadowSkip(ref bool __result) { __result = false; return false; }
+    // Declared scene boundary (same scope as ACScene): green-NPC, shadow and
+    // difficulty/story-mode inputs are controlled; the native Immunity and
+    // RemoveOnResurrect checks and the CanApply input stay real.
+    private static bool CanApplyScene(RuleCanApplyBuff __instance)
+    {
+        if (!__instance.CanApply) return false;
+        if (__instance.Immunity && !__instance.IgnoreImmunity) __instance.CanApply = false;
+        __instance.CanApply &= !__instance.Blueprint.RemoveOnResurrect || !__instance.Initiator.State.Features.Immortality || __instance.Initiator.State.ForceKill;
+        return false;
+    }
+
+
+    // Native refusal input: PrepareFactForAttach consults RuleCanApplyBuff and
+    // returns null when CanApply is false, exactly as in the full game.
+    private static void NativeCanApply(RuleCanApplyBuff __instance)
+    {
+        if (refuseAdviceGrant && __instance.Blueprint == AdviceBuff(MainCache) &&
+            (refuseRecipient == null || __instance.Initiator == refuseRecipient))
+            __instance.CanApply = false;
+        if (refuseStrikeGrant && __instance.Blueprint == StrikeBuff(MainCache))
+            __instance.CanApply = false;
     }
     private static bool FailSecondAdviceGrant(BlueprintBuff __0)
     {
@@ -1699,14 +1753,6 @@ internal static class CryptidScholar0070Tests
             "D-F01 baseline free advice in force");
         SetGameTime(TimeSpan.FromDays(200) + TimeSpan.FromSeconds(6));
         refuseAdviceGrant = true;
-        var ra2 = AccessTools.Method(Main.GetType("CallOfTheWild.Wrath.Prototype.CryptidAdviceAction0070"), "RunAction");
-        var rai2 = ra2.GetMethodBody().GetILAsByteArray();
-        for (int i = 0; i < rai2.Length - 4; i++)
-            if (rai2[i] == 0x28 || rai2[i] == 0x6F)
-            {
-                int token = BitConverter.ToInt32(rai2, i + 1);
-                i += 4;
-            }
         try { CastAdvice(caster, animal); }
         finally { refuseAdviceGrant = false; }
         Check(ResourceAmount(caster, haResource) == 2 && ReferenceEquals(prior, AdviceBatchOf(caster)) &&
@@ -1876,6 +1922,92 @@ internal static class CryptidScholar0070Tests
         RulebookEventBus.OnEventAboutToTrigger(rider); RulebookEventBus.OnEventDidTrigger(rider);
         Check(PrecisionPackages(rider) == 0,
             "D-F04 secondary spell bundle of the same attack adds nothing");
+
+        // ===== D2-F01: mid-commit failure preserves another scholar's tokens =====
+        SetGameTime(TimeSpan.FromDays(206));
+        var donor = Learner("d2-donor");
+        var r1 = Learner("d2-r1");
+        var r2 = Learner("d2-r2");
+        areaUnits = new[] { donor, r1, r2 };
+        CastAdvice(donor, animal);
+        var donorBatch = AdviceBatchOf(donor);
+        Check(HasAdvice(r1, donor) && HasAdvice(r2, donor), "D2-F01 donor advice live on both recipients");
+        var midCaster = Learner("d2-mid-caster");
+        areaUnits = new[] { midCaster };
+        CastAdvice(midCaster, animal);
+        var midPrior = AdviceBatchOf(midCaster);
+        var midReceipt = ReceiptOf(midCaster, KeyOf(animal)).Expires;
+        SetGameTime(GameTime() + TimeSpan.FromSeconds(6));
+        areaUnits = new[] { r1, r2 };
+        var midBalance = ResourceAmount(midCaster, haResource);
+        addBuffCalls = 0; throwOnSecondAdvice = true;
+        try { CastAdvice(midCaster, animal); }
+        finally { throwOnSecondAdvice = false; }
+        Check(ResourceAmount(midCaster, haResource) == midBalance &&
+              ReferenceEquals(midPrior, AdviceBatchOf(midCaster)) &&
+              ReceiptOf(midCaster, KeyOf(animal)).Expires == midReceipt &&
+              ReferenceEquals(donorBatch, AdviceBatchOf(donor)) &&
+              HasAdvice(r1, donor) && HasAdvice(r2, donor) &&
+              !HasAdvice(r1, midCaster) && !HasAdvice(r2, midCaster),
+            "D2-F01 mid-commit failure refunds, keeps donor tokens on both recipients and removes only the temporary grants");
+
+        // Partial native refusal: first recipient accepted, second refused.
+        SetGameTime(GameTime() + TimeSpan.FromSeconds(6));
+        var partBalance = ResourceAmount(midCaster, haResource);
+        refuseAdviceGrant = true; refuseRecipient = r2;
+        try { CastAdvice(midCaster, animal); }
+        finally { refuseAdviceGrant = false; refuseRecipient = null; }
+        Check(ResourceAmount(midCaster, haResource) == partBalance - 1 &&
+              AdviceBatchOf(midCaster).Id != midPrior.Id &&
+              HasAdvice(r1, midCaster) && !HasAdvice(r2, midCaster) && HasAdvice(r2, donor),
+            "D2-F01 partial refusal commits for the accepted recipient only and keeps the refused recipient's donor advice");
+
+        // ===== D2-F02: refused strike grant keeps the existing opportunity =====
+        SetGameTime(TimeSpan.FromDays(207));
+        var strikeA = Learner("d2-strike-a");
+        var strikeB = Scholar(cache, 12, "d2-strike-b", intScore: 16);
+        strikeB.Stats.GetStat(StatType.SkillLoreNature).BaseValue = 30;
+        var shared = Learner("d2-strike-shared");
+        areaUnits = new[] { strikeA, shared };
+        CastAdvice(strikeA, animal);
+        CastStrike(strikeA);
+        Check(HasStrike(shared) && StrikeTokenOf(shared).Dice == 2, "D2-F02 shared holder has A's 2d6 strike");
+        areaUnits = new[] { strikeB, shared };
+        CastAdvice(strikeB, animal);
+        refuseStrikeGrant = true;
+        CastStrike(strikeB);
+        refuseStrikeGrant = false;
+        var keptBuff = shared.Buffs.Enumerable.First(b => b.Blueprint.AssetGuid == StrikeBuff(cache).AssetGuid);
+        Check(HasStrike(shared) && StrikeTokenOf(shared).Dice == 2 && ReferenceEquals(keptBuff.Context?.MaybeCaster, strikeA) &&
+              AdviceBatchOf(strikeB) == null,
+            "D2-F02 refused B strike keeps A's opportunity and source; B's advice batch still ends");
+        CastAdvice(strikeB, animal);
+        CastStrike(strikeB);
+        var replacedBuff = shared.Buffs.Enumerable.First(b => b.Blueprint.AssetGuid == StrikeBuff(cache).AssetGuid);
+        Check(HasStrike(shared) && StrikeTokenOf(shared).Dice == 3 && ReferenceEquals(replacedBuff.Context?.MaybeCaster, strikeB),
+            "D2-F02 successful B grant replaces A's opportunity with B's 3d6");
+
+        // ===== D2-F03: spell damage carrying the weapon shape never consumes =====
+        SetGameTime(TimeSpan.FromDays(208));
+        var archer = Learner("d2-archer");
+        areaUnits = new[] { archer };
+        CastAdvice(archer, animal);
+        CastStrike(archer);
+        var bow = RangedWeapon();
+        Set(animal, "m_Position", Vector3.zero);
+        var sharedRoll = Attack(archer, animal, bow, true);
+        var spellBp = new BlueprintAbility { Type = AbilityType.Spell, ComponentsArray = Array.Empty<BlueprintComponent>() };
+        spellBp.OnEnable();
+        var spellPackage = DamageEvent(archer, animal, sharedRoll, bow);
+        spellPackage.ParentRule.SourceAbility = spellBp;
+        RulebookEventBus.OnEventAboutToTrigger(spellPackage); RulebookEventBus.OnEventDidTrigger(spellPackage);
+        Check(PrecisionPackages(spellPackage) == 0 && HasStrike(archer),
+            "D2-F03 spell package with the same hit roll and a real bow neither adds precision nor consumes");
+        var mainPackage = DamageEvent(archer, animal, sharedRoll, bow);
+        RulebookEventBus.OnEventAboutToTrigger(mainPackage); RulebookEventBus.OnEventDidTrigger(mainPackage);
+        Check(PrecisionPackages(mainPackage) == 1 && !HasStrike(archer),
+            "D2-F03 the main weapon package of the same attack settles exactly once afterwards");
+
         grants.UnpatchAll(grants.Id);
     }
 }
