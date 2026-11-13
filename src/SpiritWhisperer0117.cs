@@ -1390,40 +1390,4 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         public void OnEventDidTrigger(RuleDealDamage evt) { }
     }
-
-    [TypeId("0117c0e1a1b24c5d8e9f001122334405")]
-    internal sealed class WeatherSpeed0117 : UnitFactComponentDelegate, Kingmaker.Controllers.Units.ITickEachRound, IGlobalSubscriber
-    {
-        sealed class State { internal Kingmaker.EntitySystem.Stats.ModifiableValue.Modifier Speed; }
-        static readonly ConditionalWeakTable<UnitEntityData, State> Speeds = new ConditionalWeakTable<UnitEntityData, State>();
-        public void OnNewRound() => Refresh();
-        protected override void OnTurnOn() => Refresh();
-        protected override void OnTurnOff() => Clear();
-        void Refresh()
-        {
-            if (Owner == null) return;
-            var state = Speeds.GetOrCreateValue(Owner);
-            if (BadWeather())
-            {
-                if (state.Speed == null) state.Speed = Owner.Stats.Speed.AddModifier(10, ModifierDescriptor.UntypedStackable);
-            }
-            else if (state.Speed != null)
-            {
-                Owner.Stats.Speed.RemoveModifier(state.Speed);
-                state.Speed = null;
-            }
-        }
-        void Clear()
-        {
-            if (Owner != null && Speeds.TryGetValue(Owner, out var state) && state.Speed != null)
-                Owner.Stats.Speed.RemoveModifier(state.Speed);
-            if (Owner != null) Speeds.Remove(Owner);
-        }
-        static bool BadWeather()
-        {
-            var weather = Game.Instance?.Player?.Weather;
-            var actual = weather == null ? null : AccessTools.Property(weather.GetType(), "ActualWeather")?.GetValue(weather);
-            return actual != null && Convert.ToInt32(actual) >= 2;
-        }
-    }
 }

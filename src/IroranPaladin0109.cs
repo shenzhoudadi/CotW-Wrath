@@ -136,7 +136,11 @@ namespace CallOfTheWild.Wrath.Prototype
             var irori = f.Native<BlueprintFeature>(IroriId);
             var deities = f.Native<BlueprintFeatureSelection>(DeitySelectionId);
 
-            var deity = BuildIrori(f, irori);
+            // Registered, never granted. Granting Irori at 1st level made the
+            // creation deity step ask for a second, different deity, because the
+            // character already carried Irori when the step opened. The feature
+            // stays registered so saves from the 0.14.71 TEST package resolve it.
+            BuildIrori(f, irori);
             var proficiencies = BuildProficiencies(f);
             var unarmed = BuildUnarmed(f, paladin, monk);
             var defense = BuildConfidentDefense(f, paladin, monk);
@@ -149,8 +153,12 @@ namespace CallOfTheWild.Wrath.Prototype
             var excellence = BuildAura(f, IroranRerolls0109.AuraKind.Excellence, "Excellence", ExcellenceToken, "Aura of Excellence", ExcellenceText);
             var perfection = BuildAura(f, IroranRerolls0109.AuraKind.Perfection, "Perfection", PerfectionToken, "Aura of Perfection", PerfectionText);
 
-            // One PrerequisiteNoFeature per other native deity plus the Irori
-            // alignment mask; an existing deity is never replaced.
+            // One PrerequisiteNoFeature per other native paladin deity plus the
+            // Irori alignment mask. Every entry sits in the All group, so a
+            // character that has not reached the deity step passes all of them,
+            // and the only deity that keeps passing afterwards is Irori: the
+            // archetype is selectable before the deity choice and only with
+            // Irori once it is made.
             var prerequisites = ((BlueprintFeatureReference[])Get(deities, "m_AllFeatures") ?? Array.Empty<BlueprintFeatureReference>())
                 .Where(d => d != null && d.Guid != irori.AssetGuid).GroupBy(d => d.Guid)
                 .Select(g => { var p = new PrerequisiteNoFeature { name = "IroranNoDeity" + g.Key }; Set(p, "m_Feature", CopyData(g.First())); return (BlueprintComponent)p; })
@@ -166,7 +174,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 ComponentsArray = prerequisites,
                 AddFeatures = new[]
                 {
-                    Entry(1, deity, proficiencies, f.Native<BlueprintFeature>(ImprovedUnarmedStrikeId), unarmed, defense, trial),
+                    Entry(1, proficiencies, f.Native<BlueprintFeature>(ImprovedUnarmedStrikeId), unarmed, defense, trial),
                     Entry(3, excellence),
                     Entry(4, ki, f.Native<BlueprintFeature>(KiStrikeMagicId), trialExtra),
                     Entry(5, body),
@@ -200,18 +208,18 @@ namespace CallOfTheWild.Wrath.Prototype
             foreach (var feature in f.Assets.Values.OfType<BlueprintFeature>()) feature.IsClassFeature = true;
             foreach (var buff in f.Assets.Values.OfType<BlueprintBuff>()) buff.IsClassFeature = true;
 
-            var group = MagusBatch01454.Group(deity, proficiencies, unarmed, defense, trial, ki, body, excellence, perfection);
+            var group = MagusBatch01454.Group(proficiencies, unarmed, defense, trial, ki, body, excellence, perfection);
             var undoClass = MagusBatch01454.CaptureClass(paladin);
             Action undo = () => undoClass();
             void Connect()
             {
                 MagusBatch01454.ConnectArchetype(paladin, root, group);
-                MagusBatch01454.Determinators(paladin, deity, defense);
+                MagusBatch01454.Determinators(paladin, defense);
             }
             void Verify()
             {
                 MagusBatch01454.VerifyArchetype(paladin, root, group);
-                MagusBatch01454.VerifyDeterminators(paladin, deity, defense);
+                MagusBatch01454.VerifyDeterminators(paladin, defense);
                 VerifyTiers(f, unarmed);
             }
             MagusBatch01454.Publish(ModuleName, f, Connect, undo, Verify);

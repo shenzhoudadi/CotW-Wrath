@@ -48,7 +48,7 @@ namespace MediumClass.Medium
                 .AddPrerequisiteFeature(Guids.MediumChannelSpirit)
                 .AddComponent<MediumSpiritInfluenceFeatureComponent>()
                 .AddFactsChangeTrigger(checkedFacts: new() { BlueprintTool.GetRef<BlueprintUnitFactReference>(Guids.MediumChannelSpiritPrimarySpiritBuff) },
-                    onFactGainedActions: ActionsBuilder.New().ApplyBuffPermanent(marker),
+                    onFactGainedActions: ActionsBuilder.New().ApplyBuffPermanentFixed(marker),
                     onFactLostActions: ActionsBuilder.New().RemoveBuff(marker))
                 .Configure();
         }

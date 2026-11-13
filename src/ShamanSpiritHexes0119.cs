@@ -128,16 +128,19 @@ namespace CallOfTheWild.Wrath.Prototype
             internal Spec(string name, string spirits, string description) { Name = name; Spirits = spirits; Description = description; }
         }
 
+        // Descriptions are the original CotW text verbatim, including its
+        // typographic apostrophes and wording. Only the sentences whose effect
+        // actually changed in this port were adjusted.
         internal static readonly Spec[] Specs =
         {
-            new Spec("Curse of Suffering", "Battle,Life", "The target takes 1 extra point of damage whenever it takes bleed damage, and healing restores only half. The curse lasts one round per shaman level. A creature cannot be targeted by this hex again for 24 hours."),
-            new Spec("Enveloping Void", "Heavens", "One enemy within close range is blinded for a number of rounds equal to your shaman level. A Will save negates. Whether or not it succeeds, that creature cannot be targeted by this hex again for 24 hours."),
-            new Spec("Heaven's Leap", "Heavens", "Choose one ally or yourself within close range, then choose a point within close range; that creature moves there. A creature cannot be targeted by this hex again for 24 hours."),
-            new Spec("Stormwalker", "Nature", "While the weather is bad, your speed increases by 10 feet. At 10th level you ignore concealment from fog."),
-            new Spec("Loadstone", "Stone", "One creature within close range is slowed, as the slow spell. A Will save negates. Whether or not it succeeds, that creature cannot be targeted by this hex again for 24 hours."),
-            new Spec("Crashing Waves", "Waves", "Water spells you cast are cast at a higher caster level and can knock a damaged target prone unless it succeeds at a Fortitude save. From 8th level cold spells are also cast higher; from 16th level any damaging spell can knock the target prone."),
-            new Spec("Mist's Shroud", "Waves", "A willing creature gains blur concealment until an attack misses because of it, or for 1 minute. At 8th level the mist lasts through one extra such miss, and at 16th through two. A creature cannot be targeted by this hex again for 24 hours."),
-            new Spec("Fluid Magic", "Waves", "Your magic is not constrained by the reservoirs that hold others back. Your spirit magic spells are cast from your normal spell slots.")
+            new Spec("Curse of Suffering", "Battle,Life", "The shaman causes a creature within 30 feet to take more damage from bleed effects and causes its wounds to heal at a slower rate. When the cursed creature takes bleed damage, it takes 1 additional point of bleed damage (even if the bleed is ability damage). Furthermore, when the target is subject to an effect that would restore its hit points, that effect restores only half the normal amount of hit points. This curse lasts for a number of rounds equal to the shaman’s level. A creature affected by this hex cannot be affected by it again for 24 hours."),
+            new Spec("Enveloping Void", "Heavens", "The shaman curses one creature with the dark void. As a standard action, the shaman can cause one enemy within close range to become blind. This effect lasts for a number of rounds equal to the shaman’s level. A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours."),
+            new Spec("Heaven's Leap", "Heavens", "The shaman is adept at creating tiny tears in the fabric of space, and temporarily stitching them together to reach other locations through a limited, one-way wormhole. As a standard action, the shaman can designate herself or a single ally that she can see who is within close range of her. She can move that creature to any point within close range of herself. Once targeted by this hex, the ally cannot be the target of this hex again for 24 hours."),
+            new Spec("Stormwalker", "Nature", "The shaman can move through non-magical fog, rain, mist, snow, and other environmental effects without penalty. She is never slowed by such effects. At 10th level she is also ignoring any concealement that is provided by environmental effects, whether or not they are magical in nature."),
+            new Spec("Loadstone", "Stone", "The shaman causes one creature within 30 feet to become heavy and lethargic. The creature is treated as if it suffered effect of slow spell. The effect lasts for a number of rounds equal to the shaman’s level. A successful Will saving throw negates this effect. Whether or not the save is successful, the creature cannot be the target of this hex again for 24 hours."),
+            new Spec("Crashing Waves", "Waves", "The force of a waves shaman’s water spells can bring even the mightiest of foes to the ground. When the shaman casts a spell with the water descriptor, she does so at 1 caster level higher. If that spell deals damage, the target must succeed at a Fortitude saving throw or be knocked prone; a cold spell the shaman casts can knock the target prone in the same way. At 8th level, the shaman casts cold spells at 2 caster levels higher. At 16th level, her ability to knock creatures prone extends to any spell that deals damage."),
+            new Spec("Mist's Shroud", "Waves", "The shaman touches a willing creature (including herself ) and enshrouds that creature in mist. This grants the creature concealment as the blur spell. The mist dissipates after it causes an attack to miss because of concealment or after 1 minute, whichever comes first. At 8th and 16th levels, the mist lasts for one additional attack. A creature affected by this hex cannot be affected by it again for 24 hours."),
+            new Spec("Fluid Magic", "Waves", "The shaman’s magic is not constrained by the reservoirs of magic that hold others back. She is able to prepare her spirit magic spells in her regular spell slots.")
         };
 
         static readonly Dictionary<string, string[]> Owners = Specs.ToDictionary(
@@ -422,7 +425,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(gate, "m_Feature", Ref<BlueprintFeatureReference>(fog));
             Set(gate, "m_AdditionalClasses", Array.Empty<BlueprintCharacterClassReference>());
             Set(gate, "m_Archetypes", Array.Empty<BlueprintArchetypeReference>());
-            var feature = f.Feature(token, "Stormwalker", desc, new WeatherSpeed0117(), gate);
+            var feature = f.Feature(token, "Stormwalker", desc, new ShamanStormwalker0119(), gate);
             Set(feature, "m_Icon", PsychicOriginalIcons.Load(StormwalkerIconAsset));
             return feature;
         }
@@ -724,7 +727,10 @@ namespace CallOfTheWild.Wrath.Prototype
             var spell = evt.SourceAbility;
             if (spell == null) return;
             int level = Level();
-            if (level < 16 && !Water(spell)) return;
+            // Below 16th the knockdown is limited to the hex's own water spells,
+            // which here means cold, name-matched water spells and any spell
+            // carrying CotW's Water marker.
+            if (level < 16 && !Water(spell) && !Cold(spell)) return;
             int dc = 10 + level / 2 + Math.Max(0, Owner.Stats.Wisdom.Bonus);
             var save = Rulebook.Trigger(new RuleSavingThrow(evt.Target, SavingThrowType.Fortitude, dc));
             if (save.IsPassed) return;
@@ -738,19 +744,83 @@ namespace CallOfTheWild.Wrath.Prototype
 
         public void OnEventDidTrigger(RuleDealDamage evt) { }
 
-        static bool Cold(BlueprintAbility spell)
+        // Kingmaker had no Water descriptor, so original CotW tagged water spells
+        // with its own bit (AdditionalSpellDescriptors.ExtraSpellDescriptor.Water,
+        // 0x0010000000000000). Wrath ships no such marker, so a spell counts as
+        // water when the CotW bit (or a native descriptor literally named Water)
+        // is set, or when its name looks like water. The cold descriptor is
+        // handled next to it: cold spells never carried CotW's bit, but the hex
+        // treats them as water too, both for the caster level and the knockdown.
+        const long CotWWaterBit = 0x0010000000000000L;
+        static readonly SpellDescriptor WaterMarker = ResolveWaterMarker();
+
+        static SpellDescriptor ResolveWaterMarker()
         {
-            var desc = spell.GetComponent<SpellDescriptorComponent>()?.Descriptor ?? SpellDescriptor.None;
-            return (desc & SpellDescriptor.Cold) != 0;
+            foreach (var name in Enum.GetNames(typeof(SpellDescriptor)))
+                if (string.Equals(name, "Water", StringComparison.OrdinalIgnoreCase))
+                    return (SpellDescriptor)Enum.Parse(typeof(SpellDescriptor), name);
+            var marker = (SpellDescriptor)CotWWaterBit;
+            // If the game already uses that bit for something else, claiming it
+            // would turn unrelated spells into water spells.
+            return Enum.IsDefined(typeof(SpellDescriptor), marker) ? SpellDescriptor.None : marker;
         }
 
-        static bool Water(BlueprintAbility spell)
+        static SpellDescriptor Descriptor(BlueprintAbility spell) =>
+            spell.GetComponent<SpellDescriptorComponent>()?.Descriptor ?? SpellDescriptor.None;
+
+        static bool Cold(BlueprintAbility spell) => (Descriptor(spell) & SpellDescriptor.Cold) != 0;
+
+        static bool Water(BlueprintAbility spell) =>
+            (Descriptor(spell) & WaterMarker) != 0 || WaterByName(spell);
+
+        static bool WaterByName(BlueprintAbility spell)
         {
             var name = spell.name ?? "";
             return name.IndexOf("Water", StringComparison.OrdinalIgnoreCase) >= 0 ||
                    name.IndexOf("Wave", StringComparison.OrdinalIgnoreCase) >= 0 ||
                    name.IndexOf("Hydraulic", StringComparison.OrdinalIgnoreCase) >= 0 ||
                    name.IndexOf("Tsunami", StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+    }
+
+    // Original CotW ignored the weather movement penalty instead of granting a
+    // flat speed bonus: a postfix on UnitEntityData.CalculateSpeedModifier
+    // doubles the already-halved result back to normal while the weather is bad
+    // and the unit carries this feature. Ported as-is, with no speed bonus.
+    [TypeId("0119a1b2c3d4e5f60718293a4b5c0003")]
+    public sealed class ShamanStormwalker0119 : UnitFactComponentDelegate
+    {
+        internal static bool Active(UnitEntityData unit) =>
+            unit?.Facts?.List.Any(f => f.IsTurnedOn && !f.IsDisposed &&
+                f.Blueprint.GetComponent<ShamanStormwalker0119>() != null) == true;
+    }
+
+    [HarmonyPatch(typeof(UnitEntityData), "CalculateSpeedModifier")]
+    internal static class ShamanStormwalkerSpeed0119
+    {
+        static void Postfix(UnitEntityData __instance, ref float __result)
+        {
+            // Only the weather slowdown needs undoing; anything else that leaves
+            // the unit at or below half speed is somebody else's business.
+            if (__result > 0.51f) return;
+            if (!ShamanStormwalker0119.Active(__instance)) return;
+            if (!BadWeather()) return;
+            __result *= 2f;
+        }
+
+        // ActualWeather and SlowdownBonusBeginsOn are InclemencyType values from
+        // Owlcat.Runtime.Visual, which the main project does not reference, so
+        // both are read reflectively and compared as integers.
+        static bool BadWeather()
+        {
+            var weather = Kingmaker.Game.Instance?.Player?.Weather;
+            var actual = weather == null ? null : AccessTools.Property(weather.GetType(), "ActualWeather")?.GetValue(weather);
+            var settings = Kingmaker.Blueprints.Root.BlueprintRoot.Instance?.WeatherSettings;
+            var begins = settings == null ? null
+                : AccessTools.Property(settings.GetType(), "SlowdownBonusBeginsOn")?.GetValue(settings)
+                  ?? AccessTools.Field(settings.GetType(), "SlowdownBonusBeginsOn")?.GetValue(settings);
+            if (actual == null || begins == null) return false;
+            return Convert.ToInt32(actual) >= Convert.ToInt32(begins);
         }
     }
 

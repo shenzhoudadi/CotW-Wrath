@@ -200,7 +200,7 @@ namespace MediumClass.Medium.NewComponents
 			[JsonProperty]
 			public BlueprintAbilityResourceReference m_RequiredResource;
 			[JsonProperty]
-			public BlueprintCharacterClassReference m_Spirit;
+			public BlueprintCharacterClassReference m_Spirit = null; // deserialized from saved ability data
 			[JsonProperty]
 			public int cost = 1;
 		}

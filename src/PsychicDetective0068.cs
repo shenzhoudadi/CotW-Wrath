@@ -37,48 +37,6 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static string[] LastMissing = Array.Empty<string>();
         internal static string[] LastOptional = Array.Empty<string>();
 
-        private sealed class Correction
-        {
-            internal readonly string OriginalRef, Guid;
-            internal readonly int Level;
-            internal readonly PsychicSpellLink Fallback;
-            internal Correction(string originalRef,string guid,int level,PsychicSpellLink fallback=null)
-            { OriginalRef=originalRef; Guid=guid; Level=level; Fallback=fallback; }
-        }
-
-        // A-evidence.json providerCorrections. Empty rows in the original 180-line
-        // catalogue are resolved from existing shared links or the audited TTT
-        // identity; no external spell is re-authored or faked as published.
-        private static readonly Correction[] Corrections = {
-            new Correction("Witch.hermean_potential.AssetGuid","37853550902a4cadae16833c5f4c6b17",1),
-            new Correction("NewSpells.long_arm.AssetGuid","fde4d2da304345bca11a73eb8f06b755",1),
-            new Correction("NewSpells.hypnotic_pattern.AssetGuid","56b8f0304a704a67b3c35cbe8c774854",2),
-            new Correction("NewSpells.inflict_pain.AssetGuid","e023af1af9c147549a8e7bd246967861",2),
-            new Correction("NewSpells.telekinetic_strikes.AssetGuid","9c2f011a4c664dccb73a1426fb55050e",2),
-            new Correction("NewSpells.resinous_skin.AssetGuid","4b8f3792a86e45f4b40a2c01805f1e5e",3),
-            new Correction("NewSpells.sands_of_time.AssetGuid","da49f07e431b47abaad41ef28df487f7",3),
-            new Correction("NewSpells.stunning_barrier_greater.AssetGuid","9e33ed477ddd4fad9d90fb64b1a6f732",3,
-                new PsychicSpellLink("9e33ed477ddd4fad9d90fb64b1a6f732","StunningBarrierGreaterAbility",
-                    "TabletopTweaks-Base",SpellSchool.Abjuration,true,3,-1,-1)),
-            new Correction("NewSpells.inflict_pain_mass.AssetGuid","ff31ae1abe3c418db7842dcc76eca7ee",6)
-        };
-
-        private static Correction FindCorrection(string originalRef) => Corrections.FirstOrDefault(c => c.OriginalRef == originalRef);
-
-        private static PsychicSpellLink LinkFor(Correction correction) => correction.Fallback ??
-            PsychicSharedSpellCatalog.Entries.FirstOrDefault(e => e.Guid == correction.Guid);
-
-        private static BlueprintAbility ResolveCorrection(BlueprintsCache cache,Correction correction,out string reason)
-        {
-            reason=null;
-            var link=LinkFor(correction);
-            if(link==null){reason="no shared provider link";return null;}
-            var spell=cache.Load(BlueprintGuid.Parse(correction.Guid)) as BlueprintAbility;
-            if(spell==null){reason="provider root missing";return null;}
-            if(!PsychicSpellIntegration.Available(cache,link,out var available)){reason="provider unavailable, disabled, wrong identity or unpublished";return null;}
-            return available;
-        }
-
         private static T Provider<T>(BlueprintsCache cache,string id,string name,List<string> missing) where T : SimpleBlueprint
         {
             var bp=cache.Load(BlueprintGuid.Parse(id));
@@ -150,9 +108,14 @@ namespace CallOfTheWild.Wrath.Prototype
             return entry!=null&&entry.Features.Any(f=>f.AssetGuid==feature.AssetGuid);
         }
 
-        private static BlueprintAbilityResource Pool(PsychicAssets f,BlueprintCharacterClass cls)
+        // The detective's pool is the psychic's phrenic pool in everything but
+        // its size, so it carries the very same icon: the psychic resource's
+        // own, or the native Mind Fog ability CotW used when that is missing.
+        private static BlueprintAbilityResource Pool(PsychicAssets f,BlueprintCharacterClass cls,BlueprintAbilityResource donor)
         {
             var resource=f.Add(new BlueprintAbilityResource(),PsychicDetective0068Ids.PoolToken,"","");
+            var icon=donor?.Icon??f.Native<BlueprintAbility>("eabf94e4edc6e714cabd96aa69f8b207").Icon;
+            if(icon!=null)Set(resource,"m_Icon",icon);
             var amount=Get(resource,"m_MaxAmount");
             Set(amount,"BaseValue",0);
             Set(amount,"m_Class",Array.Empty<BlueprintCharacterClassReference>());
@@ -185,62 +148,48 @@ namespace CallOfTheWild.Wrath.Prototype
             return book;
         }
 
+        // The detective's list is the Psychic list itself, circles 0-6. Ranked
+        // families (Mind Thrust I-VI and the like) are separate spells at their
+        // own circle, so copying the list keeps every rank the psychic has.
         private static BlueprintSpellList BuildList(PsychicAssets f,BlueprintsCache cache)
         {
-            var spells=Enumerable.Range(0,11).Select(_=>new List<BlueprintAbility>()).ToArray();
-            var optional=new List<string>();int resolved=0,skipped=0;
-            var traps=BlueprintGuid.Parse(PsychicDetective0068Ids.FindTrapsId);
-            var banishment=BlueprintGuid.Parse(PsychicDetective0068Ids.BanishmentId);
-            foreach(var row in MindbladeSpellAnchors01454.Rows)
+            var source=cache.Load(BlueprintGuid.Parse(PsychicClass.ListId)) as BlueprintSpellList
+                ??throw new InvalidOperationException("0068 Psychic spell list is missing.");
+            var levels=Enumerable.Range(0,11).Select(_=>new List<BlueprintAbility>()).ToArray();
+            foreach(var row in source.SpellsByLevel??Array.Empty<SpellLevelList>())
             {
-                int level=Mindblade01454.RowLevel(row);
-                if(level<0||level>6)continue;
-                var spell=Mindblade01454.ResolveRow(f,row);
-                if(spell==null)
-                {
-                    var correction=FindCorrection(row[1]);
-                    if(correction!=null)
-                    {
-                        spell=ResolveCorrection(cache,correction,out var reason);
-                        optional.Add(correction.OriginalRef+": "+(spell==null?"skipped ("+reason+")":"available"));
-                        if(spell!=null)level=correction.Level;
-                    }
-                }
-                if(spell==null){skipped++;continue;}
-                bool explicitRing=spell.AssetGuid==traps||spell.AssetGuid==banishment;
-                int target=spell.AssetGuid==traps?1:spell.AssetGuid==banishment?6:level;
-                if(explicitRing)foreach(var group in spells)group.RemoveAll(a=>a.AssetGuid==spell.AssetGuid);
-                else if(spells.Any(g=>g.Any(a=>a.AssetGuid==spell.AssetGuid)))continue;
-                if(target<0||target>6||spells[target].Any(a=>a.AssetGuid==spell.AssetGuid))continue;
-                spells[target].Add(spell);resolved++;
+                if(row==null||row.SpellLevel<0||row.SpellLevel>6)continue;
+                foreach(var spell in row.Spells??Array.Empty<BlueprintAbility>())
+                    if(spell!=null&&!levels[row.SpellLevel].Any(a=>a.AssetGuid==spell.AssetGuid))
+                        levels[row.SpellLevel].Add(spell);
             }
-            LastOptional=optional.ToArray();
-            LastSpellSummary=$"Original 180 rows: {resolved} available, {skipped} skipped, {optional.Count} provider corrections examined, levels 7-10 empty.";
-            var list=SpellBatch01447.List(f,PsychicDetective0068Ids.ListToken,index=>index<spells.Length?spells[index].ToArray():Array.Empty<BlueprintAbility>());
+            int resolved=levels.Sum(g=>g.Count);
+            if(resolved==0)throw new InvalidOperationException("0068 Psychic spell list exposes no spell in circles 0-6.");
+            LastOptional=Array.Empty<string>();
+            LastSpellSummary="Psychic list circles 0-6: "+resolved+" spells copied from "+source.name+".";
+            var list=SpellBatch01447.List(f,PsychicDetective0068Ids.ListToken,index=>index<levels.Length?levels[index].ToArray():Array.Empty<BlueprintAbility>());
             list.SpellsByLevel=SpellListCompatibility.Build(list.SpellsByLevel);
             if(!SpellListCompatibility.Canonical(list.SpellsByLevel))throw new InvalidOperationException("0068 detective spell list is not canonical.");
             return list;
         }
 
-        // Q01: late optional providers only refresh this package's own list.
-        // No foreign spell list, provider root or permanent known spell is touched.
+        // Q01: a save reload republishes this package before every later
+        // provider has finished; re-copy the psychic circles so nothing that
+        // arrived late stays missing. No foreign list is touched.
         internal static void RefreshOptional(BlueprintsCache cache)
         {
             var list=cache.Load(Id(PsychicDetective0068Ids.ListToken)) as BlueprintSpellList;
-            if(list==null||list.SpellsByLevel==null)return;
-            foreach(var correction in Corrections)
+            var source=cache.Load(BlueprintGuid.Parse(PsychicClass.ListId)) as BlueprintSpellList;
+            if(list?.SpellsByLevel==null||source?.SpellsByLevel==null)return;
+            foreach(var row in list.SpellsByLevel)
             {
-                if(correction.Level>=list.SpellsByLevel.Length)continue;
-                var row=list.SpellsByLevel[correction.Level];
-                var current=(List<BlueprintAbilityReference>)Get(row,"m_Spells")??new List<BlueprintAbilityReference>();
-                var spell=ResolveCorrection(cache,correction,out _);
-                var id=BlueprintGuid.Parse(correction.Guid);
-                if(spell!=null)
-                {
-                    if(!current.Any(r=>r.Guid==id))current.Add(Ref<BlueprintAbilityReference>(spell));
-                }
-                else current.RemoveAll(r=>r.Guid==id);
-                Set(row,"m_Spells",current);Set(row,"m_SpellsProxy",null);Set(row,"m_SpellsFiltered",null);
+                if(row==null||row.SpellLevel<0||row.SpellLevel>6)continue;
+                var refs=new List<BlueprintAbilityReference>();
+                var donor=source.SpellsByLevel.FirstOrDefault(r=>r!=null&&r.SpellLevel==row.SpellLevel);
+                if(donor!=null)
+                    foreach(var spell in donor.Spells??Array.Empty<BlueprintAbility>())
+                        if(spell!=null&&!refs.Any(r=>r.Guid==spell.AssetGuid))refs.Add(Ref<BlueprintAbilityReference>(spell));
+                Set(row,"m_Spells",refs);Set(row,"m_SpellsProxy",null);Set(row,"m_SpellsFiltered",null);
             }
         }
 
@@ -256,7 +205,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var features=new List<BlueprintFeature>();
             var toggles=new List<BlueprintActivatableAbility>();
 
-            BlueprintActivatableAbility Mode(string name,PsychicAmplificationKind kind,int cost,int strength,int minimum,BlueprintBuff effect=null)
+            BlueprintActivatableAbility Mode(string name,PsychicAmplificationKind kind,int cost,int strength,int minimum,
+                BlueprintActivatableAbility source,BlueprintBuff effect=null)
             {
                 var component=new PsychicAmplificationComponent{name="DetectiveLinkedPhrenicCast",Kind=kind,Cost=cost,
                     Strength=strength,MinimumLevel=minimum,CharacterClass=Ref<BlueprintCharacterClassReference>(cls),
@@ -270,40 +220,40 @@ namespace CallOfTheWild.Wrath.Prototype
                     ComponentsArray=Array.Empty<BlueprintComponent>()},"PsychicDetective0068"+name+"Toggle",name,name);
                 Set(toggle,"m_Buff",Ref<BlueprintBuffReference>(buff));
                 Set(toggle,"m_ActivateWithUnitCommand",UnitCommand.CommandType.Free);
+                // The psychic toggle carries the published name, description and
+                // icon; the detective copy must show exactly those in the bar.
+                if(source!=null){Adopt(toggle,source);Adopt(buff,source);}
                 toggles.Add(toggle);modes.Add(toggle);return toggle;
             }
 
             BlueprintFeature Feature(string token,string title,string text,params BlueprintComponent[] components)
                 =>f.Feature("PsychicDetective0068"+token,title,text,components);
 
-            void Add(string token,string title,string text,PsychicAmplificationKind kind,int cost,int strength,
-                int minimum,BlueprintBuff effect=null,bool linked=false,int tiers=1)
+            void Adopt(BlueprintUnitFact fact,BlueprintUnitFact source)
+            {
+                Set(fact,"m_DisplayName",Get(source,"m_DisplayName"));
+                Set(fact,"m_Description",Get(source,"m_Description"));
+                if(source.Icon!=null)Set(fact,"m_Icon",source.Icon);
+            }
+
+            BlueprintFeature AddTiered(string token,BlueprintFeature source,PsychicAmplificationKind kind,
+                ModeInfo[] found,int[] gates,bool linked,BlueprintBuff[] effects)
             {
                 var granted=new List<BlueprintUnitFact>();
                 var components=new List<BlueprintComponent>();
-                for(int i=1;i<=tiers;i++)
+                for(int i=1;i<=found.Length;i++)
                 {
-                    // D-F02: Defensive Prognostication tier i costs i points for
-                    // +2*i AC through the real tier-i effect buff, exactly like
-                    // the existing Psychic implementation.
-                    int tierCost=kind==PsychicAmplificationKind.OverpoweringMind||
-                        kind==PsychicAmplificationKind.UndercastSurge||
-                        kind==PsychicAmplificationKind.DefensivePrognostication?
-                        (kind==PsychicAmplificationKind.DefensivePrognostication?i:2*i):cost;
-                    int tierStrength=kind==PsychicAmplificationKind.OverpoweringMind||
-                        kind==PsychicAmplificationKind.UndercastSurge?i:
-                        kind==PsychicAmplificationKind.DefensivePrognostication?2*i:strength;
-                    int tierMinimum=kind==PsychicAmplificationKind.OverpoweringMind?(i==1?1:i==2?8:15):minimum;
-                    var tierEffect=kind==PsychicAmplificationKind.DefensivePrognostication?(i==1?defense1:defense2):effect;
-                    var toggle=Mode(token+i,kind,tierCost,tierStrength,tierMinimum,tierEffect);
-                    // D-F03: only the first Overpowering Mind tier is granted
-                    // immediately; the 8/15 tiers arrive through the native
-                    // AddFeatureOnClassLevel against the real HA Investigator,
-                    // so a low-level toggle never exists to switch modes off.
-                    if(kind==PsychicAmplificationKind.OverpoweringMind&&i>1)
+                    var effect=effects!=null&&effects.Length>0?effects[Math.Min(i-1,effects.Length-1)]:null;
+                    var toggle=Mode(token+i,kind,found[i-1].Mode.Cost,found[i-1].Mode.Strength,
+                        found[i-1].Mode.MinimumLevel,found[i-1].Source,effect);
+                    // Tiers the Psychic feature gates behind AddFeatureOnClassLevel
+                    // arrive the same way, so a low-level toggle never exists to
+                    // switch modes off.
+                    if(gates[i-1]>0)
                     {
-                        var tier=Feature(token+"Tier"+i,title+" +"+i,text,Facts(toggle));
-                        var add=new AddFeatureOnClassLevel{name="DetectiveMindTier"+i,Level=tierMinimum};
+                        var tier=Feature(token+"Tier"+i,"","",Facts(toggle));
+                        Adopt(tier,source);
+                        var add=new AddFeatureOnClassLevel{name="DetectiveTier"+token+i,Level=gates[i-1]};
                         Set(add,"m_Class",Ref<BlueprintCharacterClassReference>(cls));
                         Set(add,"m_Feature",Ref<BlueprintFeatureReference>(tier));
                         Set(add,"m_AdditionalClasses",Array.Empty<BlueprintCharacterClassReference>());
@@ -314,32 +264,86 @@ namespace CallOfTheWild.Wrath.Prototype
                 }
                 if(granted.Count>0)components.Insert(0,Facts(granted.ToArray()));
                 if(linked)components.Add(new PsychicLinkedSpellEffects{name="DetectivePaid"+token,Kind=kind});
-                var feature=Feature(token,title,text,components.ToArray());
-                features.Add(feature);
+                var feature=Feature(token,"","",components.ToArray());
+                Adopt(feature,source);
+                return feature;
             }
 
-            Add("BiokineticHealing","Biokinetic Healing","Spend one phrenic point to heal 2 hit points per spell level when casting a transmutation spell.",
-                PsychicAmplificationKind.BiokineticHealing,1,2,1);
-            Add("ConjuredArmor","Conjured Armor","Spend one phrenic point to protect summoned creatures.",
-                PsychicAmplificationKind.ConjuredArmor,1,0,1,armor,true);
-            Add("DefensivePrognostication","Defensive Prognostication","Spend one or two phrenic points for an insight bonus to AC.",
-                PsychicAmplificationKind.DefensivePrognostication,1,2,1,defense1,tiers:2);
-            Add("FocusedForce","Focused Force","Spend one phrenic point to increase force damage dice by one step.",
-                PsychicAmplificationKind.FocusedForce,1,0,1,null,true);
-            Add("MindsEye","Mind's Eye","Spend two phrenic points for an insight bonus on ranged attack rolls.",
-                PsychicAmplificationKind.MindsEye,2,0,1,null,true);
-            Add("OverpoweringMind","Overpowering Mind","Spend phrenic points to increase the saving throw DC of mind-affecting spells.",
-                PsychicAmplificationKind.OverpoweringMind,2,1,1,null,false,3);
-            Add("WillOfTheDead","Will of the Dead","Spend two phrenic points to affect mindless undead with a mind-affecting spell.",
-                PsychicAmplificationKind.WillOfTheDead,2,0,1);
-            Add("OngoingDefense","Ongoing Defense","Spend one phrenic point to extend a mental barrier by one round.",
-                PsychicAmplificationKind.OngoingDefense,1,0,1);
-            Add("RelentlessCasting","Relentless Casting","Spend one phrenic point to roll spell resistance twice.",
-                PsychicAmplificationKind.RelentlessCasting,1,0,1);
-            Add("UndercastSurge","Undercast Surge","Spend phrenic points to cast a higher-circle family spell with a lower slot.",
-                PsychicAmplificationKind.UndercastSurge,2,1,1,null,false,5);
+            // Read the list from Psychic's own selection instead of maintaining a
+            // parallel hand-written catalogue. Amplifications gated on Major
+            // Amplifications (or Bodily Mutations once it is published) stay with
+            // the full psychic class and never appear here.
+            var source=cache.Load(Id("PhrenicAmplificationSelection")) as BlueprintFeatureSelection
+                ??throw new InvalidOperationException("0068 Psychic phrenic amplification selection is missing.");
+            foreach(var offered in source.AllFeatures)
+            {
+                if(offered==null||NeedsAdvancedPsychic(offered))continue;
+                var found=AmplificationModes(offered);
+                if(found.Count==0)continue; // Psychofeedback is rebuilt separately below
+                found=found.OrderBy(m=>m.Mode.MinimumLevel).ThenBy(m=>m.Mode.Cost).ToList();
+                var kind=found[0].Mode.Kind;
+                var token=kind.ToString();
+                var gated=offered.GetComponents<AddFeatureOnClassLevel>().Any();
+                var gates=Enumerable.Range(0,found.Count).Select(i=>i>0&&gated?found[i].Mode.MinimumLevel:0).ToArray();
+                var effects=kind==PsychicAmplificationKind.DefensivePrognostication?new[]{defense1,defense2}
+                    :kind==PsychicAmplificationKind.ConjuredArmor?new[]{armor}:new BlueprintBuff[0];
+                features.Add(AddTiered(token,offered,kind,found.ToArray(),gates,
+                    offered.GetComponent<PsychicLinkedSpellEffects>()!=null,effects));
+            }
             features.Add(Psychofeedback(f,cache,cls,pool));
             return features.ToArray();
+        }
+
+        // Major Amplifications (and, once it exists, Bodily Mutations) are the
+        // full psychic class's advanced gates; the archetype only borrows the
+        // basic amplifications.
+        private static bool NeedsAdvancedPsychic(BlueprintFeature feature)
+        {
+            var major=BlueprintGuid.Parse(PsychicClass.MajorId);
+            foreach(var gate in feature.GetComponents<PrerequisiteFeature>())
+            {
+                var reference=(BlueprintFeatureReference)Get(gate,"m_Feature");
+                if(reference==null)continue;
+                if(reference.Guid==major)return true;
+                var blueprint=reference.Get();
+                if(blueprint?.name!=null&&blueprint.name.IndexOf("BodilyMutation",StringComparison.OrdinalIgnoreCase)>=0)return true;
+            }
+            return false;
+        }
+
+        private readonly struct ModeInfo
+        {
+            internal readonly PsychicAmplificationComponent Mode;
+            internal readonly BlueprintActivatableAbility Source;
+            internal ModeInfo(PsychicAmplificationComponent mode,BlueprintActivatableAbility source){Mode=mode;Source=source;}
+        }
+
+        // A Psychic amplification feature grants its mode toggles directly or
+        // through tier features that AddFeatureOnClassLevel hands out later.
+        // The owning toggle is kept so the detective copy can adopt its name,
+        // description and icon instead of inventing its own.
+        private static List<ModeInfo> AmplificationModes(BlueprintFeature feature)
+        {
+            var result=new List<ModeInfo>();
+            void Walk(BlueprintFeature current,int depth)
+            {
+                if(depth>2)return;
+                foreach(var grant in current.GetComponents<AddFacts>())
+                    foreach(var reference in (BlueprintUnitFactReference[])Get(grant,"m_Facts")??Array.Empty<BlueprintUnitFactReference>())
+                    {
+                        var fact=reference?.Get();
+                        if(fact is BlueprintActivatableAbility toggle)
+                        {
+                            var mode=toggle.Buff?.GetComponent<PsychicAmplificationComponent>();
+                            if(mode!=null)result.Add(new ModeInfo(mode,toggle));
+                        }
+                        else if(fact is BlueprintFeature tier)Walk(tier,depth+1);
+                    }
+                foreach(var gate in current.GetComponents<AddFeatureOnClassLevel>())
+                    if(((BlueprintFeatureReference)Get(gate,"m_Feature"))?.Get() is BlueprintFeature tier)Walk(tier,depth+1);
+            }
+            Walk(feature,0);
+            return result;
         }
 
         private static BlueprintFeature Psychofeedback(PsychicAssets f,BlueprintsCache cache,
@@ -405,7 +409,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var f=new PsychicAssets(cache);
             var list=BuildList(f,cache);
             var book=Book(f,cls,list);
-            var pool=Pool(f,cls);
+            var psychicPool=cache.Load(BlueprintGuid.Parse(PsychicClass.WisdomPoolId)) as BlueprintAbilityResource;
+            var pool=Pool(f,cls,psychicPool);
             var center=cache.Load(BlueprintGuid.Parse(PsychicClass.CenterAbilityId)) as BlueprintAbility;
             var casting=f.Feature(PsychicDetective0068Ids.CastingToken,"Psychic Spellcasting",
                 "A psychic detective casts spells spontaneously from a private six-circle Intelligence spellbook.",Facts(center));
@@ -415,6 +420,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var dabbler=f.Feature(PsychicDetective0068Ids.DabblerToken,"Phrenic Dabbler",
                 "Gain a phrenic pool equal to half your investigator level and one basic phrenic amplification.",
                 new AddAbilityResources{name="DetectivePhrenicPool",RestoreAmount=true,RestoreOnLevelUp=true});
+            if(pool.Icon!=null)Set(dabbler,"m_Icon",pool.Icon);
             Set(dabbler.GetComponent<AddAbilityResources>(),"m_Resource",Ref<BlueprintAbilityResourceReference>(pool));
 
             var modes=new List<BlueprintActivatableAbility>();
@@ -439,10 +445,43 @@ namespace CallOfTheWild.Wrath.Prototype
                 StatType.SkillPerception,StatType.SkillPersuasion,StatType.SkillUseMagicDevice};
             Set(root,"m_ReplaceSpellbook",Ref<BlueprintSpellbookReference>(book));
 
+            // The talent is listed in the HomebrewArchetypes Investigator talent
+            // selection and raises whichever pool the character actually uses:
+            // the shared psychic pool when multiclassed, the private half-level
+            // pool otherwise.
             var expanded=f.Feature(PsychicDetective0068Ids.ExpandedPoolTalentToken,"Expanded Phrenic Pool",
                 "Your phrenic pool increases by 2 points.",Need(cls,root,3),
-                new IncreaseResourceAmount{name="DetectiveExpandedPool",Value=2});
+                new IncreaseResourceAmount{name="DetectiveExpandedPool",Value=2},
+                new IncreaseResourceAmount{name="DetectiveExpandedPoolWisdom",Value=2},
+                new IncreaseResourceAmount{name="DetectiveExpandedPoolCharisma",Value=2});
             Set(expanded.GetComponent<IncreaseResourceAmount>(),"m_Resource",Ref<BlueprintAbilityResourceReference>(pool));
+            // Option B: detective levels count toward the shared psychic pool, so
+            // a multiclass cap is floor((psychic + detective) / 2) plus the
+            // discipline's stat modifier. A pure detective never receives that
+            // resource and keeps the private half-level pool instead.
+            var sharedPools=new[]{PsychicClass.WisdomPoolId,PsychicClass.CharismaPoolId}
+                .Select(id=>cache.Load(BlueprintGuid.Parse(id)) as BlueprintAbilityResource).Where(r=>r!=null).ToArray();
+            var sharedDivOld=sharedPools.Select(r=>(BlueprintArchetypeReference[])Get(Get(r,"m_MaxAmount"),"m_ArchetypesDiv")).ToArray();
+            void LinkSharedPools()
+            {
+                for(int i=0;i<sharedPools.Length;i++)
+                {
+                    var current=sharedDivOld[i]??Array.Empty<BlueprintArchetypeReference>();
+                    if(current.Any(r=>r?.Guid==root.AssetGuid))continue;
+                    Set(Get(sharedPools[i],"m_MaxAmount"),"m_ArchetypesDiv",
+                        current.Concat(new[]{Ref<BlueprintArchetypeReference>(root)}).ToArray());
+                }
+            }
+            void UnlinkSharedPools()
+            {
+                for(int i=0;i<sharedPools.Length;i++)Set(Get(sharedPools[i],"m_MaxAmount"),"m_ArchetypesDiv",sharedDivOld[i]);
+            }
+
+            var sharedAmounts=new[]{PsychicClass.WisdomPoolId,PsychicClass.CharismaPoolId}
+                .Select(id=>cache.Load(BlueprintGuid.Parse(id)) as BlueprintAbilityResource).Where(r=>r!=null).ToArray();
+            var sharedComponents=expanded.GetComponents<IncreaseResourceAmount>().Skip(1).ToArray();
+            for(int i=0;i<sharedComponents.Length&&i<sharedAmounts.Length;i++)
+                Set(sharedComponents[i],"m_Resource",Ref<BlueprintAbilityResourceReference>(sharedAmounts[i]));
             var extra=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,
                 ComponentsArray=new BlueprintComponent[]{Need(cls,root,3)}},
                 PsychicDetective0068Ids.ExtraAmplificationTalentToken,"Extra Phrenic Amplification",
@@ -463,6 +502,7 @@ namespace CallOfTheWild.Wrath.Prototype
             try
             {
                 f.Enable();
+                LinkSharedPools();
                 foreach(var asset in assets){cache.AddCachedBlueprint(asset.AssetGuid,asset);added.Add(asset);}
                 Set(cls,"m_Archetypes",(oldArchetypes??Array.Empty<BlueprintArchetypeReference>())
                     .Concat(new[]{Ref<BlueprintArchetypeReference>(root)}).ToArray());
@@ -476,6 +516,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 Set(cls,"m_Archetypes",oldArchetypes);cls.Progression.UIGroups=oldGroups;
                 Set(talents,"m_Features",oldTalentFeatures);Set(talents,"m_AllFeatures",oldTalentAll);
+                UnlinkSharedPools();
                 foreach(var asset in added)if(ReferenceEquals(cache.Load(asset.AssetGuid),asset))cache.RemoveCachedBlueprint(asset.AssetGuid);
                 throw;
             }

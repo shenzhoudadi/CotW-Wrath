@@ -64,6 +64,14 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal static BlueprintAbilityResource DetectivePool(UnitEntityData unit)
         {
+            // A detective who also has psychic levels spends from the shared
+            // psychic pool; the private half-level pool only serves a pure
+            // detective, so pure characters never inherit the discipline's stat
+            // modifier.
+            var wisdom = ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(PsychicClass.WisdomPoolId);
+            if (wisdom != null && unit?.Resources?.ContainsResource(wisdom) == true) return wisdom;
+            var charisma = ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(PsychicClass.CharismaPoolId);
+            if (charisma != null && unit?.Resources?.ContainsResource(charisma) == true) return charisma;
             var resource = ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(PoolId);
             return resource != null && unit?.Resources?.ContainsResource(resource) == true ? resource : null;
         }
