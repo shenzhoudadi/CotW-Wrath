@@ -269,6 +269,7 @@ internal static partial class Arcane01446Tests
             if(Environment.GetEnvironmentVariable("COTW_0081_CASE")=="starseeker0081")return Starseeker0081(parent,h);
             if(Environment.GetEnvironmentVariable("COTW_0117_CASE")=="spiritwhisperer0117")return SpiritWhisperer0117Tests.Run(parent,h);
             if(Environment.GetEnvironmentVariable("COTW_0060_CASE")=="spiritguide0060")return SpiritGuide0060Tests.Run(parent,h);
+            if(Environment.GetEnvironmentVariable("COTW_0046_CASE")=="speaker0046")return Speaker0046(parent,h);
             if(Environment.GetEnvironmentVariable("COTW_01454_CASE")!=null)return MagusBatch01454Tests.Run(parent,h);
             if(Environment.GetEnvironmentVariable("COTW_01452_CASE")?.StartsWith("menu-external")==true)return Feedback01449Tests.External01450(parent,h);
             if(Environment.GetEnvironmentVariable("COTW_01452_CASE")?.StartsWith("menu")==true)return Feedback01449Tests.Menu01452(parent,h);

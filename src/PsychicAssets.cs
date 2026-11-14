@@ -68,6 +68,14 @@ namespace CallOfTheWild.Wrath.Prototype
             lock (Get(pack, "m_Lock"))
                 if (!((IDictionary)Get(pack, "m_Strings")).Contains(key)) pack.PutString(key, value);
         }
+        internal static string PeekText(BlueprintUnitFact fact, bool description = false) {
+            if (fact == null) return null;
+            var ls = Get(fact, description ? "m_Description" : "m_DisplayName") as LocalizedString;
+            if (ls == null) return null;
+            if (!string.IsNullOrEmpty(ls.Key) && Strings.TryGetValue(ls.Key, out var cached)) return cached;
+            if (ls.Shared?.String != null && !string.IsNullOrEmpty(ls.Shared.String.Key) && Strings.TryGetValue(ls.Shared.String.Key, out cached)) return cached;
+            return null;
+        }
         internal static void ApplyLocalization() {
             foreach (var pair in Strings) PutFallback(pair.Key, pair.Value);
         }
