@@ -1,7 +1,6 @@
-> 本次测试包说明见 [0.14.73 Cryptid Scholar TEST](docs/releases/0.14.73-TEST.md)。
+> [0.14.74 Speaker for the Past TEST](docs/releases/0.14.74-TEST.md) · [工作状态](WORK_STATUS.md)
 
-> 🚧 **[施工占用 / WORK STATUS](WORK_STATUS.md)**：COTW-0046 Speaker for the Past已认领，请勿重复开发。
-> Current preview: [0.14.73 Cryptid Scholar TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST). Stable: 0.14.66.
+> 猫猫堡快去复楚
 
 # Call of the Wild — Wrath
 

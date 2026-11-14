@@ -29,6 +29,7 @@ using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Parts;
+using Newtonsoft.Json;
 using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 
 namespace CallOfTheWild.Wrath.Prototype
@@ -261,7 +262,6 @@ namespace CallOfTheWild.Wrath.Prototype
         static void RelinquishSpeakerSpell(Spellbook book, int level, BlueprintAbility spell,
             List<AbilityData> foreignTemps, ref int removed)
         {
-            int removedBefore = removed;
             foreach (var known in book.GetKnownSpells(level).ToArray())
             {
                 if (known?.Blueprint != spell || known.CopiedFromScroll || known.IsTemporary) continue;
@@ -269,23 +269,74 @@ namespace CallOfTheWild.Wrath.Prototype
                 // Use native AbilityData equality, which includes the base circle.
                 // The native ledger can now remove a shared spell when its last source ends.
                 var shared = foreignTemps.Where(temporary => temporary == known).ToArray();
-                known.IsTemporary = true;
-                foreach (var temporary in shared)
-                    temporary.IsTemporary = true;
-                if (shared.Length != 0) continue;
+                if (shared.Length != 0)
+                {
+                    book.Owner.Unit.Ensure<SpeakerSpellHandoffs0046>().Track(book, level, spell);
+                    known.IsTemporary = true;
+                    foreach (var temporary in shared)
+                        temporary.IsTemporary = true;
+                    continue;
+                }
 
-                book.RemoveTemporarySpell(known);
+                if (!RemoveOrdinaryWithSpecialGrant(book, level, known))
+                {
+                    known.IsTemporary = true;
+                    book.RemoveTemporarySpell(known);
+                }
+                ClearLostOrdinarySpell(book, level, spell);
                 removed++;
             }
+        }
 
-            if (removed == removedBefore || book.IsKnownOnLevel(spell, level)) return;
+        static bool HasSpecialGrant(Spellbook book, int level, BlueprintAbility spell)
+            => book.GetSpecialSpells(level).Any(known => known.Blueprint == spell);
 
-            // A metamagic copy can occupy a higher slot while retaining this base circle.
-            foreach (var slot in book.GetMemorizedSpellSlots(spell))
-                if (slot.Type == SpellSlotType.Common && slot.SpellShell?.SpellLevelInSpellbook == level)
-                    slot.Clear();
+        static bool RemoveOrdinaryWithSpecialGrant(Spellbook book, int level, AbilityData known)
+        {
+            if (!HasSpecialGrant(book, level, known.Blueprint)) return false;
+
+            // Native RemoveTemporarySpell uses value equality across both lists and removes
+            // their common level index. Keep that index and the independent spirit grant.
+            book.GetKnownSpells(level).RemoveAll(candidate => candidate == known);
+            return true;
+        }
+
+        static void ClearLostOrdinarySpell(Spellbook book, int level, BlueprintAbility spell)
+        {
+            if (book.GetKnownSpells(level).Any(known => known.Blueprint == spell)) return;
+
+            // Hidden slots return intact when the number of slots increases. The
+            // prepared circle can also differ from the base circle after metamagic.
+            for (int slotLevel = 0; slotLevel <= 10; slotLevel++)
+            {
+                foreach (var slot in book.GetMemorizedSpells(slotLevel).Concat(book.GetHiddenCommonSpells(slotLevel)))
+                {
+                    var prepared = slot.SpellShell;
+                    if (slot.Type == SpellSlotType.Common && prepared?.Blueprint == spell && prepared.SpellLevelInSpellbook == level)
+                        slot.Clear();
+                }
+            }
+
+            if (HasSpecialGrant(book, level, spell)) return;
             foreach (var custom in book.GetCustomSpells(spell).Where(data => data.SpellLevelInSpellbook == level).ToArray())
                 book.RemoveCustomSpell(custom);
+        }
+
+        [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.RemoveTemporarySpell))]
+        internal static class EndHandoff
+        {
+            static bool Prefix(Spellbook __instance, AbilityData spell, out bool __state)
+            {
+                __state = spell.IsTemporary && (__instance.Owner.Unit.Get<SpeakerSpellHandoffs0046>()?
+                    .Forget(__instance, spell.SpellLevel, spell.Blueprint) ?? false);
+                return !__state || !RemoveOrdinaryWithSpecialGrant(__instance, spell.SpellLevel, spell);
+            }
+
+            static void Postfix(Spellbook __instance, AbilityData spell, bool __state)
+            {
+                if (__state)
+                    ClearLostOrdinarySpell(__instance, spell.SpellLevel, spell.Blueprint);
+            }
         }
 
         void Sync()
@@ -304,7 +355,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (spell == null) continue;
                     if (row.SpellLevel <= max)
                     {
-                        if (!book.IsKnownOnLevel(spell, row.SpellLevel))
+                        if (!book.GetKnownSpells(row.SpellLevel).Any(known => known.Blueprint == spell))
                             book.AddKnown(row.SpellLevel, spell);
 
                         // Leave temporary entries outside the native source ledger untouched.
@@ -353,6 +404,21 @@ namespace CallOfTheWild.Wrath.Prototype
                 }
             }
         }
+    }
+
+    public sealed class SpeakerSpellHandoffs0046 : UnitPart
+    {
+        // The Speaker fact can be gone when the native temporary source ends.
+        [JsonProperty] readonly HashSet<string> m_Pending = new HashSet<string>();
+
+        internal void Track(Spellbook book, int level, BlueprintAbility spell)
+            => m_Pending.Add(Key(book, level, spell));
+
+        internal bool Forget(Spellbook book, int level, BlueprintAbility spell)
+            => m_Pending.Remove(Key(book, level, spell));
+
+        static string Key(Spellbook book, int level, BlueprintAbility spell)
+            => $"{book.Blueprint.AssetGuid}/{level}/{spell.AssetGuid}";
     }
 
     // Rewind Time: one failed d20 gets one reroll, taking the best result.

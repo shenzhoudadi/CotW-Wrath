@@ -507,9 +507,18 @@ internal static partial class Arcane01446Tests
     static IEqualityComparer<object> PsychicAssetsIdentityComparer()
         => (IEqualityComparer<object>)AccessTools.Property(T("PsychicAssets"), "IdentityComparer").GetValue(null);
 
+    static HashSet<BlueprintGuid> d4DlcBlueprints;
+    static bool D4DlcForBattleSpell(BlueprintScriptableObject __0, ref bool __result)
+    {
+        if (__0 == null || !d4DlcBlueprints.Contains(__0.AssetGuid)) return true;
+        __result = false;
+        return false;
+    }
+
     static int Speaker0046(BlueprintsCache parent, Harmony h)
     {
         int start = checks;
+        h.CreateClassProcessor(typeof(SpeakerSpellbookSync0046).GetNestedType("EndHandoff", BindingFlags.NonPublic)).Patch();
         var timeModule = T("TimeMystery0046");
         var speakerModule = T("SpeakerForThePast0046");
         var binder = (GuidClassBinder)Kingmaker.Blueprints.JsonSystem.Json.Serializer.Binder;
@@ -998,6 +1007,144 @@ internal static partial class Arcane01446Tests
                     Check(!crossBook.IsKnown(spiritualAlly) && crossBook.GetMemorizedSpellSlots(spiritualAlly).Count == 0,
                         scenario + " native ledger removes the final temporary grant and its preparation");
                 }
+            }
+
+            // The spellbook preserves prepared spells in its hidden slots when slot count shrinks.
+            var restoreUnit = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "D4-hidden-slot", Sp046ClassId, 10);
+            restoreUnit.Progression.Classes[0].AddArchetype(root);
+            restoreUnit.Stats.Wisdom.BaseValue = 22;
+            var restoreBook = new Spellbook(restoreUnit.Descriptor, shamanBookBp);
+            Set(restoreBook, "m_BaseLevelInternal", 10);
+            Set(restoreUnit.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, restoreBook } });
+            restoreBook.UpdateAllSlotsSize(false);
+            var restoreFact = Fact(restoreUnit, mysteriesFeat);
+            var originalKnown = restoreBook.GetKnownSpells(4).Single(s => s.Blueprint == spiritualAlly);
+            Check(restoreBook.Memorize(originalKnown), "D4 setup: native preparation of Speaker's four-circle spell");
+            var originalSlot = restoreBook.GetMemorizedSpells(4).Single(s => ReferenceEquals(s.SpellShell, originalKnown));
+            var reduced = new AbilityData(spiritualAlly, restoreBook, 4)
+            {
+                MetamagicData = new MetamagicData { SpellLevelCost = -1 }
+            };
+            restoreBook.AddCustomSpell(reduced);
+            Check(restoreBook.Memorize(reduced), "D4 setup: prepare a reduced-cost version in circle 3");
+            // Lower Wisdom so the native Resize can hide slots while the higher circles are still visited.
+            restoreUnit.Stats.Wisdom.BaseValue = 10;
+            restoreBook.UpdateAllSlotsSize(true);
+            Check(restoreBook.GetHiddenCommonSpells(4).Contains(originalSlot) &&
+                  !restoreBook.GetMemorizedSpells(4).Any(s => s.SpellShell?.Blueprint == spiritualAlly),
+                  "D4 setup: native UpdateAllSlotsSize moved the prepared spell into a hidden slot");
+
+            Set(restoreBook, "m_BaseLevelInternal", 6);
+            var restoreRuntime = restoreFact.Components.Single(rc => rc.SourceBlueprintComponent is SpeakerSpellbookSync0046);
+            using (restoreRuntime.RequestEventContext())
+                ((SpeakerSpellbookSync0046)restoreRuntime.SourceBlueprintComponent).HandleUnitGainLevel();
+            Check(!restoreBook.IsKnownOnLevel(spiritualAlly, 4), "D4 level loss: Speaker spell leaves known circle 4");
+            bool hiddenAfterLevelLoss = restoreBook.GetHiddenCommonSpells(4).Any(s => s.SpellShell?.Blueprint == spiritualAlly);
+            restoreUnit.Facts.Remove(restoreFact);
+            bool hiddenAfterRemoval = restoreBook.GetHiddenCommonSpells(4).Any(s => s.SpellShell?.Blueprint == spiritualAlly);
+
+            Set(restoreBook, "m_BaseLevelInternal", 10);
+            restoreUnit.Stats.Wisdom.BaseValue = 22;
+            restoreBook.Rest();
+            bool returnedWithoutSource = restoreBook.GetMemorizedSpells(4).Any(s => s.SpellShell?.Blueprint == spiritualAlly);
+            Check(!restoreBook.IsKnownOnLevel(spiritualAlly, 4), "D4 setup: returned slot without any learn source");
+            Check(!hiddenAfterLevelLoss && !hiddenAfterRemoval && !returnedWithoutSource, "D4-F01: hidden preparation is cleared and stays absent after slot restoration");
+            Check(!restoreBook.GetMemorizedSpells(3).Any(s => ReferenceEquals(s.SpellShell, reduced)) &&
+                  !restoreBook.GetHiddenCommonSpells(3).Any(s => ReferenceEquals(s.SpellShell, reduced)),
+                  "D4-F01: a lower-slot metamagic version is also cleared");
+
+            var newRestoreFact = Fact(restoreUnit, mysteriesFeat);
+            var restoredKnown = restoreBook.GetKnownSpells(4).SingleOrDefault(s => s.Blueprint == spiritualAlly);
+            Check(restoredKnown != null && !ReferenceEquals(restoredKnown, originalKnown), "D4 relearn: reacquiring Mysteries teaches a fresh level-four spell");
+            restoreUnit.Facts.Remove(newRestoreFact);
+
+
+            // If another source shares the base circle, cleanup must wait until the last source ends.
+            var sharedUnit = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "D4-shared-metamagic", Sp046ClassId, 10);
+            sharedUnit.Progression.Classes[0].AddArchetype(root);
+            sharedUnit.Stats.Wisdom.BaseValue = 22;
+            var sharedBook = new Spellbook(sharedUnit.Descriptor, shamanBookBp);
+            Set(sharedBook, "m_BaseLevelInternal", 10);
+            Set(sharedUnit.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, sharedBook } });
+            sharedBook.UpdateAllSlotsSize(false);
+            var sharedSpeaker = Fact(sharedUnit, mysteriesFeat);
+            var sharedBase = sharedBook.GetKnownSpells(4).Single(s => s.Blueprint == spiritualAlly);
+            var sharedMeta = new MetamagicData { SpellLevelCost = 1 };
+            sharedMeta.Add(Metamagic.Extend);
+            var sharedCustom = new AbilityData(spiritualAlly, sharedBook, 4) { MetamagicData = sharedMeta };
+            sharedBook.AddCustomSpell(sharedCustom);
+            Check(sharedBook.Memorize(sharedCustom), "D4 setup: prepare Speaker metamagic copy before sharing");
+            var sharedTempSource = Fact(sharedUnit, foreignTempFeat);
+            sharedUnit.Facts.Remove(sharedSpeaker);
+            Check(sharedBase.IsTemporary && sharedBook.IsKnownOnLevel(spiritualAlly, 4) &&
+                  sharedBook.GetMemorizedSpells(5).Any(s => ReferenceEquals(s.SpellShell, sharedCustom)),
+                "D4: active same-circle temporary source preserves the shared base and preparation");
+            sharedUnit.Facts.Remove(sharedTempSource);
+            Check(!sharedBook.IsKnownOnLevel(spiritualAlly, 4), "D4: native last-source removal forgets the base spell");
+            sharedBook.Rest();
+            bool sharedPreparationRemains = sharedBook.GetMemorizedSpells(5).Any(slot => ReferenceEquals(slot.SpellShell, sharedCustom));
+            bool sharedCustomRemains = sharedBook.GetCustomSpells(spiritualAlly).Any(ability => ReferenceEquals(ability, sharedCustom));
+            bool canSpendSharedPreparation = sharedBook.CanSpend(sharedCustom);
+            Check(!sharedPreparationRemains && !sharedCustomRemains && !canSpendSharedPreparation, "D4-F02: last temporary source clears the metamagic preparation and prevents spending");
+
+            // The real Battle Spirit list and its AddSpecialSpellList feature come from the game's archived rows.
+            // Restrict this boundary stub to the archive rows hydrated below. No spellbook logic is patched.
+            var dlcType = typeof(Kingmaker.DLC.DlcConditionExtension);
+            var dlcMethods = typeof(Arcane01446Tests);
+            string[] battleAssetIds = {
+                "90810e5cf53bf854293cbd5ea1066252", "c60969e7f264e6d4b84a1499fdcf9039", "4c3d08935262b6544ae97599b3a9556d",
+                "2d4263d80f5136b4296d6eb43a221d7d", "2daf9c5112f16d54ab3cd6904c705c59", "6a234c6dcde7ae94e94e9c36fd1163a7",
+                "e3d0dfe1c8527934294f241e0ae96a8d", "e788b02f8d21014488067bdd3ba7b325", "22b9044aa229815429d57d0a30e4b739"
+            };
+            d4DlcBlueprints = new HashSet<BlueprintGuid>(battleAssetIds.Select(BlueprintGuid.Parse));
+            h.Patch(AccessTools.Method(dlcType, "IsDlcRestricted"),
+                prefix: new HarmonyMethod(AccessTools.Method(dlcMethods, nameof(D4DlcForBattleSpell))));
+            var battleRows = new Newtonsoft.Json.Linq.JArray(PsychicExpansionTests.NativeRows.Where(row =>
+            {
+                string id = (string)row["blueprint"]["AssetId"];
+                return id == "e702a1335e1f66648afbe3e2ac182751" || id == "e788846aaf449404db11e51182174be8" ||
+                    id == Sp046ShamanSpellbookId || d4DlcBlueprints.Contains(BlueprintGuid.Parse(id));
+            }));
+            PsychicExpansionTests.LoadNativeRows(c2, new Newtonsoft.Json.Linq.JObject { ["requiredNative"] = battleRows }, true);
+            var battleGrant = Native<BlueprintFeature>(c2, "e702a1335e1f66648afbe3e2ac182751");
+            var battleList = Native<BlueprintSpellList>(c2, "e788846aaf449404db11e51182174be8");
+            var righteous = Native<BlueprintAbility>(c2, "90810e5cf53bf854293cbd5ea1066252");
+            Check(battleList.GetSpells(5).Contains(righteous) &&
+                  !shamanNativeList.SpellsByLevel[5].Spells.Contains(righteous) &&
+                  battleGrant.GetComponent<AddSpecialSpellList>()?.SpellList == battleList,
+                "D4 Battle Spirit fixture verifies the three real blueprint identities and a true overlap");
+
+            var archivedShamanBook = battleRows.Single(row => (string)row["blueprint"]["AssetId"] == Sp046ShamanSpellbookId);
+            shamanBookBp.AllSpellsKnown = (bool)archivedShamanBook["blueprint"]["Data"]["AllSpellsKnown"];
+            Check(shamanBookBp.AllSpellsKnown, "D4 Battle Spirit fixture restores the archived Shaman AllSpellsKnown flag");
+            foreach (bool spiritFirst in new[] { false, true })
+            {
+                var unit = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "D4-BattleSpirit-" + spiritFirst, Sp046ClassId, 10);
+                unit.Progression.Classes[0].AddArchetype(root);
+                unit.Stats.Wisdom.BaseValue = 22;
+                var battleBook = new Spellbook(unit.Descriptor, shamanBookBp);
+                Set(battleBook, "m_BaseLevelInternal", 10);
+                Set(unit.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, battleBook } });
+                if (spiritFirst) Fact(unit, battleGrant);
+                var speaker = Fact(unit, mysteriesFeat);
+                if (!spiritFirst) Fact(unit, battleGrant);
+                battleBook.UpdateAllSlotsSize(false);
+                var ordinary = battleBook.GetKnownSpells(5).FirstOrDefault(s => s.Blueprint == righteous);
+                var spirit = battleBook.GetSpecialSpells(5).FirstOrDefault(s => s.Blueprint == righteous);
+                Check(spirit != null && battleBook.SpecialLists.Contains(battleList),
+                    "D4 Battle Spirit fixture: real AddSpecialSpellList added the five-circle spirit grant");
+                Check(ordinary != null && !ReferenceEquals(ordinary, spirit), "D4 Battle Spirit: ordinary and spirit copies are distinct");
+                var favorite = battleBook.GetMemorizedSpellSlots(5).First(s => s.Type == SpellSlotType.Favorite);
+                var common = battleBook.GetMemorizedSpellSlots(5).First(s => s.Type == SpellSlotType.Common);
+                Check(battleBook.Memorize(spirit, favorite) && battleBook.Memorize(ordinary, common),
+                    "D4 Battle Spirit: native Memorize prepares the two distinct slot types");
+                unit.Facts.Remove(speaker);
+                bool commonKnown = battleBook.GetKnownSpells(5).Any(s => s.Blueprint == righteous);
+                bool spiritKnown = battleBook.GetSpecialSpells(5).Any(s => s.Blueprint == righteous);
+                bool spiritPrepared = ReferenceEquals(favorite.SpellShell, spirit);
+                Check(!commonKnown && common.SpellShell == null && spiritKnown && spiritPrepared &&
+                      battleBook.IsKnownOnLevel(righteous, 5) && battleBook.SpecialLists.Contains(battleList),
+                    "D4-F03: only the ordinary Spirit overlap is removed, in either acquisition order");
             }
 
             // ---- 5. Runtime Rulebook Tests: D-0046-03 Blood of Heroes ----
