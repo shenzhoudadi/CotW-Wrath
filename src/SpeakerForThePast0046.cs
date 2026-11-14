@@ -141,8 +141,8 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             internal int Base, Step, Start, PerStep = 1, LevelIncrease;
             internal bool ByStat, ByLevel;
-            internal static ResCfg Div(int step, int start, int perStep = 1) => new ResCfg { Step = step, Start = start, PerStep = perStep };
-            internal static ResCfg Gated(int start, int step, int perStep = 1) => new ResCfg { Step = step, Start = start, PerStep = perStep };
+            internal static ResCfg Div(int step, int start, int perStep = 1, int baseValue = 0) => new ResCfg { Base = baseValue, Step = step, Start = start, PerStep = perStep };
+            internal static ResCfg Gated(int start, int step, int perStep = 1, int baseValue = 0) => new ResCfg { Base = baseValue, Step = step, Start = start, PerStep = perStep };
             internal static ResCfg Stat(int baseValue) => new ResCfg { Base = baseValue, ByStat = true };
             internal static ResCfg Level(int increase) => new ResCfg { ByLevel = true, LevelIncrease = increase };
         }
@@ -215,46 +215,30 @@ namespace CallOfTheWild.Wrath.Prototype
                     return Reject("reject: removal L" + removal.Level + " " + removal.Guid + " not on Shaman progression");
             }
 
-            // Require Time Mystery and Ancestors Mystery as upstream sources.
+            // Validate external TTT-Base Sands of Time atomically before creating any assets.
+            var sandsLink = PsychicSharedSpellCatalog.Entries.FirstOrDefault(l => l.Guid == SandsOfTimeId);
+            if (sandsLink != null && !PsychicSpellIntegration.Available(cache, sandsLink, out _))
+            {
+                ProviderReport = "missing: " + sandsLink.Provider + " / " + sandsLink.Name + " / " + SandsOfTimeId;
+                return Reject("reject: external provider " + sandsLink.Provider +
+                    " has not published " + sandsLink.Name + " (" + SandsOfTimeId + "); Register returns false by contract");
+            }
+
+            // Read-only Oracle upstream metadata & native Ancestors revelations.
             var oracleClass = cache.Load(BlueprintGuid.Parse(TimeMystery0046.OracleClassId)) as BlueprintCharacterClass;
             var arcanistClass = cache.Load(BlueprintGuid.Parse(TimeMystery0046.ArcanistClassId)) as BlueprintCharacterClass;
-            var timeMystery = cache.Load(Id(TimeMystery0046.RootToken)) as BlueprintFeature;
             var ancestorsMystery = cache.Load(BlueprintGuid.Parse(TimeMystery0046.OracleAncestorsMysteryId)) as BlueprintFeature;
             var oracleRevelationSelection = cache.Load(BlueprintGuid.Parse(TimeMystery0046.OracleRevelationSelectionId)) as BlueprintFeatureSelection;
-            if (timeMystery == null)
-            {
-                var link = PsychicSharedSpellCatalog.Entries.FirstOrDefault(l => l.Guid == SandsOfTimeId);
-                if (link != null && !PsychicSpellIntegration.Available(cache, link, out _))
-                {
-                    ProviderReport = "missing: " + link.Provider + " / " + link.Name + " / " + link.Guid;
-                    return Reject("reject: external provider " + link.Provider + " has not published " +
-                        link.Name + " (" + link.Guid + "); TimeOracleMysteryFeature0046 absent; Register returns false by contract");
-                }
-                return Reject("reject: TimeOracleMysteryFeature0046 (" + Id(TimeMystery0046.RootToken) + ") not registered; " + TimeMystery0046.GateReport);
-            }
-            if (oracleClass == null || ancestorsMystery == null || oracleRevelationSelection == null)
-                return Reject("reject: OracleClass / OracleAncestorsMysteryFeature / OracleRevelationSelection missing");
+            var spiritWalk = cache.Load(BlueprintGuid.Parse(TimeMystery0046.OracleRevelationSpiritWalkId)) as BlueprintFeature;
+            if (oracleClass == null || ancestorsMystery == null || oracleRevelationSelection == null || spiritWalk == null)
+                return Reject("reject: OracleClass / OracleAncestorsMysteryFeature / OracleRevelationSelection / OracleRevelationSpiritWalk missing");
 
-            // Auto-discover 18 bonus spells (9 Time + 9 Ancestors) from mystery level-2 spell grants.
-            if (!DiscoverMysterySpells(oracleClass, timeMystery, ancestorsMystery, out var resolved, out var spellErr))
+            // Load and validate the 18 frozen bonus spells (9 Time + 9 C01-frozen Ancestors).
+            if (!DiscoverMysterySpells(cache, sandsLink, out var resolved, out var spellErr))
                 return Reject(spellErr);
 
-            var sandsLink = PsychicSharedSpellCatalog.Entries.FirstOrDefault(l => l.Guid == SandsOfTimeId);
-            if (sandsLink != null)
-            {
-                if (!PsychicSpellIntegration.Available(cache, sandsLink, out var providerSands))
-                {
-                    ProviderReport = "missing: " + sandsLink.Provider + " / " + sandsLink.Name + " / " + SandsOfTimeId;
-                    return Reject("reject: external provider " + sandsLink.Provider +
-                        " has not published " + sandsLink.Name + " (" + SandsOfTimeId + "); Register returns false by contract");
-                }
-                if (resolved[3].All(s => s.AssetGuid != providerSands.AssetGuid))
-                    return Reject("reject: discovered Time Mystery circle-3 spell does not match external " + SandsOfTimeId);
-                ProviderReport = "available: " + sandsLink.Provider + " / " + sandsLink.Name + " / " + SandsOfTimeId;
-            }
-
-            // Auto-discover 16 revelations (8 Time + 8 Ancestors) from OracleRevelationSelection.
-            if (!DiscoverMysteryRevelations(oracleRevelationSelection, timeMystery, ancestorsMystery, out var sourceRevelations, out var revErr))
+            // Auto-discover the 6 native Ancestors revelations + read-only Spirit Walk (7 total).
+            if (!DiscoverAncestorsRevelations(oracleRevelationSelection, ancestorsMystery, spiritWalk, out var nativeAncestorsRevs, out var revErr))
                 return Reject(revErr);
 
             var leaf = LoadLeafAssets(cache, out var missingLeaf);
@@ -318,9 +302,16 @@ namespace CallOfTheWild.Wrath.Prototype
             mysteries.IsClassFeature = true;
             RevelationBridge0046.Icon(mysteries, leaf[IconDonorId]);
 
-            // Auto-clone and rebind every discovered Time + Ancestors revelation.
-            var cloner = new RevelationCloner(f, cache, cls, root, oracleClass, arcanistClass, timeMystery, ancestorsMystery, leaf[IconDonorId]);
-            var adaptedFeatures = sourceRevelations.Select(cloner.Adapt).ToArray();
+            // Auto-clone the 7 native Ancestors/Spirit Walk revelations and build the 9 shared Time/Ancestral Weapon revelations.
+            var bind = RevelationBridge0046.ForSpeaker(cls, root);
+            var cloner = new RevelationCloner(f, cache, cls, root, oracleClass, arcanistClass,
+                ancestorsMystery, leaf[IconDonorId], leaf[IncorporealId]);
+            var sharedSpecs = TimeMystery0046.TimeRevelations()
+                .Concat(new[] { TimeMystery0046.AncestralWeaponSpec() })
+                .ToArray();
+            var adaptedFeatures = nativeAncestorsRevs.Select(cloner.Adapt)
+                .Concat(sharedSpecs.Select(spec => TimeMystery0046.BuildSpeakerRevelation(f, bind, spec, leaf)))
+                .ToArray();
 
             var selection = f.Add(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true, IgnorePrerequisites = false },
                 SelectionToken, "Revelations of the Past", SelectionText);
@@ -339,54 +330,48 @@ namespace CallOfTheWild.Wrath.Prototype
             if (root.RemoveFeatures.Any(x => x == null)) return Reject("reject: a removal entry resolved to null");
 
             SpellBatch01447.PublishArchetype(cache, f, cls, root, new BlueprintFeatureBase[] { mysteries, selection });
-            GateReport = "published: auto-read 18 spells / 16 revelations / " + ProviderReport;
+            GateReport = "published: 18 frozen spells / 16 revelations / " + ProviderReport;
             return true;
         }
 
         // ------------------------------------------------------------------
-        // Automatic discovery from Time Mystery + Ancestors Mystery
+        // Frozen 18-spell C01 table + read-only native Ancestors/Spirit Walk discovery
         // ------------------------------------------------------------------
-        static bool DiscoverMysterySpells(BlueprintCharacterClass oracleClass, BlueprintFeature timeMystery,
-            BlueprintFeature ancestorsMystery, out BlueprintAbility[][] resolved, out string error)
+        static bool DiscoverMysterySpells(BlueprintsCache cache, PsychicSpellLink sandsLink,
+            out BlueprintAbility[][] resolved, out string error)
         {
             resolved = new BlueprintAbility[10][];
-            var timeByCircle = ReadMysterySpellTable(oracleClass, timeMystery);
-            var ancByCircle = ReadMysterySpellTable(oracleClass, ancestorsMystery);
+            BlueprintAbility providerSands = null;
+            if (sandsLink != null && !PsychicSpellIntegration.Available(cache, sandsLink, out providerSands))
+            {
+                error = "reject: external provider " + sandsLink.Provider + " has not published " + sandsLink.Name;
+                return false;
+            }
+            if (sandsLink != null)
+                ProviderReport = "available: " + sandsLink.Provider + " / " + sandsLink.Name + " / " + SandsOfTimeId;
+
             for (int circle = 1; circle <= 9; circle++)
             {
-                if (!timeByCircle.TryGetValue(circle, out var tSpell) || !ValidSpell(tSpell))
-                { error = "reject: discovered Time Mystery circle " + circle + " spell missing or invalid"; return false; }
-                if (!ancByCircle.TryGetValue(circle, out var aSpell) || !ValidSpell(aSpell))
-                { error = "reject: discovered Ancestors Mystery circle " + circle + " spell missing or invalid"; return false; }
+                string timeId = TimeMystery0046.TimeSpellIds[circle - 1];
+                string ancId = TimeMystery0046.AncestorsFrozenSpellIds[circle - 1];
+                var tSpell = timeId == SandsOfTimeId && providerSands != null
+                    ? providerSands
+                    : cache.Load(BlueprintGuid.Parse(timeId)) as BlueprintAbility;
+                if (!ValidSpell(tSpell))
+                { error = "reject: Time Mystery circle " + circle + " spell (" + timeId + ") missing or invalid"; return false; }
+
+                var aSpell = cache.Load(BlueprintGuid.Parse(ancId)) as BlueprintAbility;
+                if (!ValidSpell(aSpell))
+                { error = "reject: Ancestors C01 frozen circle " + circle + " spell (" + ancId + ") missing or invalid"; return false; }
+
                 resolved[circle] = new[] { tSpell, aSpell };
             }
             error = null;
             return true;
         }
 
-        static Dictionary<int, BlueprintAbility> ReadMysterySpellTable(BlueprintCharacterClass oracleClass, BlueprintFeature mystery)
-        {
-            var dict = new Dictionary<int, BlueprintAbility>();
-            var grants = mystery.ComponentsArray?.OfType<AddFeatureOnClassLevel>()
-                .Where(g => g.Level == 2 && (g.Feature != null))
-                .Select(g => g.Feature)
-                .ToArray() ?? Array.Empty<BlueprintFeature>();
-            foreach (var grant in grants)
-            {
-                foreach (var ak in grant.ComponentsArray?.OfType<AddKnownSpell>() ?? Array.Empty<AddKnownSpell>())
-                {
-                    var spellCls = (Get(ak, "m_CharacterClass") as BlueprintCharacterClassReference)?.Get();
-                    if (spellCls != null && spellCls.AssetGuid != oracleClass.AssetGuid) continue;
-                    var spell = (Get(ak, "m_Spell") as BlueprintAbilityReference)?.Get();
-                    if (spell != null && ak.SpellLevel >= 1 && ak.SpellLevel <= 9 && !dict.ContainsKey(ak.SpellLevel))
-                        dict[ak.SpellLevel] = spell;
-                }
-            }
-            return dict;
-        }
-
-        static bool DiscoverMysteryRevelations(BlueprintFeatureSelection oracleSelection, BlueprintFeature timeMystery,
-            BlueprintFeature ancestorsMystery, out BlueprintFeature[] revelations, out string error)
+        static bool DiscoverAncestorsRevelations(BlueprintFeatureSelection oracleSelection, BlueprintFeature ancestorsMystery,
+            BlueprintFeature spiritWalk, out BlueprintFeature[] revelations, out string error)
         {
             var allRefs = (Get(oracleSelection, "m_AllFeatures") as BlueprintFeatureReference[]) ?? Array.Empty<BlueprintFeatureReference>();
             if (allRefs.Length == 0)
@@ -401,7 +386,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var prereqs = feat.ComponentsArray?.OfType<PrerequisiteFeaturesFromList>().ToArray() ?? Array.Empty<PrerequisiteFeaturesFromList>();
                 bool matches = prereqs.Any(p =>
                     ((Get(p, "m_Features") as BlueprintFeatureReference[]) ?? Array.Empty<BlueprintFeatureReference>())
-                    .Any(mf => mf != null && (mf.Guid == timeMystery.AssetGuid || mf.Guid == ancestorsMystery.AssetGuid)));
+                    .Any(mf => mf != null && mf.Guid == ancestorsMystery.AssetGuid));
                 if (matches)
                 {
                     seen.Add(feat.AssetGuid);
@@ -409,10 +394,16 @@ namespace CallOfTheWild.Wrath.Prototype
                 }
             }
 
-            if (list.Count != 16)
+            if (spiritWalk != null && !seen.Contains(spiritWalk.AssetGuid))
+            {
+                seen.Add(spiritWalk.AssetGuid);
+                list.Add(spiritWalk);
+            }
+
+            if (list.Count != 7)
             {
                 revelations = null;
-                error = "reject: expected 16 auto-discovered Time/Ancestors revelations in OracleRevelationSelection, found " + list.Count;
+                error = "reject: expected 7 read-only native Ancestors/Spirit Walk revelations, found " + list.Count;
                 return false;
             }
             revelations = list.ToArray();
@@ -434,6 +425,7 @@ namespace CallOfTheWild.Wrath.Prototype
             readonly RevelationBinding0046 bind;
             readonly HashSet<BlueprintGuid> ignoredMysteries;
             readonly BlueprintUnitFact iconDonor;
+            readonly BlueprintUnitFact incorporealFact;
             readonly BlueprintBuff transformationBuff;
             readonly Dictionary<BlueprintGuid, SimpleBlueprint> clonedMap = new Dictionary<BlueprintGuid, SimpleBlueprint>();
 
@@ -441,7 +433,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
             internal RevelationCloner(PsychicAssets f, BlueprintsCache cache, BlueprintCharacterClass shaman,
                 BlueprintArchetype speaker, BlueprintCharacterClass oracle, BlueprintCharacterClass arcanist,
-                BlueprintFeature timeMystery, BlueprintFeature ancestorsMystery, BlueprintUnitFact iconDonor)
+                BlueprintFeature ancestorsMystery, BlueprintUnitFact iconDonor, BlueprintUnitFact incorporealFact)
             {
                 this.f = f;
                 this.cache = cache;
@@ -450,8 +442,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 this.oracle = oracle;
                 this.arcanist = arcanist;
                 bind = RevelationBridge0046.ForSpeaker(shaman, speaker);
-                ignoredMysteries = new HashSet<BlueprintGuid> { timeMystery.AssetGuid, ancestorsMystery.AssetGuid };
+                ignoredMysteries = new HashSet<BlueprintGuid> { ancestorsMystery.AssetGuid };
                 this.iconDonor = iconDonor;
+                this.incorporealFact = incorporealFact;
                 transformationBuff = cache.Load(BlueprintGuid.Parse(TransformationBuffId)) as BlueprintBuff;
             }
 
@@ -475,15 +468,19 @@ namespace CallOfTheWild.Wrath.Prototype
                 bool isSacredCouncil = src.AssetGuid == BlueprintGuid.Parse(SacredCouncilId);
                 bool isBloodOfHeroes = src.AssetGuid == BlueprintGuid.Parse(BloodOfHeroesId);
                 bool isSpiritOfWarrior = src.AssetGuid == BlueprintGuid.Parse(SpiritOfTheWarriorId);
+                bool isSpiritWalk = src.AssetGuid == BlueprintGuid.Parse(TimeMystery0046.OracleRevelationSpiritWalkId);
 
                 BlueprintAbilityResource primaryResource = null;
-                foreach (var aarPre in (feat.ComponentsArray ?? Array.Empty<BlueprintComponent>()).OfType<AddAbilityResources>())
+                if (!isSpiritWalk)
                 {
-                    var preRes = (Get(aarPre, "m_Resource") as BlueprintAbilityResourceReference)?.Get();
-                    if (preRes != null)
+                    foreach (var aarPre in (feat.ComponentsArray ?? Array.Empty<BlueprintComponent>()).OfType<AddAbilityResources>())
                     {
-                        var clonedPre = CloneResource(preRes, resToken);
-                        if (primaryResource == null) primaryResource = clonedPre;
+                        var preRes = (Get(aarPre, "m_Resource") as BlueprintAbilityResourceReference)?.Get();
+                        if (preRes != null)
+                        {
+                            var clonedPre = CloneResource(preRes, resToken);
+                            if (primaryResource == null) primaryResource = clonedPre;
+                        }
                     }
                 }
                 var nextComps = new List<BlueprintComponent>();
@@ -501,6 +498,9 @@ namespace CallOfTheWild.Wrath.Prototype
                             nextComps.Add(pcl);
                         continue;
                     }
+
+                    if (isSpiritWalk && (comp is AddAbilityResources || comp is AddFacts))
+                        continue; // Replaced below by C01 2.5 #10 Spirit Walk toggle/resource/buff.
 
                     if (comp is AddAbilityResources aar)
                     {
@@ -527,6 +527,9 @@ namespace CallOfTheWild.Wrath.Prototype
                     var councilParent = SacredCouncilVariants(f, bind, featureToken, displayName, displayDesc, primaryResource, iconDonor);
                     nextComps.Add(Facts(councilParent));
                 }
+
+                if (isSpiritWalk)
+                    BuildSpiritWalkComponents(f, bind, feat, featureToken, resToken, displayName, displayDesc, incorporealFact, nextComps);
 
                 feat.ComponentsArray = nextComps.ToArray();
 

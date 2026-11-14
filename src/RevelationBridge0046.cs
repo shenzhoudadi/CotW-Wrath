@@ -253,6 +253,67 @@ namespace CallOfTheWild.Wrath.Prototype
             return keep;
         }
 
+        static readonly FieldInfo TempEntriesField = AccessTools.Field(typeof(UnitPartTemporarySpellsKnown), "m_Entries");
+
+        static List<AbilityData> CollectForeignTempSpells(UnitDescriptor owner, Spellbook book)
+        {
+            var result = new List<AbilityData>();
+            var part = owner?.Unit?.Get<UnitPartTemporarySpellsKnown>();
+            var entries = part != null ? TempEntriesField?.GetValue(part) as List<UnitPartTemporarySpellsKnown.Entry> : null;
+            if (entries == null) return result;
+            foreach (var entry in entries)
+            {
+                if (entry == null || entry.Removed || entry.Spells == null) continue;
+                foreach (var ab in entry.Spells)
+                    if (ab != null && ReferenceEquals(ab.Spellbook, book) && ab.Blueprint != null)
+                        result.Add(ab);
+            }
+            return result;
+        }
+
+        static void RelinquishSpeakerSpell(Spellbook book, int level, BlueprintAbility spell,
+            List<AbilityData> foreignTemps, ref int removed)
+        {
+            var matchingTemps = foreignTemps
+                .Where(ab => ab.Blueprint.AssetGuid == spell.AssetGuid)
+                .ToArray();
+            if (matchingTemps.Length == 0)
+            {
+                if (book.IsKnown(spell))
+                {
+                    book.RemoveSpell(spell);
+                    removed++;
+                }
+                return;
+            }
+
+            bool sharedOnLevel = matchingTemps.Any(ab => ab.SpellLevel == level);
+            if (sharedOnLevel)
+            {
+                // Another active temporary source shares this exact book/circle
+                // AbilityData object. Keep the spell and common-slot preparations,
+                // and mark it temporary so removing the last temporary source
+                // cleanly triggers UnitPartTemporarySpellsKnown.RemoveEntry.
+                foreach (var ab in book.GetKnownSpells(level).ToArray())
+                    if (ab != null && ab.Blueprint?.AssetGuid == spell.AssetGuid)
+                        ab.IsTemporary = true;
+                foreach (var ab in matchingTemps)
+                    if (ab.SpellLevel == level)
+                        ab.IsTemporary = true;
+                return;
+            }
+
+            // Foreign temporary grant sits on a different circle in the same book:
+            // unlearn only Speaker's circle without wiping the foreign circle.
+            foreach (var ab in book.GetKnownSpells(level).ToArray())
+            {
+                if (ab == null || ab.Blueprint?.AssetGuid != spell.AssetGuid) continue;
+                ab.IsTemporary = true;
+                book.RemoveTemporarySpell(ab);
+                removed++;
+            }
+        }
+
         void Sync()
         {
             var book = Book();
@@ -260,6 +321,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (book == null || list?.SpellsByLevel == null) return;
             int max = book.MaxSpellLevel, learned = 0, removed = 0;
             var keep = CollectKeptSpells(Owner, book, NativeShamanSpellList?.Get(), Math.Max(0, max), Fact?.Blueprint?.AssetGuid ?? BlueprintGuid.Empty);
+            var foreignTemps = CollectForeignTempSpells(Owner, book);
             foreach (var row in list.SpellsByLevel)
             {
                 if (row == null || row.SpellLevel < 1 || row.SpellLevel > 9) continue;
@@ -268,14 +330,25 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (spell == null) continue;
                     if (row.SpellLevel <= max)
                     {
-                        if (!book.IsKnownOnLevel(spell, row.SpellLevel))
+                        bool hadKnownOnLevel = book.IsKnownOnLevel(spell, row.SpellLevel);
+                        if (!hadKnownOnLevel)
                             book.AddKnown(row.SpellLevel, spell);
+                        bool hasForeignTempOnLevel = foreignTemps.Any(ft =>
+                            ft.Blueprint.AssetGuid == spell.AssetGuid && ft.SpellLevel == row.SpellLevel);
+                        // Promote to non-temporary only when Speaker newly adds the spell
+                        // or shares the slot with an active UnitPartTemporarySpellsKnown entry;
+                        // unbacked pre-existing temporary entries keep IsTemporary=true.
+                        if (!hadKnownOnLevel || hasForeignTempOnLevel)
+                        {
+                            foreach (var ab in book.GetKnownSpells(row.SpellLevel))
+                                if (ab != null && ab.Blueprint?.AssetGuid == spell.AssetGuid)
+                                    ab.IsTemporary = false;
+                        }
                         learned++;
                     }
-                    else if (!keep.Contains(spell.AssetGuid) && book.IsKnown(spell))
+                    else if (!keep.Contains(spell.AssetGuid))
                     {
-                        book.RemoveSpell(spell);
-                        removed++;
+                        RelinquishSpeakerSpell(book, row.SpellLevel, spell, foreignTemps, ref removed);
                     }
                 }
             }
@@ -285,23 +358,24 @@ namespace CallOfTheWild.Wrath.Prototype
 
         void Cleanup() => Cleanup(Owner, CharacterClassSpellbook?.Get(), SpellList?.Get(), NativeShamanSpellList?.Get(), Fact?.Blueprint?.AssetGuid ?? BlueprintGuid.Empty);
 
-        // On removal, only unlearn spells from the 18-spell Mysteries list that
-        // are not also granted by the native Shaman spell list or any other
-        // still-active feature on this Shaman spellbook. Idempotent if called again.
+        // On removal, unlearn Speaker-exclusive spells unless kept by native progression,
+        // another permanent source, or an active foreign UnitPartTemporarySpellsKnown entry.
+        // Idempotent if called again.
         internal static void Cleanup(UnitDescriptor owner, BlueprintSpellbook wantedBook, BlueprintSpellList list,
             BlueprintSpellList nativeList, BlueprintGuid excludeFactId)
         {
             var book = FindBook(owner, wantedBook);
             if (book == null || list?.SpellsByLevel == null) return;
             var keep = CollectKeptSpells(owner, book, nativeList, Math.Max(0, book.MaxSpellLevel), excludeFactId);
+            var foreignTemps = CollectForeignTempSpells(owner, book);
+            int removed = 0;
             foreach (var row in list.SpellsByLevel)
             {
                 if (row == null || row.Spells == null) continue;
                 foreach (var spell in row.Spells)
                 {
                     if (spell == null || keep.Contains(spell.AssetGuid)) continue;
-                    if (book.IsKnown(spell))
-                        book.RemoveSpell(spell);
+                    RelinquishSpeakerSpell(book, row.SpellLevel, spell, foreignTemps, ref removed);
                 }
             }
         }

@@ -64,7 +64,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal const string OracleRevelationSpiritWalkId = "87bdea524911cfa4dacfe7243abe8b51";
         internal const string SandsOfTimeId = "da49f07e431b47abaad41ef28df487f7";
 
-        static readonly string[] TimeSpellIds = {
+        internal static readonly string[] TimeSpellIds = {
             "14c90900b690cac429b229efdf416127", // 1: Longstrider
             "464a7193519429f48b4d190acb753cf0", // 2: Grace
             SandsOfTimeId,                      // 3: Sands of Time (TTT-Base)
@@ -74,6 +74,20 @@ namespace CallOfTheWild.Wrath.Prototype
             "4aa7942c3e62a164387a73184bca3fc1", // 7: Disintegrate
             "8b0761f3873aefb976c0f47fec3c600c", // 8: Temporal Stasis
             "585f7776285d17b60b9e8e2fe42a69be", // 9: TimeStopSpell01438
+        };
+
+        // Frozen C01 2.8 Ancestors spell table (circles 1..9); prevents Wrath's
+        // OracleAncestorsSpells.jbp from drifting the 7 non-matching circles.
+        internal static readonly string[] AncestorsFrozenSpellIds = {
+            "2c38da66e5a599347ac95b3294acbe00", // 1: True Strike
+            "b924f40705afa57283f65679a2468775", // 2: Spiritual Weapon
+            "5ab0d42fb68c9e34abae4921822b9d63", // 3: Heroism
+            "b406c2835f416afb0824cec610cba20a", // 4: Spiritual Ally
+            "90810e5cf53bf854293cbd5ea1066252", // 5: Righteous Might
+            "e15e5e7045fda2244b98c8f010adfe31", // 6: Heroism, Greater
+            "98310a099009bbd4dbdf66bcef58b4cd", // 7: Invisibility, Mass
+            "0e67fa8f011662c43934d486acc50253", // 8: Prediction of Failure
+            "43740dab07286fe4aa00a6ee104ce7c1", // 9: Heroic Invocation
         };
 
         // Vanilla Enlightened Philosopher circles 2..9 fixed spell table.
@@ -102,10 +116,10 @@ namespace CallOfTheWild.Wrath.Prototype
             "Upon reaching 20th level, you become a true master of time and stop aging. " +
             "You gain a +2 competence bonus to Intelligence, Wisdom and Charisma, and may cast Time Stop once per day as a spell-like ability.";
 
-        static Rev[] TimeRevelations() => new[] {
+        internal static Rev[] TimeRevelations() => new[] {
             new Rev { Token="AgingTouchOracleRevelation0046", Name="Aging Touch", Min=0,
                 Text="As a standard action, touch a creature to wither it with the weight of years. Undead are unaffected; constructs take direct damage instead of ability damage.",
-                ResToken="AgingTouchOracleRevelationResource0046", Res=ResCfg.Div(5,5),
+                ResToken="AgingTouchOracleRevelationResource0046", Res=ResCfg.Div(5,5,1,1),
                 Action=UnitCommand.CommandType.Standard, Range=AbilityRange.Touch, Duration=1 },
             new Rev { Token="RewindTimeOracleRevelation0046", Name="Rewind Time", Min=7,
                 Text="As a swift action, gain the ability to reroll one failed d20 check within the next round, taking the better result. Limited uses per day.",
@@ -136,11 +150,11 @@ namespace CallOfTheWild.Wrath.Prototype
                 GrantLevel=18, GrantToken="TimeSightOracleForesightFeature0046", GrantName="Time Sight: Foresight", GrantBuffId=SpeakerForThePast0046.ForesightBuffId },
             new Rev { Token="EraseFromTimeOracleRevelation0046", Name="Erase from Time", Min=0,
                 Text="As a standard action, touch a creature and erase it from time. A successful Fortitude save negates the effect; the target is suspended and its other effects are paused.",
-                ResToken="EraseFromTimeOracleRevelationResource0046", Res=ResCfg.Gated(11,100),
+                ResToken="EraseFromTimeOracleRevelationResource0046", Res=ResCfg.Gated(11,100,1,1),
                 Action=UnitCommand.CommandType.Standard, Range=AbilityRange.Touch, Duration=1 },
         };
 
-        static Rev AncestralWeaponSpec() => new Rev {
+        internal static Rev AncestralWeaponSpec() => new Rev {
             Token = AncestralWeaponToken,
             Name = "Ancestral Weapon",
             Min = 0,
@@ -154,8 +168,65 @@ namespace CallOfTheWild.Wrath.Prototype
             Rate = DurationRate.Minutes
         };
 
+        // C01 2.7 strictly isolates native Oracle mysteries, selections and prerequisites.
+        static readonly bool OracleExpansionEnabled = false;
+
+        internal static BlueprintFeature BuildSpeakerRevelation(PsychicAssets f, RevelationBinding0046 bind,
+            Rev spec, Dictionary<string, BlueprintUnitFact> leaf)
+        {
+            var donor = leaf[SpeakerForThePast0046.IconDonorId];
+            string stem = spec.Token.EndsWith("OracleRevelation0046", StringComparison.Ordinal)
+                ? spec.Token.Substring(0, spec.Token.Length - "OracleRevelation0046".Length)
+                : spec.Token;
+            var mapped = new Rev {
+                Token = stem + "ShamanRevelationFeature0046",
+                Name = spec.Name,
+                Text = spec.Text,
+                Min = spec.Min,
+                ResToken = stem + "ShamanRevelationResource0046",
+                Res = spec.Res,
+                Action = spec.Action,
+                Range = spec.Range,
+                Duration = spec.Duration,
+                Rate = spec.Rate,
+                Personal = spec.Personal,
+                ApplyIds = spec.ApplyIds,
+                OwnBuffTokens = spec.OwnBuffTokens,
+                Passive = spec.Passive,
+                GrantLevel = spec.GrantLevel,
+                GrantToken = spec.GrantToken,
+                GrantName = spec.GrantName,
+                GrantBuffId = spec.GrantBuffId
+            };
+            var comps = new List<BlueprintComponent>();
+            if (mapped.Min > 0)
+                comps.Add(RevelationBridge0046.Level(bind, mapped.Min));
+            BlueprintAbilityResource res = null;
+            if (mapped.Res != null)
+            {
+                res = SpeakerForThePast0046.BuildResource(f, bind, mapped.ResToken, mapped.Res);
+                comps.Add(ArchetypeBatch01445.Grant(res));
+            }
+            if (mapped.Passive)
+                comps.AddRange(SpeakerForThePast0046.BuildTemporalCelerityEffects(f, bind, donor, "SpeakerTemporalCelerity"));
+            else
+                comps.AddRange(SpeakerForThePast0046.BuildEffects(f, bind, mapped, res, leaf));
+
+            var feat = f.Feature(mapped.Token, mapped.Name, mapped.Text, comps.ToArray());
+            feat.Groups = Array.Empty<FeatureGroup>();
+            feat.Ranks = 1;
+            feat.IsClassFeature = true;
+            feat.HideInUI = false;
+            feat.HideInCharacterSheetAndLevelUp = false;
+            RevelationBridge0046.Icon(feat, donor);
+            return feat;
+        }
+
         internal static bool Register(BlueprintsCache cache)
         {
+            if (!OracleExpansionEnabled)
+                return Reject("disabled: COTW-0046 keeps native Oracle mysteries, selections and Spirit Walk untouched per C01 2.7");
+
             GateReport = "preflight";
             var oracle = cache.Load(BlueprintGuid.Parse(OracleClassId)) as BlueprintCharacterClass;
             if (oracle == null) return Reject("reject: OracleClass " + OracleClassId + " missing");

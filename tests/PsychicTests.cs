@@ -51,6 +51,21 @@ internal static class PsychicTests
 {
     private static Type module, casting;
     private static int assertions;
+    private static Kingmaker.Game sp046FixtureGame;
+    private static bool Sp046GameInstance(ref Kingmaker.Game __result) { __result = sp046FixtureGame; return false; }
+    private static bool Sp046ForceIcon(ref UnityEngine.Sprite __result) { __result = Empty<UnityEngine.Sprite>(); return false; }
+    private static bool Sp046Faction(ref bool __result) { __result = true; return false; }
+    private static bool Sp046MinimumAttribute(ref int __result) { __result = 1; return false; }
+    private static bool Sp046ExposeException0(Exception __0)
+    {
+        if (__0 != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__0).Throw();
+        return false;
+    }
+    private static bool Sp046ExposeException1(Exception __1)
+    {
+        if (__1 != null) System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(__1).Throw();
+        return false;
+    }
     private static string Const(string field) => (string)AccessTools.Field(module, field).GetValue(null);
     private static object Get(object o, string f) => AccessTools.Field(o.GetType(), f).GetValue(o);
     private static void Set(object o, string f, object v) => AccessTools.Field(o.GetType(), f).SetValue(o, v);
@@ -104,6 +119,61 @@ internal static class PsychicTests
         var ids = (string[])AccessTools.Field(module, "OwnIds").GetValue(null);
         Check(ids.Distinct().Count() == ids.Length && !native.Any(j => ids.Contains((string)j["AssetId"])), "New identities unique and absent from native input");
         Console.WriteLine("Psychic: registration fixture"); var f = new Fixture(catalog); Register(f);
+        // COTW-0046: route directed Speaker for the Past checks directly after the
+        // shared registration fixture; no unrelated Psychic behaviour suites enter.
+        if (Environment.GetEnvironmentVariable("COTW_0046_CASE") == "speaker0046")
+        {
+            var nativeDoc0046 = JObject.Parse(File.ReadAllText(args[4]));
+            PsychicExpansionTests.NativeRows = (JArray)anchorEvidence;
+            PsychicExpansionTests.LoadNativeRows(f.Cache, nativeDoc0046, true);
+            PsychicExpansionTests.HydrateEmptyTables(f.Cache, nativeDoc0046);
+            PsychicExpansionTests.HydrateCachedSpellbooks(f.Cache, nativeDoc0046);
+            foreach (var r0046 in PsychicExpansionTests.NativeRows.Where(r => r["blueprint"]["Data"]["BlueprintParameterVariants"] != null))
+            {
+                var pf0046 = f.Cache.Load(BlueprintGuid.Parse((string)r0046["blueprint"]["AssetId"])) as Kingmaker.Blueprints.Classes.Selection.BlueprintParametrizedFeature;
+                if (pf0046 != null) pf0046.BlueprintParameterVariants = (AnyBlueprintReference[])PsychicExpansionTests.Read(r0046["blueprint"]["Data"]["BlueprintParameterVariants"], typeof(AnyBlueprintReference[]));
+            }
+            var swUnitId0046 = (BlueprintGuid)AccessTools.Method(assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicAssets"), "Id").Invoke(null, new object[] { "SpiritualWeaponUnit" });
+            if (f.Cache.Load(swUnitId0046) == null)
+                f.Cache.AddCachedBlueprint(swUnitId0046, new BlueprintUnit { AssetGuid = swUnitId0046, name = "SpiritualWeaponUnit", Body = new BlueprintUnit.UnitBody() });
+            sp046FixtureGame = Empty<Kingmaker.Game>();
+            Set(sp046FixtureGame, "Rulebook", new Kingmaker.RuleSystem.Rulebook());
+            Set(sp046FixtureGame, "TimeController", Empty<Kingmaker.Controllers.TimeController>());
+            var h0046 = new Harmony("CotW0046.GameInstance");
+            h0046.Patch(AccessTools.PropertyGetter(typeof(Kingmaker.Game), "Instance"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests), nameof(Sp046GameInstance))));
+            h0046.Patch(AccessTools.PropertyGetter(typeof(UnitDescriptor), "IsPlayerFaction"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests), nameof(Sp046Faction))));
+            h0046.Patch(AccessTools.PropertyGetter(typeof(ModifiableValueAttributeStat), "MinValueRaw"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests), nameof(Sp046MinimumAttribute))));
+            foreach (var exLog in typeof(Owlcat.Runtime.Core.Logging.LogChannel).GetMethods()
+                .Where(m => m.Name == "Exception" && !m.IsStatic))
+            {
+                var exIdx = Array.FindIndex(exLog.GetParameters(), p => p.ParameterType == typeof(Exception));
+                if (exIdx >= 0)
+                    h0046.Patch(exLog, prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests),
+                        exIdx == 0 ? nameof(Sp046ExposeException0) : nameof(Sp046ExposeException1))));
+            }
+            h0046.Patch(AccessTools.Method(assembly.GetType("CallOfTheWild.Wrath.Prototype.PsychicOriginalIcons"), "Load"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(PsychicTests), nameof(Sp046ForceIcon))));
+            int passed0046;
+            try
+            {
+                AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, f.Cache);
+                passed0046 = Arcane01446Tests.Run(f.Cache);
+            }
+            finally { h0046.UnpatchAll(h0046.Id); sp046FixtureGame = null; }
+            var report0046 = new JObject { ["case"] = "speaker0046", ["assertionsPassed"] = passed0046,
+                ["scope"] = "Directed COTW-0046 Speaker for the Past checks only; shared fixture registration, no unrelated historical Psychic behaviour suites." };
+            if (args[2] == "-") Console.WriteLine(report0046.ToString());
+            else {
+                var path0046 = Path.GetFullPath(args[2]);
+                Directory.CreateDirectory(Path.GetDirectoryName(path0046));
+                File.WriteAllText(path0046, report0046.ToString());
+            }
+            Console.WriteLine("PASS: " + passed0046 + " Speaker for the Past 0046 directed assertions. Standalone managed verification, not a game test.");
+            return;
+        }
         // COTW-0068: route the directed detective case directly after the shared
         // registration fixture. It materialises only the reviewed native row
         // archive and stages the audited HA provider identities; no historical

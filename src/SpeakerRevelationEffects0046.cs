@@ -584,12 +584,32 @@ namespace CallOfTheWild.Wrath.Prototype
             return new BlueprintComponent[] { Facts(a) };
         }
 
+        // Spirit Walk (C01 2.5 #10): Standard-action toggle spending 1 round/round from
+        // a 2 * Shaman(Speaker) pool (22 at L11, 40 at L20), granting Incorporeal,
+        // BuffInvisibility (NotDispellAfterOffensiveAction) and UnitCondition.CantAct.
+        internal static void BuildSpiritWalkComponents(PsychicAssets f, RevelationBinding0046 bind,
+            BlueprintFeature feat, string featureToken, string resToken, string displayName, string displayDesc,
+            BlueprintUnitFact incorporealFact, List<BlueprintComponent> comps)
+        {
+            var res = BuildResource(f, bind, resToken, ResCfg.Level(2));
+            var buff = Bf(f, featureToken + "Buff", displayName, displayDesc, feat,
+                new BuffInvisibility { name = "Speaker0046SpiritWalkInvis", NotDispellAfterOffensiveAction = true },
+                new AddCondition { name = "Speaker0046SpiritWalkCantAct", Condition = UnitCondition.CantAct },
+                Facts(incorporealFact));
+            buff.Stacking = StackingType.Replace;
+            var toggle = Toggle(f, featureToken + "Toggle", displayName, displayDesc,
+                buff, feat, new BlueprintComponent[] { RoundCost(res) }, UnitCommand.CommandType.Standard);
+            toggle.DeactivateImmediately = true;
+            comps.Add(ArchetypeBatch01445.Grant(res));
+            comps.Add(Facts(toggle));
+        }
+
     }
 
     // Aging Touch: Wrath has no GameAction for ability damage, so raise the
     // native RuleDealStatDamage through the ordinary context rule bus. This is
     // real Strength damage (healable / restorable), not a stat penalty buff.
-    [TypeId("0046a1b2c3d4e5f60000000000000003")]
+    [TypeId("0046a1b2c3d4e5f60000000000000007")]
     public sealed class SpeakerAgingTouch0046 : ContextAction
     {
         public override string GetCaption() => "Wither the target's Strength";
@@ -608,7 +628,7 @@ namespace CallOfTheWild.Wrath.Prototype
     // Temporal Celerity, Ruling #6: from L7 the owner is allowed to act in a
     // surprise round. The native turn-based handler fires when the surprise
     // round starts; clearing the initiative cooldown lets the owner take it.
-    [TypeId("0046a1b2c3d4e5f60000000000000004")]
+    [TypeId("0046a1b2c3d4e5f60000000000000008")]
     public sealed class SpeakerSurpriseRound0046 : UnitFactComponentDelegate, ITurnBasedModeHandler
     {
         public void HandleSurpriseRoundStarted()

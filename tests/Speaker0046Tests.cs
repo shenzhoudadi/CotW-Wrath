@@ -187,6 +187,8 @@ internal static partial class Arcane01446Tests
     static void Sp046HydrateIsolatedHost(BlueprintsCache c, Type speakerModule, bool includeSands)
     {
         if (includeSands) Sp046InjectSandsProvider(c);
+        Sp046InjectSpell(c, "b924f40705afa57283f65679a2468775", "SpiritualWeapon");
+        Sp046InjectSpell(c, "b406c2835f416afb0824cec610cba20a", "SpiritualAlly");
         Sp046InjectSpell(c, "585f7776285d17b60b9e8e2fe42a69be", "TimeStopSpell01438");
         Sp046InjectSpell(c, "503c3613f77e27d0a2650a09001b511f", "ThreefoldAspect");
         Sp046InjectSpell(c, "b39dd2d96af348236b0117f57e5e445d", "Contingency");
@@ -511,9 +513,30 @@ internal static partial class Arcane01446Tests
         var timeModule = T("TimeMystery0046");
         var speakerModule = T("SpeakerForThePast0046");
         var binder = (GuidClassBinder)Kingmaker.Blueprints.JsonSystem.Json.Serializer.Binder;
-        foreach (var type in Main.GetTypes().Where(t => t.Name.EndsWith("0046")))
-            foreach (var attr in type.GetCustomAttributes(typeof(TypeIdAttribute), false).Cast<TypeIdAttribute>())
-                binder.AddToCache(type, attr.GuidString);
+        var allTypeIdAttrs = Main.GetTypes()
+            .SelectMany(t => t.GetCustomAttributes(typeof(TypeIdAttribute), false)
+                .Cast<TypeIdAttribute>()
+                .Select(a => new { Type = t, Guid = a.GuidString }))
+            .ToArray();
+        var duplicateTypeIds = allTypeIdAttrs
+            .GroupBy(x => x.Guid, StringComparer.OrdinalIgnoreCase)
+            .Where(g => g.Count() > 1)
+            .Select(g => g.Key + "=[" + string.Join(",", g.Select(x => x.Type.Name)) + "]")
+            .ToArray();
+        Check(duplicateTypeIds.Length == 0,
+            "0046 D2-F01 assembly-wide TypeId scan has zero collisions: " + string.Join("; ", duplicateTypeIds));
+
+        var type0046 = allTypeIdAttrs.Where(x => x.Type.Name.EndsWith("0046")).ToArray();
+        Check(type0046.Length == 8, "0046 D2-F01 all 8 COTW-0046 custom runtime types carry [TypeId]");
+        foreach (var entry in type0046)
+            binder.AddToCache(entry.Type, entry.Guid);
+        foreach (var entry in type0046)
+        {
+            binder.BindToName(entry.Type, out var boundAsm, out var boundType);
+            Check(string.Equals(boundType, entry.Guid, StringComparison.OrdinalIgnoreCase) &&
+                  binder.BindToType(boundAsm, boundType) == entry.Type,
+                "0046 D2-F01 native GuidClassBinder round-trip failed for " + entry.Type.Name + " (" + entry.Guid + ")");
+        }
 
         Console.WriteLine("0046 [BOUNDARY]: Managed tests run in PsychicTests EngineLauncher host; missing compact-JSON Ancestors/Time donors (ThreefoldAspect/Contingency/TemporalStasis/SpiritShieldMissBuff/omitted Ancestors revelation sub-assets) and TTT-Base SandsOfTimeCast are hydrated in-fixture from blueprints.zip schemas.");
 
@@ -543,17 +566,13 @@ internal static partial class Arcane01446Tests
             ShamanClassArchetypeCount(c, out var archetypesBefore);
 
             string timeRootToken = (string)AccessTools.Field(timeModule, "RootToken").GetValue(null);
-            string timeSpellsToken = (string)AccessTools.Field(timeModule, "SpellsToken").GetValue(null);
-            string timeFinalToken = (string)AccessTools.Field(timeModule, "FinalToken").GetValue(null);
-            string timeFinalSlaToken = (string)AccessTools.Field(timeModule, "FinalStopAbilityToken").GetValue(null);
-            string ancWeaponToken = (string)AccessTools.Field(timeModule, "AncestralWeaponToken").GetValue(null);
 
             bool timeGate = (bool)Call(timeModule, "Register", c);
             Check(!timeGate && c.Load(Id(timeRootToken)) == null,
-                "0046 TimeMystery Register returns false atomically when external Sands of Time is absent");
+                "0046 D2-F02 TimeMystery Oracle expansion remains disabled per C01 2.7");
             bool speakerGate = (bool)Call(speakerModule, "Register", c);
             Check(!speakerGate && c.Load(Id(Sp046Root)) == null && c.Load(Id(Sp046Selection)) == null && c.Load(Id(Sp046SpellList)) == null,
-                "0046 SpeakerForThePast Register returns false atomically without TimeMystery / Sands of Time");
+                "0046 SpeakerForThePast Register returns false atomically without TTT-Base Sands of Time");
             ShamanClassArchetypeCount(c, out var archetypesAfter);
             Check(archetypesAfter == archetypesBefore && Sp046OracleAncestorsSnapshot(c) == oracleSnapBefore,
                 "0046 rejection leaves ShamanClass.m_Archetypes and native Oracle Ancestors untouched");
@@ -563,65 +582,42 @@ internal static partial class Arcane01446Tests
                 "0046 rejection diagnostics name missing TTT-Base Sands of Time provider");
 
             Sp046InjectSandsProvider(c);
-            Check((bool)Call(timeModule, "Register", c), "0046 TimeMystery retry succeeds once Sands of Time arrives");
-            Check((bool)Call(speakerModule, "Register", c), "0046 Speaker retry succeeds after TimeMystery publishes: " + AccessTools.Field(speakerModule, "GateReport").GetValue(null));
-            Check((bool)Call(timeModule, "Register", c) && (bool)Call(speakerModule, "Register", c),
+            Check((bool)Call(speakerModule, "Register", c), "0046 Speaker retry succeeds once Sands of Time arrives: " + AccessTools.Field(speakerModule, "GateReport").GetValue(null));
+            Check((bool)Call(speakerModule, "Register", c),
                 "0046 idempotent re-entry succeeds after late-provider retry");
 
-            // ---- 2. Clean Time Mystery + Ancestors Completion + Auto-Discovery Audit ----
+            // ---- 2. Strict Oracle Isolation (C01 2.7) + 18 Frozen Bonus Spells (C01 2.8) + 16 Revelations ----
             var c2 = Fresh(parent);
             Sp046HydrateIsolatedHost(c2, speakerModule, includeSands: true);
-            Check((bool)Call(timeModule, "Register", c2), "0046 TimeMystery publishes cleanly");
+            string SelectionSnapshot(BlueprintFeatureSelection fs)
+                => fs == null ? "null" : string.Join(",", fs.AllFeatures.Select(x => x?.AssetGuid.ToString() ?? "")) + ";" +
+                   string.Join(",", fs.Features.Select(x => x?.AssetGuid.ToString() ?? ""));
 
-            var oracleAncSnapAfterTime = Sp046OracleAncestorsSnapshot(c2);
-            var timeMystery = Asset<BlueprintFeature>(c2, timeRootToken);
-            var timeSpells = Asset<BlueprintFeature>(c2, timeSpellsToken);
-            var timeFinal = Asset<BlueprintFeature>(c2, timeFinalToken);
-            var oracleMysterySel = Native<BlueprintFeatureSelection>(c2, Sp046OracleMysterySelId);
-            var secondMystery = Native<BlueprintFeatureSelection>(c2, Sp046SecondMysteryId);
-            var oracleRevSel = Native<BlueprintFeatureSelection>(c2, Sp046OracleRevSelId);
-            var spiritWalk = Native<BlueprintFeature>(c2, "87bdea524911cfa4dacfe7243abe8b51");
-            var ancestralOracle = Asset<BlueprintFeature>(c2, ancWeaponToken);
+            var oracleMysterySelBefore = SelectionSnapshot(Native<BlueprintFeatureSelection>(c2, Sp046OracleMysterySelId));
+            var secondMysteryBefore = SelectionSnapshot(Native<BlueprintFeatureSelection>(c2, Sp046SecondMysteryId));
+            var oracleRevSelBefore = SelectionSnapshot(Native<BlueprintFeatureSelection>(c2, Sp046OracleRevSelId));
+            var hermitSelBefore = SelectionSnapshot(c2.Load(BlueprintGuid.Parse("bc86ea452bef22a45989c6fa644bd2eb")) as BlueprintFeatureSelection);
+            var spiritWalkBefore = Native<BlueprintFeature>(c2, "87bdea524911cfa4dacfe7243abe8b51");
+            string spiritWalkSnapBefore = Sp046Signature(spiritWalkBefore) + "|" +
+                string.Join(",", spiritWalkBefore.GetComponents<PrerequisiteFeaturesFromList>().SelectMany(p => p.Features).Select(x => x?.AssetGuid.ToString()));
+            string oracleAncSnapBefore = Sp046OracleAncestorsSnapshot(c2);
 
-            Check(timeMystery.Groups.SequenceEqual(new[] { FeatureGroup.OracleMystery }) && !timeMystery.HideInCharacterSheetAndLevelUp && timeMystery.IsClassFeature,
-                "0046 Time Mystery follows vanilla OracleMystery Groups & UI visibility");
-            var timeSkills = timeMystery.GetComponents<AddClassSkill>().Select(s => s.Skill).ToArray();
-            Check(new[] { StatType.SkillMobility, StatType.SkillPerception, StatType.SkillUseMagicDevice }.All(s => timeSkills.Contains(s)),
-                "0046 Time Mystery adds Mobility, Perception and UMD class skills");
-            Check(timeMystery.GetComponent<AddFeaturesFromSelectionToDescription>() is AddFeaturesFromSelectionToDescription afd &&
-                  afd.OnlyIfRequiresThisFeature && afd.FeatureSelection?.AssetGuid == oracleRevSel.AssetGuid,
-                "0046 Time Mystery carries AddFeaturesFromSelectionToDescription bound to OracleRevelationSelection");
-            Check(timeSpells.GetComponents<AddKnownSpell>().Count() == 9 && timeSpells.GetComponent<AddSpellsToDescription>() != null,
-                "0046 Time Mystery bonus spells grant circles 1..9 including Sands of Time and Time Stop plus AddSpellsToDescription");
-            Check(oracleMysterySel.AllFeatures.Count(x => x?.AssetGuid == timeMystery.AssetGuid) == 1 &&
-                  secondMystery.AllFeatures.Count(x => x?.AssetGuid == timeMystery.AssetGuid) == 1,
-                "0046 Time Mystery registered once in OracleMysterySelection and SecondMystery");
-            var timeStopRoot = Native<BlueprintAbility>(c2, "585f7776285d17b60b9e8e2fe42a69be");
-            var timeFinalSla = Asset<BlueprintAbility>(c2, timeFinalSlaToken);
-            Check(timeFinalSla != null && timeFinalSla.Type == AbilityType.SpellLike && timeStopRoot.Type == AbilityType.Spell,
-                "0046 Time Final Revelation clones Time Stop into 1/day SLA without mutating shared TimeStop01438 spell");
-            Check(timeFinal.GetComponents<AddStatBonus>().Count(b => b.Descriptor == ModifierDescriptor.Competence && b.Value == 2) == 3,
-                "0046 Time Final Revelation grants +2 competence to Int/Wis/Cha");
-
-            // Time Oracle's own Rewind Time & Time Flicker fixes + Ancestors completion.
-            var timeRewindToggle = Asset<BlueprintActivatableAbility>(c2, "RewindTimeOracleRevelation0046AttackRollToggle");
-            var timeRewindActiveBuff = Asset<BlueprintBuff>(c2, "RewindTimeOracleRevelation0046Buff");
-            var timeFlickerToggle = Asset<BlueprintActivatableAbility>(c2, "TimeFlickerOracleRevelation0046DisplacementToggle");
-            Check(timeRewindActiveBuff.GetComponent<SpeakerFailedReroll0046>() is SpeakerFailedReroll0046 tAct && !tAct.SpendOnTrigger && tAct.ConsumeBuffOnTrigger,
-                "0046 Time Oracle Rewind Time active buff pre-pays on cast & consumes on trigger");
-            Check(timeRewindToggle.GetComponent<ActivatableAbilityResourceLogic>() == null,
-                "0046 Time Oracle Rewind Time reaction toggles do not drain resource passively");
-            Check((UnitCommand.CommandType)Sp046Field(timeFlickerToggle, "m_ActivateWithUnitCommand") == UnitCommand.CommandType.Standard,
-                "0046 Time Oracle Time Flicker Displacement toggle uses Standard action");
-            Check(ancestralOracle != null && oracleRevSel.AllFeatures.Count(x => x?.AssetGuid == ancestralOracle.AssetGuid) == 1 &&
-                  spiritWalk.GetComponent<PrerequisiteFeaturesFromList>().Features.Any(m => m?.AssetGuid == BlueprintGuid.Parse(Sp046OracleMysteryId)),
-                "0046 Ancestors Mystery completed with Ancestral Weapon + Spirit Walk prerequisites");
-
-            // Publish Speaker for the Past automatically from Time + Ancestors.
-            Check((bool)Call(speakerModule, "Register", c2), "0046 SpeakerForThePast publishes via automatic Time+Ancestors discovery");
+            // Publish Speaker for the Past directly via C01 contract.
+            Check((bool)Call(speakerModule, "Register", c2), "0046 SpeakerForThePast publishes cleanly");
             Check((bool)Call(speakerModule, "Register", c2), "0046 SpeakerForThePast re-entry is idempotent");
-            Check(Sp046OracleAncestorsSnapshot(c2) == oracleAncSnapAfterTime,
-                "0046 SpeakerForThePast leaves native Oracle Ancestors blueprints completely untouched");
+            Check(c2.Load(Id(timeRootToken)) == null,
+                "0046 D2-F02 TimeOracleMysteryFeature0046 is not published into Oracle");
+            Check(Sp046OracleAncestorsSnapshot(c2) == oracleAncSnapBefore &&
+                  SelectionSnapshot(Native<BlueprintFeatureSelection>(c2, Sp046OracleMysterySelId)) == oracleMysterySelBefore &&
+                  SelectionSnapshot(Native<BlueprintFeatureSelection>(c2, Sp046SecondMysteryId)) == secondMysteryBefore &&
+                  SelectionSnapshot(Native<BlueprintFeatureSelection>(c2, Sp046OracleRevSelId)) == oracleRevSelBefore &&
+                  SelectionSnapshot(c2.Load(BlueprintGuid.Parse("bc86ea452bef22a45989c6fa644bd2eb")) as BlueprintFeatureSelection) == hermitSelBefore,
+                "0046 D2-F02 native Oracle mysteries, selections and Hermit selections remain untouched");
+            string spiritWalkSnapAfter = Sp046Signature(spiritWalkBefore) + "|" +
+                string.Join(",", spiritWalkBefore.GetComponents<PrerequisiteFeaturesFromList>().SelectMany(p => p.Features).Select(x => x?.AssetGuid.ToString()));
+            Check(spiritWalkSnapAfter == spiritWalkSnapBefore &&
+                  !spiritWalkBefore.GetComponents<PrerequisiteFeaturesFromList>().Any(p => p.Features.Any(m => m?.AssetGuid == BlueprintGuid.Parse(Sp046OracleMysteryId))),
+                "0046 D2-F02 native OracleRevelationSpiritWalk prerequisites remain untouched");
 
             var root = Asset<BlueprintArchetype>(c2, Sp046Root);
             var sel = Asset<BlueprintFeatureSelection>(c2, Sp046Selection);
@@ -634,13 +630,28 @@ internal static partial class Arcane01446Tests
             Check(root.RemoveFeatures.Any(e => e.Level == 1 && e.Features.Any(x => x.AssetGuid == BlueprintGuid.Parse("d22f319fefac4ca4b90f03ac5cb9c714"))) &&
                   root.RemoveFeatures.Any(e => e.Level == 4 && e.Features.Any(x => x.AssetGuid == BlueprintGuid.Parse("70e6075a72633ba49804ccb6203fb18c"))),
                 "0046 Speaker progression removes L1 familiar and L4 wandering spirit");
-            Check(spellList.SpellsByLevel.Skip(1).Take(9).All(r => r.Spells.Count == 2) &&
-                  spellList.SpellsByLevel[3].Spells.Any(s => s.AssetGuid == BlueprintGuid.Parse(Sp046SandsId)),
-                "0046 auto-discovered 18 spells (9 circles x 2) including Time's Sands of Time");
+            var frozenByCircle = new[] {
+                new[] { "14c90900b690cac429b229efdf416127", "2c38da66e5a599347ac95b3294acbe00" }, // 1: Longstrider + True Strike
+                new[] { "464a7193519429f48b4d190acb753cf0", "b924f40705afa57283f65679a2468775" }, // 2: Grace + Spiritual Weapon
+                new[] { Sp046SandsId,                        "5ab0d42fb68c9e34abae4921822b9d63" }, // 3: Sands of Time + Heroism
+                new[] { "503c3613f77e27d0a2650a09001b511f", "b406c2835f416afb0824cec610cba20a" }, // 4: Threefold Aspect + Spiritual Ally
+                new[] { "41e8a952da7a5c247b3ec1c2dbb73018", "90810e5cf53bf854293cbd5ea1066252" }, // 5: Hold Monster + Righteous Might
+                new[] { "b39dd2d96af348236b0117f57e5e445d", "e15e5e7045fda2244b98c8f010adfe31" }, // 6: Contingency + Heroism, Greater
+                new[] { "4aa7942c3e62a164387a73184bca3fc1", "98310a099009bbd4dbdf66bcef58b4cd" }, // 7: Disintegrate + Invisibility, Mass
+                new[] { "8b0761f3873aefb976c0f47fec3c600c", "0e67fa8f011662c43934d486acc50253" }, // 8: Temporal Stasis + Prediction of Failure
+                new[] { "585f7776285d17b60b9e8e2fe42a69be", "43740dab07286fe4aa00a6ee104ce7c1" }, // 9: Time Stop + Heroic Invocation
+            };
+            for (int circle = 1; circle <= 9; circle++)
+            {
+                var actual = spellList.SpellsByLevel[circle].Spells.Select(s => s.AssetGuid).OrderBy(g => g.ToString()).ToArray();
+                var expected = frozenByCircle[circle - 1].Select(BlueprintGuid.Parse).OrderBy(g => g.ToString()).ToArray();
+                Check(actual.SequenceEqual(expected),
+                    "0046 D2-F02 circle " + circle + " spells match frozen C01 2.8 GUIDs");
+            }
 
             var spRevs = sel.AllFeatures.ToArray();
             Check(spRevs.Length == 16 && Sp046Names.All(n => spRevs.Any(r => Sp046DisplayName(r) == n)),
-                "0046 RevelationPastSelection auto-discovered & cloned all 16 Time + Ancestors revelations");
+                "0046 RevelationPastSelection exposes all 16 Time + Ancestors revelations");
             var spGraph = new SimpleBlueprint[] { mysteriesFeat }.Concat(spRevs).SelectMany(Sp046CollectGraph).Distinct().ToArray();
             var spComps = Sp046Components(spGraph);
             var spParamCalcs = spComps.OfType<ContextCalculateAbilityParamsBasedOnClass>().ToArray();
@@ -656,13 +667,13 @@ internal static partial class Arcane01446Tests
                   spComps.OfType<SpeakerCasterLevelChecks0046>().Count() == 1,
                 "0046 D-0046-04: BonusCasterLevel removed; Sacred Council uses SpeakerCasterLevelChecks0046 (+2 CL checks)");
 
-            // Check ModuleCatalog entries for both modules.
+            // Check ModuleCatalog only exposes Speaker for the Past (not public Oracle Time Mystery).
             var catDefs = (Array)AccessTools.Field(T("ModuleCatalog"), "Definitions").GetValue(null);
             var catNames = catDefs.Cast<object>().Select(d => (string)Sp046Member(d, "Name")).ToArray();
             string timeModName = (string)AccessTools.Field(timeModule, "ModuleName").GetValue(null);
             string speakerModName = (string)AccessTools.Field(speakerModule, "ModuleName").GetValue(null);
-            Check(catNames.Contains(timeModName) && catNames.Contains(speakerModName),
-                "0046 ModuleCatalog contains diagnostic entries for Time Mystery and Speaker for the Past");
+            Check(!catNames.Contains(timeModName) && catNames.Contains(speakerModName),
+                "0046 ModuleCatalog exposes Speaker for the Past and omits Oracle Time Mystery");
 
             // ---- 3. Runtime Rulebook Tests: D-0046-01 Rewind Time ----
             var rewindFeat = spRevs.First(r => Sp046DisplayName(r) == "Rewind Time");
@@ -672,6 +683,9 @@ internal static partial class Arcane01446Tests
             var rewindActiveBuff = (BlueprintBuff)rewindRerolls.Single(r => !r.SpendOnTrigger && r.ConsumeBuffOnTrigger).OwnerBlueprint;
             var rewindSaveToggle = rewindRerolls.Single(r => r.SpendOnTrigger && r.Rules.Length == 1 && r.Rules[0] == RuleType.SavingThrow);
             var rewindSaveBuff = (BlueprintBuff)rewindSaveToggle.OwnerBlueprint;
+            var rewindInitToggle = rewindRerolls.Single(r => r.SpendOnTrigger && r.Rules.Length == 1 && r.Rules[0] == RuleType.Initiative);
+            var rewindInitBuff = (BlueprintBuff)rewindInitToggle.OwnerBlueprint;
+            var rewindSwiftAbility = Sp046CollectGraph(rewindFeat).OfType<BlueprintAbility>().Single(a => a.ActionType == UnitCommand.CommandType.Swift);
 
             var uRewind = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "rewind", Sp046ClassId, 14);
             uRewind.Progression.Classes[0].AddArchetype(root);
@@ -680,9 +694,14 @@ internal static partial class Arcane01446Tests
             Fact(uRewind, rewindFeat);
             uRewind.Resources.Restore(rewindRes, 10);
 
-            // Active Swift cast: pre-pay 1 leaving 0 remaining, then apply Active buff.
-            uRewind.Resources.Spend(rewindRes, uRewind.Resources.GetResourceAmount(rewindRes));
-            Check(uRewind.Resources.GetResourceAmount(rewindRes) == 0, "0046 D-0046-01 active cast pre-paid pool down to 0 remaining");
+            // Active Swift cast: real AbilityResourceLogic.Spend deducts 1->0, then apply Active buff.
+            uRewind.Resources.Spend(rewindRes, Math.Max(0, uRewind.Resources.GetResourceAmount(rewindRes) - 1));
+            var rewindAbilityData = new AbilityData(rewindSwiftAbility, uRewind.Descriptor);
+            var rewindSpendLogic = rewindSwiftAbility.GetComponent<AbilityResourceLogic>();
+            Check(rewindSpendLogic != null && rewindSpendLogic.IsSpendResource && rewindSpendLogic.CalculateCost(rewindAbilityData) == 1,
+                "0046 D-0046-01 Rewind Time swift ability carries real 1-use AbilityResourceLogic cost");
+            rewindSpendLogic.Spend(rewindAbilityData);
+            Check(uRewind.Resources.GetResourceAmount(rewindRes) == 0, "0046 D-0046-01 active cast AbilityResourceLogic.Spend deducts pool 1->0");
             Buff(uRewind, rewindActiveBuff);
 
             Sp046Dice.Clear(); Sp046DiceRollsSeen = 0; Sp046DiceOverrideActive = true;
@@ -738,6 +757,35 @@ internal static partial class Arcane01446Tests
                       !uRewind.Buffs.HasFact(rewindActiveBuff) &&
                       uRewind.Resources.GetResourceAmount(rewindRes) == beforeSimultaneous,
                     "0046 D-0046-01 simultaneous Active + Save reaction performs only 1 reroll and never double-deducts");
+
+                // Initiative active & reaction branches (ModifyD20-aligned RuleInitiativeRoll).
+                uRewind.Resources.Restore(rewindRes, 3);
+                int beforeInitActive = uRewind.Resources.GetResourceAmount(rewindRes);
+                var actInitBuffFact = Buff(uRewind, rewindActiveBuff);
+                Sp046DiceRollsSeen = 0; Sp046Dice.Enqueue(3); Sp046Dice.Enqueue(17);
+                var initActive = Rulebook.Trigger(new RuleInitiativeRoll(uRewind));
+                Check(initActive.Result >= 17 && Sp046DiceRollsSeen == 2 &&
+                      !uRewind.Buffs.HasFact(rewindActiveBuff) &&
+                      uRewind.Resources.GetResourceAmount(rewindRes) == beforeInitActive,
+                    "0046 D-0046-01 active Rewind buff rerolls RuleInitiativeRoll once, consumes buff and charges 0 on trigger");
+
+                var initToggleFact = Buff(uRewind, rewindInitBuff);
+                int beforeInitReaction = uRewind.Resources.GetResourceAmount(rewindRes);
+                Sp046DiceRollsSeen = 0; Sp046Dice.Enqueue(4); Sp046Dice.Enqueue(16);
+                var initReact = Rulebook.Trigger(new RuleInitiativeRoll(uRewind));
+                Check(initReact.Result >= 16 && Sp046DiceRollsSeen == 2 &&
+                      uRewind.Resources.GetResourceAmount(rewindRes) == beforeInitReaction - 1,
+                    "0046 D-0046-01 Initiative reaction toggle rerolls RuleInitiativeRoll and spends 1 resource");
+
+                Buff(uRewind, rewindActiveBuff);
+                int beforeInitSim = uRewind.Resources.GetResourceAmount(rewindRes);
+                Sp046DiceRollsSeen = 0; Sp046Dice.Enqueue(2); Sp046Dice.Enqueue(19);
+                var initSim = Rulebook.Trigger(new RuleInitiativeRoll(uRewind));
+                Check(initSim.Result >= 19 && Sp046DiceRollsSeen == 2 &&
+                      !uRewind.Buffs.HasFact(rewindActiveBuff) &&
+                      uRewind.Resources.GetResourceAmount(rewindRes) == beforeInitSim,
+                    "0046 D-0046-01 simultaneous Active + Initiative toggle rerolls once with 0 trigger charge");
+                initToggleFact.Remove();
             }
             finally
             {
@@ -745,13 +793,13 @@ internal static partial class Arcane01446Tests
                 Sp046Dice.Clear();
             }
 
-            // ---- 4. Runtime Spellbook Tests: D-0046-02 Bonus Spellbook Cleanup ----
+            // ---- 4. Runtime Spellbook Tests: D-0046-02 Bonus Spellbook Cleanup & D2-F04 Temp Known Interop ----
             var shamanCls = Native<BlueprintCharacterClass>(c2, Sp046ClassId);
             var shamanBookBp = Native<BlueprintSpellbook>(c2, Sp046ShamanSpellbookId);
             var shamanNativeList = Native<BlueprintSpellList>(c2, Sp046ShamanListId);
             var heroism = Native<BlueprintAbility>(c2, "5ab0d42fb68c9e34abae4921822b9d63"); // circle 3 Speaker spell
             var longstrider = Native<BlueprintAbility>(c2, "14c90900b690cac429b229efdf416127"); // circle 1 Speaker spell
-            var crusadersEdge = Native<BlueprintAbility>(c2, "be5452c422a6ea744bf1037b0a443bb1"); // circle 4 Speaker spell
+            var spiritualAlly = Native<BlueprintAbility>(c2, "b406c2835f416afb0824cec610cba20a"); // circle 4 Speaker spell (C01 2.8)
 
             var uBook = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "spellbook", Sp046ClassId, 10);
             uBook.Progression.Classes[0].AddArchetype(root);
@@ -777,15 +825,15 @@ internal static partial class Arcane01446Tests
             var mystFact = Fact(uBook, mysteriesFeat);
             var syncRt = mystFact.Components.FirstOrDefault(rc => rc.SourceBlueprintComponent is SpeakerSpellbookSync0046);
             Check(syncRt != null, "0046 D-0046-02 SpeakerSpellbookSync0046 runtime component active");
-            Check(book.IsKnown(longstrider) && book.IsKnown(heroism) && book.IsKnown(crusadersEdge),
+            Check(book.IsKnown(longstrider) && book.IsKnown(heroism) && book.IsKnown(spiritualAlly),
                 "0046 D-0046-02 at Shaman L10 Speaker circles 1..5 are known on primary spellbook");
             Check(book.SpecialLists.Count == 0, "0046 D-0046-02 zero spells leak into spirit magic SpecialLists");
 
-            // De-level 10 -> 6 (drops 4th/5th circle coverage): Crusader's Edge removed, L1..3 + temp preserved!
+            // De-level 10 -> 6 (drops 4th/5th circle coverage): Spiritual Ally removed, L1..3 + temp preserved!
             Set(book, "m_BaseLevelInternal", 6);
             using (syncRt.RequestEventContext()) ((SpeakerSpellbookSync0046)syncRt.SourceBlueprintComponent).HandleUnitGainLevel();
-            Check(!book.IsKnown(crusadersEdge) && book.IsKnown(longstrider) && book.IsKnown(heroism),
-                "0046 D-0046-02 de-level removes uncovered Speaker circle-4 exclusive spell while keeping L1..3");
+            Check(!book.IsKnown(spiritualAlly) && book.IsKnown(longstrider) && book.IsKnown(heroism),
+                "0046 D-0046-02 de-level removes uncovered Speaker circle-4 exclusive spell (Spiritual Ally) while keeping L1..3");
             Check(book.IsKnown(tempOverlapSpell), "0046 D-0046-02 de-level preserves temporary known spell overlap");
 
             // Feature removal -> removes remaining Speaker exclusives, preserves overlapping active Heroism + native L1 + temp!
@@ -801,6 +849,80 @@ internal static partial class Arcane01446Tests
             cleanupMethod.Invoke(null, new object[] { uBook.Descriptor, shamanBookBp, spellList, shamanNativeList, mysteriesFeat.AssetGuid });
             Check(!book.IsKnown(longstrider) && book.IsKnown(heroism),
                 "0046 D-0046-02 repeated cleanup stays idempotent and keeps valid overlaps intact");
+
+            // D2-F04: UnitPartTemporarySpellsKnown multi-source interop (BOTH acquisition orders!)
+            var foreignTempComp = new Kingmaker.UnitLogic.FactLogic.AddSpellKnownTemporary { name = "ForeignTempSpiritualAlly", Level = 4, OnlySpontaneous = false };
+            Set(foreignTempComp, "m_CharacterClass", Sp046Ref<BlueprintCharacterClassReference>(shamanCls));
+            Set(foreignTempComp, "m_Spell", Sp046Ref<BlueprintAbilityReference>(spiritualAlly));
+            var foreignTempFeat = new BlueprintFeature {
+                AssetGuid = BlueprintGuid.Parse("0046a1b2c3d4e5f600000000000000fd"),
+                name = "Speaker0046TestForeignTemp",
+                ComponentsArray = new BlueprintComponent[] { foreignTempComp }
+            };
+
+            // Order A: Foreign AddSpellKnownTemporary -> Speaker -> Remove Speaker -> Remove Foreign
+            var uOrdA = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "tempOrdA", Sp046ClassId, 10);
+            uOrdA.Progression.Classes[0].AddArchetype(root);
+            uOrdA.Stats.Wisdom.BaseValue = 18;
+            var bookA = new Spellbook(uOrdA.Descriptor, shamanBookBp);
+            Set(bookA, "m_BaseLevelInternal", 10);
+            bookA.UpdateAllSlotsSize(false);
+            var sureMemSlots = AccessTools.Method(typeof(Spellbook), "SureMemorizedSpells");
+            var slotsA4 = (List<SpellSlot>)sureMemSlots.Invoke(bookA, new object[] { 4 });
+            if (!slotsA4.Any(s => s.Type == SpellSlotType.Common))
+                slotsA4.Add(new SpellSlot(4, SpellSlotType.Common, 0, bookA));
+            Set(uOrdA.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, bookA } });
+            var ftFactA = Fact(uOrdA, foreignTempFeat);
+            var knownA0 = bookA.GetKnownSpells(4).FirstOrDefault(s => s.Blueprint == spiritualAlly);
+            Check(knownA0 != null && knownA0.IsTemporary, "0046 D2-F04 OrderA foreign temporary source teaches circle-4 Spiritual Ally as temporary");
+            Check(bookA.Memorize(knownA0), "0046 D2-F04 OrderA prepares Spiritual Ally into L4 common slot before Speaker");
+            var mystFactA = Fact(uOrdA, mysteriesFeat);
+            Check(bookA.GetKnownSpells(4).Any(s => s.Blueprint == spiritualAlly && !s.IsTemporary),
+                "0046 D2-F04 OrderA Speaker acquisition promotes shared circle-4 spell to non-temporary while active");
+            uOrdA.Facts.Remove(mystFactA);
+            var knownAfterSpRmA = bookA.GetKnownSpells(4).FirstOrDefault(s => s.Blueprint == spiritualAlly);
+            int memCountA = bookA.GetMemorizedSpells(4).Count(s => s.SpellShell?.Blueprint == spiritualAlly);
+            Check(knownAfterSpRmA != null && knownAfterSpRmA.IsTemporary && memCountA > 0,
+                "0046 D2-F04 OrderA removing Speaker preserves foreign temporary Spiritual Ally, common-slot preparation, and restores IsTemporary=true (known=" + (knownAfterSpRmA != null) + " isTemp=" + (knownAfterSpRmA?.IsTemporary ?? false) + " mem=" + memCountA + ")");
+            uOrdA.Facts.Remove(ftFactA);
+            Check(!bookA.IsKnown(spiritualAlly),
+                "0046 D2-F04 OrderA removing final foreign temporary source cleanly unlearns Spiritual Ally");
+
+            // Order B: Speaker -> Foreign AddSpellKnownTemporary -> Remove Speaker -> Remove Foreign (plus reverse Foreign-first removal)
+            var uOrdB = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "tempOrdB", Sp046ClassId, 10);
+            uOrdB.Progression.Classes[0].AddArchetype(root);
+            uOrdB.Stats.Wisdom.BaseValue = 18;
+            var bookB = new Spellbook(uOrdB.Descriptor, shamanBookBp);
+            Set(bookB, "m_BaseLevelInternal", 10);
+            bookB.UpdateAllSlotsSize(false);
+            var slotsB4 = (List<SpellSlot>)sureMemSlots.Invoke(bookB, new object[] { 4 });
+            if (!slotsB4.Any(s => s.Type == SpellSlotType.Common))
+                slotsB4.Add(new SpellSlot(4, SpellSlotType.Common, 0, bookB));
+            Set(uOrdB.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, bookB } });
+            var mystFactB = Fact(uOrdB, mysteriesFeat);
+            var knownB0 = bookB.GetKnownSpells(4).FirstOrDefault(s => s.Blueprint == spiritualAlly);
+            Check(knownB0 != null && bookB.Memorize(knownB0), "0046 D2-F04 OrderB prepares Speaker Spiritual Ally into L4 common slot before Foreign temp");
+            var ftFactB = Fact(uOrdB, foreignTempFeat);
+            uOrdB.Facts.Remove(mystFactB);
+            var knownAfterSpRmB = bookB.GetKnownSpells(4).FirstOrDefault(s => s.Blueprint == spiritualAlly);
+            int memCountB = bookB.GetMemorizedSpells(4).Count(s => s.SpellShell?.Blueprint == spiritualAlly);
+            Check(knownAfterSpRmB != null && knownAfterSpRmB.IsTemporary && memCountB > 0,
+                "0046 D2-F04 OrderB removing Speaker preserves later foreign AddSpellKnownTemporary Spiritual Ally & common-slot preparation (known=" + (knownAfterSpRmB != null) + " isTemp=" + (knownAfterSpRmB?.IsTemporary ?? false) + " mem=" + memCountB + ")");
+            uOrdB.Facts.Remove(ftFactB);
+            Check(!bookB.IsKnown(spiritualAlly),
+                "0046 D2-F04 OrderB removing remaining foreign temporary source cleanly unlearns Spiritual Ally");
+
+            var uOrdB2 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "tempOrdB2", Sp046ClassId, 10);
+            uOrdB2.Progression.Classes[0].AddArchetype(root);
+            var bookB2 = new Spellbook(uOrdB2.Descriptor, shamanBookBp);
+            Set(bookB2, "m_BaseLevelInternal", 10);
+            Set(uOrdB2.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, bookB2 } });
+            var mystFactB2 = Fact(uOrdB2, mysteriesFeat);
+            var ftFactB2 = Fact(uOrdB2, foreignTempFeat);
+            uOrdB2.Facts.Remove(ftFactB2);
+            var knownAfterFtRmB2 = bookB2.GetKnownSpells(4).FirstOrDefault(s => s.Blueprint == spiritualAlly);
+            Check(knownAfterFtRmB2 != null && !knownAfterFtRmB2.IsTemporary && bookB2.IsKnown(longstrider),
+                "0046 D2-F04 OrderB2 removing foreign temporary source while Speaker stays active preserves non-temporary Spiritual Ally and other circles");
 
             // ---- 5. Runtime Rulebook Tests: D-0046-03 Blood of Heroes ----
             var bohRev = spRevs.First(r => Sp046DisplayName(r) == "Blood of Heroes");
@@ -875,6 +997,9 @@ internal static partial class Arcane01446Tests
             var baseSrEvt = Rulebook.Trigger(new RuleSpellResistanceCheck(baseCtx, scTarget));
             int baseSrPen = (Get(baseSrEvt, "m_AdditionalSpellPenetration") as ModifiableBonus)?.TotalValue ?? 0;
             int baseDispel = Rulebook.Trigger(new RuleDispelMagic(uSc, scTarget, null, RuleDispelMagic.CheckType.CasterLevel, StatType.Wisdom, uSc)).Bonus;
+            int baseDispelNone = Rulebook.Trigger(new RuleDispelMagic(uSc, scTarget, null, RuleDispelMagic.CheckType.None, StatType.Wisdom, uSc)).Bonus;
+            int baseEnemyDispelCl = Rulebook.Trigger(new RuleDispelMagic(scTarget, uSc, null, RuleDispelMagic.CheckType.CasterLevel, StatType.Wisdom, scTarget)).Bonus;
+            int baseEnemyDispelDc = Rulebook.Trigger(new RuleDispelMagic(scTarget, uSc, null, RuleDispelMagic.CheckType.DC, StatType.Wisdom, scTarget)).Bonus;
             Sp046StopTrigger = false;
 
             Buff(uSc, scClBuff);
@@ -884,10 +1009,16 @@ internal static partial class Arcane01446Tests
             int buffedSrPen = (Get(buffedSrEvt, "m_AdditionalSpellPenetration") as ModifiableBonus)?.TotalValue ?? 0;
             int buffedDispelCl = Rulebook.Trigger(new RuleDispelMagic(uSc, scTarget, null, RuleDispelMagic.CheckType.CasterLevel, StatType.Wisdom, uSc)).Bonus;
             int buffedDispelDc = Rulebook.Trigger(new RuleDispelMagic(uSc, scTarget, null, RuleDispelMagic.CheckType.DC, StatType.Wisdom, uSc)).Bonus;
+            int buffedDispelNone = Rulebook.Trigger(new RuleDispelMagic(uSc, scTarget, null, RuleDispelMagic.CheckType.None, StatType.Wisdom, uSc)).Bonus;
+            int buffedEnemyDispelCl = Rulebook.Trigger(new RuleDispelMagic(scTarget, uSc, null, RuleDispelMagic.CheckType.CasterLevel, StatType.Wisdom, scTarget)).Bonus;
+            int buffedEnemyDispelDc = Rulebook.Trigger(new RuleDispelMagic(scTarget, uSc, null, RuleDispelMagic.CheckType.DC, StatType.Wisdom, scTarget)).Bonus;
             Sp046StopTrigger = false;
 
             Check(buffedSrPen == baseSrPen + 2 && buffedDispelCl == baseDispel + 2 && buffedDispelDc == 2,
                 "0046 D-0046-04 Sacred Council Caster Level Checks adds +2 to SR penetration and Dispel CL/DC checks");
+            Check(buffedDispelNone == baseDispelNone && buffedDispelNone == 0 &&
+                  buffedEnemyDispelCl == baseEnemyDispelCl && buffedEnemyDispelDc == baseEnemyDispelDc,
+                "0046 D-0046-04 negative controls: CheckType.None (+0) and incoming enemy RuleDispelMagic against buffed unit are unchanged");
             Check(buffedCl == baseCl && uSc.Stats.GetStat(StatType.BonusCasterLevel).ModifiedValue == 0,
                 "0046 D-0046-04 general CasterLevel, BonusCasterLevel, damage dice & duration remain unchanged");
 
@@ -951,6 +1082,148 @@ internal static partial class Arcane01446Tests
                     " dmg=" + sshFact.Context[Kingmaker.UnitLogic.Abilities.AbilitySharedValue.Damage] +
                     " d1x4=" + Rulebook.Trigger(new RuleRollDice(uAc, new DiceFormula(4, DiceType.One))).Result + ")");
             }
+
+            // ---- 8. D2-F03 Spirit Walk + Temporal Celerity + Erase from Time (Multiclass Isolation) ----
+            var fighterCls = Native<BlueprintCharacterClass>(c2, Sp046FighterClassId);
+
+            // 8a. Spirit Walk
+            var spwRev = spRevs.First(r => Sp046DisplayName(r) == "Spirit Walk");
+            var spwPrereq = spwRev.GetComponents<Kingmaker.Blueprints.Classes.Prerequisites.PrerequisiteArchetypeLevel>().SingleOrDefault();
+            Check(spwPrereq != null && spwPrereq.Level == 11 && spwPrereq.Archetype == root && spwPrereq.CharacterClass == shamanCls,
+                "0046 D2-F03 Spirit Walk requires Shaman Speaker archetype level 11");
+            var spwRes = spwRev.GetComponents<AddAbilityResources>().Single().Resource;
+            var spwToggleBp = Sp046CollectGraph(spwRev).OfType<BlueprintActivatableAbility>().Single();
+            var spwResLogic = spwToggleBp.GetComponent<Kingmaker.UnitLogic.ActivatableAbilities.ActivatableAbilityResourceLogic>();
+            var spwBuffBp = spwToggleBp.Buff;
+            var spwInvis = spwBuffBp.GetComponent<Kingmaker.Designers.Mechanics.Buffs.BuffInvisibility>();
+            var spwCantAct = spwBuffBp.GetComponents<Kingmaker.UnitLogic.FactLogic.AddCondition>()
+                .Any(ac => ac.Condition == Kingmaker.UnitLogic.UnitCondition.CantAct);
+            var spwIncFact = Native<BlueprintUnitFact>(c2, "c4a7f98d743bc784c9d4cf2105852c39");
+            var spwGrantsInc = spwBuffBp.GetComponents<Kingmaker.UnitLogic.FactLogic.AddFacts>()
+                .Any(af => af.Facts.Contains(spwIncFact));
+            Check((UnitCommand.CommandType)Sp046Field(spwToggleBp, "m_ActivateWithUnitCommand") == UnitCommand.CommandType.Standard &&
+                  spwResLogic != null && spwResLogic.RequiredResource == spwRes &&
+                  spwResLogic.SpendType == Kingmaker.UnitLogic.ActivatableAbilities.ActivatableAbilityResourceLogic.ResourceSpendType.NewRound,
+                "0046 D2-F03 Spirit Walk uses Standard action toggle with ResourceSpendType.NewRound");
+            Check(spwInvis != null && spwInvis.NotDispellAfterOffensiveAction && spwCantAct && spwGrantsInc,
+                "0046 D2-F03 Spirit Walk buff grants Incorporeal, BuffInvisibility(NotDispellAfterOffensiveAction), and CantAct");
+
+            var uSpw11 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "spw11", Sp046ClassId, 11);
+            uSpw11.Progression.Classes[0].AddArchetype(root);
+            uSpw11.Progression.Classes.Add(new ClassData(fighterCls) { Level = 5 });
+            if (uSpw11.State == null) Set(uSpw11.Descriptor, "State", new UnitState(uSpw11.Descriptor));
+            Set(uSpw11, "Stealth", new UnitStealth());
+            Fact(uSpw11, spwRev);
+            var uSpw20 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "spw20", Sp046ClassId, 20);
+            uSpw20.Progression.Classes[0].AddArchetype(root);
+            Check(spwRes.GetMaxAmount(uSpw11) == 22 && spwRes.GetMaxAmount(uSpw20) == 40,
+                "0046 D2-F03 Spirit Walk resource pool == 2 * ShamanLevel (22 at Fighter5+Shaman11, 40 at Shaman20)");
+
+            var spwBefore = uSpw11.Resources.GetResourceAmount(spwRes);
+            var spwAa = uSpw11.ActivatableAbilities.RawFacts.Single(a => a.Blueprint == spwToggleBp);
+            var spwTickHarmony = new Harmony("Speaker0046.SpwTick");
+            spwTickHarmony.Patch(AccessTools.Method(typeof(Kingmaker.Controllers.Units.UnitActivatableAbilitiesController), "GetTimeToNextRound"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(BardMasterpieces01435Tests), "NextRound")));
+            spwTickHarmony.Patch(AccessTools.Method(typeof(Kingmaker.Controllers.Units.UnitActivatableAbilitiesController), "CanTickNewRound"),
+                prefix: new HarmonyMethod(AccessTools.Method(typeof(BardMasterpieces01435Tests), "TickAllowed")));
+            var spwCtrl = new Kingmaker.Controllers.Units.UnitActivatableAbilitiesController();
+            var spwTickMethod = AccessTools.Method(typeof(Kingmaker.Controllers.Units.UnitActivatableAbilitiesController), "TickAbility");
+            try
+            {
+                spwAa.IsOn = true;
+                spwAa.TryStart();
+                spwTickMethod.Invoke(spwCtrl, new object[] { uSpw11, spwAa, false }); // spends 1, stays active
+                Check(spwAa.IsOn && spwAa.IsStarted && uSpw11.Buffs.HasFact(spwBuffBp) &&
+                      uSpw11.State.HasCondition(Kingmaker.UnitLogic.UnitCondition.CantAct) &&
+                      uSpw11.HasFact(spwIncFact) &&
+                      spwBefore == 22 &&
+                      uSpw11.Resources.GetResourceAmount(spwRes) == spwBefore - 1,
+                    "0046 D2-F03 Spirit Walk activation applies buff, CantAct, and Incorporeal while spending per round (before=" + spwBefore + " after=" + uSpw11.Resources.GetResourceAmount(spwRes) + " on=" + spwAa.IsOn + " started=" + spwAa.IsStarted + " buff=" + uSpw11.Buffs.HasFact(spwBuffBp) + " cantAct=" + uSpw11.State.HasCondition(Kingmaker.UnitLogic.UnitCondition.CantAct) + " inc=" + uSpw11.HasFact(spwIncFact) + ")");
+
+                uSpw11.Resources.Spend(spwRes, uSpw11.Resources.GetResourceAmount(spwRes));
+                spwTickMethod.Invoke(spwCtrl, new object[] { uSpw11, spwAa, false });
+                Check(!spwAa.IsOn && !spwAa.IsStarted && spwAa.AppliedBuff == null,
+                    "0046 D2-F03 Spirit Walk controller exhaustion stops toggle (on=" + spwAa.IsOn + " started=" + spwAa.IsStarted + ")");
+                uSpw11.Buffs.Tick();
+                Check(!uSpw11.Buffs.HasFact(spwBuffBp) &&
+                      !uSpw11.State.HasCondition(Kingmaker.UnitLogic.UnitCondition.CantAct) &&
+                      !uSpw11.HasFact(spwIncFact),
+                    "0046 D2-F03 Spirit Walk removes all three effects on resource exhaustion tick (buff=" + uSpw11.Buffs.HasFact(spwBuffBp) + " cantAct=" + uSpw11.State.HasCondition(Kingmaker.UnitLogic.UnitCondition.CantAct) + " inc=" + uSpw11.HasFact(spwIncFact) + ")");
+
+                uSpw11.Resources.Restore(spwRes, 5);
+                spwAa.IsOn = true;
+                spwAa.TryStart();
+                Check(uSpw11.Buffs.HasFact(spwBuffBp) && uSpw11.HasFact(spwIncFact),
+                    "0046 D2-F03 Spirit Walk re-enables cleanly when resource restored");
+                spwAa.TurnOffImmediately();
+                uSpw11.Buffs.Tick();
+                Check(!spwAa.IsOn && !spwAa.IsStarted && spwAa.AppliedBuff == null &&
+                      !uSpw11.Buffs.HasFact(spwBuffBp) &&
+                      !uSpw11.State.HasCondition(Kingmaker.UnitLogic.UnitCondition.CantAct) &&
+                      !uSpw11.HasFact(spwIncFact),
+                    "0046 D2-F03 Spirit Walk TurnOffImmediately removes all three effects cleanly (on=" + spwAa.IsOn + " started=" + spwAa.IsStarted + " buff=" + uSpw11.Buffs.HasFact(spwBuffBp) + " cantAct=" + uSpw11.State.HasCondition(Kingmaker.UnitLogic.UnitCondition.CantAct) + " inc=" + uSpw11.HasFact(spwIncFact) + ")");
+            }
+            finally { spwTickHarmony.UnpatchAll(spwTickHarmony.Id); }
+
+            // 8b. Temporal Celerity (2 vs 3 dice & surprise round + multiclass isolation)
+            var tcRev = spRevs.First(r => Sp046DisplayName(r) == "Temporal Celerity");
+            var tcGraph = Sp046CollectGraph(tcRev);
+            var tcModD20s = tcGraph.OfType<BlueprintScriptableObject>().SelectMany(o => o.ComponentsArray).OfType<Kingmaker.Designers.Mechanics.Facts.ModifyD20>()
+                .Where(m => m.Rule == Kingmaker.Designers.Mechanics.Facts.RuleType.Initiative).ToList();
+            var tcSurprise = tcGraph.OfType<BlueprintScriptableObject>().SelectMany(o => o.ComponentsArray).OfType<SpeakerSurpriseRound0046>().ToList();
+            Check(tcModD20s.Any(m => m.RollsAmount == 1 && m.TakeBest) && tcModD20s.Any(m => m.RollsAmount == 2 && m.TakeBest) && tcSurprise.Count == 1,
+                "0046 Temporal Celerity contains 1-reroll (2 dice), 2-reroll (3 dice) RuleType.Initiative ModifyD20 and SpeakerSurpriseRound0046");
+
+            var uTc10 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "tc10", Sp046ClassId, 10);
+            uTc10.Progression.Classes[0].AddArchetype(root);
+            uTc10.Progression.Classes.Add(new ClassData(fighterCls) { Level = 5 });
+            Fact(uTc10, tcRev);
+            var uTc11 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "tc11", Sp046ClassId, 11);
+            uTc11.Progression.Classes[0].AddArchetype(root);
+            Fact(uTc11, tcRev);
+            Sp046DiceOverrideActive = true;
+            try
+            {
+                Sp046Dice.Clear(); Sp046DiceRollsSeen = 0;
+                Sp046Dice.Enqueue(2); Sp046Dice.Enqueue(17);
+                var tcRoll10 = Rulebook.Trigger(new RuleInitiativeRoll(uTc10));
+                int tcSeen10 = Sp046DiceRollsSeen;
+
+                Sp046Dice.Clear(); Sp046DiceRollsSeen = 0;
+                Sp046Dice.Enqueue(2); Sp046Dice.Enqueue(3); Sp046Dice.Enqueue(19);
+                var tcRoll11 = Rulebook.Trigger(new RuleInitiativeRoll(uTc11));
+                int tcSeen11 = Sp046DiceRollsSeen;
+                Check(tcSeen10 == 2 && tcRoll10.D20.Result == 17 && tcSeen11 == 3 && tcRoll11.D20.Result == 19,
+                    "0046 Temporal Celerity rolls 2 dice at Fighter5+Shaman10 and 3 dice at Shaman11 (seen10=" + tcSeen10 + " seen11=" + tcSeen11 + ")");
+            }
+            finally
+            {
+                Sp046DiceOverrideActive = false;
+                Sp046Dice.Clear();
+            }
+
+            // 8c. Erase from Time (1/day at L10, 2/day at L11, PsychicStasisPause without Paralyzed)
+            var eftRev = spRevs.First(r => Sp046DisplayName(r) == "Erase from Time");
+            var eftGraph = Sp046CollectGraph(eftRev);
+            var eftRes = eftRev.GetComponents<AddAbilityResources>().Single().Resource;
+            var eftAbs = eftGraph.OfType<BlueprintAbility>().ToList();
+            var eftAb = eftAbs.Single(a => a.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityResourceLogic>() != null);
+            var eftResLogic = eftAb.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityResourceLogic>();
+            var eftBuff = eftGraph.OfType<BlueprintBuff>().Single();
+            Check(eftAbs.Count == 2 && eftResLogic != null && eftResLogic.Amount == 1 &&
+                  eftBuff.GetComponent<PsychicStasisPause>() != null &&
+                  !eftBuff.GetComponents<Kingmaker.UnitLogic.FactLogic.AddCondition>().Any(cnd => cnd.Condition == Kingmaker.UnitLogic.UnitCondition.Paralyzed),
+                "0046 Erase from Time uses held-charge touch pair with 1-charge AbilityResourceLogic and PsychicStasisPause without Paralyzed");
+            Check(eftRes.GetMaxAmount(uTc10) == 1 && eftRes.GetMaxAmount(uTc11) == 2,
+                "0046 Erase from Time charges == 1 at Fighter5+Shaman10 and == 2 at Shaman11 (max10=" + eftRes.GetMaxAmount(uTc10) + " max11=" + eftRes.GetMaxAmount(uTc11) + ")");
+            var atRev = spRevs.First(r => Sp046DisplayName(r) == "Aging Touch");
+            var atRes = atRev.GetComponents<AddAbilityResources>().Single().Resource;
+            var uAt1 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "at1", Sp046ClassId, 1);
+            uAt1.Progression.Classes[0].AddArchetype(root);
+            var uAt5 = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, "at5", Sp046ClassId, 5);
+            uAt5.Progression.Classes[0].AddArchetype(root);
+            Check(atRes.GetMaxAmount(uAt1) == 1 && atRes.GetMaxAmount(uAt5) == 2 && atRes.GetMaxAmount(uTc10) == 3,
+                "0046 Aging Touch charges follow 1 + ShamanLevel/5 (1 at L1, 2 at L5, 3 at Fighter5+Shaman10)");
         }
         finally
         {
