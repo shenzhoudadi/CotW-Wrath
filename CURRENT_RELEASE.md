@@ -1,5 +1,7 @@
 # 当前开发与出包流程
 
+[0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已预发布。GitHub TEST 标签指向 `026ccdb`。4/4 附件下载回读与本地 SHA256 一致。GitHub 上传 15.086 秒，下载回读 17.109 秒。包内主 DLL 定向复跑 211 条，41.828 秒。 主体及内置模块编译 24.825 秒，打包与包内核对 2.470 秒。[测试说明](docs/releases/0.14.74-TEST.md)。
+
 [0.14.73 Cryptid Scholar TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST)已在 GitHub 预发布，4/4 附件下载一致。版本提交 `5f1729b`，编译 26.062 秒、打包与 DLL 核对 1.816 秒、GitHub 上传 4.902 秒、分段下载回读 27.125 秒。复用 244 条定向和 D3 的 5/5，未重复跑同内容。[测试说明](docs/releases/0.14.73-TEST.md)
 
 0.14.72 Psychic Detective TEST 已在 GitHub 预发布，四个附件下载一致。306 条本项隔离定向／14.778 秒。[测试说明](docs/releases/0.14.72-TEST.md)

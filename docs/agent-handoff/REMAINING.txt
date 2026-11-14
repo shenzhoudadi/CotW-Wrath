@@ -7,9 +7,7 @@ HOLD_SHARED_KINETICIST
 Native Witch and Kineticist exist. Original mutates shared blast progressions, prerequisite class levels, ability visibility and all kineticist parameter scaling; spellburn consumes prepared Witch slots and offsets infusion burn. No isolated Witch/Intelligence burn, progression and multiclass contract is published in the current project. A leaf that only grants native blasts would be incomplete.
 
 COTW-0046 Speaker for the Past
-IN_PROGRESS_RESERVED — issue #6；A/C完成、B v2已实现，D复查NEEDS_FIX，交原B修复；未交付，请勿重复开发。
-Historical blocker: HOLD_SHARED_REVELATIONS
-Original builds sixteen Ancestor/Time revelations with Shaman/Wisdom scaling and a private additional spell list. Current project has no shared revelation engine that preserves prerequisites, source-aware rerolls, class resources, initiative and cross-class isolation. Native Oracle identity alone does not establish these contracts.
+COMPLETED_DEVELOPMENT_TEST — 0.14.74 TEST。211 条定向和包内复跑通过；4/4 GitHub 附件下载一致。真实 TTT-Base、实机、重训与存档未测。
 
 COTW-0060 Spirit Guide
 COMPLETED_DEVELOPMENT_TEST — 0.14.70 TEST，D3复查通过，320条本项定向/15.00秒。GitHub交付已完成，4/4附件下载核对一致；四外部根缺失则整包不激活，实机未测。见docs/work-packages/COTW-0060/README.md，不重复开发。

@@ -2177,19 +2177,19 @@
       "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "施工中／已认领：A/C准备，B未实现",
+      "status": "已交付 0.14.74 TEST",
       "importance": "中",
       "dependsOn": [
         "Shaman 主体与相关能力稳定"
       ],
-      "action": "见issue #6及docs/work-packages/COTW-0046/README.md；请勿重复开发",
+      "action": "见 docs/work-packages/COTW-0046/RELEASE-VERIFY.md；请勿重复开发",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L27",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "已完成开发／TEST 交付",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
       "userAnnotationGroup": "暂且正常做的东西",
       "historicalStatusBeforeWorkTracking": "待迁移候选：未找到对应",
-      "currentWorkStatus": "IN_PROGRESS_RESERVED"
+      "currentWorkStatus": "COMPLETED_DEVELOPMENT_TEST"
     },
     {
       "id": "COTW-0047",
