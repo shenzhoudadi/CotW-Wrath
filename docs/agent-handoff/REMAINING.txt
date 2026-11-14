@@ -1,13 +1,12 @@
 # 剩余项与当前开发状态（已合并 sxl1216 已完成功能）
 
-0.14.68 TEST已包含Starseeker；施工占用与完成状态以WORK_STATUS.md为准。以下不是自动开工队列，排除项不恢复。
+0.14.104 开发中（未打包、未 commit；最近本地包为 0.14.76）；施工占用与完成状态以 HANDOFF.md 与 inventory.json 为准（WORK_STATUS.md 已于 b55fa17 退役，只剩 git 历史 `git show b55fa17^:WORK_STATUS.md`）。以下不是自动开工队列，排除项不恢复；标注 SHELVED 的条目只是搁置，用户点名即可重启。
 
 COTW-0020 Havocker
-HOLD_SHARED_KINETICIST
-Native Witch and Kineticist exist. Original mutates shared blast progressions, prerequisite class levels, ability visibility and all kineticist parameter scaling; spellburn consumes prepared Witch slots and offsets infusion burn. No isolated Witch/Intelligence burn, progression and multiclass contract is published in the current project. A leaf that only grants native blasts would be incomplete.
+COMPLETED_DEVELOPMENT_TEST — 0.14.67 TEST（Havocker、Spellburn 图标接线、Mimic 展示），已并入 0.14.69 Combined TEST，不重复开发。原 HOLD 理由（共享 Kineticist 成长与法术位燃烧）已按独立叶子实现；实机、存读档与高阶参数验收未做。原交付说明已随 4138e6f 清理，见 git 历史 `git show 4138e6f^:docs/havocker/README.md`。
 
 COTW-0046 Speaker for the Past
-IN_PROGRESS_RESERVED — issue #6；A/C完成、B v2已实现，D复查NEEDS_FIX，交原B修复；未交付，请勿重复开发。
+REOPEN_FROM_B — issue #6（仍 open 占用）。A/C/D 各做过一轮、D 复查判定 NEEDS_FIX，但 B 的候选源码从未进入任何提交、已随 b55fa17 丢失，本机无副本，重做需从 B 开始。详见下方第 7 条。
 Historical blocker: HOLD_SHARED_REVELATIONS
 Original builds sixteen Ancestor/Time revelations with Shaman/Wisdom scaling and a private additional spell list. Current project has no shared revelation engine that preserves prerequisites, source-aware rerolls, class resources, initiative and cross-class isolation. Native Oracle identity alone does not establish these contracts.
 
@@ -24,18 +23,16 @@ COTW-0081 Esoteric Starseeker
 COMPLETED_DEVELOPMENT_TEST — 0.14.68 TEST，536条定向断言与D复查已完成。90项目录及5项外部能力按当前合同原子校验；实机未测边界见docs/starseeker/README.md。不再进入新迁移队列。
 
 COTW-0095 Insinuator
-HOLD_PROVIDER_AND_INVOCATION
-Original depends on the Antipaladin base and invocation-selected outsider alignment, source-scoped smite/healing/channel/auras. The current project has no Antipaladin base and no verified current provider component contract; identity or copied Paladin assets cannot replace the invocation and alignment rules.
+COMPLETED_DEVELOPMENT_TEST — 0.14.89–0.14.104（核心 6 项、五个光环、Personal Champion、Ambitious Bond、Smite／Selfish Healing／Greeds 与降灵特效；Aura of Glory 双份加成于 0.14.104 修复）。依赖 MCE 反圣武士提供方；实机与存读档验收未做，不写成完整迁移通过。
 
 COTW-0098 Unholy Minion
-HOLD_PROVIDER_AND_DOMAINS
-Requires the unverified current Antipaladin provider, deity/domain preparation bridge and class-scoped channel/bond allocation. Those shared contracts are absent; the parallel Sacred Servant leaf is not an already-ready mechanism.
+EXCLUDED — 用户 2026-11-14 决定跳过（该变体靠领域＋邪魔羁绊＋召唤邪魔支撑，面对游戏实际环境的敌人意义有限）。inventory 已标 excludeNewImplementation=true、userSelectionAllowed=false，不冒称本包已实现；核对过的规格要点留在 inventory 的 note 里，重启前先读它。
 
 COTW-0109 Iroran Paladin
 COMPLETED_DEVELOPMENT_TEST — 0.14.71 TEST／issue #11。D复查通过，105条隔离定向／1.23秒；4/4附件下载核对一致。见docs/work-packages/COTW-0109/README.md，不重复开发。
 
 COTW-0110 Sacred Servant
-SOURCE_MERGED — sxl1216 PR #8，2026-11-09；已合入Sacred Servant与原生领域目录适配，不重复开发。沿用用户认可的贡献者测试；合并编译已通过，已纳入0.14.69 TEST，见WORK_STATUS.md。
+SOURCE_MERGED — sxl1216 PR #8，2026-11-09；已合入Sacred Servant与原生领域目录适配，不重复开发。沿用用户认可的贡献者测试；合并编译已通过，已纳入0.14.69 TEST。记录见 HANDOFF.md 与 docs/contributions/20261109-integration.md（WORK_STATUS.md 已于 b55fa17 退役）。
 
 COTW-0117 Spirit Whisperer
 COMPLETED_DEVELOPMENT_TEST — 0.14.69 Combined TEST／issue #7；A/C/B/D和最终整合复查完成，完整十魂域Wizard变体与最小隔离桥已合入源码，不再按HOLD重复开发。174条隔离检查及合并编译通过；未测行为／UI及已知选标边界见docs/spirit-whisperer/README.md。已纳入0.14.69 TEST，Spirit Guide并未因此完成。
@@ -49,7 +46,7 @@ COMPLETED_DEVELOPMENT_TEST — 0.14.69 Combined TEST／issue #7；A/C/B/D和最�
 3. 确认 issue #7 关闭条件：WORK_STATUS.md 记为"GitHub上传下载核对后关闭issue"。附件替换与下载核对完成后再关闭，并在 issue 里注明玩家 2026-11-10 的实机确认结果。
 4. 上游精选 PR：`upstream-sacred-servant-liveon`（基于 upstream/main `5275b86`，提交 `bcd2738`）已推送 origin，PR 需手动创建（本机无 gh CLI）。本轮新增的 `src/SpiritWhisperer0117.cs`、`Modules/MediumClass/Prowler/ProwlerForms.cs` 修复尚未纳入该分支；若要回馈上游，需先确认用户是否批准把这两处加入精选改动。旧 `upstream-submissions` PR 未合并，保持 `71a9c2d` 不动。
 5. 定向回归验收（玩家侧）：本轮修改了共享原生蓝图，影响所有 Shaman，且改了 Prowler 的 AutoMetamagic 补丁。建议抽查 Frost／Stone／Waves／Wind 的 L20 Manifestation 是否都显示三个不同超魔、普通萨满是否同步恢复，以及 Prowler 剑齿虎形态压制瞬发法术的原有语义没有回归。不要写成完整玩家验收。
-6. 工作区未提交改动清理：当前 `git status` 有约 46 项改动，除本轮的 `src/SpiritWhisperer0117.cs` 与 `Modules/MediumClass/Prowler/ProwlerForms.cs` 外，还有上一模型留下的多个 tests/*.cs、`src/SpiritClassBridge0117.cs`、未跟踪的 tests/TestPaths.cs 等。提交前请用户确认哪些保留、哪些回滚，不要整体 `git add .`。
-7. COTW-0046 Speaker for the Past（issue #6）：D 复查 NEEDS_FIX，交原 B 生产负责人按 docs/work-packages/COTW-0046/D-review.md 修四项后复查；不重复开发、不并入 0.14.69 TEST。
-8. HOLD 队列（inventory.json 的 allowedRemainingIds：0020、0046、0060、0068、0070、0095、0098、0109）：保持搁置，只有用户点名才启动；开工前仍按 AGENTS.md 第 14 条先查 GitHub 已有提交／PR／分支／认领。
+6. 工作区未提交改动清理：2026-11-14 18:25 的 `git status` 为 30 项（16 项已跟踪修改 + 14 项未跟踪），未跟踪的是 `README.zh-CN.md` 与 13 个新模块源文件（AlliedSpellcaster0576／AmbitiousBond0095／AnimateDead0598／AreaPreview0293／Insinuator0095／KineticKnightBladeRush／TransientAbilityCleanup／TransientDiagnostics／UnarmedTwf0610／UniversalistMetamagic0609／VersatilePerformance0600／WeaponProperties0296／WildArmor01465）。提交前请用户确认哪些保留、哪些回滚，不要整体 `git add .`。
+7. COTW-0046 Speaker for the Past（issue #6，仍 open）：A/C/B/D 各做过一轮，D 复查 NEEDS_FIX；B 源码从未提交、已随 b55fa17 丢失，重做需从 B 开始。遗留文档只在 git 历史 `git show 9256b49:docs/work-packages/COTW-0046/`；不重复开发、不并入已发布 TEST。
+8. 可开工队列（inventory.json 的 allowedRemainingIds）现仅 **COTW-0046**。原 HOLD 队列的其余项：0020／0060／0068／0070／0095／0109 已交付、0098 已排除。2026-11-14 起原「暂且正常做的东西」除 0046 外 59 条整体转为「暂且搁置的东西」（改后 84 条搁置、1 条正常选题）；搁置不是排除，只有用户点名才启动；开工前仍按 AGENTS.md 第 14 条先查 GitHub 已有提交／PR／分支／认领。
 9. 对方持续开发的新上游提交：按 AGENTS.md 第 9 条在 main 上正常 merge upstream/main、解决冲突并编译验证后推送；`upstream-submissions` 不参与日常同步。

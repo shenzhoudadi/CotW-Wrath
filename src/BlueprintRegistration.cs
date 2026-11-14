@@ -91,6 +91,11 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(Inquisitions01426.ModuleName, () => Inquisitions01426.Register(cache), report);
             RegisterModule(Inquisitions01428.ModuleName, () => Inquisitions01428.Register(cache), report);
             RegisterModule(PurifyingFlames01428.ModuleName, () => PurifyingFlames01428.Register(cache), report);
+            // Before the subschools: Arcane Crafter clones the universalist
+            // progression, so it has to clone the rewritten table. That way both
+            // schools share one Metamagic Mastery feature instead of Arcane
+            // Crafter keeping the native fixed 8/12/16/20 uses.
+            RegisterModule(UniversalistMetamagic0609.ModuleName, () => UniversalistMetamagic0609.Register(cache), report);
             RegisterModule(WizardSubschools01428.ModuleName, () => WizardSubschools01428.Register(cache), report);
             RegisterModule(EnhancementSchool01429.ModuleName, () => EnhancementSchool01429.Register(cache), report);
             RegisterModule(RagePowers.ModuleName, () => RagePowers.Register(cache), report);
@@ -179,6 +184,14 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(UrbanBloodrager01463.ModuleName, () => UrbanBloodrager01463.Register(cache), report);
             RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
             RegisterAvailableModule(Amnesiac01464.ModuleName, () => Amnesiac01464.Register(cache), report);
+            RegisterModule(WildArmor01465.ModuleName, () => WildArmor01465.Register(cache), report);
+            RegisterModule(WeaponProperties0296.ModuleName, () => WeaponProperties0296.Register(cache), report);
+            RegisterModule(VersatilePerformance0600.ModuleName, () => VersatilePerformance0600.Register(cache), report);
+            RegisterModule(AlliedSpellcaster0576.ModuleName, () => AlliedSpellcaster0576.Register(cache), report);
+            RegisterModule(UnarmedTwf0610.ModuleName, () => UnarmedTwf0610.Register(cache), report);
+            RegisterModule(AnimateDead0598.ModuleName, () => AnimateDead0598.Register(cache), report);
+            RegisterAvailableModule(Insinuator0095.ModuleName, () => Insinuator0095.Register(cache), report);
+            RegisterAvailableModule(KineticKnightBladeRush.ModuleName, () => KineticKnightBladeRush.Register(cache, report), report);
             RegisterAvailableModule(EsotericStarseeker0081.ModuleName, () => EsotericStarseeker0081.Register(cache), report);
             RegisterAvailableModule(LoreSpirit0118.ModuleName, () => LoreSpirit0118.Register(cache), report);
             RegisterAvailableModule(SpiritSpellListOverrides0119.ModuleName, () => SpiritSpellListOverrides0119.Register(cache), report);

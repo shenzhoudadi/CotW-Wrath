@@ -57,9 +57,17 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         internal T Native<T>(string guid) where T : SimpleBlueprint => Cache.Load(BlueprintGuid.Parse(guid)) as T ?? throw new InvalidOperationException("Psychic native dependency missing: " + guid);
         internal T Find<T>(string token) where T : BlueprintScriptableObject => (T)Assets[token];
+        internal static string Key(string token, string suffix) => "cotw-wrath.psychic.full." + token + "." + suffix;
         internal static LocalizedString Text(string token, string suffix, string value) {
-            string key = "cotw-wrath.psychic.full." + token + "." + suffix; Strings[key] = value;
+            string key = Key(token, suffix); Strings[key] = value;
             PutFallback(key, QlTexts01460.Resolve(key,value)); return new LocalizedString { Key = key };
+        }
+        // Only for keys this project composes at runtime: unlike Text(), which
+        // must never overwrite a translation, these are recomputed from the live
+        // pack so they follow both the player's language and late providers.
+        internal static void Override(string key, string value) {
+            var pack = LocalizationManager.CurrentPack; if (pack == null) return;
+            lock (Get(pack, "m_Lock")) pack.PutString(key, value);
         }
         // GetText(key,false) conflates an absent key with an intentionally empty
         // translation. The actual native dictionary distinguishes both cases.
