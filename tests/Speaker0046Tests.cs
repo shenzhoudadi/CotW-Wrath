@@ -924,6 +924,82 @@ internal static partial class Arcane01446Tests
             Check(knownAfterFtRmB2 != null && !knownAfterFtRmB2.IsTemporary && bookB2.IsKnown(longstrider),
                 "0046 D2-F04 OrderB2 removing foreign temporary source while Speaker stays active preserves non-temporary Spiritual Ally and other circles");
 
+            // D3-F01: the same spell can be granted independently on a different circle.
+            foreach (bool lowerLevel in new[] { false, true })
+            foreach (bool temporary in new[] { false, true })
+            {
+                string scenario = $"0046 D3-F01 {(lowerLevel ? "level loss" : "feature removal")}, {(temporary ? "temporary" : "permanent")} overlap";
+                int foreignCircle = lowerLevel ? 3 : 5;
+                var unit = (UnitEntityData)Call(typeof(BardMasterpieces01435Tests), "Unit", c2, scenario, Sp046ClassId, 10);
+                unit.Progression.Classes[0].AddArchetype(root);
+                unit.Stats.Wisdom.BaseValue = 22;
+                var crossBook = new Spellbook(unit.Descriptor, shamanBookBp);
+                Set(crossBook, "m_BaseLevelInternal", 10);
+                crossBook.UpdateAllSlotsSize(false);
+                foreach (int circle in new[] { 4, 5, foreignCircle }.Distinct())
+                {
+                    var slots = (List<SpellSlot>)sureMemSlots.Invoke(crossBook, new object[] { circle });
+                    if (!slots.Any(slot => slot.Type == SpellSlotType.Common))
+                        slots.Add(new SpellSlot(circle, SpellSlotType.Common, 0, crossBook));
+                }
+                if (foreignCircle == 5)
+                {
+                    var slots = (List<SpellSlot>)sureMemSlots.Invoke(crossBook, new object[] { 5 });
+                    if (slots.Count(slot => slot.Type == SpellSlotType.Common) < 2)
+                        slots.Add(new SpellSlot(5, SpellSlotType.Common, slots.Count, crossBook));
+                }
+                Set(unit.Descriptor, "m_Spellbooks", new Dictionary<BlueprintSpellbook, Spellbook> { { shamanBookBp, crossBook } });
+
+                var speakerFact = Fact(unit, mysteriesFeat);
+                var ownSpell = crossBook.GetKnownSpells(4).SingleOrDefault(s => s.Blueprint == spiritualAlly);
+                Check(ownSpell != null && crossBook.Memorize(ownSpell), scenario + " prepares Speaker circle 4");
+                var metamagic = new MetamagicData { SpellLevelCost = 1 };
+                metamagic.Add(Metamagic.Extend);
+                var ownCustom = new AbilityData(spiritualAlly, crossBook, 4) { MetamagicData = metamagic };
+                crossBook.AddCustomSpell(ownCustom);
+                Check(crossBook.Memorize(ownCustom), scenario + " prepares the Speaker metamagic version in circle 5");
+
+                BlueprintComponent grant = temporary
+                    ? (BlueprintComponent)new AddSpellKnownTemporary { name = "D3Temporary", Level = foreignCircle, OnlySpontaneous = false }
+                    : new AddKnownSpell { name = "D3Permanent", SpellLevel = foreignCircle };
+                Set(grant, "m_CharacterClass", Sp046Ref<BlueprintCharacterClassReference>(shamanCls));
+                Set(grant, "m_Spell", Sp046Ref<BlueprintAbilityReference>(spiritualAlly));
+                var independentFact = Fact(unit, new BlueprintFeature {
+                    AssetGuid = BlueprintGuid.Parse(temporary ? "0046a1b2c3d4e5f600000000000000fa" : "0046a1b2c3d4e5f600000000000000fb"),
+                    name = temporary ? "Speaker0046D3Temporary" : "Speaker0046D3Permanent",
+                    ComponentsArray = new[] { grant }
+                });
+                var otherSpell = crossBook.GetKnownSpells(foreignCircle).SingleOrDefault(s => s.Blueprint == spiritualAlly);
+                Check(otherSpell != null && otherSpell.IsTemporary == temporary && crossBook.Memorize(otherSpell),
+                    scenario + " prepares the independent version");
+
+                if (lowerLevel)
+                {
+                    Set(crossBook, "m_BaseLevelInternal", 6);
+                    var runtime = speakerFact.Components.Single(rc => rc.SourceBlueprintComponent is SpeakerSpellbookSync0046);
+                    using (runtime.RequestEventContext())
+                        ((SpeakerSpellbookSync0046)runtime.SourceBlueprintComponent).HandleUnitGainLevel();
+                }
+                else
+                    unit.Facts.Remove(speakerFact);
+
+                Check(!crossBook.IsKnownOnLevel(spiritualAlly, 4) &&
+                      !crossBook.GetKnownSpells(4).Any(s => s.Blueprint == spiritualAlly),
+                    scenario + " forgets only the Speaker circle");
+                Check(!crossBook.GetMemorizedSpellSlots(spiritualAlly).Any(s => s.SpellShell.SpellLevelInSpellbook == 4) &&
+                      !crossBook.GetCustomSpells(spiritualAlly).Any(s => s.SpellLevelInSpellbook == 4),
+                    scenario + " clears the Speaker preparations and metamagic copy");
+                Check(crossBook.IsKnownOnLevel(spiritualAlly, foreignCircle) &&
+                      crossBook.GetMemorizedSpells(foreignCircle).Any(s => ReferenceEquals(s.SpellShell, otherSpell)),
+                    scenario + " keeps the independent circle and its exact preparation");
+                if (temporary)
+                {
+                    unit.Facts.Remove(independentFact);
+                    Check(!crossBook.IsKnown(spiritualAlly) && crossBook.GetMemorizedSpellSlots(spiritualAlly).Count == 0,
+                        scenario + " native ledger removes the final temporary grant and its preparation");
+                }
+            }
+
             // ---- 5. Runtime Rulebook Tests: D-0046-03 Blood of Heroes ----
             var bohRev = spRevs.First(r => Sp046DisplayName(r) == "Blood of Heroes");
             var bohCloneBuff = Sp046CollectGraph(bohRev).OfType<BlueprintBuff>().Single();

@@ -152,10 +152,9 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintSpellListReference SpellList;
         public BlueprintSpellListReference NativeShamanSpellList;
 
-        // Retained for diagnostic inspection; actual reconciliation invokes
-        // native Spellbook.AddKnown / RemoveSpell directly.
+        // Retained for diagnostic inspection of the native spellbook methods.
         static readonly MethodInfo AddKnownMethod = AccessTools.Method(typeof(Spellbook), nameof(Spellbook.AddKnown), new[] { typeof(int), typeof(BlueprintAbility), typeof(bool) });
-        static readonly MethodInfo RemoveSpellMethod = AccessTools.Method(typeof(Spellbook), nameof(Spellbook.RemoveSpell), new[] { typeof(BlueprintAbility) });
+        static readonly MethodInfo RemoveKnownMethod = AccessTools.Method(typeof(Spellbook), nameof(Spellbook.RemoveTemporarySpell), new[] { typeof(AbilityData) });
 
         // B-stage diagnostic: proves the real native methods were resolved and
         // records how many spells were learned / removed on the last pass.
@@ -175,13 +174,11 @@ namespace CallOfTheWild.Wrath.Prototype
         static Spellbook FindBook(UnitDescriptor owner, BlueprintSpellbook wanted)
             => owner?.Spellbooks?.FirstOrDefault(b => b != null && (wanted == null || b.Blueprint == wanted));
 
-        // Compute spells that remain legitimately known in the target Shaman
-        // spellbook from native Shaman progression or other still-active
-        // features (LearnSpellList / AddKnownSpell / LearnSpells / copied scrolls).
-        static HashSet<BlueprintGuid> CollectKeptSpells(UnitDescriptor owner, Spellbook book, BlueprintSpellList nativeList,
+        // Track the circles that still have a permanent source in this spellbook.
+        static HashSet<(int Circle, BlueprintGuid Spell)> CollectPermanentGrants(UnitDescriptor owner, Spellbook book, BlueprintSpellList nativeList,
             int maxSpellLevel, BlueprintGuid excludeFactId)
         {
-            var keep = new HashSet<BlueprintGuid>();
+            var keep = new HashSet<(int Circle, BlueprintGuid Spell)>();
             if (owner == null || book == null) return keep;
 
             void AddFromList(BlueprintSpellList spellList, int upToLevel)
@@ -191,7 +188,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 {
                     if (row == null || row.SpellLevel < 1 || row.SpellLevel > upToLevel || row.Spells == null) continue;
                     foreach (var spell in row.Spells)
-                        if (spell != null) keep.Add(spell.AssetGuid);
+                        if (spell != null) keep.Add((row.SpellLevel, spell.AssetGuid));
                 }
             }
 
@@ -218,7 +215,7 @@ namespace CallOfTheWild.Wrath.Prototype
                         if (cd != null && cd.Spellbook == targetBookBp &&
                             (aks.Archetype == null || cd.Archetypes.Contains(aks.Archetype)) &&
                             (aks.ExcludeArchetype == null || !cd.Archetypes.Contains(aks.ExcludeArchetype)))
-                            keep.Add(aks.Spell.AssetGuid);
+                            keep.Add((aks.SpellLevel, aks.Spell.AssetGuid));
                     }
                     else if (c is LearnSpells ls && ls.CharacterClass != null)
                     {
@@ -232,22 +229,12 @@ namespace CallOfTheWild.Wrath.Prototype
                                 {
                                     if ((slc.SpellList == targetBookBp.SpellList || slc.SpellList == targetBookBp.SpellList.FilteredList) &&
                                         slc.SpellLevel <= maxSpellLevel)
-                                        keep.Add(spell.AssetGuid);
+                                        keep.Add((slc.SpellLevel, spell.AssetGuid));
                                 }
                             }
                         }
                     }
                 }
-            }
-
-            // Preserve copied scrolls and temporary known spells across all circles 1..9 even after de-level.
-            for (int lvl = 1; lvl <= 9; lvl++)
-            {
-                var known = book.GetKnownSpells(lvl);
-                if (known == null) continue;
-                foreach (var ad in known)
-                    if (ad?.Blueprint != null && (ad.CopiedFromScroll || ad.IsTemporary))
-                        keep.Add(ad.Blueprint.AssetGuid);
             }
 
             return keep;
@@ -274,44 +261,31 @@ namespace CallOfTheWild.Wrath.Prototype
         static void RelinquishSpeakerSpell(Spellbook book, int level, BlueprintAbility spell,
             List<AbilityData> foreignTemps, ref int removed)
         {
-            var matchingTemps = foreignTemps
-                .Where(ab => ab.Blueprint.AssetGuid == spell.AssetGuid)
-                .ToArray();
-            if (matchingTemps.Length == 0)
+            int removedBefore = removed;
+            foreach (var known in book.GetKnownSpells(level).ToArray())
             {
-                if (book.IsKnown(spell))
-                {
-                    book.RemoveSpell(spell);
-                    removed++;
-                }
-                return;
-            }
+                if (known?.Blueprint != spell || known.CopiedFromScroll || known.IsTemporary) continue;
 
-            bool sharedOnLevel = matchingTemps.Any(ab => ab.SpellLevel == level);
-            if (sharedOnLevel)
-            {
-                // Another active temporary source shares this exact book/circle
-                // AbilityData object. Keep the spell and common-slot preparations,
-                // and mark it temporary so removing the last temporary source
-                // cleanly triggers UnitPartTemporarySpellsKnown.RemoveEntry.
-                foreach (var ab in book.GetKnownSpells(level).ToArray())
-                    if (ab != null && ab.Blueprint?.AssetGuid == spell.AssetGuid)
-                        ab.IsTemporary = true;
-                foreach (var ab in matchingTemps)
-                    if (ab.SpellLevel == level)
-                        ab.IsTemporary = true;
-                return;
-            }
+                // Use native AbilityData equality, which includes the base circle.
+                // The native ledger can now remove a shared spell when its last source ends.
+                var shared = foreignTemps.Where(temporary => temporary == known).ToArray();
+                known.IsTemporary = true;
+                foreach (var temporary in shared)
+                    temporary.IsTemporary = true;
+                if (shared.Length != 0) continue;
 
-            // Foreign temporary grant sits on a different circle in the same book:
-            // unlearn only Speaker's circle without wiping the foreign circle.
-            foreach (var ab in book.GetKnownSpells(level).ToArray())
-            {
-                if (ab == null || ab.Blueprint?.AssetGuid != spell.AssetGuid) continue;
-                ab.IsTemporary = true;
-                book.RemoveTemporarySpell(ab);
+                book.RemoveTemporarySpell(known);
                 removed++;
             }
+
+            if (removed == removedBefore || book.IsKnownOnLevel(spell, level)) return;
+
+            // A metamagic copy can occupy a higher slot while retaining this base circle.
+            foreach (var slot in book.GetMemorizedSpellSlots(spell))
+                if (slot.Type == SpellSlotType.Common && slot.SpellShell?.SpellLevelInSpellbook == level)
+                    slot.Clear();
+            foreach (var custom in book.GetCustomSpells(spell).Where(data => data.SpellLevelInSpellbook == level).ToArray())
+                book.RemoveCustomSpell(custom);
         }
 
         void Sync()
@@ -320,7 +294,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var list = SpellList?.Get();
             if (book == null || list?.SpellsByLevel == null) return;
             int max = book.MaxSpellLevel, learned = 0, removed = 0;
-            var keep = CollectKeptSpells(Owner, book, NativeShamanSpellList?.Get(), Math.Max(0, max), Fact?.Blueprint?.AssetGuid ?? BlueprintGuid.Empty);
+            var keep = CollectPermanentGrants(Owner, book, NativeShamanSpellList?.Get(), Math.Max(0, max), Fact?.Blueprint?.AssetGuid ?? BlueprintGuid.Empty);
             var foreignTemps = CollectForeignTempSpells(Owner, book);
             foreach (var row in list.SpellsByLevel)
             {
@@ -330,29 +304,29 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (spell == null) continue;
                     if (row.SpellLevel <= max)
                     {
-                        bool hadKnownOnLevel = book.IsKnownOnLevel(spell, row.SpellLevel);
-                        if (!hadKnownOnLevel)
+                        if (!book.IsKnownOnLevel(spell, row.SpellLevel))
                             book.AddKnown(row.SpellLevel, spell);
-                        bool hasForeignTempOnLevel = foreignTemps.Any(ft =>
-                            ft.Blueprint.AssetGuid == spell.AssetGuid && ft.SpellLevel == row.SpellLevel);
-                        // Promote to non-temporary only when Speaker newly adds the spell
-                        // or shares the slot with an active UnitPartTemporarySpellsKnown entry;
-                        // unbacked pre-existing temporary entries keep IsTemporary=true.
-                        if (!hadKnownOnLevel || hasForeignTempOnLevel)
+
+                        // Leave temporary entries outside the native source ledger untouched.
+                        foreach (var known in book.GetKnownSpells(row.SpellLevel))
                         {
-                            foreach (var ab in book.GetKnownSpells(row.SpellLevel))
-                                if (ab != null && ab.Blueprint?.AssetGuid == spell.AssetGuid)
-                                    ab.IsTemporary = false;
+                            if (known?.Blueprint != spell) continue;
+                            foreach (var temporary in foreignTemps)
+                            {
+                                if (temporary != known) continue;
+                                known.IsTemporary = false;
+                                temporary.IsTemporary = false;
+                            }
                         }
                         learned++;
                     }
-                    else if (!keep.Contains(spell.AssetGuid))
+                    else if (!keep.Contains((row.SpellLevel, spell.AssetGuid)))
                     {
                         RelinquishSpeakerSpell(book, row.SpellLevel, spell, foreignTemps, ref removed);
                     }
                 }
             }
-            LastReport = "addKnown=" + AddKnownMethod + "; removeSpell=" + RemoveSpellMethod +
+            LastReport = "addKnown=" + AddKnownMethod + "; removeKnown=" + RemoveKnownMethod +
                 "; maxSpellLevel=" + max + "; learned=" + learned + "; removed=" + removed;
         }
 
@@ -366,15 +340,15 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var book = FindBook(owner, wantedBook);
             if (book == null || list?.SpellsByLevel == null) return;
-            var keep = CollectKeptSpells(owner, book, nativeList, Math.Max(0, book.MaxSpellLevel), excludeFactId);
+            var keep = CollectPermanentGrants(owner, book, nativeList, Math.Max(0, book.MaxSpellLevel), excludeFactId);
             var foreignTemps = CollectForeignTempSpells(owner, book);
             int removed = 0;
             foreach (var row in list.SpellsByLevel)
             {
-                if (row == null || row.Spells == null) continue;
+                if (row == null || row.SpellLevel < 1 || row.SpellLevel > 9 || row.Spells == null) continue;
                 foreach (var spell in row.Spells)
                 {
-                    if (spell == null || keep.Contains(spell.AssetGuid)) continue;
+                    if (spell == null || keep.Contains((row.SpellLevel, spell.AssetGuid))) continue;
                     RelinquishSpeakerSpell(book, row.SpellLevel, spell, foreignTemps, ref removed);
                 }
             }
