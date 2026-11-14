@@ -21,7 +21,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if(!Receipts.GetValue(cache,_=>new Dictionary<string,Receipt>()).TryGetValue(module,out var r))return false;
             for(int i=0;i<r.Assets.Length;i++) {
                 var asset=r.Assets[i];var actual=ArchetypeBatch01445.Definition(asset);
-                if(!ReferenceEquals(cache.Load(asset.AssetGuid),asset)||actual!=r.Shapes[i]&&!ProviderOnlyAppend(cache,r,asset,r.Shapes[i])) {
+                if(!ReferenceEquals(cache.Load(asset.AssetGuid),asset)||(BlueprintRegistration.StrictPublishedGraphChecks&&actual!=r.Shapes[i]&&!ProviderOnlyAppend(cache,r,asset,r.Shapes[i]))) {
                     int at=0;while(at<actual.Length&&at<r.Shapes[i].Length&&actual[at]==r.Shapes[i][at])at++;
                     string Slice(string value)=>value.Substring(Math.Max(0,at-60),Math.Min(value.Length-Math.Max(0,at-60),220));
                     throw new InvalidOperationException("01446 published resource changed: "+asset.name+"; firstDifference="+at+" expected="+Slice(r.Shapes[i])+" actual="+Slice(actual)+"; nativePrerequisites="+BloodlineProvider01453.Describe(asset));

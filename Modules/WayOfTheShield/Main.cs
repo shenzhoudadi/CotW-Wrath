@@ -67,7 +67,6 @@ namespace Way_of_the_shield {
    RunBlueprintStep(BlueprintBuildStep01444.BucklerGrip,BoringBucklerTweaks.Buckler1h_Component.CachePatch.AddBuckler1hToBlueprint);
    RunBlueprintStep(BlueprintBuildStep01444.ShieldBash,ShieldBashAbilityTweak.BlueprintsCache_Init_Patch_MoveShieldBashAbilityToProficiencyBP);
    RunBlueprintStep(BlueprintBuildStep01444.CouchedSpears,CouchedSpears.AddCouchedSpears1hToMountedCombat);
-   RunBlueprintStep(BlueprintBuildStep01444.OneHandedGrip,OneHandedToggle.CachePatch_Postfix);
    RunBlueprintStep(BlueprintBuildStep01444.ShieldedDefense,ShieldedDefense.BlueprintCache_Init_Patch);
    RunBlueprintStep(BlueprintBuildStep01444.ShieldBrace,ShieldBrace.CachePatch.Postfix);
    RunBlueprintStep(BlueprintBuildStep01444.UnhinderingShield,UnhinderingShield.BlueprintsCache_Patch);

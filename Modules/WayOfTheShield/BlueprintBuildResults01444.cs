@@ -14,7 +14,7 @@ namespace Way_of_the_shield
 {
     internal enum BlueprintBuildStep01444
     {
-        Proficiency, BucklerParry, BucklerGrip, ShieldBash, CouchedSpears, OneHandedGrip,
+        Proficiency, BucklerParry, BucklerGrip, ShieldBash, CouchedSpears,
         ShieldedDefense, ShieldBrace, UnhinderingShield, UpsettingStyle, MythicParry, SacredShield
     }
 
@@ -92,7 +92,7 @@ namespace Way_of_the_shield
                         RequireFeatures("ac8aaf29054f5b74eb18f2af950e752d", BucklerProficiency, ShieldProficiency);
                     }
                     break;
-                // Proficiency, mounted spear and one-handed grip are already
+                // Proficiency and mounted spear are already
                 // safely resumable; Sacred Shield preflights its own donors.
             }
         }
@@ -121,9 +121,6 @@ namespace Way_of_the_shield
                 case BlueprintBuildStep01444.CouchedSpears:
                     return !AllowTwoHandedSpears_as_OneHandedWhenMounted.GetValue() ||
                         (Published("d02e3b77b5234c0ea7e181db362d45cd") && Grants(Defensive, "d02e3b77b5234c0ea7e181db362d45cd"));
-                case BlueprintBuildStep01444.OneHandedGrip:
-                    return Published("549016f34f4349fdb6b20ecb11e79a73", "15542aa4e3f542a4bbd66bcb13392798", "21a2cfc0fc894dd9ac1ab49e4c35ba38")
-                        && Grants(Defensive, "21a2cfc0fc894dd9ac1ab49e4c35ba38");
                 case BlueprintBuildStep01444.ShieldedDefense:
                     return Published(DefenseFeature, "fa65cbcf6bba4f3992261173381a3874", "29397505648a462a874872b132a00b75", "807ca5b2501444aab22a0f08a64691e1", DefenseAbility, MythicDefense)
                         && (!AddShieldedDefense.GetValue() || (Restricts(ShieldBashAbility, DefenseAbility)

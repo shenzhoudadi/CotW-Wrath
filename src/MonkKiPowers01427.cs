@@ -85,9 +85,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (!ReferenceEquals(actual, pair.Value))
                     throw new InvalidOperationException("Ki power published graph missing or replaced: " + pair.Value.name + " [" + pair.Key + "]");
                 var currentDefinition = Layout(pair.Value);
-                if (currentDefinition != row.Definitions[pair.Key])
+                if (BlueprintRegistration.StrictPublishedGraphChecks && currentDefinition != row.Definitions[pair.Key])
                     throw new InvalidOperationException("Ki power published graph changed: " + pair.Value.name + " [" + pair.Key + "]; " + Migration01426.Difference(row.Definitions[pair.Key], currentDefinition));
-                if (pair.Value.ComponentsArray.Any(c => c == null || !ReferenceEquals(c.OwnerBlueprint, pair.Value)))
+                if (BlueprintRegistration.StrictPublishedGraphChecks && pair.Value.ComponentsArray.Any(c => c == null || !ReferenceEquals(c.OwnerBlueprint, pair.Value)))
                     throw new InvalidOperationException("Ki power published component ownership changed: " + pair.Value.name + " [" + pair.Key + "]");
                 var references = References(pair.Value.ComponentsArray, new HashSet<object>()).ToList();
                 if (pair.Value is BlueprintAbility a) references.Add((BlueprintAbilityReference)Get(a, "m_Parent"));

@@ -71,12 +71,12 @@ internal static class Program
     private static void Execute(string modulePath)
     {
         var harmony = typeof(Harmony).Assembly;
-        Check(harmony.GetName().Version.ToString() == "2.0.4.0", "actual game Harmony version");
+        Check(harmony.GetName().Version.ToString() == "2.3.6.0", "actual game Harmony version");
         string digest;
         using (var sha = SHA256.Create()) using (var stream = File.OpenRead(harmony.Location))
             digest = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "");
-        Check(digest == "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5", "actual game Harmony SHA");
-        Check(Path.GetFullPath(harmony.Location).Equals(Path.Combine(managed, "0Harmony.dll"), StringComparison.OrdinalIgnoreCase), "no copied Harmony runtime");
+        Check(digest == "DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80", "actual game Harmony SHA");
+        Check(Path.GetFullPath(harmony.Location).Equals(Path.Combine(managed, "UnityModManager", "0Harmony.dll"), StringComparison.OrdinalIgnoreCase), "no copied Harmony runtime");
         var game = Assembly.LoadFrom(Path.Combine(managed, "Assembly-CSharp.dll"));
         Check(!Enum.IsDefined(Type(game, "Kingmaker.RuleSystem.Rules.BonusType"), 160), "custom weapon penalty bonus ID has no native collision");
         Check(!Enum.IsDefined(Type(game, "Kingmaker.Enums.ModifierDescriptor"), 81), "custom armor penalty descriptor has no native collision");
@@ -152,18 +152,8 @@ internal static class Program
         Check(contextType.GetField("Slot").GetValue(contextField.GetValue(null)) == null, "finalizer clears insertion scope after failure or success");
 
         var ordinary = NewUnit(game);
-        var gripToggle = Type(module, "Way_of_the_shield.NewFeatsAndAbilities.OneHandedToggle");
-        var gripAllowed = Method(gripToggle, "CanUseOneHandedGrip");
-        Check(!(bool)gripAllowed.Invoke(null, new[] { NewWeapon(game, "Longbow", true, true), ordinary }), "actual two-handed ranged weapon cannot force a one-handed grip");
-        Check((bool)gripAllowed.Invoke(null, new[] { NewWeapon(game, "Longsword"), ordinary }), "actual one-handed melee weapon keeps its grip toggle");
-        foreach (var endpoint in new[]
-        {
-            Method(Type(module, "Way_of_the_shield.NewFeatsAndAbilities.OneHandedToggle+EquipmentOneHandedRestriction"), "IsAvailable"),
-            Method(Type(module, "Way_of_the_shield.NewFeatsAndAbilities.OneHandedToggle+EquipmentForceOneHandedComponent"), "ApplyGrip"),
-            Method(Type(module, "Way_of_the_shield.ItemEntityWeapon__HoldInTwoHands__Patch"), "ExtendGripPermission")
-        }) Check(PatchProcessor.GetOriginalInstructions(endpoint, (ILGenerator)null).Any(i => i.Calls(gripAllowed)), "both real restriction and equip-change paths check ranged grip legality: " + endpoint.Name);
-        Check(PatchProcessor.GetOriginalInstructions(Method(Type(module, "Way_of_the_shield.NewFeatsAndAbilities.OneHandedToggle+EquipmentForceOneHandedComponent"), "ApplyGrip"), (ILGenerator)null)
-            .Any(i => i.operand is MethodInfo m && m.Name == "ResetGripPreferences"), "changing from toggled melee to a two-handed ranged weapon restores native automatic grip");
+        // The forced one-handed grip toggle was removed from Way of the Shield;
+        // its retired IL/runtime assertions were deleted with that feature.
         var acRule = Raw(Type(game, "Kingmaker.RuleSystem.Rules.RuleCalculateAC"));
         Set(acRule, "Initiator", ordinary); Set(acRule, "Target", ordinary);
         var runtime = Type(module, "Way_of_the_shield.ShieldRuntimePatches");
@@ -241,9 +231,7 @@ internal static class Program
         Check(!(bool)Method(runtime, "IsShieldDenied").Invoke(null, new object[] { null }), "no unit does not deny shield AC");
         Check((int)Method(runtime, "CalculateEquippedShieldBonus").Invoke(null, new object[] { null }) == 0, "no unit grants no shield AC");
 
-        var data = Type(module, "Way_of_the_shield.NewFeatsAndAbilities.OneHandedToggle+EquipmentForceOneHandedComponent+ComponentData");
-        Check(data.GetField("Retained").GetCustomAttributes(false).Any(a => a.GetType().FullName == "Newtonsoft.Json.JsonIgnoreAttribute"), "grip retention is per runtime and rebuilt after load");
-        File.WriteAllText(Path.Combine(Path.GetDirectoryName(modulePath), "equipment-smoke-result.json"), "{\"checks\":" + checks + ",\"nativeRuntimeTargets\":" + nativeTargetCount + ",\"harmony\":\"2.0.4.0\",\"nativeIl\":true}");
+        File.WriteAllText(Path.Combine(Path.GetDirectoryName(modulePath), "equipment-smoke-result.json"), "{\"checks\":" + checks + ",\"nativeRuntimeTargets\":" + nativeTargetCount + ",\"harmony\":\"2.3.6.0\",\"nativeIl\":true}");
         Console.WriteLine("PASS " + checks + " actual-game equipment IL and penalty checks");
     }
 }

@@ -56,7 +56,7 @@ BlueprintTool.Assets[Guids.HierophantSupremeAbility2]=currentLegendary;
 BlueprintTool.Assets[Guids.HierophantSupremeAbility4]=legacyLegendary;
 if(args.Contains("--reflection-smoke"))
 {
-    Check(typeof(Harmony).Assembly.GetName().Version==new Version(2,0,4,0),"must load actual game Harmony 2.0.4");
+    Check(typeof(Harmony).Assembly.GetName().Version==new Version(2,3,6,0),"must load actual game Harmony 2.3.6");
     object Invoke(Type t,string method,params object[] values)=>t.GetMethod(method,BindingFlags.NonPublic|BindingFlags.Static).Invoke(null,values);
     foreach(var kind in new[]{"archmage","hierophant","medium","wizard"})
     {

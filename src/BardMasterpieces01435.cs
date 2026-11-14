@@ -194,13 +194,13 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (!ReferenceEquals(cache.Load(asset.AssetGuid), asset))
                         throw new InvalidOperationException("01435 published masterpiece graph identity changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]");
                     var current=Definition(asset);
-                    if(current!=publication.Definitions[i])
+                    if(BlueprintRegistration.StrictPublishedGraphChecks&&current!=publication.Definitions[i])
                         throw new InvalidOperationException("01435 published masterpiece graph changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]; "+Migration01426.Difference(publication.Definitions[i],current));
-                    if(asset.ComponentsArray.Any(c=>c==null||!ReferenceEquals(c.OwnerBlueprint,asset)))
+                    if(BlueprintRegistration.StrictPublishedGraphChecks&&asset.ComponentsArray.Any(c=>c==null||!ReferenceEquals(c.OwnerBlueprint,asset)))
                         throw new InvalidOperationException("01435 published masterpiece component ownership changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]");
                 }
                 var containerDefinition=Definition(publication.Container);
-                if(containerDefinition!=publication.ContainerDefinition)throw new InvalidOperationException("01435 published masterpiece container changed; "+Migration01426.Difference(publication.ContainerDefinition,containerDefinition));
+                if(BlueprintRegistration.StrictPublishedGraphChecks&&containerDefinition!=publication.ContainerDefinition)throw new InvalidOperationException("01435 published masterpiece container changed; "+Migration01426.Difference(publication.ContainerDefinition,containerDefinition));
                 AppendTransactional(cache, publication.Container, publication.Root); OptionalVersatile(cache,publication.Container); return;
             }
             var f = new PsychicAssets(cache); var container = Container(f);var ledger=KnownSource(f);

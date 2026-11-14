@@ -37,7 +37,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var harmonyAssembly = typeof(Harmony).Assembly;
             mod.Logger.Log("Harmony runtime: " + harmonyAssembly.FullName + "; path=" + harmonyAssembly.Location);
             CotW.Runtime.HarmonyRuntimeCompatibility.Verify();
-            mod.Logger.Log("Harmony compile API baseline: 2.0.4.0; using the process-loaded compatible runtime without loading/replacing another copy.");
+            mod.Logger.Log("Harmony compile API baseline: 2.3.6.0; using the process-loaded compatible runtime without loading/replacing another copy.");
             var coreHarmony=new Harmony(mod.Manifest.UniqueName);
             InstallEarlyCorePatches(coreHarmony);
             psychicHarmony=new Harmony(mod.Manifest.UniqueName+".Psychic");
@@ -76,7 +76,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static void ApplyLocalization()
         {
             if (modification == null || LocalizationManager.CurrentPack == null) return;
-            try { modification.ApplyLocalization(); PsychicAssets.ApplyLocalization(); WayOfTheShieldIntegration.ApplyLocalization(); PsychicAssets.ApplyQLLocalization(); menu.RefreshLocalization(); }
+            try { modification.ApplyLocalization(); PsychicAssets.ApplyLocalization(); WayOfTheShieldIntegration.ApplyLocalization(); PsychicAssets.ApplyQLLocalization(); MimicCatalogue01461.ApplyLabels(); menu.RefreshLocalization(); }
             catch (Exception exception)
             {
                 modification.Logger.Error("Failed to apply prototype localization after initialization: " + exception);
@@ -110,6 +110,12 @@ namespace CallOfTheWild.Wrath.Prototype
                     state.InitialDispatchCompleted = true;
                 } else if (state.PendingCount != 0) BlueprintRegistration.RetryInitial(state, ReportModule);
                 registrationCompleted = true;
+                // The wall preview owns a persistent GameObject rather than any
+                // blueprint, so it is installed once, outside the registration
+                // transaction, and must never abort registration.
+                try { AreaPreview0293.Install(message => modification.Logger.Log(message)); }
+                catch (Exception exception) { modification.Logger.Error("Wall AoE preview install failed: " + exception); }
+                BlueprintRegistration.PublishedGraphChecksRelaxed = true;
                 WriteDiagnostics(state.PendingCount == 0 ? "Initial registration complete." : "Initial registration completed with pending modules; later ready/settings callbacks can retry them.");
                 TryMenu();
             } catch (Exception exception) {

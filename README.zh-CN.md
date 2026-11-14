@@ -1,4 +1,14 @@
-# 0.14.73 Cryptid Scholar TEST
+# 0.14.76 Wild Armor / 武器特性 / Versatile Performance / Blade Rush TEST
+
+本包在 0.14.75 基础上修两处。都只经过本机编译与包内核对，**没有做玩家实机验收**。
+
+- **Kinetic Knight Blade Rush 修复**：DarkCodex 是 UMM 模组，它的蓝图在原生模组入口之后才发布，上一版首次尝试时必然取不到，于是整项被跳过。现在首次取不到会挂一个蓝图缓存监视：Blade Rush 一进入缓存，就把 `KineticBladeRush` 追加进 Kinetic Knight 的 3 级 `AddFeatures` 并报告注册成功。缺少 DarkCodex 时仍然完全不改动变体。**已有角色不会回溯补发**，请新建角色或重训到 3 级确认。
+- **Weapon Shift 适用范围**：从"仅德鲁伊／变形者的 Wild Shape"改为**任何变形**（Wild Shape、Beast Shape、变形类法术等）。判定改成 `UnitBody.IsPolymorphed`，前置专长链**未改动**。描述同步改为 "During any polymorph or wild shape"。
+- 其余内容与 0.14.75 相同：Wild armor（+3 护甲附魔）、武器类型 disarm/trip/sunder 特性、Versatile Performance 纯半级（2 级 +1、4 级 +2、12 级 +6）、Expanded Versatility、Martial Performance（武器名读游戏本地化）。
+
+重点可测：Wild 变形期间 AC 不掉且结束后护甲恢复显示；连枷／镰刀类战技 +2 且白板武器仍可批量出售；Weapon Shift 在 Beast Shape 等非 Wild Shape 变形下也生效且 +2 只出现一次；Kinetic Knight 新建角色 3 级直接拿到 Blade Rush。
+
+## 上一版：0.14.73 Cryptid Scholar TEST
 
 猫猫堡是猪猪
 

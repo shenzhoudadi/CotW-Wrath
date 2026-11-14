@@ -78,7 +78,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
         }
 
 
-        public bool isSecondaryCheck;
+        public bool isSecondaryCheck = false; // never set by production code
     }
 }
 

@@ -11,7 +11,7 @@
     <TargetFramework>net472</TargetFramework>
     <!-- Needed to use publicized assembly -->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
+
     <AssemblyName>MediumClass</AssemblyName>
     <RootNamespace>MediumClass</RootNamespace>
     <Version>0.4.3</Version>
@@ -122,10 +122,12 @@
       <HintPath>$(ManagedPath)\UnityEngine.IMGUIModule.dll</HintPath>
     </Reference>
 
-    <!-- Harmony comes only from the shared Directory.Build.props; UMM remains separate. -->
-    <Reference Include="UnityModManager, Version=0.32.4.0, Culture=neutral, PublicKeyToken=null">
+    <!-- Harmony comes only from the shared Directory.Build.props; UMM remains separate.
+         Resolve by HintPath rather than a pinned assembly version: the installed UMM
+         is 0.33.2.0, while the original project referenced 0.32.4.0. -->
+    <Reference Include="UnityModManager">
       <HintPath>$(UMMPath)\UnityModManager.dll</HintPath>
-      <SpecificVersion>true</SpecificVersion>
+      <SpecificVersion>false</SpecificVersion>
     </Reference>
   </ItemGroup>
 

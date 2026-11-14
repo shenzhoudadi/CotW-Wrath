@@ -1,19 +1,12 @@
 {
   "title": "CotW Wrath agent inventory",
-  "snapshotVersion": "0.14.66",
+  "snapshotVersion": "0.14.104",
   "previousDeliveredVersion": "0.14.65",
   "additionalMigrationItemsInThisRepair": 0,
   "allowedRemainingIds": [
-    "COTW-0020",
-    "COTW-0046",
-    "COTW-0060",
-    "COTW-0068",
-    "COTW-0070",
-    "COTW-0095",
-    "COTW-0098",
-    "COTW-0109"
+    "COTW-0046"
   ],
-  "authority": "The eleven HOLD entries and explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
+  "authority": "The entries listed in allowedRemainingIds and the explicit exclusions govern selection. Historical tasks and ecosystem profiles do not authorize implementation.",
   "provenance": "Project inventory copied with all entry IDs, status/exclusion flags and source references preserved. Local machine prefixes are replaced by portable placeholders; this is a public context export, not the original private evidence file.",
   "items": [
     {
@@ -490,7 +483,7 @@
       "currentProfile": "按原文新实现（0.14.61已交付）",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "delivery01461": {
         "version": "0.14.61",
         "newMigrationItem": true,
@@ -568,7 +561,7 @@
       "currentProfile": "按原文新实现（0.14.61已交付）",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "delivery01461": {
         "version": "0.14.61",
         "newMigrationItem": true,
@@ -697,7 +690,7 @@
       "userFeedbackDate": "2026-10-17",
       "latestUserConfirmedVersion": "0.14.37",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0017",
@@ -889,17 +882,17 @@
       "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已实现并交付：0.14.67 Havocker／Spellburn 图标接线 TEST；0.14.69 Combined TEST 保留",
       "importance": "中",
       "dependsOn": [
         "Witch 主体与相关能力稳定"
       ],
       "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L23",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0021",
@@ -1160,7 +1153,7 @@
       "currentProfile": "本项目0.14.63完整移植，托管检查与独立复查通过",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": false,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.63",
       "gameAcceptanceInferred": false
     },
@@ -1462,7 +1455,7 @@
       },
       "currentFault01442UrbanResolved": true,
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0032",
@@ -1585,7 +1578,7 @@
         "newSerializedComponentTypeCount": 0
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0034",
@@ -1671,7 +1664,7 @@
       "gameFeedback": "用户确认OK",
       "gameFeedbackDate": "2026-10-19",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0035",
@@ -2156,7 +2149,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.47",
       "deliveryEvidence": "outputs/0.14.47交付自检.json"
     },
@@ -2174,15 +2167,15 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "2026-11-14核实：A/C/B/D 各做过一轮，D 复查判定 NEEDS_FIX；但 B 的候选源码（src/SpeakerForThePast0046.cs、src/SpeakerRevelationEffects0046.cs、src/RevelationBridge0046.cs、tests/Speaker0046Tests.cs）从未进入任何提交，已随 b55fa17 退役 tests/ 与 work-package 文档一起丢失，本机已无副本（D:/CodexProjects 不存在）。只剩 git 历史里的文档：git show 9256b49:docs/work-packages/COTW-0046/（README.md 含 A/B/C/D 分工与范围，D-review.md 含 4 项必修）。D 判定必修：D-0046-01 Rewind Time 重复扣费／最后一次不可用／触发后不销毁；D-0046-02 奖励法术清理误删其他仍有效来源；D-0046-03 Blood of Heroes 误加全部意志豁免；D-0046-04 Sacred Council 误加通用施法等级而非穿透检定。另需核实 Spirit of the Warrior 的 BAB/强韧残留与 Time Flicker 动作规格。issue #6 仍处于施工占用（open）。原CotW规格见 work/CallOfTheWild/Classes/Shaman.cs createSpeakerForThePast()。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "施工中／已认领：A/C准备，B未实现",
+      "status": "认领失效：B 源码未提交已丢失，需从 B 重做（issue #6 仍 open 占用）",
       "importance": "中",
       "dependsOn": [
         "Shaman 主体与相关能力稳定"
       ],
-      "action": "见issue #6及docs/work-packages/COTW-0046/README.md；请勿重复开发",
+      "action": "重做前先核对 issue #6 占用；A/C/D 结论见 git show 9256b49:docs/work-packages/COTW-0046/；不复用不存在的文件",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L27",
       "currentProfile": "仍需实现、外部模组或核验",
       "ecosystemProfile": "待迁移候选：未找到对应",
@@ -2427,7 +2420,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.47",
       "deliveryEvidence": "outputs/0.14.47交付自检.json",
       "userFeedback01447": {
@@ -2708,7 +2701,7 @@
       "currentProfile": "320条定向/15.00秒；D3通过；真实提供方与玩家边界未测",
       "ecosystemProfile": "本项目已实现，外部依赖按冻结合同原子校验",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0061",
@@ -3032,7 +3025,7 @@
       "currentProfile": "306条隔离定向／14.778秒；真实HA／TTT与实机未测",
       "ecosystemProfile": "本项目新增 HA Investigator 的 Psychic Detective 变体",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0070",
@@ -3061,7 +3054,7 @@
       "currentProfile": "244条隔离定向，D3复跑5/5；真实HA与实机、存档、重训未测",
       "ecosystemProfile": "本项目新增 HA Investigator 的 Cryptid Scholar 变体",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0071",
@@ -3398,7 +3391,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.47",
       "deliveryEvidence": "outputs/0.14.47交付自检.json",
       "userFeedback01447": {
@@ -3457,7 +3450,7 @@
       "currentProfile": "本项目0.14.64完整移植，托管检查与独立复查通过",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": false,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.64",
       "gameAcceptanceInferred": false
     },
@@ -3488,7 +3481,7 @@
       "currentProfile": "仍需实现、外部模组或核验",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": false,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "historicalStatusBeforeWorkTracking": "待迁移候选：未找到对应",
       "currentWorkStatus": "COMPLETED_DEVELOPMENT_TEST"
     },
@@ -3519,7 +3512,7 @@
       "currentProfile": "按原文新实现（0.14.57已交付）",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "delivery01457": {
         "version": "0.14.57",
         "newMigrationItem": true,
@@ -3608,7 +3601,7 @@
       "currentProfile": "按原文新实现（0.14.57已交付）",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "delivery01457": {
         "version": "0.14.57",
         "newMigrationItem": true,
@@ -4044,7 +4037,7 @@
         "scope": "用户确认本轮起点0.14.44；保留历史问题/修复记录，不推定新0.14.45已获用户效果反馈。"
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0085",
@@ -4340,17 +4333,17 @@
       "note": "MCE AntipaladinAdder.cs:44 的 DreadVanguard.AddDreadVanguard() 已被注释；存在源码不算可用职业变体。",
       "priority": "P1",
       "difficulty": "中高",
-      "status": "历史/停用实现：重新核验",
+      "status": "未实现：按用户决定搁置（2026-11-14）；MCE 侧 DreadVanguard.AddDreadVanguard 入口仍被注释",
       "importance": "中",
       "dependsOn": [
         "Antipaladin 主体与相关能力稳定"
       ],
       "action": "先确认维护版本和注册入口，再决定修复、复用或迁移",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L34",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "历史/停用实现：重新核验",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0095",
@@ -4369,17 +4362,17 @@
       "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "已实现并交付：0.14.89–0.14.104 Insinuator（Aura of Glory 双份加成于 0.14.104 修复）",
       "importance": "中",
       "dependsOn": [
         "Antipaladin 主体与相关能力稳定"
       ],
       "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L34",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0096",
@@ -4500,20 +4493,24 @@
           "external": []
         }
       ],
-      "note": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
+      "note": "2026-11-14按用户决定更新：跳过，不实现。用户判断该变体靠领域＋邪魔羁绊＋召唤邪魔支撑，面对游戏实际环境的敌人意义有限。规格只存在于原CotW源码（Classes/Antipaladin.cs createUnholyMinion，第312行起），无第三方资料；已核对：移除Fiendish Boon六段／Aura of Despair(8)／Smite Good额外次数(4、10、16)，新增领域(1)、Fiendish Bond(5/8/11/14/17/20)、Call Fiendish Ally(8)。未推定规则等价。 历史记录：在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。",
       "priority": "P2",
       "difficulty": "高",
-      "status": "待迁移候选：未找到对应",
+      "status": "排除：用户决定跳过（2026-11-14）",
       "importance": "中",
       "dependsOn": [
         "Antipaladin 主体与相关能力稳定"
       ],
-      "action": "进一步比对组件/规则后实施缺口；开发前再次检查重复注册",
+      "action": "不重新开启迁移；保留来源与身份记录",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L34",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "待迁移候选：未找到对应",
-      "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "currentProfile": "用户决定不做",
+      "ecosystemProfile": "排除：用户决定跳过",
+      "userSelectionAllowed": false,
+      "userAnnotationGroup": "未列为正常选题；保留历史条目",
+      "excludeNewImplementation": true,
+      "dedupDisposition": "用户明确跳过；不冒称本包已实现",
+      "historicalEcosystemProfile": "待迁移候选：未找到对应",
+      "historicalNote": "在本轮游戏蓝图及选定源码范围未定位到对应；不是断言整个模组生态不存在实现。"
     },
     {
       "id": "COTW-0099",
@@ -4900,7 +4897,7 @@
       "currentProfile": "105条隔离定向／1.23秒；玩家实机及存档等未测",
       "ecosystemProfile": "本项目已实现原生圣武士变体",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0110",
@@ -4929,7 +4926,7 @@
       "currentProfile": "本项目已纳入0.14.69 Combined TEST",
       "ecosystemProfile": "贡献者已实现，用户接受其测试；PR #8已合入",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0111",
@@ -4958,7 +4955,7 @@
       "currentProfile": "本项目已实现并获玩家确认",
       "ecosystemProfile": "职业、施法、Solo Tactics、Smite、Gang Up、Swift Justice、Aura 与 Ultimate 均已接入并获玩家确认",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0112",
@@ -5113,7 +5110,7 @@
         "nativeSerializedTypes": 4
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "courtBardUserFault20261021": {
         "status": "修复已交付；等候本次效果反馈",
         "evidence": "$WORKSPACE\\work\\court-bard01445",
@@ -5306,7 +5303,7 @@
       "currentProfile": "本项目已纳入0.14.69 Combined TEST",
       "ecosystemProfile": "本项目完整十魂域Wizard变体源码已合入，实际未测边界保留",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0118",
@@ -5815,7 +5812,7 @@
         "scope": "用户确认本轮起点0.14.44；保留历史问题/修复记录，不推定新0.14.45已获用户效果反馈。"
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0127",
@@ -5973,7 +5970,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.54",
       "deliveryEvidence": "outputs/0.14.54交付自检.json",
       "delivery01454": {
@@ -6035,7 +6032,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.54",
       "deliveryEvidence": "outputs/0.14.54交付自检.json",
       "delivery01454": {
@@ -6370,7 +6367,7 @@
       "gameFeedback": "用户确认OK",
       "gameFeedbackDate": "2026-10-19",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0135",
@@ -6513,7 +6510,7 @@
         "scope": "用户确认本轮起点0.14.44；保留历史问题/修复记录，不推定新0.14.45已获用户效果反馈。"
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0136",
@@ -6664,7 +6661,7 @@
         "externalReviewPending": true
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "userFeedback01445": {
         "date": "2026-10-21",
         "result": "正常",
@@ -7483,7 +7480,7 @@
         "externalReviewPending": true
       },
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "userFeedback01445": {
         "date": "2026-10-21",
         "result": "正常",
@@ -14114,15 +14111,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "部分覆盖：0.14.74 已提供 Wild armor 附魔（COTW-01465）；本项要求的特定独特护甲附加与全物品开关未做",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L193",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "部分覆盖、仍需补缺口",
+      "ecosystemProfile": "本包部分实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0293",
@@ -14135,15 +14132,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.82 墙型法术预览，0.14.83 重做并扩展到所有生成区域法术（AreaPreview0293）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L198",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0295",
@@ -14156,15 +14153,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L200",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0296",
@@ -14177,15 +14174,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.74 武器类型 disarm/trip/sunder 特性（含 Weapon Shift 适配）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L202",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0299",
@@ -14975,7 +14972,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.54",
       "deliveryEvidence": "outputs/0.14.54交付自检.json",
       "delivery01454": {
@@ -16699,7 +16696,7 @@
       "currentProfile": "用户指定移除本项目实现",
       "ecosystemProfile": "ECM Blood Havoc实际实现",
       "userSelectionAllowed": false,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveryVersion": "0.14.46",
       "deliveryDate": "2026-10-21",
       "implementationToken": "BloodHavoc01446",
@@ -16788,7 +16785,7 @@
       "currentProfile": "本项目已恢复实现",
       "ecosystemProfile": "ECM当前为空占位；CotW提供实际机制",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveryVersion": "0.14.46",
       "deliveryDate": "2026-10-21",
       "implementationToken": "BloodIntensity01446",
@@ -16865,7 +16862,7 @@
       "currentProfile": "本项目已恢复实现",
       "ecosystemProfile": "ECM当前为空占位；CotW提供实际机制",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveryVersion": "0.14.46",
       "deliveryDate": "2026-10-21",
       "implementationToken": "BloodPiercing01446",
@@ -16942,7 +16939,7 @@
       "currentProfile": "本包已实现",
       "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveryVersion": "0.14.46",
       "deliveryDate": "2026-10-21",
       "implementationToken": "BloodlineFamiliar01446",
@@ -17205,7 +17202,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.47",
       "deliveryEvidence": "outputs/0.14.47交付自检.json",
       "userFeedback01447": {
@@ -17420,7 +17417,7 @@
       "latestRepairTestGuide": "0.14.38时间凝滞与奥术发现修复测试说明.txt",
       "latestRepairEvidence": "$WORKSPACE\\work\\repair01438",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0371",
@@ -17447,7 +17444,7 @@
       "currentProfile": "本包已实现",
       "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveryVersion": "0.14.46",
       "deliveryDate": "2026-10-21",
       "implementationToken": "AdmixtureSchool01446",
@@ -17654,7 +17651,7 @@
       "currentProfile": "本原型已实现",
       "ecosystemProfile": "待迁移候选：未找到对应",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西",
+      "userAnnotationGroup": "暂且搁置的东西",
       "deliveredVersion": "0.14.47",
       "deliveryEvidence": "outputs/0.14.47交付自检.json",
       "userFeedback01447": {
@@ -25508,15 +25505,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L519",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0573",
@@ -25529,15 +25526,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L521",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0576",
@@ -25550,15 +25547,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.84 Allied Spellcaster 同法术加成，0.14.86 修注册失败",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L524",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0582",
@@ -25571,15 +25568,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.75 Kinetic Knight 3 级 Blade Rush，0.14.76 改为等待 provider 就绪后挂载",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L530",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0584",
@@ -25645,7 +25642,7 @@
       "gameFeedback": "用户确认正常",
       "gameFeedbackVersion": "0.14.40",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0598",
@@ -25658,15 +25655,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.87 Animate Dead 桌面规则，0.14.88 修注册失败／次等版本／装备转移",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L546",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0600",
@@ -25679,15 +25676,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.74 Versatile Performance／Expanded Versatility／Martial Performance，0.14.75 改为纯半级加值",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L548",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0609",
@@ -25697,18 +25694,18 @@
       "source": "README.md:557",
       "original": "Universalist wizard Metamagic Mastery changed to work as per pnp",
       "parts": [],
-      "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
+      "note": "0.14.99按桌面规则实现：8级起每日1次、每2级+1次（复用原生 UniversalistSchoolGreaterResource），按 Metamagic 枚举值生成开关（排除 Heighten），开关复用原生超魔 feat 的名称/描述/图标；施法时不改环级与施法时间，按 DefaultCost 扣次数（CompletelyNormal 的 -1 夹到1次），超过最高可施放环则不生效。原生8级固定 Extend/Reach 与12/16/20的免费 Empower/Maximize/Quicken 一并移除。0.14.102：能力栏改成单个父选项（BlueprintActivatableAbility + ActivatableAbilityVariants + ActivationDisable，与原生猎人动物专攻同构），子开关 HiddenInUI 只在父菜单里出现，并用 GetConversions 后置补丁只列出角色已拥有的超魔；Arcane Crafter 改为在重写之后克隆该 progression，因此同样获得新表。0.14.104：修掉注册期 NullReferenceException——事务内校验把 m_Variants 当成 BlueprintActivatableAbility 的字段读取，而它属于 ActivatableAbilityVariants 组件，导致整个模块回滚、Arcane Crafter 连带因守卫抛错；现改为从组件读取。游戏内选取/施法/扣次数/读档未验收。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "本包已实现",
       "importance": "低",
       "dependsOn": [],
-      "action": "有可复现需求才移植，默认不启用广域改动",
+      "action": "按0.14.99说明在游戏内验收，不重复迁移",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L557",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
-      "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
+      "userSelectionAllowed": false,
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0610",
@@ -25721,15 +25718,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "已实现并交付：0.14.85 徒手打击副手开关，0.14.87 改为单独只出一个徒手",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L558",
-      "currentProfile": "仍需实现、外部模组或核验",
-      "ecosystemProfile": "规则复核：不直接搬运",
+      "currentProfile": "已提供/无需重复新建",
+      "ecosystemProfile": "本包已实现",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0614",
@@ -25742,15 +25739,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L564",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0615",
@@ -25763,15 +25760,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L565",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0616",
@@ -25784,15 +25781,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L566",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0617",
@@ -25805,15 +25802,15 @@
       "note": "需先复现本机问题或确认玩法需求，再评估原生/TTT等实现；不按旧游戏补丁数量直接移植。",
       "priority": "P3",
       "difficulty": "高",
-      "status": "规则复核：不直接搬运",
+      "status": "未实现：按用户决定搁置（2026-11-14）",
       "importance": "低",
       "dependsOn": [],
       "action": "有可复现需求才移植，默认不启用广域改动",
       "sourceUrl": "https://github.com/Holic75/KingmakerRebalance/blob/1332fb0db844b7863f484ca978bea2349fe49769/README.md#L567",
-      "currentProfile": "仍需实现、外部模组或核验",
+      "currentProfile": "用户决定搁置",
       "ecosystemProfile": "规则复核：不直接搬运",
       "userSelectionAllowed": true,
-      "userAnnotationGroup": "暂且正常做的东西"
+      "userAnnotationGroup": "暂且搁置的东西"
     },
     {
       "id": "COTW-0640",

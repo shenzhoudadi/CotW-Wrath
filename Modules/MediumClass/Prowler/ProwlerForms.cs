@@ -153,11 +153,27 @@ namespace MediumClass.Prowler
     {
         private static bool Prefix(AutoMetamagic c, ref bool __result)
         {
-            if (c == null || !ProwlerForms.Shaped(c.Owner)) return true;
-            var guid = c.Fact.Blueprint.AssetGuid.ToString();
-            if (guid != ProwlerContent.QuickenedRage && guid != ProwlerContent.QuickenedTirelessRage) return true;
-            __result = false;
-            return false;
+            if (c == null) return true;
+            try
+            {
+                if (!ProwlerForms.Shaped(c.Owner)) return true;
+                var guid = c.Fact?.Blueprint?.AssetGuid.ToString();
+                if (guid == null ||
+                    (guid != ProwlerContent.QuickenedRage && guid != ProwlerContent.QuickenedTirelessRage)) return true;
+                __result = false;
+                return false;
+            }
+            catch
+            {
+                // AutoMetamagic is an EntityFactComponentDelegate. Reading Owner
+                // outside a fact runtime (UI tooltips, ability-availability and
+                // hover passes) throws "ComponentRuntime is unavailable in
+                // current context". An exception here propagates through
+                // UnitPartSpecialMetamagic.GetMetamagic -> CanBeCastByCaster and
+                // makes EVERY spell go dark and unclickable. In that context
+                // there is no shape to suppress, so let vanilla logic run.
+                return true;
+            }
         }
     }
 }

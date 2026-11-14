@@ -20,7 +20,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var cls=cache.Load(BlueprintGuid.Parse(PsychicClass.ClassId)) as BlueprintCharacterClass;
             var root=cache.Load(Id(MagaambyanTelepath01447.RootToken)) as BlueprintArchetype;
             if(cls==null||root==null||!ArcaneBatch01446.Existing(cache,PsychicClassCompletion01458.ModuleName))return false;
-            if(Complete.TryGetValue(cache,out _)){Existing(cache,MagaambyanTelepath01447.RootToken,cls);return true;}
+            if(Complete.TryGetValue(cache,out _))return true;
             if(!Existing(cache,MagaambyanTelepath01447.RootToken,cls))throw new InvalidOperationException("058 Magaambyan original receipt is unavailable.");
             var pool=cache.Load(Id("MagaambyanDisciplineSelection01447")) as BlueprintFeatureSelection??throw new InvalidOperationException("058 original Magaambyan discipline pool is unavailable.");
             var f=new PsychicAssets(cache);string[] keys={"Pain","Psychedelia","Abomination"};

@@ -16,11 +16,11 @@ class SacredTests
             if (!File.Exists(candidate)) candidate = Path.Combine(Path.GetDirectoryName(modulePath), file);
             return File.Exists(candidate) ? Assembly.LoadFrom(candidate) : null;
         };
-        var harmony = Assembly.LoadFrom(Path.Combine(managed, "0Harmony.dll"));
+        var harmony = Assembly.LoadFrom(Path.Combine(managed, "UnityModManager", "0Harmony.dll"));
         using (var hash = SHA256.Create())
-            Check(harmony.GetName().Version.ToString() == "2.0.4.0" &&
+            Check(harmony.GetName().Version.ToString() == "2.3.6.0" &&
                 BitConverter.ToString(hash.ComputeHash(File.ReadAllBytes(harmony.Location))).Replace("-", "") ==
-                "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5", "Pinned game Harmony identity and SHA256");
+                "DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80", "Pinned game Harmony identity and SHA256");
         var game = Assembly.LoadFrom(Path.Combine(managed, "Assembly-CSharp.dll"));
         var module = Assembly.LoadFrom(modulePath);
         var pool = module.GetType("Way_of_the_shield.NewComponents.ContextActionShieldGeneralEnchantPool", true);
