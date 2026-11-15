@@ -5,7 +5,7 @@
 ## 🚧 施工中／已认领，请勿重复开发
 
 - **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C/B 已完成：S-B01 Anger 原生伙伴链状态桥与 S-B02 基础职业、私有 137 行法表、六情绪、完整主人进度均已实现，分支 `feat/cotw-0085-spiritualist`。B 两轮自行复查修复后 210 条隔离定向通过（19.38 秒，含 C13/C14 精确算术），主体编译 0 警告／0 错误，打包与包内 DLL 回读核对 0.602 秒。待 D 独立复查与玩家 TEST；原生链实调用、存读档、重训界面、骑乘按钮等未测。基线 main `bdc4e39` / 0.14.74 TEST。[B 交付](docs/work-packages/COTW-0085/B-summary.md) · [分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md) · [冻结合同](docs/work-packages/COTW-0085/C-spiritualist-contract.md)。
+- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D 独立复查 **NEEDS_FIX，退回 B**。复查 `a293f31`（生产 `39fe319`），主工程编译通过，隔离定向 210/210。原生等级公式复现多一级，伤害转移目标与 Inference 来源隔离等仍需修复。原生完整伙伴链及玩家场景未验收，候选安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[D 复查与接手](docs/work-packages/COTW-0085/D-spiritualist-review.md) · [冻结合同](docs/work-packages/COTW-0085/C-spiritualist-contract.md)。
 
 ## 本次0.14.69 TEST交付
 
