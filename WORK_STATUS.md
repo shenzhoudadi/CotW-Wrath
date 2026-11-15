@@ -5,7 +5,7 @@
 ## 🚧 施工中／已认领，请勿重复开发
 
 - **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
+- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A 盘点与 C 合同已完成，生产尚未开始。维护者协调，B 单一负责人待指定，先接 Anger 原生伙伴生命周期，D 独立复查。基线 main `939e04d` / 0.14.74 TEST。[分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md) · [冻结合同](docs/work-packages/COTW-0085/C-spiritualist-contract.md)。
 
 ## 本次0.14.69 TEST交付
 

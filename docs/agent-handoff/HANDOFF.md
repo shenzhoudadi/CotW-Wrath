@@ -1,5 +1,7 @@
 # 当前交接：从简继续
 
+- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A 已盘点六种情绪和 137 条法术，C 已冻结显现、收回、召回、死亡恢复、跨区与重训。待指定 B 负责人，以 Anger 走首条 Wrath 原生伙伴链。生产尚未开始，实机未测。[分工与接手](../work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
+
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
 - **COTW-0070 Cryptid Scholar** — [0.14.73 Cryptid Scholar TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST)已交付，4/4附件下载一致。D3复查通过，244条本项定向及D3复跑5/5。真实HA、实机、存读档和重训未测。[交接](../work-packages/COTW-0070/README.md) · [验证](../work-packages/COTW-0070/RELEASE-VERIFY.md)。
