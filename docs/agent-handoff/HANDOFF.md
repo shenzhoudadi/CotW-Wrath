@@ -1,5 +1,7 @@
 # 当前交接：从简继续
 
+- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 完成（`eb20191`）；B 首切片（Abjuration）已实现，**开发态未发布**：O-S01 权威 Mental Focus 状态机、O-S02 法器/配额/来源账本、Abjuration 18 根目录与原生适配器，未注册职业/法书/成长、共享注册链未改。合同 `C-0099-20261115-r1`。编译 0 警告/0 错误（3.863 秒），隔离状态模型定向 279 条断言 PASS / 2.837 秒；MF07、MF11 未运行，SP05/SP06 部分覆盖，原生 Wrath 入口、实机、存读档、重训、提供方启用与打包/上传均未运行（本机仅 PowerShell 5.1，build.ps1 要求 7.4）。后续按完整学派分包，齐套后统一注册并交 D 独立复查，不冒充玩家验收。[B 交接与证据](../work-packages/COTW-0099/B-abjuration-slice.md) · [断言报告](../work-packages/COTW-0099/B-slice-report.json)。
+
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
 - **COTW-0070 Cryptid Scholar** — [0.14.73 Cryptid Scholar TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.73-Cryptid-Scholar-TEST)已交付，4/4附件下载一致。D3复查通过，244条本项定向及D3复跑5/5。真实HA、实机、存读档和重训未测。[交接](../work-packages/COTW-0070/README.md) · [验证](../work-packages/COTW-0070/RELEASE-VERIFY.md)。

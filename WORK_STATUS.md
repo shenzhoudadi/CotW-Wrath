@@ -4,7 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 完成，生产实现待 B 开工。范围为八学派、四 Panoply、Mental Focus、独立六环法书和职业成长。A/C 由本会话完成，B 单一整合负责人待维护者指定，D 独立复查。基线主线 `939e04d` / 0.14.74 TEST，工作分支 `feat/cotw-0099-occultist`。B 从 Abjuration 开始。编译、运行时定向、打包及安装包上传均未运行。 [A 盘点](docs/work-packages/COTW-0099/A-occultist-map.md) · [C 合同](docs/work-packages/COTW-0099/C-occultist-contract.md) · [分工](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
+- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。**A/C 完成；B 首切片（Abjuration）已实现，开发态未发布**，后续按完整学派分包。范围为八学派、四 Panoply、Mental Focus、独立六环法书和职业成长。按用户 2026-11-15 指令本会话执行 B 首切片：O-S01 权威状态机、O-S02 法器/配额/来源账本、Abjuration 18 根法术目录及原生适配器；`SlicePublished=false`，未注册职业/法书/成长，共享注册链未改。B 单一整合负责人仍待维护者指定，D 独立复查未开始。基线主线 `939e04d` / 0.14.74 TEST，工作分支 `feat/cotw-0099-occultist`。主工程编译 0 警告/0 错误（首次 3.863 秒）；一次隔离状态模型定向检查 279 条断言 PASS / 2.837 秒，19 条用例按实际状态记录（MF07、MF11 未运行；SP05、SP06 部分覆盖），**原生 Wrath 入口未测**；包内 DLL 6/6 新类型核对通过。打包与安装包上传未运行（本机仅 PowerShell 5.1，build.ps1 要求 7.4），无新发布。 [A 盘点](docs/work-packages/COTW-0099/A-occultist-map.md) · [C 合同](docs/work-packages/COTW-0099/C-occultist-contract.md) · [B 首切片交接与证据](docs/work-packages/COTW-0099/B-abjuration-slice.md) · [断言报告](docs/work-packages/COTW-0099/B-slice-report.json) · [分工](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
 - **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
 
 ## 本次0.14.69 TEST交付
