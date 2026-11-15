@@ -4,7 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
+- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 完成，生产实现待 B 开工。范围为八学派、四 Panoply、Mental Focus、独立六环法书和职业成长。A/C 由本会话完成，B 单一整合负责人待维护者指定，D 独立复查。基线主线 `939e04d` / 0.14.74 TEST，工作分支 `feat/cotw-0099-occultist`。B 从 Abjuration 开始。编译、运行时定向、打包及安装包上传均未运行。 [A 盘点](docs/work-packages/COTW-0099/A-occultist-map.md) · [C 合同](docs/work-packages/COTW-0099/C-occultist-contract.md) · [分工](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
 - **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
 
 ## 本次0.14.69 TEST交付

@@ -1,0 +1,325 @@
+{
+  "contract": "C-0099-20261115-r1",
+  "state": "Specifications only",
+  "entryPoints": "Run through the specified native Wrath paths in B/D. Sample numeric state models supplement the native tests.",
+  "cases": [
+    {
+      "id": "MF01",
+      "phase": "slice",
+      "entry": "Native action and resource path",
+      "setup": "L=5, Int modifier +2, Abjuration and Transmutation known, new rest cycle",
+      "actions": [
+        "Invest Abjuration 4 and Transmutation 2",
+        "Attempt Mind Barrier before locking",
+        "Lock",
+        "Activate Mind Barrier through standard resource payment"
+      ],
+      "expected": [
+        "Before lock G=1, R=4/2, U=0 and no Warding Talisman",
+        "Pre-lock use pays zero and applies no effect",
+        "After lock Mind Barrier gives 10 absorption for its native duration and deducts exactly 1 Abjuration point",
+        "After use G=1, R=3/2, U=1 and Warding Talisman remains +2 resistance"
+      ]
+    },
+    {
+      "id": "MF02",
+      "phase": "slice",
+      "entry": "Native action and guard",
+      "setup": "MF01 after using Mind Barrier",
+      "actions": [
+        "Replenish Abjuration once",
+        "On a full school with a separate fixture where G≥1, try Replenish again",
+        "Try Invest and Reset after lock",
+        "Try changing the physical resonance choice"
+      ],
+      "expected": [
+        "First replenish G=0, R=4/2, U=1 and preserved snapshots",
+        "Full, locked Invest/Reset and attribute change paths preserve the state"
+      ]
+    },
+    {
+      "id": "MF03",
+      "phase": "slice",
+      "entry": "Native payment and duplicate paths",
+      "setup": "L=8, G=3, A[Abjuration]=2, R[Abjuration]=0, valid locked Abjuration snapshot",
+      "actions": [
+        "Invoke Mind Barrier from valid ability",
+        "Call read-only availability repeatedly",
+        "Restore one Abjuration point with Replenish then invoke Mind Barrier",
+        "Re-enter the same execution callback"
+      ],
+      "expected": [
+        "Insufficient school balance cannot use the generic fallback and changes no state",
+        "A valid use consumes one, the duplicate event consumes zero",
+        "Resonance stays present at R=0"
+      ]
+    },
+    {
+      "id": "MF04",
+      "phase": "slice",
+      "entry": "Rest/activation/save lifecycle",
+      "setup": "L=8, Int +2; G=4 after locking/spending, record rest id",
+      "actions": [
+        "Save/reload, reattach resource facts, remove/reapply projection buffs",
+        "Apply temporary Int and expire it",
+        "Complete one successful rest twice by the same event id"
+      ],
+      "expected": [
+        "Day, balances, spent and existing snapshot survive reload and reattachment",
+        "Temporary Int cannot refill",
+        "Rest once gives B=G=10, zero ordinary allocation and no active old resonance"
+      ]
+    },
+    {
+      "id": "MF05",
+      "phase": "full",
+      "entry": "Reset and explicit general cost",
+      "setup": "L=8, Int +2, unlocked, R[Abjuration]=4, G=6",
+      "actions": [
+        "Use Repower Construct on a valid construct corpse",
+        "Attempt the same corpse again",
+        "Reset twice"
+      ],
+      "expected": [
+        "Valid use costs G=1 exactly, fails target check on second use and consumes nothing",
+        "After both resets G=9, U=1, R=0; corpse consumption recorded separately from owner"
+      ]
+    },
+    {
+      "id": "MF06",
+      "phase": "full",
+      "entry": "Connected member native payment",
+      "setup": "Trappings chosen and locked, ordinary R Abjuration=2, Transmutation=2, both snapshots≥1",
+      "actions": [
+        "Run one native approved Counterstrike and repeat the same attack event",
+        "Spend through a multi-point Panoply test action using the same adapter",
+        "Attempt an unaffordable transaction"
+      ],
+      "expected": [
+        "First cost 1 uses Abjuration tie position, repeat consumes zero",
+        "A cost-2 plan from R=1/2 takes Transmutation then Abjuration, leaves 0/1",
+        "Unaffordable plan changes no member or generic balance; snapshots stay"
+      ]
+    },
+    {
+      "id": "MF07",
+      "phase": "full",
+      "entry": "Panoply triggers",
+      "setup": "Mage's Paraphernalia selected; Divination, Evocation and Necromancy invested and locked",
+      "actions": [
+        "Arm Spell Power +2 at L=11",
+        "Cast qualifying spell from 0099 book",
+        "Cast from Psychic book and item",
+        "Try +3 at L=11 and again at L=12",
+        "Try primary effect with insufficient payment"
+      ],
+      "expected": [
+        "Arming costs zero; qualifying cast costs 2 and CL increases by 2",
+        "Foreign and item casts have normal params and no debit",
+        "At 12 +3 costs 3; invalid/insufficient trigger gives no follow-on effect"
+      ]
+    },
+    {
+      "id": "MF08",
+      "phase": "full",
+      "entry": "Mastery scope",
+      "setup": "L=20, Int modifier +5; Mastery Abjuration, A=2 and R=2 for Abjuration, H=4; eligible locked groups",
+      "actions": [
+        "Read Mind Barrier, class list and separate school's power params",
+        "Use Mind Barrier",
+        "Pay one Trappings cost",
+        "Attempt Respec to another school then commit"
+      ],
+      "expected": [
+        "Mind Barrier effective L=24, capacity 48; matching save DC 27, other ordinary focus DC 25; book CL remains 20",
+        "Mind Barrier uses H first (H=3, R=2)",
+        "Trappings leaves H=3",
+        "Respec carries T=1 into new mastery with at most 3 remaining, removes old mastery-only contributions"
+      ]
+    },
+    {
+      "id": "MF09",
+      "phase": "slice",
+      "entry": "Level-up/respec source lifecycle",
+      "setup": "Locked Abjuration R=3, U=1, second same-school slot selected",
+      "actions": [
+        "Discard preview that would remove both slots",
+        "Commit removal of Extra Spells only",
+        "Remove last Abjuration slot while locked",
+        "Respec out and back into 0099 on same day"
+      ],
+      "expected": [
+        "Discard leaves live state byte-for-byte equivalent",
+        "Extra Spells removal preserves school state",
+        "Last removal invalidates Abjuration and dependent Panoplies; Q increases by 3",
+        "No new daily budget or free old snapshot"
+      ]
+    },
+    {
+      "id": "MF10",
+      "phase": "slice",
+      "entry": "Two units and multiclass",
+      "setup": "Unit A is Occultist 5/Psychic 4; unit B is Occultist 1; an unrelated owner has the same action icon",
+      "actions": [
+        "Spend and reset A through native entries",
+        "Check B, Psychic Phrenic and unrelated original resources",
+        "Inspect ranks and DCs",
+        "Try a zero-capacity owner"
+      ],
+      "expected": [
+        "B and foreign resources are untouched",
+        "Occultist effects scale from 5, phrenic pool uses its own rules",
+        "Budget floor 0, no negative or free spend"
+      ]
+    },
+    {
+      "id": "MF11",
+      "phase": "full",
+      "entry": "Reentry and full failure",
+      "setup": "Already armed spend-on-cast, invalidated target or activation and three member pools",
+      "actions": [
+        "Check CanPay then change balance before execution",
+        "Raise a duplicate cast or callback",
+        "Remove a required Panoply member after authorization",
+        "Trigger StickyTouch delivery"
+      ],
+      "expected": [
+        "Execution rechecks and fails atomically",
+        "Same execution identity is charged at most once",
+        "Invalidated source does not pay or grant effect",
+        "StickyTouch delivers a previously paid use"
+      ]
+    },
+    {
+      "id": "SP01",
+      "phase": "slice",
+      "entry": "Native level-up selection",
+      "setup": "New Occultist at level 1, Abjuration first and then Abjuration (Extra Spells)",
+      "actions": [
+        "Try Extra Spells before first selection",
+        "Select two valid slots in order",
+        "Pick MageShield and Warding Weapon from private level 1 list",
+        "Try third Abjuration later"
+      ],
+      "expected": [
+        "Extra Spells unavailable until first slot is set",
+        "One base power and one school resource",
+        "Two roots known at level 1 and exactly six fixed knacks",
+        "Third Abjuration selection rejected"
+      ]
+    },
+    {
+      "id": "SP02",
+      "phase": "slice",
+      "entry": "New circle native selection",
+      "setup": "Two Abjuration slots; Int≥16",
+      "actions": [
+        "Level 4 activates two level-2 selections (Allied Cloak and Resist Energy). Level 16 requests two level-6 selections; pick Globe of Invulnerability for first slot."
+      ],
+      "expected": [
+        "No level-2 quota before level 4",
+        "At 4 each slot gains one valid selection and separate provenance",
+        "At 16 duplicate root and other levels are excluded, second slot remains empty"
+      ]
+    },
+    {
+      "id": "SP03",
+      "phase": "slice",
+      "entry": "Source cleanup and other book",
+      "setup": "One Abjuration slot, MageShield sourced there and via another legal same-book grant; mixed Wizard also knows MageShield",
+      "actions": [
+        "Cancel removal in preview",
+        "Commit replacing Abjuration slot",
+        "Remove another same-book source"
+      ],
+      "expected": [
+        "Cancel restores old quota and data",
+        "Other same-book source and Wizard source survive class-slot removal",
+        "Last same-book source removed; Wizard side survives"
+      ]
+    },
+    {
+      "id": "SP04",
+      "phase": "full",
+      "entry": "Panoply prerequisites",
+      "setup": "New Occultist with two slots at level 1 and more at 2 and 6",
+      "actions": [
+        "Pick Abjuration and Transmutation",
+        "Select Trappings on 2 and try duplicate",
+        "Test Mage's Paraphernalia with 2/3 and 3/3 members",
+        "Lose one of Trappings' members"
+      ],
+      "expected": [
+        "Trappings at 2 gives one union selection per castable level",
+        "Duplicate barred",
+        "Mage's first legal at 6 after all 3 prerequisite schools",
+        "Loss invalidates derived quotas and corresponding known sources"
+      ]
+    },
+    {
+      "id": "SP05",
+      "phase": "full",
+      "entry": "Actual private level and school",
+      "setup": "Final enabled catalog",
+      "actions": [
+        "Inspect 143 A rows and roots, variants, schools and DLC guards",
+        "Learn Hideous Laughter, Mass Daze, Lesser Animate Dead, Control Construct and Spirit-Bound Blade from appropriate known schools"
+      ],
+      "expected": [
+        "Known levels are 1, 4, 2, 6 and 4 respectively for 0099",
+        "Spirit-Bound Blade is Transmutation only",
+        "Any backlink or global spell list data from baseline is unchanged"
+      ]
+    },
+    {
+      "id": "SP06",
+      "phase": "full",
+      "entry": "Provider enabled/disabled/late and saved source",
+      "setup": "Provider file loads three modes; existing save learned Fire Shield from Evocation",
+      "actions": [
+        "Register with no provider, disabled provider, active provider, then active but one broken child",
+        "Restore actual valid provider and reload"
+      ],
+      "expected": [
+        "First two modes skip Fire Shield from new choices",
+        "Valid active root takes one L4 choice and exposes both variants",
+        "Broken child excludes root; no free spell replacement",
+        "Same saved root/provenance resolves and can be used again"
+      ]
+    },
+    {
+      "id": "SP07",
+      "phase": "slice",
+      "entry": "Cross-book psychic mechanics",
+      "setup": "Psychic/Occultist shares spell GUID on each private book; other item uses that GUID",
+      "actions": [
+        "Learn and cast from each book at its own level",
+        "Use Center Self and test thought/emotion and Logical using each intended book",
+        "Attempt Psychic-only amplifications, undercast and discipline effects with 0099 book",
+        "Use shared item ability"
+      ],
+      "expected": [
+        "0099 known grants, slots and CL remain private",
+        "Shared thought/emotion applies only to intended psychic casts",
+        "Psychic-only additions continue to require their specific book",
+        "Item keeps native behavior"
+      ]
+    },
+    {
+      "id": "SP08",
+      "phase": "full",
+      "entry": "Registration atomicity",
+      "setup": "Fresh cache missing one mandatory donor; signed unchanged foreign GUID collision fixture",
+      "actions": [
+        "Attempt full registration",
+        "Repeat after injecting correct donor",
+        "Reload with completion twice"
+      ],
+      "expected": [
+        "Missing donor or collision leaves 0099 unavailable and foreign data intact",
+        "Complete map registers exactly one class entry, one spellbook and complete choices",
+        "No duplicate registrations, replacement or lingering preview ledger"
+      ]
+    }
+  ]
+}
