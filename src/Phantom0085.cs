@@ -96,7 +96,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var devotion = Native<BlueprintFeature>(DevotionId);
             var naturalArmor = Native<BlueprintFeature>(NaturalArmorGrowthId);
             var attrGrowth = Native<BlueprintFeature>(AttributeGrowthId);
-            var multiAttack = Native<BlueprintFeature>("79042cb558544ad42bd2c2c4f2a3b3a5"); // resolved below by name if absent
+            var multiAttack = Native<BlueprintFeature>("a634f97d23662b347872ffcf580495b3");
 
             // DR 5/slashing at 1; DR magic 5/10/15 at 4/8/12; DR 15/- text at 15
             // (original component actually sets 5/slashing; contract keeps code).
@@ -131,7 +131,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     Entry(4, naturalArmor, attrGrowth, drMagic),
                     Entry(5, devotion),
                     Entry(6, naturalArmor, attrGrowth),
-                    Entry(7, multiAttack ?? slamDice),
+                    Entry(7, multiAttack),
                     Entry(8, naturalArmor, attrGrowth),
                     Entry(9, naturalArmor, attrGrowth),
                     Entry(10), Entry(11),
@@ -214,6 +214,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 ?? new Kingmaker.Blueprints.UnitVisualParams();
             visual.BloodType = Kingmaker.Visual.HitSystem.BloodType.BlackUndead;
             visual.FootstepSoundSizeType = Kingmaker.Visual.Sound.FootstepSoundSizeType.Ghost;
+            var spectreVisual = Get(spectre, "Visual");
+            if (spectreVisual != null)
+                AccessTools.Property(visual.GetType(), "Barks").SetValue(visual, AccessTools.Property(spectreVisual.GetType(), "Barks").GetValue(spectreVisual));
             unit.Visual = visual;
             Set(unit, "m_Portrait", Get(spectre, "m_Portrait"));
             return unit;
@@ -1011,7 +1014,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 ActivationType = AbilityActivationType.Immediately,
                 DeactivateImmediately = true,
-                Group = ActivatableAbilityGroup.None,
+                Group = (ActivatableAbilityGroup)850085,
                 WeightInGroup = 1
             }, token, name, description);
             Set(toggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Free);
@@ -1048,8 +1051,16 @@ namespace CallOfTheWild.Wrath.Prototype
             }, "BondedManifestation", "Bonded Manifestation", DescOf(shieldBuff));
             Set(toggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Swift);
             Set(toggle, "m_Buff", Ref<BlueprintBuffReference>(shieldBuff));
+            var tendril8 = BuildTendril(f, character, phantomClass, "BondedTendrils8", "Tendrils Attack",
+                "At 8th level, the spiritualist sprouts ectoplasmic tendrils. As a swift action, she can attack a creature within her melee reach with them, using the damage dice of her manifested phantom.",
+                UnitCommand.CommandType.Swift, fullRound: false);
+            var tendril18 = BuildTendril(f, character, phantomClass, "BondedTendrils18", "Tendrils Attack II",
+                "At 18th level, as a full-round action, the spiritualist can attack all creatures within her melee reach with her tendrils, rolling the attack roll twice and taking the better result.",
+                UnitCommand.CommandType.Standard, fullRound: true);
             var bonded = f.Feature("BondedManifestationFeature", "Bonded Manifestation", DescOf(shieldBuff),
-                Facts(toggle), Grant(resource));
+                Facts(toggle), Grant(resource),
+                ClassLevelGrant(character, 8, tendril8, "Phantom0085Tendrils8Grant"),
+                ClassLevelGrant(character, 18, tendril18, "Phantom0085Tendrils18Grant"));
 
             var dualResource = new IncreaseResourceAmountBySharedValue { name = "Phantom0085DualBond", Value = new ContextValue { ValueType = ContextValueType.Rank } };
             Set(dualResource, "m_Resource", Ref<BlueprintAbilityResourceReference>(resource));
@@ -1058,6 +1069,37 @@ namespace CallOfTheWild.Wrath.Prototype
                 dualResource, Rank(character, "OnePlusDivStep"));
             dualBond.ReapplyOnLevelUp = true;
             return bonded;
+        }
+
+        private static BlueprintFeature BuildTendril(FactoryShim f, BlueprintCharacterClass character, BlueprintCharacterClass phantomClass,
+            string token, string name, string description, UnitCommand.CommandType action, bool fullRound)
+        {
+            var diceBuff = f.Buff(token + "Dice", "", "",
+                new Phantom0085TendrilDice { name = "Phantom0085TendrilDice" + token },
+                Rank(character, "DelayedStartPlusDivStep"));
+            SetEnum(diceBuff, "m_Flags", "HiddenInUi");
+            var diceRank = diceBuff.GetComponent<ContextRankConfig>();
+            Set(diceRank, "m_StepLevel", 3);
+            Set(diceRank, "m_StartLevel", 4);
+            BlueprintBuff rerollBuff = null;
+            if (fullRound)
+            {
+                rerollBuff = f.Buff(token + "Reroll", "", "",
+                    new ModifyD20 { name = "Phantom0085TendrilReroll", Rule = RuleType.AttackRoll, RollsAmount = 1, TakeBest = true });
+                SetEnum(rerollBuff, "m_Flags", "HiddenInUi");
+            }
+            var slam = f.Native<BlueprintItemWeapon>(Spiritualist0085Ids.SlamWeaponId);
+            var ability = f.Ability(token + "Ability", name, description, AbilityType.Supernatural, action, AbilityRange.Touch,
+                PsychicAssets.Run(new Phantom0085TendrilAttack
+                {
+                    name = "Phantom0085Tendril" + token, FullRound = fullRound,
+                    DiceBuff = Ref<BlueprintBuffReference>(diceBuff),
+                    RerollBuff = rerollBuff != null ? Ref<BlueprintBuffReference>(rerollBuff) : null,
+                    Slam = Ref<BlueprintItemWeaponReference>(slam)
+                }));
+            ability.CanTargetEnemies = true;
+            if (fullRound) Set(ability, "m_IsFullRoundAction", true);
+            return f.Feature(token, name, description, Facts(ability));
         }
 
         internal static BlueprintFeature BuildInference(FactoryShim f, BlueprintCharacterClass character, BlueprintCharacterClass phantomClass, bool greater)
@@ -1073,6 +1115,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 new AddStatBonus { name = "Phantom0085InferenceAllyFort", Stat = StatType.SaveFortitude, Value = 2, Descriptor = ModifierDescriptor.Circumstance },
                 new AddStatBonus { name = "Phantom0085InferenceAllyRef", Stat = StatType.SaveReflex, Value = 2, Descriptor = ModifierDescriptor.Circumstance },
                 new AddStatBonus { name = "Phantom0085InferenceAllyWill", Stat = StatType.SaveWill, Value = 2, Descriptor = ModifierDescriptor.Circumstance });
+            ownerBuff.Stacking = StackingType.Stack;
+            allyBuff.Stacking = StackingType.Stack;
             var aura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 10.Feet(), AffectEnemies = false,
@@ -1112,8 +1156,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var ability = f.Ability("PhantomRecallAbility", "Phantom Recall",
                 "At 6th level, as a swift action, a spiritualist can call her manifested phantom to her side. This functions as dimension door, using the spiritualist's caster level. The phantom appears adjacent to the spiritualist (or as close as possible). Once per day at 6th level, plus one additional time per day for every four levels beyond 6th.",
                 AbilityType.Supernatural, UnitCommand.CommandType.Swift, AbilityRange.Personal,
-                PsychicAssets.Run(new Phantom0085Recall { name = "Phantom0085Recall" }),
-                Cost(resource));
+                PsychicAssets.Run(new Phantom0085Recall { name = "Phantom0085Recall" }));
             ability.CanTargetSelf = true;
             return f.Feature("PhantomRecall", "Phantom Recall", NameOf(ability), Facts(ability), Grant(resource));
         }

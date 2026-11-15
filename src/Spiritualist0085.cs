@@ -571,6 +571,7 @@ namespace CallOfTheWild.Wrath.Prototype
             yield return Spiritualist0085Ids.RayCalculateId;
             yield return Spiritualist0085Ids.TouchCalculateId;
             yield return Spiritualist0085Ids.DevotionId;
+            yield return "a634f97d23662b347872ffcf580495b3";
             yield return Spiritualist0085Ids.NaturalArmorGrowthId;
             yield return Spiritualist0085Ids.AttributeGrowthId;
             yield return Spiritualist0085Ids.SkillFocusSelectionId;

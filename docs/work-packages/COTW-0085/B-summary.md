@@ -12,9 +12,9 @@
 
 ## 验证（本机，未启动游戏/UMM）
 
-- 隔离定向：**PASS，193 条断言，0 失败**，20.81 秒（PsychicTests 宿主，`COTW_0085_CASE=spiritualist0085`，`COTW_ARCANE_01446_ONLY=1`）。覆盖 C01 注册/幂等、主人职业与私法表、137 行目录与源环位、六情绪各一 AddPet 与标记单位、Phantom 职业/进度、主人里程碑、Recall 1/2/3/4 与 Bonded 3+L/3+2L 资源形状、意识加值、Potent 互斥、共享根不变。运行器 `tests/Run-Spiritualist0085.py`，提取器 `tests/Extract-Spiritualist0085.py`（172 行原生供体，A 记录指纹全部核验），定向 `tests/Spiritualist0085Tests.cs`。生成件（B-report/B-result/B-directed 日志/计时）含绝对本机路径，按交接约定只留 `C:/Users/xuenc/agent-tools/spiritualist-next/`。
-- 编译：主体全量重编 **4.189 秒，0 警告／0 错误**（游戏 Harmony 2.0.4.0 固定引用）。内置 Medium/WayOfTheShield 源码相对 origin/main 无改动，复用 0.14.74 已暂存产物（本机缺 UMM 0.32.4.0 引用，未重编）。
-- 打包与包内核对：**0.966 秒**，23 条目，三个 DLL 从 ZIP 回读 SHA256 一致。主 DLL `24BD668A925260FB500DB5FB753B6EC03AF74912E937A83C6D6D1DA70CE97886`。本地实验包 `D:/work/release-staging/0.14.74/c19006fd97ce4d188e4c6f0c31378eee/CallOfTheWildWrathPrototype-0.14.74-experimental.zip`（未上传 GitHub，未称 TEST 交付）。
+- 隔离定向：**PASS，202 条断言，0 失败**，19.49 秒（含自行复查新增 9 条）（PsychicTests 宿主，`COTW_0085_CASE=spiritualist0085`，`COTW_ARCANE_01446_ONLY=1`）。覆盖 C01 注册/幂等、主人职业与私法表、137 行目录与源环位、六情绪各一 AddPet 与标记单位、Phantom 职业/进度、主人里程碑、Recall 1/2/3/4 与 Bonded 3+L/3+2L 资源形状、意识加值、Potent 互斥、共享根不变。运行器 `tests/Run-Spiritualist0085.py`，提取器 `tests/Extract-Spiritualist0085.py`（172 行原生供体，A 记录指纹全部核验），定向 `tests/Spiritualist0085Tests.cs`。生成件（B-report/B-result/B-directed 日志/计时）含绝对本机路径，按交接约定只留 `C:/Users/xuenc/agent-tools/spiritualist-next/`。
+- 编译：主体重编 **0 警告／0 错误**（首轮全量 4.189 秒）（游戏 Harmony 2.0.4.0 固定引用）。内置 Medium/WayOfTheShield 源码相对 origin/main 无改动，复用 0.14.74 已暂存产物（本机缺 UMM 0.32.4.0 引用，未重编）。
+- 打包与包内核对：**0.602 秒**，23 条目，三个 DLL 从 ZIP 回读 SHA256 一致。主 DLL `5F60A0E82FB3A8649F517AAF752C3066D87CA5A9FA87B867B30DBEC60B8BDFDC`。本地实验包 `D:/work/release-staging/0.14.74/1adfddc2403c41288c98172d0e8e1fe0/CallOfTheWildWrathPrototype-0.14.74-experimental.zip`（未上传 GitHub，未称 TEST 交付）。
 - `build.ps1` 未运行：本机无 PowerShell 7.4；以等价 dotnet 编译 + python 打包/回读步骤代替，如实记录。
 
 ## 合同修订与差异记录
@@ -25,6 +25,25 @@
 - **Ghoul Touch**：无确认等价根，目录保留、注册时报告缺失，不以假根填空。
 - **可选提供方 SLA**（Stricken Heart / Inflict Pain / Savage Maw / Force Sword）：原子门禁，根缺失则整包不发布；离线测试按 A 审计身份暂存提供方根（含互惠列表发布），真实提供方行为留 D/玩家。
 - **抓取（grappled）门控**：Wrath 无 `UnitCondition.Grappled`；Inference 暂以 Helpless/Unconscious 门控，grappled 判定留 D 确认原生等价状态。
+
+## 自行复查（2026-11-16，B 同会话）
+
+按 C 合同逐条审代码，发现并修复：
+
+1. **PetId 永不初始化（致命）**：原 `BoundPet` 要求 PetId 非空才匹配，而 PetId 只在匹配后赋值——生命周期桥找不到伙伴。改为按 Type+私有标记+双向 Master 解析并收养 PetId；新增主情绪 fact 授权校验与保留类型碰撞保护（碰撞时保留外部单位、停用本次操作）。
+2. **Recall 失败也扣资源**：原用 AbilityResourceLogic 预扣。改为动作内仅在成功移动时扣 1；已在落点（≤5 ft）、收回、阵亡、出区、引用不匹配、次数不足均不扣。
+3. **伤害转移时序与语义**：原在 RuleDealDamage.OnEventDidTrigger 设 RedirectedDamage（只读计算属性，且伤害已结算）。改为 RuleCalculateDamage 全局后置（Result 求和前），按 C13/C14 算精确转移量，用原生 `RedirectedPercent`/`RedirectionTarget` 通道（向上取整百分比，<100 伤害时精确）；新增显现、同区、存活门控；派生伤害不回流（目标互换后各自短路）。难度缩放与 MinHP 钳制下的百分比舍入留 D 核。
+4. **Tether/Bond 未互斥**：两开关改同组 `(ActivatableAbilityGroup)850085`、WeightInGroup=1。
+5. **意识台账串号**：Shared/Fused 共用台账会互删 Skill Focus。改为单一协调器按主情绪 fact/收回/Fused 状态汇总期望集合，再增删 fact 与模式豁免 buff；情绪撤销时确定性回收全部已授 focus。
+6. **Potent 接线错误**：原把次情绪整条进度（含主人 SLA）挂到 Phantom。改为只取 1/7/12/17 四个 `AddFeatureToPet` 内层特性授予同一 Phantom。
+7. **Bonded 未清场**：死亡/显现/休息/跨区复投影时清除 Bonded buff；休息后复投影复活伙伴。
+8. **触手未实现**：补 8 级 Swift / 18 级 Full-round 触手攻击（主情绪 slam 骰、18 级两掷取高 ModifyD20），经 AddFeatureOnClassLevel 授予。
+9. **Inference 叠加**：owner/ally buff 改 StackingType.Stack，两主人独立。
+10. **Multiattack 供体 GUID 错误**：原猜测 GUID 不存在，改原生 `a634f97d23662b347872ffcf580495b3` 并入门禁与提取器。
+11. **骑乘排除**：新增 `AbilityTargetIsSuitableMount.IsTargetRestrictionPassed` 窄前缀，仅拒绝标记的 850085 Phantom；仅有 Phantom 时移除骑乘按钮（原有补丁）。
+12. **视觉 Barks**：补回 Spectre 供体 Barks 复制。
+
+CotW 根 GUID（BurstOfAdrenaline/SavageMaw/ForceSword）经 MD5 盐值核验一致。新增 9 条定向断言覆盖 Recall 扣减、互斥组、Stack、触手授予、Multiattack、DR 15/–。
 
 ## 未测边界（D / 玩家 TEST）
 

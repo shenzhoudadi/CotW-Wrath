@@ -14,6 +14,8 @@ using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Components;
@@ -271,6 +273,32 @@ internal static class Spiritualist0085Tests
             var option = reference.Get();
             Check(option.GetComponent<Kingmaker.Blueprints.Classes.Prerequisites.PrerequisiteNoFeature>() != null, "Potent option " + option.name + " forbids the same primary emotion");
         }
+
+        // ---- Self-review fixes (2026-11-16) ----
+        var recallAbility = Load<BlueprintAbility>(cache, Id("PhantomRecallAbility"));
+        Check(recallAbility.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityResourceLogic>() == null, "recall spends inside the action only on a successful move, not via pre-cost");
+        Check(recallAbility.ComponentsArray.Any(c => c.GetType().Name == "AbilityEffectRunAction"), "recall action present");
+        var tether = Load<BlueprintFeature>(cache, Id("EthericTetherFeature"));
+        var bond = Load<BlueprintFeature>(cache, Id("SpiritualBondFeature"));
+        var tetherToggle = tether.GetComponent<AddFacts>();
+        var bondToggle = bond.GetComponent<AddFacts>();
+        var tetherActivatable = ((BlueprintUnitFactReference[])Get(tetherToggle, "m_Facts")).Select(r => r.Get()).OfType<BlueprintActivatableAbility>().First();
+        var bondActivatable = ((BlueprintUnitFactReference[])Get(bondToggle, "m_Facts")).Select(r => r.Get()).OfType<BlueprintActivatableAbility>().First();
+        Check((int)tetherActivatable.Group == 850085 && (int)bondActivatable.Group == 850085 && tetherActivatable.WeightInGroup == 1 && bondActivatable.WeightInGroup == 1, "Etheric Tether and Spiritual Bond share one mutually exclusive group");
+        var inferenceOwner = Load<BlueprintBuff>(cache, Id("SpiritualInferenceOwner"));
+        var inferenceAlly = Load<BlueprintBuff>(cache, Id("GreaterSpiritualInferenceAlly"));
+        Check(inferenceOwner.Stacking == StackingType.Stack && inferenceAlly.Stacking == StackingType.Stack, "inference buffs stack per owning phantom");
+        var bondedFeature = Load<BlueprintFeature>(cache, Id("BondedManifestationFeature"));
+        var bondedGrants = bondedFeature.GetComponents<AddFeatureOnClassLevel>().ToArray();
+        Check(bondedGrants.Any(g => g.Level == 8) && bondedGrants.Any(g => g.Level == 18), "tendril attacks granted at 8 and 18");
+        Check(bondedGrants.All(g => ((BlueprintFeatureReference)Get(g, "m_Feature")).Get().GetComponent<AddFacts>() != null), "tendril grants carry abilities");
+        var phantomProg2 = phantomClass.Progression;
+        Check(phantomProg2.LevelEntries[6].Features.Any(f => f.AssetGuid == BlueprintGuid.Parse("a634f97d23662b347872ffcf580495b3")), "phantom level 7 grants the native Multiattack donor");
+        var dr15 = Load<BlueprintFeature>(cache, Id("PhantomDR15"));
+        var dr15Comp = dr15.GetComponent<Kingmaker.UnitLogic.FactLogic.AddDamageResistancePhysical>();
+        Check(dr15Comp != null, "dr15 component present");
+        var dr15Value = (Kingmaker.UnitLogic.Mechanics.ContextValue)Get(dr15Comp, "Value");
+        Check(dr15Value.Value == 15 && !dr15Comp.BypassedByForm, "level-15 DR implements the contract 15/- (not the original 5/slashing)");
 
         // ---- Shared roots untouched ----
         Check(ReferenceEquals(cache.Load(inqBook.AssetGuid), inqBook), "Inquisitor spellbook identity preserved");
