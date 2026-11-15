@@ -17,7 +17,7 @@ namespace Kingmaker.Blueprints {
         [MethodImpl(MethodImplOptions.NoInlining)] public int GetMaxAmount(UnitDescriptor unit)=>5;
     }
 }
-namespace Kingmaker.Blueprints.Classes {public class BlueprintFeature:BlueprintScriptableObject{} }
+namespace Kingmaker.Blueprints.Classes {public class BlueprintFeature:BlueprintScriptableObject{} public class BlueprintCharacterClass:BlueprintScriptableObject{} }
 namespace Kingmaker.UnitLogic.Buffs.Blueprints {public class BlueprintBuff:BlueprintScriptableObject{} }
 namespace BlueprintCore.Utils {
     public static class BlueprintTool {
@@ -34,13 +34,24 @@ namespace Kingmaker.EntitySystem.Entities {
         public T Ensure<T>() where T:UnitPart,new(){if(Get<T>() is T p)return p;var n=new T{Owner=this};parts[typeof(T)]=n;return n;}
     }
 }
+namespace Kingmaker.EntitySystem.Stats {
+    public enum StatType { Unknown, Charisma }
+    public class ModifiableValueAttributeStat { public int BonusWithoutTemp; }
+    public class StatsCollection {
+        public int CharismaBonus;
+        public ModifiableValueAttributeStat GetStat(StatType stat)=>
+            new(){BonusWithoutTemp=stat==StatType.Charisma?CharismaBonus:0};
+    }
+}
 namespace Kingmaker.UnitLogic {
     public class UnitPart {public Kingmaker.EntitySystem.Entities.UnitEntityData Owner;}
-    public class Progression {public int MythicLevel;}
+    public class ClassData {public Kingmaker.Blueprints.Classes.BlueprintCharacterClass CharacterClass;public int Level;}
+    public class Progression {public int MythicLevel;public List<ClassData> Classes=new();}
     public class UnitDescriptor {
         public Kingmaker.EntitySystem.Entities.UnitEntityData Unit;
         public UnitAbilityResourceCollection Resources;
         public Progression Progression=new(); public BuffCollection Buffs=new();
+        public Kingmaker.EntitySystem.Stats.StatsCollection Stats=new();
         public HashSet<BlueprintScriptableObject> Facts=new();
         public bool HasFact(BlueprintScriptableObject fact)=>Facts.Contains(fact)||Buffs.Active.Contains(fact);
         public UnitDescriptor(){Unit=new(){Descriptor=this};Resources=new(this);}
@@ -111,7 +122,7 @@ namespace MediumClass.Medium.NewUnitParts { public class UnitPartMedium:UnitPart
 namespace MediumClass.Medium {
     internal static class HardenedSoul { internal const string FeatureGuid="28224e93-7791-4385-bc98-5bd6e1c4f56d"; internal static bool HasFeature(UnitDescriptor owner)=>owner?.HasFact(BlueprintCore.Utils.BlueprintTool.Get<Kingmaker.Blueprints.Classes.BlueprintFeature>(FeatureGuid))==true; }
     internal static class MythicInfluence {internal const string FeatureGuid="ae859d6d-ffb3-4ba4-93c7-f6458f02db1e";}
-    internal static class MultiSpiritRules {internal static int NextChannelCost(Kingmaker.EntitySystem.Entities.UnitEntityData owner)=>Math.Max(1,owner.Get<NewUnitParts.UnitPartMedium>()?.ActiveSpiritClasses.Count ?? 0);}
+    internal static class MultiSpiritRules {internal static int NextChannelCost(Kingmaker.EntitySystem.Entities.UnitEntityData owner)=>1;}
 }
 // The archetype's blueprints cannot be built offline; only its rule hook is modelled.
 namespace MediumClass.Features.MediumSpecific {

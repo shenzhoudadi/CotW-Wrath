@@ -64,7 +64,17 @@ var surgeBp=BlueprintTool.Get<BlueprintScriptableObject>(Guids.SpiritSurgeAbilit
 var harmony=new Harmony("MediumClass.tests.influence");
 harmony.PatchAll(typeof(MediumInfluenceRules).Assembly);
 Console.WriteLine("Installed production patches on explicit API doubles with Harmony "+typeof(Harmony).Assembly.GetName().Version);
-UnitDescriptor Fresh(){var u=new UnitDescriptor();u.Resources.Add(common,false);u.Unit.Ensure<UnitPartMedium>();return u;}
+// The reworked cap is 3 + half the Medium class level + the Charisma modifier.
+// Level 4 with Cha 0 keeps the historical cap of 5 (3 + 2 + 0), so every
+// capacity assertion below still describes the same boundary; the formula
+// itself is asserted explicitly at the end of this section.
+var mediumClass=new BlueprintCharacterClass{AssetGuid=BlueprintGuid.Parse(Guids.Medium)};
+UnitDescriptor Fresh(int mediumLevel=4,int charisma=0){
+    var u=new UnitDescriptor();u.Resources.Add(common,false);u.Unit.Ensure<UnitPartMedium>();
+    u.Progression.Classes.Add(new ClassData{CharacterClass=mediumClass,Level=mediumLevel});
+    u.Stats.CharismaBonus=charisma;
+    return u;
+}
 AbilityData Ability(UnitDescriptor u,BlueprintScriptableObject bp=null,int cost=1)=>new(){Caster=u,Blueprint=bp??new(){AssetGuid=BlueprintGuid.Parse(Guid.NewGuid().ToString())},ResourceLogic=new(){RequiredResource=common,Amount=cost}};
 var hero=Fresh();
 Equal(0,MediumInfluenceRules.Amount(hero),"fresh starts zero");
@@ -74,17 +84,18 @@ var channel=Ability(hero,channelBp);
 var convertedSlot=new MechanicActionBarSlotSpell{Spell=channel};
 Equal("0/5",convertedSlot.GetCountText(0),"converted spell counterlabel");
 Equal(5,convertedSlot.GetResource(),"converted spell retains availability atzerocounter");
-for(int nth=1;nth<=3;nth++){
-    Equal(Math.Max(1,nth-1),channel.ResourceLogic.CalculateCost(channel),"channel dynamic cost");
+// 神话多重降灵重做后每次降灵都是 1 点，不再随人数递增。
+for(int nth=1;nth<=5;nth++){
+    Equal(1,channel.ResourceLogic.CalculateCost(channel),"channel cost is always one point");
     channel.ResourceLogic.Spend(channel);
     hero.Unit.Get<UnitPartMedium>().ActiveSpiritClasses.Add("spirit"+nth);
 }
-Equal(4,MediumInfluenceRules.Amount(hero),"first+second+third = 1+1+2");
-Equal(3,channel.ResourceLogic.CalculateCost(channel),"fourth +3");
-Equal(0,AbilityCastRateUtils.GetAvailableCastsCountFromResources(channel),"cannot fit fourth at cap5");
-Check(hero.Buffs.Active.Contains(penalty),"penalty active at4");
+Equal(5,MediumInfluenceRules.Amount(hero),"five channels accumulate five points");
+Equal(1,channel.ResourceLogic.CalculateCost(channel),"a sixth channel still costs one point");
+Equal(0,AbilityCastRateUtils.GetAvailableCastsCountFromResources(channel),"cannot fit a sixth channel at cap5");
+Check(hero.Buffs.Active.Contains(penalty),"penalty active at5");
 var paid=Ability(hero);paid.ResourceLogic.Spend(paid);
-Equal(5,MediumInfluenceRules.Amount(hero),"paid adds to cap");
+Equal(5,MediumInfluenceRules.Amount(hero),"paid channel at cap is refused");
 Check(!hero.Resources.HasEnoughResource(common,1),"no paid casts at cap");
 var surge=Ability(hero,surgeBp);hero.Unit.Get<UnitPartMedium>().FreeSurgeAmount=2;
 Equal(0,surge.ResourceLogic.CalculateCost(surge),"free surge cost0");
@@ -197,6 +208,13 @@ Equal(0,MediumInfluenceRules.Amount(ordinary),"ordinary medium starts zero");
 ordinary.Unit.Get<UnitPartMedium>().ActiveSpiritClasses.Add("champion");
 MediumInfluenceRules.TryAccept(ordinary,2);
 Equal(5,MediumInfluenceRules.Cap(ordinary),"ordinary medium cap unchanged");
+// 新公式：3 + 通灵者等级的一半（向下取整）+ 魅力调整值，负数下限 0。
+Equal(5,MediumInfluenceRules.BaseCap(Fresh()),"base cap: 3 + level 4 half 2 + cha 0");
+Equal(13,MediumInfluenceRules.BaseCap(Fresh(20,0)),"base cap: 3 + level 20 half 10");
+Equal(17,MediumInfluenceRules.BaseCap(Fresh(20,4)),"base cap: 3 + level 20 + cha 4");
+Equal(6,MediumInfluenceRules.BaseCap(Fresh(1,3)),"base cap: level 1 floors half to 0");
+Equal(0,MediumInfluenceRules.BaseCap(Fresh(0,-5)),"base cap: negative modifier floors at 0");
+Equal(0,MediumInfluenceRules.BaseCap(null),"base cap: null owner");
 Check(!ordinary.Buffs.Active.Contains(penalty),"ordinary medium below threshold has no penalty");
 MediumInfluenceRules.TryAccept(ordinary,1);
 Check(ordinary.Buffs.Active.Contains(penalty),"ordinary medium still needs 3 influence");

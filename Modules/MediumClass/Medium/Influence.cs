@@ -43,21 +43,16 @@ namespace MediumClass.Medium
                 .AddComponent<MediumInfluencePenaltyComponent>()
                 .Configure();
 
+            // Mirror of MediumInfluenceRules.BaseCap: 3 plus half the Medium class
+            // level plus the Charisma modifier. InfluenceCapPatch replaces
+            // GetMaxAmount for every influence resource, so this block is the
+            // fallback for paths that bypass the patch, not the live formula.
             var resource = AbilityResourceConfigurator.New(FeatName + "Resource", Guids.MediumInfluenceResource)
-                .SetMaxAmount(new BlueprintAbilityResource.Amount
-                {
-                    BaseValue = 5,
-                    IncreasedByLevel = false,
-                    IncreasedByLevelStartPlusDivStep = false,
-                    StartingLevel = 0,
-                    StartingIncrease = 0,
-                    LevelStep = 0,
-                    PerStepIncrease = 0,
-                    MinClassLevelIncrease = 0,
-                    IncreasedByStat = false,
-                    ResourceBonusStat = StatType.Charisma
-                })
-                .SetMax(10)
+                .SetMaxAmount(ResourceAmountBuilder.New(3)
+                    .IncreaseByLevelStartPlusDivStep(classes: new[] { Guids.Medium },
+                        otherClassLevelsMultiplier: 0f, startingLevel: 0, startingBonus: 0,
+                        levelsPerStep: 2, bonusPerStep: 1, minBonus: 0)
+                    .IncreaseByStat(StatType.Charisma))
                 .SetUseMax(false)
                 .Configure();
 

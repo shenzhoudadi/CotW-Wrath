@@ -113,6 +113,8 @@ namespace Kingmaker.UnitLogic.Buffs
     {
         public List<Buff> Enumerable = new();
         public void RemoveFact(Buff buff) => Enumerable.Remove(buff);
+        public void RemoveFact(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff blueprint) =>
+            Enumerable.RemoveAll(b => b.Blueprint == blueprint);
         public Buff AddBuff(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff blueprint, object context, TimeSpan duration)
         {
             var buff = new Buff { Blueprint = blueprint };
@@ -346,6 +348,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             SpiritIntermediatePowerMove, SpiritIntermediatePowerSwift, SpiritOverwriteIntermediate,
             SpiritGreaterPower, SpiritOverwriteGreater, SpiritSupremePower;
     }
+    internal static class MediumSpiritualDefenseComponent { public static void RefreshFor(Kingmaker.EntitySystem.Entities.UnitEntityData owner) { } }
+    internal static class MediumAdvancedWeaponTrainingComponent { public static void RefreshFor(Kingmaker.EntitySystem.Entities.UnitEntityData owner) { } }
 }
 namespace BlueprintCore.Blueprints.References
 {

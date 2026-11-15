@@ -339,6 +339,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
         public Kingmaker.EntitySystem.Stats.StatType[] Stats;
         public Kingmaker.EntitySystem.Stats.StatType[] Penalties;
     }
+    internal static class MediumSpiritualDefenseComponent { public static void RefreshFor(Kingmaker.EntitySystem.Entities.UnitEntityData owner) { } }
+    internal static class MediumAdvancedWeaponTrainingComponent { public static void RefreshFor(Kingmaker.EntitySystem.Entities.UnitEntityData owner) { } }
 }
 
 // ---- 0.3.4 Death Curse toggle action, restriction and migration ---------------------------------------------------

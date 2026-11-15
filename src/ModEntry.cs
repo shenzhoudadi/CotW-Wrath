@@ -21,6 +21,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static bool deferredPatchesAttempted;
         private static readonly ConditionalWeakTable<BlueprintsCache, RegistrationRetry01444> registrations = new ConditionalWeakTable<BlueprintsCache, RegistrationRetry01444>();
         private static bool registrationCompleted;
+        private static int optionalPasses;
         private static readonly ModMenuIntegration menu = new ModMenuIntegration();
         private static readonly Dictionary<string, string> moduleStates = ModuleCatalog.InitialStates();
         internal static ModuleStatus[] GetModuleStatuses() => ModuleCatalog.Snapshot(moduleStates);
@@ -162,7 +163,16 @@ namespace CallOfTheWild.Wrath.Prototype
             // A provider may have registered after our cache postfix. Repair only
             // the optional lists after retrying failed initial publications.
             // Existing successful provider reconciliation remains unchanged.
+            // Keep the settings-menu path cheap: RegisterOptional is idempotent
+            // per module, but every pass still forces ~40 cache.Load probes and
+            // re-runs providers that failed on a serialized-content mismatch.
+            // Run it once, then only while something is still pending (max 3).
+            int passes = Volatile.Read(ref optionalPasses);
+            if (passes >= 3) return;
+            if (passes > 0 && (!registrations.TryGetValue(cache, out var current) ||
+                               current.PendingCount == 0)) return;
             if (Interlocked.CompareExchange(ref registrationInProgress, 1, 0) != 0) return;
+            Interlocked.Increment(ref optionalPasses);
             registrations.TryGetValue(cache, out state);
             try { BlueprintRegistration.RegisterOptional(cache, (name, succeeded, error) => {
                 if (succeeded) state?.Complete(name);
@@ -176,12 +186,12 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (modification == null || !registrationCompleted) return;
             RegisterMenu(menu, ModMenuIntegration.FindAssembly(), modification, modification.Manifest.Version,
-                WriteDiagnostics, message => modification.Logger.Error(message));
+                message => modification.Logger.Log(message), message => modification.Logger.Error(message));
         }
 
         internal static void RegisterMenu(ModMenuIntegration integration, Assembly assembly, OwlcatModification mod,
             string version, Action<string> log, Action<string> error) =>
-            integration.TryRegister(assembly, mod, version, GetModuleStatuses(), log, error);
+            integration.TryRegister(assembly, mod, version, log, error);
 
         // Runs before ModMenu's SettingsVM postfix builds its dropdown. Also handles a
         // dependency loaded after the blueprint cache, without running Unity on a worker thread.

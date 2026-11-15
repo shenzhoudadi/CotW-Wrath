@@ -117,12 +117,22 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(container,"m_Features",Array.Empty<BlueprintFeatureReference>());Set(container,"m_AllFeatures",Array.Empty<BlueprintFeatureReference>());
             RetireLegacySelection(cache,container);
         }
+        static readonly ConditionalWeakTable<BlueprintsCache, object> RetiredLegacyCaches = new ConditionalWeakTable<BlueprintsCache, object>();
+        static System.Reflection.FieldInfo cachedEntryBlueprintField;
         static BlueprintFeatureSelection[] SelectionSnapshot(BlueprintsCache cache){
-            var gate=Get(cache,"m_Lock");var loaded=(IDictionary)Get(cache,"m_LoadedBlueprints");var field=AccessTools.Field(loaded.GetType().GetGenericArguments()[1],"Blueprint");object[] entries=null;
+            var gate=Get(cache,"m_Lock");var loaded=(IDictionary)Get(cache,"m_LoadedBlueprints");
+            var field=cachedEntryBlueprintField ?? (cachedEntryBlueprintField = AccessTools.Field(loaded.GetType().GetGenericArguments()[1],"Blueprint"));
+            object[] entries=null;
             for(int attempt=0;;attempt++)try{lock(gate){entries=new object[loaded.Count];loaded.Values.CopyTo(entries,0);}break;}catch(Exception e)when(attempt<2&&(e is InvalidOperationException||e is ArgumentException||e is IndexOutOfRangeException)){}
-            return entries.Where(e=>e!=null).Select(e=>field.GetValue(e)).OfType<BlueprintFeatureSelection>().ToArray();
+            var result = new List<BlueprintFeatureSelection>(256);
+            for (int i = 0; i < entries.Length; i++) {
+                var e = entries[i];
+                if (e != null && field.GetValue(e) is BlueprintFeatureSelection sel) result.Add(sel);
+            }
+            return result.ToArray();
         }
         static void RetireLegacySelection(BlueprintsCache cache,BlueprintFeatureSelection container) {
+            if (RetiredLegacyCaches.TryGetValue(cache, out _)) return;
             var snapshot=SelectionSnapshot(cache).Where(p=>!ReferenceEquals(p,container)).ToArray();
             bool ready;try{ready=PrestigeReady(cache);}catch{ready=false;}
             bool Keep(BlueprintFeatureSelection pool,BlueprintFeatureReference reference)=>reference==null||reference.Guid!=Id(SelectionToken)&&(ready&&pool.AssetGuid==BlueprintGuid.Parse(PrestigeSelection)||!RootTokens.Any(t=>reference.Guid==Id(t)));
@@ -130,6 +140,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var before=changed.Select(p=>new[]{Get(p,"m_Features"),Get(p,"m_AllFeatures")}).ToArray();
             try{foreach(var pool in changed)foreach(string field in new[]{"m_Features","m_AllFeatures"}){var refs=Get(pool,field) as BlueprintFeatureReference[];if(refs!=null)Set(pool,field,refs.Where(r=>Keep(pool,r)).ToArray());}}
             catch{for(int i=0;i<changed.Length;i++){Set(changed[i],"m_Features",before[i][0]);Set(changed[i],"m_AllFeatures",before[i][1]);}throw;}
+            RetiredLegacyCaches.GetOrCreateValue(cache);
         }
         static void OptionalVersatile(BlueprintsCache cache, BlueprintFeatureSelection container) {
             try{ConnectPrestige(cache);LastOptionalDiagnostic=null;}
@@ -193,14 +204,18 @@ namespace CallOfTheWild.Wrath.Prototype
                     var asset=publication.Assets[i];
                     if (!ReferenceEquals(cache.Load(asset.AssetGuid), asset))
                         throw new InvalidOperationException("01435 published masterpiece graph identity changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]");
-                    var current=Definition(asset);
-                    if(BlueprintRegistration.StrictPublishedGraphChecks&&current!=publication.Definitions[i])
-                        throw new InvalidOperationException("01435 published masterpiece graph changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]; "+Migration01426.Difference(publication.Definitions[i],current));
-                    if(BlueprintRegistration.StrictPublishedGraphChecks&&asset.ComponentsArray.Any(c=>c==null||!ReferenceEquals(c.OwnerBlueprint,asset)))
-                        throw new InvalidOperationException("01435 published masterpiece component ownership changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]");
+                    if (BlueprintRegistration.StrictPublishedGraphChecks) {
+                        var current=Definition(asset);
+                        if(current!=publication.Definitions[i])
+                            throw new InvalidOperationException("01435 published masterpiece graph changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]; "+Migration01426.Difference(publication.Definitions[i],current));
+                        if(asset.ComponentsArray.Any(c=>c==null||!ReferenceEquals(c.OwnerBlueprint,asset)))
+                            throw new InvalidOperationException("01435 published masterpiece component ownership changed: "+token+"; asset="+asset.name+" ["+asset.AssetGuid+"]");
+                    }
                 }
-                var containerDefinition=Definition(publication.Container);
-                if(BlueprintRegistration.StrictPublishedGraphChecks&&containerDefinition!=publication.ContainerDefinition)throw new InvalidOperationException("01435 published masterpiece container changed; "+Migration01426.Difference(publication.ContainerDefinition,containerDefinition));
+                if (BlueprintRegistration.StrictPublishedGraphChecks) {
+                    var containerDefinition=Definition(publication.Container);
+                    if(containerDefinition!=publication.ContainerDefinition)throw new InvalidOperationException("01435 published masterpiece container changed; "+Migration01426.Difference(publication.ContainerDefinition,containerDefinition));
+                }
                 AppendTransactional(cache, publication.Container, publication.Root); OptionalVersatile(cache,publication.Container); return;
             }
             var f = new PsychicAssets(cache); var container = Container(f);var ledger=KnownSource(f);

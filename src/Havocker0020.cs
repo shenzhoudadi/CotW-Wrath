@@ -2,6 +2,7 @@
 // (MIT), Classes/Witch.cs. Native mechanics remain owned by Owlcat.
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -116,6 +117,15 @@ namespace CallOfTheWild.Wrath.Prototype
         // visibility tests and condition facts are references to eligibility,
         // not new grants. Inverse prerequisite indexes and class libraries are
         // never followed. Shared projectile/status/property assets stay native.
+        static readonly ConcurrentDictionary<Type, FieldInfo[]> ExecutionFieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
+        static FieldInfo[] ExecutionFields(Type type) => ExecutionFieldCache.GetOrAdd(type, t => {
+            var list = new List<FieldInfo>();
+            for (var c = t; c != null && c != typeof(object) && c != typeof(BlueprintComponent) && c != typeof(Element); c = c.BaseType)
+                foreach (var f in c.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                    if (!f.IsStatic) list.Add(f);
+            return list.ToArray();
+        });
+
         static IEnumerable<BlueprintScriptableObject> ExecutionEdges(KineticistClassBridge0020 graph, object value, string fieldName, HashSet<object> seen, string ownerType = null) {
             if (value == null) yield break;
             if (value is BlueprintReferenceBase reference) {
@@ -135,9 +145,8 @@ namespace CallOfTheWild.Wrath.Prototype
             if (value is Prerequisite || value is Condition || type.Name.StartsWith("AbilityShowIf", StringComparison.Ordinal) || type.Name.StartsWith("AbilityHideIf", StringComparison.Ordinal)) yield break;
             if (!type.IsValueType && !seen.Add(value)) yield break;
             if (value is IEnumerable list) { foreach (var item in list) foreach (var edge in ExecutionEdges(graph, item, fieldName, seen, ownerType)) yield return edge; yield break; }
-            for (var t = type; t != null && t != typeof(object) && t != typeof(BlueprintComponent) && t != typeof(Element); t = t.BaseType)
-                foreach (var field in t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Where(f => !f.IsStatic))
-                    foreach (var edge in ExecutionEdges(graph, field.GetValue(value), field.Name, seen, type.FullName)) yield return edge;
+            foreach (var field in ExecutionFields(type))
+                foreach (var edge in ExecutionEdges(graph, field.GetValue(value), field.Name, seen, type.FullName)) yield return edge;
         }
         static void Expand(KineticistClassBridge0020 graph, IEnumerable<BlueprintScriptableObject> roots) {
             var queue = new Queue<BlueprintScriptableObject>(roots); var visited = new HashSet<BlueprintGuid>();

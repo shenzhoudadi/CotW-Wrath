@@ -249,6 +249,49 @@ foreach(var ability in new[]{Guids.SpiritSurgeAbility,Guids.MarshalMarshalsOrder
     Equal(5,allyCheck.Bonus.Total,"ally attributes use granting Marshal terms");order.OnTurnOff();
 }
 
+// Assured Surge (Spirit Affinity): every surge die is rolled twice and the higher result kept.
+{
+    var assuredDie=new ScriptedDie();
+    assuredDie.Script(2,5);
+    Equal(5,SpiritSurgeMath.Draw(6,assuredDie,assuredSurge:true),"assured surge keeps the higher of two d6");
+    Equal(2,assuredDie.Sides.Count,"assured surge draws the die twice");
+    Equal(6,assuredDie.Sides[0],"both draws use the same die type");
+    assuredDie.Script(4);
+    Equal(4,SpiritSurgeMath.Draw(6,assuredDie,assuredSurge:false),"a plain surge draws once");
+    Equal(1,assuredDie.Sides.Count,"and only once");
+    assuredDie.Script(6,1);
+    Equal(6,SpiritSurgeMath.Draw(6,assuredDie,assuredSurge:true),"the higher result wins whatever the order");
+    assuredDie.Script(1,3,2,8);
+    var assuredRoll=SpiritSurgeMath.RollDice(20,false,true,false,s=>SpiritSurgeMath.Draw(s,assuredDie,true));
+    Equal(3,assuredRoll.Results[0],"first d8 keeps the higher of 1 and 3");
+    Equal(8,assuredRoll.Results[1],"second d8 keeps the higher of 2 and 8");
+    Equal(4,assuredDie.Sides.Count,"two dice still mean four draws, not two");
+
+    // Recording both draws for combat log display
+    assuredDie.Script(2,5);
+    var recorded=SpiritSurgeMath.RollDice(1,false,false,false,assuredDie,assuredSurge:true);
+    Check(recorded.HasRerolls,"assured surge records reroll draws");
+    Equal(5,recorded.Results[0],"recorded roll keeps higher");
+    Equal(2,recorded.FirstDraws[0],"recorded first draw");
+    Equal(5,recorded.SecondDraws[0],"recorded second draw");
+
+    // Component integration with AssuredSurge enabled
+    var assuredCaster=Caster(false,false,name:"Assured");
+    assuredCaster.AssuredSurge=true;
+    var oldRnd=typeof(MediumSpiritSurgeComponent).GetField("rnd",BindingFlags.Static|BindingFlags.NonPublic).GetValue(null);
+    typeof(MediumSpiritSurgeComponent).GetField("rnd",BindingFlags.Static|BindingFlags.NonPublic).SetValue(null,assuredDie);
+    try {
+        assuredDie.Script(2,5);
+        var comp=Apply(assuredCaster,assuredCaster,Guids.SpiritSurgeAbility);
+        var rep=CombatLog.Reports.Last(r=>r.Unit==assuredCaster).Report;
+        Check(rep.Roll.HasRerolls && rep.Roll.FirstDraws[0]==2 && rep.Roll.SecondDraws[0]==5,"component report preserves both reroll draws");
+        Equal(5+6,Total(assuredCaster,StatType.AdditionalAttackBonus),"component applies kept higher roll");
+        comp.OnTurnOff();
+    } finally {
+        typeof(MediumSpiritSurgeComponent).GetField("rnd",BindingFlags.Static|BindingFlags.NonPublic).SetValue(null,oldRnd);
+    }
+}
+
 Console.WriteLine($"PASS: {checks} real SpiritSurge component checks over explicit game API doubles (single draw per instance, save/load, report vs. applied modifiers); not Unity gameplay.");
 
 sealed class ScriptedDie:Random {

@@ -8,6 +8,7 @@ using BlueprintCore.Blueprints.References;
 using BlueprintCore.Utils;
 using BlueprintCore.Utils.Types;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -214,7 +215,7 @@ namespace MediumClass.Medium
 
             var robin = Spirits.RobinHood.RobinHood.ChannelAbility();
 
-            FeatureConfigurator.New(FeatName, Guids.MediumChannelSpirit)
+            Feature = FeatureConfigurator.New(FeatName, Guids.MediumChannelSpirit)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon(AbilityRefs.ShamanWanderingHexAbility.Reference.Get().Icon)
@@ -322,5 +323,13 @@ namespace MediumClass.Medium
                 .AddFacts(new() { a, c, g, h, m, t, ad, robin })
                 .Configure();
         }
+
+        /// <summary>
+        /// The channel feature. Its fact list is the single source of truth for
+        /// "which legends exist": <see cref="LegendVariants"/> reads the channel
+        /// abilities from it, so Astral Beacon and Trance of Many pick up a new
+        /// legend (including future legendary spirits) without being edited.
+        /// </summary>
+        internal static BlueprintFeature Feature;
     }
 }

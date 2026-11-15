@@ -43,6 +43,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
                 else if (buff.Blueprint == BlueprintTool.Get<BlueprintBuff>(Guids.MediumSpiritInfluenceBuff))
                     buff.CallComponents<MediumContextSpiritInfluenceComponent>(c => c.RefreshAllies());
             }
+            MediumSpiritualDefenseComponent.RefreshFor(Owner);
+            MediumAdvancedWeaponTrainingComponent.RefreshFor(Owner);
         }
 
         public BlueprintCharacterClassReference Spirit;

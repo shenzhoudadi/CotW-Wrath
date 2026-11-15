@@ -69,15 +69,27 @@ namespace MediumClass.Medium
                 // A saved channel with unrecoverable choice is not a new session.
                 // Replacing its buff would reset influence inside OnDeactivate.
                 return !owner.HasFact(BlueprintTool.Get<BlueprintBuff>(Guids.MediumChannelSpiritPrimarySpiritBuff));
-            return owner.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicSpirits.MultipleSpiritsGuid));
+            if (!owner.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicSpirits.MultipleSpiritsGuid))) return false;
+            // The mythic ability buys one extra legend, two from mythic rank 7.
+            // It is a hard cap: without it a medium channels exactly one.
+            return state.ActiveSpiritClasses.Count() < MaxSpirits(owner);
         }
+
+        /// <summary>
+        /// How many legends may be channeled at once: the primary spirit plus
+        /// the mythic ability's extra one, plus a second extra from mythic rank
+        /// 7. Temporary lends (Astral Beacon, Trance of Many) are not channeled
+        /// and never count here.
+        /// </summary>
+        internal static int MaxSpirits(UnitEntityData owner) =>
+            (owner?.Descriptor?.Progression?.MythicLevel ?? 0) >= 7 ? 3 : 2;
 
         private static readonly (string Legendary, string Tier)[] LegendaryTiers = {
             (Guids.Adriel, Guids.Champion),
             (Guids.RobinHood, Guids.Trickster)
         };
 
-        private static bool SameTierConflict(UnitPartMedium state, BlueprintCharacterClassReference spirit)
+        internal static bool SameTierConflict(UnitPartMedium state, BlueprintCharacterClassReference spirit)
         {
             var id = spirit.Get().AssetGuid;
             foreach (var (legendary, tier) in LegendaryTiers)
@@ -92,8 +104,7 @@ namespace MediumClass.Medium
 
         // A legendary spirit shares its base tier's Spirit Focus: channeling
         // Adriel benefits from 英灵专攻（勇士）.
-        internal static int EffectiveSpiritFocus(UnitPartMedium medium, BlueprintCharacterClassReference spirit)
-        {
+        internal static int EffectiveSpiritFocus(UnitPartMedium medium, BlueprintCharacterClassReference spirit)        {
             if (spirit?.Get() == null || !medium.Spirits.TryGetValue(spirit, out var entry)) return 0;
             int focus = entry.SpiritFocus;
             var id = spirit.Get().AssetGuid;
@@ -106,7 +117,8 @@ namespace MediumClass.Medium
             return focus;
         }
 
-        internal static int NextChannelCost(UnitEntityData owner) =>
-            System.Math.Max(1, owner?.Get<UnitPartMedium>()?.ActiveSpiritClasses.Count() ?? 0);
+        // Channeling always costs one point. Additional legends used to raise it
+        // (1, 1, 2, 3 ...); the reworked mythic ability no longer does.
+        internal static int NextChannelCost(UnitEntityData owner) => 1;
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -36,8 +37,25 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static BlueprintGuid Id(string token) {
             using (var md5 = MD5.Create()) return BlueprintGuid.Parse(string.Concat(md5.ComputeHash(Encoding.UTF8.GetBytes("CotW.Wrath.Psychic.v1/" + token)).Select(b => b.ToString("x2"))));
         }
+        private static readonly ConcurrentDictionary<(Type Type, string Name), FieldInfo> FieldCache = new ConcurrentDictionary<(Type, string), FieldInfo>();
+        private static readonly ConcurrentDictionary<Type, FieldInfo[]> DeepCopyFieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
+        private static readonly MethodInfo MemberwiseCloneMethod = AccessTools.Method(typeof(object), "MemberwiseClone");
+        private static readonly PropertyInfo CachedRefProperty = AccessTools.Property(typeof(BlueprintReferenceBase), "Cached");
+
+        internal static FieldInfo CachedField(Type type, string field) =>
+            FieldCache.GetOrAdd((type, field), k => AccessTools.Field(k.Type, k.Name));
+
+        private static FieldInfo[] DeepCopyFields(Type type) =>
+            DeepCopyFieldCache.GetOrAdd(type, t => {
+                var list = new List<FieldInfo>();
+                for (var current = t; current != null && current != typeof(object); current = current.BaseType)
+                    foreach (var f in current.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                        if (!f.IsStatic) list.Add(f);
+                return list.ToArray();
+            });
+
         internal static void Set(object obj, string field, object value) {
-            var target = AccessTools.Field(obj.GetType(), field) ?? throw new MissingFieldException(obj.GetType().FullName, field);
+            var target = CachedField(obj.GetType(), field) ?? throw new MissingFieldException(obj.GetType().FullName, field);
             // CLR reflection can coerce unrelated enum types; Unity Mono rejects
             // them. Require the declared enum type on every runtime.
             if (target.FieldType.IsEnum && (value == null || value.GetType() != target.FieldType))
@@ -45,15 +63,15 @@ namespace CallOfTheWild.Wrath.Prototype
             target.SetValue(obj, value);
         }
         internal static void SetEnum(object obj, string field, string name) {
-            var target = AccessTools.Field(obj.GetType(), field) ?? throw new MissingFieldException(obj.GetType().FullName, field);
+            var target = CachedField(obj.GetType(), field) ?? throw new MissingFieldException(obj.GetType().FullName, field);
             if (!target.FieldType.IsEnum) throw new ArgumentException("Expected enum field: " + field);
             Set(obj, field, Enum.Parse(target.FieldType, name));
         }
-        internal static object Get(object obj, string field) => AccessTools.Field(obj.GetType(), field).GetValue(obj);
+        internal static object Get(object obj, string field) => CachedField(obj.GetType(), field).GetValue(obj);
         internal static T Ref<T>(SimpleBlueprint obj) where T : BlueprintReferenceBase, new() {
             var reference = BlueprintReferenceBase.CreateTyped<T>(obj);
             // Construction can refer to another staged asset before the transaction is committed.
-            AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(reference, obj, null); return reference;
+            CachedRefProperty.SetValue(reference, obj, null); return reference;
         }
         internal T Native<T>(string guid) where T : SimpleBlueprint => Cache.Load(BlueprintGuid.Parse(guid)) as T ?? throw new InvalidOperationException("Psychic native dependency missing: " + guid);
         internal T Find<T>(string token) where T : BlueprintScriptableObject => (T)Assets[token];
@@ -89,7 +107,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Assets.Add(token, obj); return obj;
         }
         internal T Clone<T>(T original, string token, string name, string description) where T : BlueprintScriptableObject {
-            var cloned = (T)AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(original, null);
+            var cloned = (T)MemberwiseCloneMethod.Invoke(original, null);
             cloned.ComponentsArray = original.ComponentsArray.Select(c => (BlueprintComponent)DeepCopy(c, new Dictionary<object, object>(ObjectIdentity.Instance))).ToArray();
             return Add(cloned, token, name, description);
         }
@@ -114,10 +132,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 var result = (IList)Activator.CreateInstance(type); seen[value] = result;
                 foreach (var element in list) result.Add(DeepCopy(element, seen)); return result;
             }
-            var clone = AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(value, null); seen[value] = clone;
-            for (var current = type; current != null && current != typeof(object); current = current.BaseType)
-                foreach (var field in current.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
-                    if (!field.IsStatic) field.SetValue(clone, DeepCopy(field.GetValue(value), seen));
+            var clone = MemberwiseCloneMethod.Invoke(value, null); seen[value] = clone;
+            foreach (var field in DeepCopyFields(type))
+                field.SetValue(clone, DeepCopy(field.GetValue(value), seen));
             return clone;
         }
         // For private runtime assets whose non-component data must not alias a

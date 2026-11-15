@@ -282,13 +282,39 @@ namespace MediumClass.Utilities
         internal const string WeakerSpiritChannelBuff = "2413ac21-7921-446e-9073-fac8b6de11bd";
         internal const string AstralBeacon = "5835c65f-1774-41d9-a20b-e012f9fbb83d";
         internal const string AstralBeaconAbility = "f4b6547b-eaf7-4eeb-a135-dc751c2304a9";
-        internal const string AstralBeaconAbilityArchmage = "ac2aedb1-bc69-473d-ab66-e9e2247d2645";
-        internal const string AstralBeaconAbilityChampion = "8579ebe9-f0eb-42fc-b634-e1b64b13d09d";
-        internal const string AstralBeaconAbilityGuardian = "2d71ac0d-b742-494f-90ed-8838047d3450";
-        internal const string AstralBeaconAbilityHierophant = "0cae2e1b-9aca-45ff-ae7e-59b6837dfa9c";
-        internal const string AstralBeaconAbilityMarshal = "7c31a885-271e-4e07-9584-2bfa28be1010";
-        internal const string AstralBeaconAbilityTrickster = "828f18b5-f402-4286-ab3f-70a4ad3cd6f4";
-        internal const string AstralBeaconBuff = "744affbb-fbac-4687-b6b8-56124828a0d7";
+
+        internal const string MediumTranceOfMany = "57e5b172-9687-4259-9e48-528f74d0c572";
+        internal const string MediumTranceOfManyAbility = "5066387a-07f1-4abd-be1a-c528bac4808e";
+
+        // 3 级英灵亲和（Spirit Affinity）。3/7/11/15/19 级各选一次。
+        internal const string MediumSpiritAffinity = "ec941f99-a879-45b7-917f-8e68fcf1dd85";
+        internal const string MediumSpiritAffinityAlignedWeaponry = "d1962035-98dd-458a-a2f0-a7fa82829d9c";
+        internal const string MediumSpiritAffinityArcaneDiscovery = "8409d562-c34b-4812-941b-fc9beeeed2a9";
+        internal const string MediumSpiritAffinityArcaneDiscoverySelection = "8c65dda0-1e83-4cdf-a1c7-7c8c25377d9f";
+        internal const string MediumSpiritAffinityArmorTraining = "509a4793-4480-4b4c-b587-0765ed60149d";
+        internal const string MediumSpiritAffinityWeaponTraining = "d44d9489-d7a2-4376-89b9-761660abf7db";
+        internal const string MediumSpiritAffinityWeaponGroupPicked = "ebb96578-574b-49e3-a5de-47eea9c1730b";
+        internal const string MediumSpiritAffinityDivineSpirit = "b73f6aa9-3abe-477e-9d8d-62e6ec13266e";
+        internal const string MediumSpiritAffinityAssuredSurge = "c1a065d3-7bbf-4017-947f-58285d3349eb";
+        internal const string MediumSpiritAffinitySpiritedFamiliar = "510a9201-169a-4ce2-9a8c-352dab5ebf89";
+        internal const string MediumSpiritAffinitySpiritedFamiliarSelection = "75ae3db1-09ed-4373-b41f-048d30274e74";
+        internal const string MediumSpiritAffinitySpiritWarding = "e550b764-8367-4110-ba15-a4126e2f01da";
+        internal const string MediumSpiritAffinitySpiritWardingGreater = "6dff920d-849b-4e3f-aa00-6befd9d41f99";
+        internal const string MediumSpiritAffinitySpiritsense = "ffb1f6d7-a142-4196-a13e-77797160529d";
+        internal const string MediumSpiritAffinitySpiritsenseGreater = "c1bfddb7-b4a8-4a6d-83c7-edf4375b20d9";
+        internal const string MediumSpiritAffinitySpiritualDefense = "f890978f-aefa-400a-8d3d-69e515f11732";
+        internal const string MediumSpiritAffinitySpiritAvatar = "0bca2050-fc42-4d3c-9f93-75d8496ad7b3";
+        internal const string MediumSpiritAffinitySpiritAvatarGreater = "d3de99a8-900a-49bf-aedd-b41d6e316fa5";
+        internal const string MediumSpiritAffinityTrapfinding = "ab353d3b-0689-4b85-a8e1-2c9548a53d10";
+        internal const string MediumSpiritAffinityUncannyDodge = "065aa165-266e-4e20-bda6-38f935a4b036";
+
+        // 4 级英灵专长（Spirit Feat）。4/8/12/16/20 级各获得一个额外专长。
+        internal const string MediumSpiritFeat = "4cff3d42-a90b-4fb6-a9cc-2d5d77709ac9";
+
+        // 原生蓝图，用于克隆组件结构（不是我们自己的资产）。
+        internal const string NativeTrapfinding = "dbb6b3bffe6db3547b31c3711653838e";
+        internal const string NativeRogueFamiliarSelection = "363cab72f77c47745bf3a8807074d183";
+        internal const string NativeBasicFeatSelection = "247a4068296e8be42890143f451b4b45";
 
         #region Robin Hood and immediate Death Curse modes
         internal const string RobinHood = "18610405-8a20-5ffe-b6f0-02f1c07d286a";

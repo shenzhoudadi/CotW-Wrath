@@ -286,7 +286,12 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var unit = Owner; if (unit == null || unit.Descriptor == null) return false;
             var cls = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(UrbanSkald01443.SkaldId); if (cls == null) return false;
-            int level = unit.Descriptor.Progression.GetClassLevel(cls), budget = level >= 16 ? 3 : level >= 8 ? 2 : level >= 1 ? 1 : 0;
+            // Sublime Chord counts as Skald levels for performance effects, so
+            // the Controlled Inspired Rage allocation budget also scales with
+            // the combined level. BonusLevels() returns 0 when that module is
+            // not registered, leaving the archetype's native behaviour intact.
+            int level = unit.Descriptor.Progression.GetClassLevel(cls) + SublimeChordPerformances.BonusLevels(unit.Descriptor),
+                budget = level >= 16 ? 3 : level >= 8 ? 2 : level >= 1 ? 1 : 0;
             if (Portion < 0 || Portion >= budget) return false;
             var ids = new HashSet<BlueprintGuid>(UrbanSkald01443.AllocationAbilities.Select(PsychicAssets.Id));
             var active = unit.ActivatableAbilities.RawFacts.Where(a => ids.Contains(a.Blueprint.AssetGuid) && a.IsOn).ToArray();

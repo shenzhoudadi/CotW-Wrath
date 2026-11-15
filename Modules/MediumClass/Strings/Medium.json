@@ -19,8 +19,8 @@
   {
     "Key": "SpiritSurge.Description",
     "ProcessTemplates": false,
-    "enGB": "A medium can allow his spirit to gain 1 additional point of influence over him in order to add 1d6 to a value modified by his spirit bonus.\n The medium must be conscious and aware to use this ability. At 10th level, the medium’s spirit surge die increases to 1d8, and at 20th level it increases to 1d10. The bonuses last for 5 rounds (30 seconds).",
-    "zhCN": "通灵者可以让英灵对自己的共鸣增加1点，使一项能获得英灵同调的数值额外获得1d6加值。\n通灵者必须保持清醒且具有意识才能使用此能力。10级时，灵力奔涌的骰子提升为1d8；20级时提升为1d10。加值持续5轮（30秒）。"
+    "enGB": "A medium can allow his spirit to gain 2 additional points of influence over him in order to add 1d6 to a value modified by his spirit bonus.\n The medium must be conscious and aware to use this ability. At 10th level, the medium’s spirit surge die increases to 1d8, and at 20th level it increases to 1d10. The bonuses last for 1 round (6 seconds).",
+    "zhCN": "通灵者可以让英灵对自己的共鸣增加2点，使一项能获得英灵同调的数值额外获得1d6加值。\n通灵者必须保持清醒且具有意识才能使用此能力。10级时，灵力奔涌的骰子提升为1d8；20级时提升为1d10。加值持续1轮（6秒）。"
   },
   {
     "Key": "MediumClass.Name",
@@ -79,8 +79,8 @@
   {
     "Key": "MediumInfluence.Description",
     "ProcessTemplates": false,
-    "enGB": "Influence starts at 0 and accumulates as you accept a spirit's power. Channeling your first spirit adds 1 point; powers with an influence cost add their listed points instead of spending a pool. All channeled spirits share one counter. The base cap is 5. An ability cannot add more influence than the cap allows; free spirit surges can still be used at the cap. At 3 or more points you suffer a -2 initiative penalty and the penalties of all active spirits; increasing the cap does not move this threshold. The counter resets to 0 when your spirits leave after resting. Ability icons show current influence / cap.",
-    "zhCN": "共鸣从0开始，随接受英灵力量逐步积累。首次降灵增加1点共鸣；有共鸣代价的能力会增加相应点数。所有已降灵英灵共用一个计数器。基础上限为5点；无法使用会使共鸣超出上限的能力，但免费的灵力奔涌仍可使用。共鸣达到3点时，先攻承受-2减值，并承受所有已降灵英灵的共鸣惩罚；提高上限不会改变这一阈值。休息、英灵离去后，共鸣重置为0。能力图标显示“当前共鸣/上限”。"
+    "enGB": "Influence starts at 0 and accumulates as you accept a spirit's power. Channeling your first spirit adds 1 point; powers with an influence cost add their listed points instead of spending a pool. All channeled spirits share one counter. The base cap is 3 plus half your medium level plus your Charisma modifier. An ability cannot add more influence than the cap allows; free spirit surges can still be used at the cap. At 3 or more points you suffer a -2 initiative penalty and the penalties of all active spirits; increasing the cap does not move this threshold. The counter resets to 0 when your spirits leave after resting. Ability icons show current influence / cap.",
+    "zhCN": "共鸣从0开始，随接受英灵力量逐步积累。首次降灵增加1点共鸣；有共鸣代价的能力会增加相应点数。所有已降灵英灵共用一个计数器。基础上限为3点加上通灵者等级的一半，再加上魅力调整值；无法使用会使共鸣超出上限的能力，但免费的灵力奔涌仍可使用。共鸣达到3点时，先攻承受-2减值，并承受所有已降灵英灵的共鸣惩罚；提高上限不会改变这一阈值。休息、英灵离去后，共鸣重置为0。能力图标显示“当前共鸣/上限”。"
   },
   {
     "Key": "MediumSharedSeance.Name",
@@ -171,8 +171,31 @@
   },
   {
     "Key": "AstralBeacon.Description",
-    "enGB": "At 20th level, a medium is an open connection to the Astral Plane and a shining beacon for spirits. As part of his seance for his primary legend, he channel the spirits of all of the five legends he did not contact via his seance. This ability lasts for the duration of the day and grants access to the intermediate, greater, and supreme spirit powers of the five additional legends.",
-    "zhCN": "20级时，通灵者成为与星界直接相连的通道，以及吸引英灵的明亮信标。在为主要英灵举行降灵仪式时，通灵者还会同时引导其余五个未选职阶的英灵。此能力持续一整天，赋予通灵者另外五个职阶的英灵的中等、高等与至高英灵之力。"
+    "enGB": "At 20th level the medium is an open conduit to the Astral Plane. As a free action and by accepting 2 points of influence, he can briefly draw on one legend he is not currently channeling, gaining that legend's intermediate, greater and supreme spirit powers for 2 rounds. This grants no spirit bonus, seance boon or influence penalty from that legend.",
+    "zhCN": "20级时，通灵者成为与星界直接相连的通道。以一个自由动作并承受2点共鸣，通灵者可以临时引导一位当前未降灵职阶的英灵，获得该英灵的中等、高等与至高英灵之力，持续2轮。此能力不会提供该英灵的英灵同调、降灵奖励或共鸣惩罚。"
+  },
+  {
+    "Key": "MediumTranceOfMany.Name",
+    "ProcessTemplates": false,
+    "enGB": "Trance of Many",
+    "zhCN": "多重降灵"
+  },
+  {
+    "Key": "MediumTranceOfMany.Description",
+    "enGB": "At 10th level the medium learns to draw on more than one legend at a time. After channeling his primary spirit he can pick another legend he is not channeling and gain its intermediate spirit power; at 14th level he also gains that legend's greater spirit power, and at 18th level its supreme spirit power. This grants only that legend's spirit powers: no spirit bonus, seance boon, influence penalty or spells. The trance lasts until the channel ends or another legend is picked.",
+    "zhCN": "10级时，通灵者学会同时引导不同职阶的英灵之力。降灵主要英灵之后，他可以再选择一位当前未降灵职阶的英灵，获得它的中等英灵之力；14级时还会获得它的高等英灵之力，18级时还会获得它的至高英灵之力。此能力只提供该英灵的英灵之力，不会提供英灵同调、降灵奖励、共鸣惩罚或法术。此降灵持续到本次降灵结束或改选其他英灵为止。"
+  },
+  {
+    "Key": "SpiritFeat.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spirit Feat",
+    "zhCN": "英灵专长"
+  },
+  {
+    "Key": "SpiritFeat.Description",
+    "ProcessTemplates": false,
+    "enGB": "At 4th level you forge a deeper bond with the experience and skills of your spirits: you gain one additional feat for which you qualify. At 8th level and every 4 levels thereafter (12th, 16th and 20th) you gain another additional feat.",
+    "zhCN": "4 级时，你与英灵的经验和技能建立了更深的联系：你获得一个满足先决条件的额外专长。8 级及之后每 4 级（12 级、16 级、20 级）你再各获得一个额外专长。"
   },
   {
     "Key": "MythicExpandedInfluence.Name",
@@ -221,6 +244,12 @@
     "ProcessTemplates": false,
     "enGB": "Concentration",
     "zhCN": "专注"
+  },
+  {
+    "Key": "SpiritSurge.CombatLog.Reroll",
+    "ProcessTemplates": false,
+    "enGB": "{0}(reroll {1},{2})",
+    "zhCN": "{0}(重骰{1},{2})"
   },
   {
     "Key": "MediumSpellcasterFeat.Name",

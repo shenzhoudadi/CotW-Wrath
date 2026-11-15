@@ -41,6 +41,15 @@ foreach (string primary in new[] { "Champion", Guids.Archmage, Guids.Trickster }
         state.AdditionalSpirits.Add(refs[id]);
         component.RefreshActiveSpirits();
     }
+    // 星界灯塔不再是「拥有 20 级特性就全天借用其余职阶」：它是一枚
+    // 2 轮的 buff，只借一个未降灵职阶的中等/高等/至高之力。
+    BlueprintCharacterClassReference beaconed = null;
+    ApplySpirits.SecondaryGrant lend = null;
+    if (beacon)
+    {
+        beaconed = state.Spirits.Keys.First(s => !state.IsActiveSpirit(s));
+        lend = ApplySpirits.GrantSecondary(owner, beaconed);
+    }
     // In practice powers are already restored when the channel buff activates on load.
     // Repeating activation must neither duplicate ranks nor refresh resources.
     var beforeReapply = Snapshot(owner);
@@ -67,18 +76,29 @@ foreach (string primary in new[] { "Champion", Guids.Archmage, Guids.Trickster }
     foreach (var inactive in state.Spirits.Keys.Where(s => !state.IsActiveSpirit(s)))
     {
         var entry = state.Spirits[inactive];
+        bool lent = beacon && inactive == beaconed;
         var intermediate = entry.OverwriteIntermediatePower ?? entry.SpiritIntermediatePower;
-        Equal(beacon ? inactive.Get().Name == Guids.Trickster ? 6 : 1 : 0,
-            owner.Progression.Features.GetRank(intermediate.Get()), context + ": secondary intermediate " + inactive.Get().Name);
+        Equal(lent ? inactive.Get().Name == Guids.Trickster ? 6 : 1 : 0,
+            owner.Progression.Features.GetRank(intermediate.Get()), context + ": beacon lent intermediate " + inactive.Get().Name);
         if (entry.OverwriteIntermediatePower != null)
-            Equal(0, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), context + ": secondary intermediate never duplicates base");
+            Equal(0, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), context + ": beacon intermediate never duplicates base");
         var greater = entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower;
-        Equal(beacon ? 1 : 0, owner.Progression.Features.GetRank(greater.Get()), context + ": secondary greater " + inactive.Get().Name);
+        Equal(lent ? 1 : 0, owner.Progression.Features.GetRank(greater.Get()), context + ": beacon lent greater " + inactive.Get().Name);
         if (entry.OverwriteGreaterPower != null)
-            Equal(0, owner.Progression.Features.GetRank(entry.SpiritGreaterPower.Get()), context + ": secondary greater never duplicates base");
+            Equal(0, owner.Progression.Features.GetRank(entry.SpiritGreaterPower.Get()), context + ": beacon greater never duplicates base");
+        Equal(lent ? 1 : 0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), context + ": beacon lent supreme " + inactive.Get().Name);
     }
     component.HandleUnitReapplyFeaturesOnLevelUp();
     Equal(beforeReapply, Snapshot(owner), context + ": upgrade callback preserves already correct ranks");
+    // 2 轮后 buff 到期：只收回被借出的那个职阶的三层之力。
+    if (beacon)
+    {
+        ApplySpirits.RevokeSecondary(owner, beaconed, lend);
+        var entry = state.Spirits[beaconed];
+        Equal(0, owner.Progression.Features.GetRank((entry.OverwriteIntermediatePower ?? entry.SpiritIntermediatePower).Get()), context + ": beacon expiry revokes intermediate");
+        Equal(0, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), context + ": beacon expiry revokes greater");
+        Equal(0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), context + ": beacon expiry revokes supreme");
+    }
     component.OnDeactivate();
     foreach (var entry in state.Spirits.Values)
     foreach (var feature in Powers(entry).Where(f => !f.Name.StartsWith("Forbid", StringComparison.Ordinal)))
@@ -321,7 +341,9 @@ foreach (int current in new[] { 5, 6, 10 })
     legacy.OnPostLoad(); legacy.OnApplyPostLoadFixes(); legacy.OnTurnOn();
     Equal(current, owner.Progression.Features.GetRank(power.Get()), $"legacy trance load is idempotent beacon={beacon}, current={current}");
     legacy.OnTurnOff();
-    int minimum = beacon ? 6 : 0;
+    // The 20th level feature no longer hands out permanent secondary ranks, so
+    // the legacy trance cleanup always drops every rank it granted itself.
+    int minimum = 0;
     int removed = Math.Min(6, Math.Max(0, current - minimum));
     Equal(current - removed, owner.Progression.Features.GetRank(power.Get()), $"legacy cleanup preserves permanent ranks beacon={beacon}, current={current}");
 }
@@ -335,15 +357,15 @@ foreach (int current in new[] { 5, 6, 10 })
     trance.OnInitialize(); trance.OnTurnOn();
     Equal(5, owner.Progression.Features.GetRank(power.Get()), "level 19 borrows five ranks");
     owner.SpiritClassLevel = 20;
-    owner.AddFact(BlueprintTool.Get<BlueprintFeature>(Guids.AstralBeacon));
-    new ApplySpirits { Owner = owner }.RefreshActiveSpirits();
-    Equal(6, owner.Progression.Features.GetRank(power.Get()), "level 20 Beacon provides its six ranks even during a trance");
+    // 20 级星界灯塔是一枚 2 轮 buff：它只补足到诡术师的 6 个 rank，因此到期
+    // 只收回自己补的那 1 级——三重降灵借出的 5 级属于别人，必须原样留着。
+    var beaconLend = ApplySpirits.GrantSecondary(owner, refs[Guids.Trickster]);
+    Equal(6, owner.Progression.Features.GetRank(power.Get()), "level 20 Beacon lends its six ranks even during a trance");
+    Equal(1, beaconLend.Intermediate, "beacon only adds the ranks the trance did not already lend");
+    ApplySpirits.RevokeSecondary(owner, refs[Guids.Trickster], beaconLend);
+    Equal(5, owner.Progression.Features.GetRank(power.Get()), "beacon expiry revokes only the rank it added");
     trance.OnTurnOff();
-    Equal(6, owner.Progression.Features.GetRank(power.Get()), "trance expiry preserves newly earned Beacon ranks");
-    trance.OnTurnOn();
-    Equal(0, trance.Data.GrantedRanks, "trance cannot stack another copy over Beacon");
-    Equal(6, owner.Progression.Features.GetRank(power.Get()), "Beacon plus repeated trance never doubles Surprise Strike");
-    trance.OnTurnOff();
+    Equal(0, owner.Progression.Features.GetRank(power.Get()), "trance expiry then removes its own five ranks");
 }
 {
     var (owner, state, refs) = NewOwner(4, 0, false);
@@ -531,6 +553,50 @@ foreach (bool secondaryOnly in new[] { false, true })
     Equal(-3, OwnModifier(owner, StatType.SkillKnowledgeArcana, penalty.Runtime), "gaining the mythic ability immediately reduces an existing channel's penalty");
     channel.OnDeactivate(); penalty.OnTurnOff(); bonus.OnTurnOff();
     Check(owner.Stats.Values.Values.All(stat => stat.Modifiers.All(m => m.Source != penalty.Runtime && m.Source != bonus.Runtime)), "ending all channeling clears reduced penalties and full bonuses");
+}
+
+// 多重降灵（10 级）：只借一位未降灵职阶的英灵，10/14/18 分别给中等/高等/至高，
+// 升级时自动补上更高一层；结束降灵时只收回它自己借出的那几级。
+{
+    var (owner, state, refs) = NewOwner(4, 0, false);
+    var trickster = refs[Guids.Trickster];
+    var entry = state.Spirits[trickster];
+    owner.SpiritClassLevel = 10;
+    var trance = new MediumTranceOfManyComponent { Owner = owner, Spirit = trickster };
+    trance.OnActivate();
+    Equal(3, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 10 trance lends the intermediate power at Trickster scaling (10/3)");
+    Equal(0, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), "level 10 trance does not lend the greater power");
+    Equal(0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "level 10 trance does not lend the supreme power");
+    trance.OnActivate();
+    Equal(3, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "repeat activation never stacks the lent ranks");
+    owner.SpiritClassLevel = 14;
+    trance.HandleUnitReapplyFeaturesOnLevelUp();
+    Equal(1, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), "level 14 adds the greater power on level up");
+    Equal(4, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 14 raises the scaled intermediate ranks (14/3)");
+    Equal(0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "level 14 still withholds the supreme power");
+    owner.SpiritClassLevel = 18;
+    trance.HandleUnitReapplyFeaturesOnLevelUp();
+    Equal(1, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "level 18 adds the supreme power on level up");
+    Equal(6, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 18 raises the scaled intermediate ranks (18/3), never duplicates them");
+    trance.OnDeactivate();
+    Equal(0, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "trance end revokes the intermediate ranks");
+    Equal(0, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), "trance end revokes the greater power");
+    Equal(0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "trance end revokes the supreme power");
+}
+{
+    // 主英灵已经提供同一份力量时，多重降灵不能重复叠加，也不能在结束时代为拆除。
+    var (owner, state, refs) = NewOwner(4, 0, false);
+    var champion = refs["Champion"];
+    state.PrimarySpirit = champion;
+    new ApplySpirits { Owner = owner }.OnActivate();
+    var intermediate = state.Spirits[champion].SpiritIntermediatePower;
+    int before = owner.Progression.Features.GetRank(intermediate.Get());
+    owner.SpiritClassLevel = 18;
+    var trance = new MediumTranceOfManyComponent { Owner = owner, Spirit = champion };
+    trance.OnActivate();
+    Equal(before, owner.Progression.Features.GetRank(intermediate.Get()), "a channeled legend lends nothing extra");
+    trance.OnDeactivate();
+    Equal(before, owner.Progression.Features.GetRank(intermediate.Get()), "and its teardown leaves the channel intact");
 }
 
 Console.WriteLine($"Production spirit lifecycle model: {checks - failures.Count}/{checks} assertions passed.");

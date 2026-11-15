@@ -47,7 +47,8 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!Published.TryGetValue(cache, out var entries) || !entries.TryGetValue(token, out var p)) return false;
             for (int i = 0; i < p.Assets.Length; i++) {
                 var actual = cache.Load(p.Assets[i].AssetGuid) as BlueprintScriptableObject;
-                if (!ReferenceEquals(actual, p.Assets[i]) || actual.ComponentsArray == null || actual.ComponentsArray.Any(c => c == null) || Definition(actual) != p.Definitions[i])
+                if (!ReferenceEquals(actual, p.Assets[i]) || actual.ComponentsArray == null || actual.ComponentsArray.Any(c => c == null) ||
+                    (BlueprintRegistration.StrictPublishedGraphChecks && Definition(actual) != p.Definitions[i]))
                     throw new InvalidOperationException("01434 published rage power identity or definition changed: " + p.Assets[i].name);
             }
             Connect(cache, token, p.Root, p.Effect, null);

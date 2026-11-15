@@ -129,7 +129,6 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(KineticUtility01433.WindsightModule, () => KineticUtility01433.RegisterWindsight(cache), report);
             RegisterModule(KineticUtility01433.ColdSnapModule, () => KineticUtility01433.RegisterColdSnap(cache), report);
             RegisterModule(KineticUtility01433.SmokeStormModule, () => KineticUtility01433.RegisterSmokeStorm(cache), report);
-            RegisterModule(WizardDiscoveries01435.ForestModule, () => WizardDiscoveries01435.RegisterForest(cache), report);
             RegisterModule(WizardDiscoveries01435.ResilientModule, () => WizardDiscoveries01435.RegisterResilient(cache), report);
             RegisterModule(TimeStutter01437.ModuleName, () => TimeStutter01437.Register(cache), report);
             RegisterModule(Invoker01437.ModuleName, () => Invoker01437.Register(cache), report);
@@ -201,6 +200,13 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(SpiritGuide0060.ModuleName, () => SpiritGuide0060.Register(cache), report);
             RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
             RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
+            // Original Wrath content, not a Kingmaker port. Registered last so
+            // the automatic spellbook/performance discovery sees every provider.
+            RegisterModule(SublimeChord.ModuleName, () => SublimeChord.Register(cache), report);
+            // Universal spellbook recognition for the native prestige pickers.
+            // Runs after Sublime Chord so its own book exists and is excluded as
+            // a prestige book. The ModMenu toggle gates the whole pass.
+            RegisterModule("Spellbook recognition", () => SpellbookRecognition.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -223,8 +229,6 @@ namespace CallOfTheWild.Wrath.Prototype
                 RegisterModule(TimeStutter01437.ModuleName, () => TimeStutter01437.RegisterOptional(cache), report);
             if (cache.Load(PsychicAssets.Id(Invoker01437.RootToken)) != null)
                 RegisterModule(Invoker01437.ModuleName, () => Invoker01437.RegisterOptional(cache), report);
-            if (cache.Load(PsychicAssets.Id(WizardDiscoveries01435.ForestToken)) != null)
-                RegisterModule(WizardDiscoveries01435.ForestModule, () => WizardDiscoveries01435.RegisterForest(cache), report);
             if (cache.Load(PsychicAssets.Id(WizardDiscoveries01435.ResilientToken)) != null)
                 RegisterModule(WizardDiscoveries01435.ResilientModule, () => WizardDiscoveries01435.RegisterResilient(cache), report);
             if (cache.Load(PsychicAssets.Id(BardMasterpieces01435.ClamorToken)) != null)

@@ -83,9 +83,11 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             if (medium == null || blueprint == null || !medium.ActiveSpiritClasses.Any()) return 0;
             bool active = medium.ActiveSpiritClasses.Any(spirit =>
                 medium.Spirits[spirit].SpiritIntermediatePower?.Get() == blueprint);
+            // Astral Beacon no longer grants permanent ranks: it is a two-round
+            // buff that lends and then revokes them, so it never raises the
+            // floor this cleanup has to preserve.
             bool granted = active
-                ? Owner.Progression.Features.GetRank(BlueprintTool.Get<BlueprintFeature>(Guids.SpiritPower)) - medium.ForgonePowers >= 2
-                : Owner.HasFact(BlueprintTool.Get<BlueprintFeature>(Guids.AstralBeacon));
+                && Owner.Progression.Features.GetRank(BlueprintTool.Get<BlueprintFeature>(Guids.SpiritPower)) - medium.ForgonePowers >= 2;
             return granted ? Math.Min(blueprint.Ranks, Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(Owner) / 3)) : 0;
         }
 

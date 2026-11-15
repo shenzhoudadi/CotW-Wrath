@@ -7,6 +7,7 @@
   },
   {
     "Key": "BackgroundMedium.Description",
+    "ProcessTemplates": false,
     "enGB": "You've been plagued by spirits for as long as you can remember. Because of this, you have a deeper connection with the Medium spirits that can be channeled. Increase the medium's spirit bonus by 1/6 for every level you take in the medium class.",
     "zhCN": "从记事起，英灵就一直缠绕着你。因此，你与可通过降灵引导的英灵有着更深的联系。每获得一个通灵者职业等级，你的英灵同调提高1/6。"
   },
@@ -18,8 +19,9 @@
   },
   {
     "Key": "MythicMultipleSpirits.Description",
-    "enGB": "You can channel additional different spirits using your channel spirit abilities. The second spirit adds 1 influence, the third 2, the fourth 3, and so on, to your shared accumulated influence. Only spirits available to your class can be chosen. Each grants powers appropriate to your level. While you formally channel N spirits, divide the magnitude of each numerical influence penalty by N, rounding down; two spirits halve it, three reduce it to one-third. This also reduces the usual -2 initiative penalty. Positive bonuses and the Marshal's forced defensive fighting are unchanged. Temporary Trance spirits and powers granted by Astral Beacon do not increase N. Overlapping spirit bonuses use the highest value. Archmage and Hierophant share the Medium spellbook and daily casts. Additional spirits do not refill spent spell slots. Rest ends all channeling.",
-    "zhCN": "你可以继续使用降灵能力，引导尚未降灵的其他英灵。第二位额外积累1点共鸣，第三位2点，第四位3点，依此类推；所有英灵共用已积累共鸣与上限。只能选择本职业可降灵的英灵，不能重复。每位英灵按当前等级提供能力。同时正式降灵N位英灵时，各项共鸣数值减值的幅度除以N并向下取整：两位时减半，三位时降至三分之一；原本的先攻−2也按此减轻。正面加值与统帅强制防御式战斗不变。临时入神及星界灯塔仅授予能力的副英灵不计入N。同一属性的英灵同调取最高值。大法师与大祭司共用通灵者本体法术书与施法次数，追加降灵不会补满已用法术位。休息结束所有降灵。"
+    "ProcessTemplates": false,
+    "enGB": "You can channel one additional spirit beyond your first using your channel spirit abilities; from mythic rank 7 you can channel a second additional spirit (three in total). Each additional spirit adds 1 point to your shared accumulated influence - the cost does not grow with the number of spirits. Only spirits available to your class can be chosen, and each grants powers appropriate to your level. While you formally channel N spirits, divide the magnitude of each numerical influence penalty by N, rounding down; two spirits halve it, three reduce it to one-third. This also reduces the usual -2 initiative penalty. Positive bonuses and the Marshal's forced defensive fighting are unchanged. Temporary trance spirits, Astral Beacon lends and the 10th-level Trance of Many are not channeled and never count toward N. Spirit bonuses that apply to the same check apply only once, using the highest value. Archmage and Hierophant share the Medium spellbook and daily casts. Additional spirits do not refill spent spell slots. Rest ends all channeling.",
+    "zhCN": "你可以继续使用降灵能力，引导一位尚未降灵的其他英灵；神话7阶起可以再引导一位（共三位）。每多降灵一位额外积累1点共鸣，不随人数递增；所有英灵共用已积累共鸣与上限。只能选择本职业可降灵的英灵，不能重复。每位英灵按当前等级提供能力。同时正式降灵N位英灵时，各项共鸣数值减值的幅度除以N并向下取整：两位时减半，三位时降至三分之一；原本的先攻−2也按此减轻。正面加值与统帅强制防御式战斗不变。临时入神、星界灯塔借力与10级多重降灵借来的英灵都不计入N。作用于同一检定的英灵同调只应用一次，取最高值。大法师与大祭司共用通灵者本体法术书与施法次数，追加降灵不会补满已用法术位。休息结束所有降灵。"
   },
   {
     "Key": "HardenedSoul.Name",
@@ -29,6 +31,7 @@
   },
   {
     "Key": "HardenedSoul.Description",
+    "ProcessTemplates": false,
     "enGB": "At Medium level 20, your hardened soul can withstand greater spirit influence. Your influence limit increases by 3, and your spirit surge rolls 2d8 instead of its normal die. This replaces Astral Beacon. The three-point influence penalty threshold is unchanged. The influence limit increase stacks with Mythic Expanded Influence.",
     "zhCN": "通灵者达到20级时，你的灵魂已能承受更强的英灵共鸣。共鸣上限额外提高3点，灵力奔涌改为掷2d8，替代通常的奔涌骰。本能力替代星界灯塔；共鸣达到3点时的惩罚阈值不变。上限加值可与神话共鸣扩容叠加。"
   },
@@ -40,6 +43,7 @@
   },
   {
     "Key": "MediumAlternateCapstone.Description",
+    "ProcessTemplates": false,
     "enGB": "At Medium level 20, choose your capstone: Astral Beacon, Hardened Soul, or an available generic alternate capstone from Tabletop Tweaks. Choose one ability only; selecting an alternative replaces Astral Beacon. This choice is enabled only while Tabletop Tweaks Base and its alternate capstone group are enabled. Existing characters retain their previously acquired capstone; retraining permits a new choice.",
     "zhCN": "通灵者达到20级时，选择一项巅峰能力：星界灯塔、坚韧灵魂，或符合条件的 Tabletop Tweaks 通用替代巅峰能力。只能选择一项，选择替代能力后不再获得星界灯塔。此选择仅在 Tabletop Tweaks Base 及其替代巅峰功能启用时开放。已有角色保留已获得的巅峰能力，重训时可以重新选择。"
   },
@@ -300,5 +304,185 @@
     "ProcessTemplates": false,
     "enGB": "Choose one feat from the combined list of fighter bonus feats and wizard bonus feats. You must still meet its prerequisites.",
     "zhCN": "从战斗专长与法师额外专长合并而成的列表中选择一个专长，仍需满足该专长的先决条件。"
+  },
+  {
+    "Key": "SpiritAffinity.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spirit Affinity",
+    "zhCN": "英灵亲和"
+  },
+  {
+    "Key": "SpiritAffinity.Description",
+    "ProcessTemplates": false,
+    "enGB": "At 3rd level and every 4 levels thereafter (7th, 11th, 15th and 19th) you gain one spirit affinity of your choice. Unless stated otherwise an affinity cannot be chosen twice.",
+    "zhCN": "3 级以及之后的每 4 级（7、11、15、19 级）各获得一项英灵亲和。除特别说明外，同一项不能重复选择。"
+  },
+  {
+    "Key": "SpiritAffinity.AlignedWeaponry.Name",
+    "ProcessTemplates": false,
+    "enGB": "Aligned Weaponry",
+    "zhCN": "阵营武器"
+  },
+  {
+    "Key": "SpiritAffinity.AlignedWeaponry.Description",
+    "ProcessTemplates": false,
+    "enGB": "Your weapon is treated as having your own alignment for the purpose of overcoming damage reduction.",
+    "zhCN": "你的武器在克服伤害减免时视为具有你自己的阵营。"
+  },
+  {
+    "Key": "SpiritAffinity.ArcaneDiscovery.Name",
+    "ProcessTemplates": false,
+    "enGB": "Arcane Discovery",
+    "zhCN": "奥术发现"
+  },
+  {
+    "Key": "SpiritAffinity.ArcaneDiscovery.Description",
+    "ProcessTemplates": false,
+    "enGB": "You may select an arcane discovery, using your medium level in place of your wizard level for its prerequisites and effects. This affinity is only offered while TabletopTweaks-Base is installed.",
+    "zhCN": "你可以选择一项奥术发现，并在计算其前提与效果时用你的通灵者等级代替法师等级。只有在安装 TabletopTweaks-Base 时才会提供本亲和。"
+  },
+  {
+    "Key": "SpiritAffinity.ArmorTraining.Name",
+    "ProcessTemplates": false,
+    "enGB": "Armor Training",
+    "zhCN": "护甲训练"
+  },
+  {
+    "Key": "SpiritAffinity.ArmorTraining.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain an advanced armor training option, using your spirit bonus in place of your armor training bonus and your medium level in place of your fighter level to determine its effects. Thereafter, for meeting other feat prerequisites, you count as having the armor training class feature, can treat your spirit bonus as your armor training bonus, and treat half your medium level as your fighter level. You can select this affinity multiple times. It is only offered while TabletopTweaks-Base is installed.",
+    "zhCN": "你获得一项进阶护甲训练选项，用你的英灵同调加值代替护甲训练加值、并用你的通灵者等级代替战士等级来计算其效果。之后在满足其他专长前提时，你视作拥有护甲训练能力，且可以将你的英灵同调加值视为你的护甲训练加值，并将你的通灵者等级的一半视作战士等级。本亲和可以多次选择。只有在安装 TabletopTweaks-Base 时才会提供。"
+  },
+  {
+    "Key": "SpiritAffinity.WeaponTraining.Name",
+    "ProcessTemplates": false,
+    "enGB": "Weapon Training",
+    "zhCN": "武器训练"
+  },
+  {
+    "Key": "SpiritAffinity.WeaponTraining.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain an advanced weapon training option, using your spirit bonus in place of your weapon training bonus and your medium level in place of your fighter level to determine its effects. The first time you select this affinity, choose one weapon group; when determining the effects of advanced weapon training options, that weapon group counts as a trained weapon group for you. Thereafter, for meeting other feat prerequisites, you count as having the weapon training class feature, can treat your spirit bonus as your weapon training bonus, and treat half your medium level as your fighter level. You can select this affinity multiple times.",
+    "zhCN": "你获得一项进阶武器训练选项，用你的英灵同调加值代替武器训练加值、并用你的通灵者等级代替战士等级来计算其效果，且第一次选择此亲和时选择一个武器组，在计算进阶武器训练的效果时，将此武器组视作你已训练的武器组。之后在满足其他专长前提时，你视作拥有武器训练能力，且可以将你的英灵同调加值视为你的武器训练加值，并将你的通灵者等级的一半视作战士等级。本亲和可以多次选择。"
+  },
+  {
+    "Key": "SpiritAffinity.AssuredSurge.Name",
+    "ProcessTemplates": false,
+    "enGB": "Assured Surge",
+    "zhCN": "有效奔涌"
+  },
+  {
+    "Key": "SpiritAffinity.AssuredSurge.Description",
+    "ProcessTemplates": false,
+    "enGB": "When you roll your spirit surge dice, roll each die twice and keep the higher result.",
+    "zhCN": "投灵力奔涌骰时，每颗骰子投两次并取较高的一次结果。"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritedFamiliar.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spirited Familiar",
+    "zhCN": "精魂魔宠"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritedFamiliar.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain a familiar. Your medium level counts as your wizard level for its abilities.",
+    "zhCN": "你获得一只魔宠。计算其能力时，你的通灵者等级视为法师等级。"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritWarding.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spirit Warding",
+    "zhCN": "英灵防护"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritWarding.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain a +4 sacred bonus on saving throws against death effects and against negative energy channeled to harm.",
+    "zhCN": "对抗死亡效果、以及用于伤害的负能量引导（引导负能量）的豁免检定获得 +4 神圣加值。"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritWardingGreater.Name",
+    "ProcessTemplates": false,
+    "enGB": "Greater Spirit Warding",
+    "zhCN": "高等英灵防护"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritWardingGreater.Description",
+    "ProcessTemplates": false,
+    "enGB": "At 15th level you may take Spirit Warding a second time. You become immune to death effects, negative energy damage, energy drain and harmful negative energy channeling.",
+    "zhCN": "15 级时可第二次选择英灵防护。你免疫死亡效果、负能量伤害、能量吸取与有害的负能量引导。"
+  },
+  {
+    "Key": "SpiritAffinity.Spiritsense.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spiritsense",
+    "zhCN": "精魂感知"
+  },
+  {
+    "Key": "SpiritAffinity.Spiritsense.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain blindsense out to 30 feet.",
+    "zhCN": "你获得 30 尺盲感。"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritsenseGreater.Name",
+    "ProcessTemplates": false,
+    "enGB": "Greater Spiritsense",
+    "zhCN": "高等精魂感知"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritsenseGreater.Description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level you may take Spiritsense a second time. Your blindsense becomes blindsight out to 60 feet.",
+    "zhCN": "7 级时可第二次选择精魂感知。你的盲感提升为 60 尺盲视。"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritualDefense.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spiritual Defense",
+    "zhCN": "灵御"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritualDefense.Description",
+    "ProcessTemplates": false,
+    "enGB": "While wearing light armor or no armor and carrying no shield, you add your spirit bonus to your AC as a shield bonus. This bonus applies against touch attacks.",
+    "zhCN": "当你穿着轻甲或不穿护甲、且不持盾时，将你的英灵同调加值作为盾牌加值加到 AC 上。该加值对接触攻击有效。"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritAvatar.Name",
+    "ProcessTemplates": false,
+    "enGB": "Spirit Avatar",
+    "zhCN": "灵体化身"
+  },
+  {
+    "Key": "SpiritAffinity.SpiritAvatar.Description",
+    "ProcessTemplates": false,
+    "enGB": "Your weapon is treated as ghost touch.",
+    "zhCN": "你的武器视为具有幽冥特性。"
+  },
+  {
+    "Key": "SpiritAffinity.Trapfinding.Name",
+    "ProcessTemplates": false,
+    "enGB": "Trapfinding",
+    "zhCN": "寻找陷阱"
+  },
+  {
+    "Key": "SpiritAffinity.Trapfinding.Description",
+    "ProcessTemplates": false,
+    "enGB": "You add half your medium level (minimum +1) on Perception checks and on Trickery checks.",
+    "zhCN": "你的察觉检定与巧手检定加上通灵者等级的一半（至少 +1）。"
+  },
+  {
+    "Key": "SpiritAffinity.UncannyDodge.Name",
+    "ProcessTemplates": false,
+    "enGB": "Uncanny Dodge",
+    "zhCN": "直觉闪避"
+  },
+  {
+    "Key": "SpiritAffinity.UncannyDodge.Description",
+    "ProcessTemplates": false,
+    "enGB": "You cannot be caught flat-footed, an invisible attacker does not deny you your Dexterity bonus, and you cannot be flanked.",
+    "zhCN": "你不会陷入措手不及，隐形攻击者也不能让你失去敏捷加值，并且你无法被夹击。"
   }
 ]

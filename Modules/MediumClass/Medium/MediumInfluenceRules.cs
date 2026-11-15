@@ -4,6 +4,7 @@ using BlueprintCore.Utils;
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.EntitySystem.Stats;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic;
@@ -49,11 +50,31 @@ namespace MediumClass.Medium
         }
 
         internal static int Amount(UnitDescriptor owner) => owner == null ? 0 : State(owner).Accumulated;
-        internal static int Cap(UnitDescriptor owner) => InfluenceMath.BaseCap +
+        internal static int Cap(UnitDescriptor owner) => BaseCap(owner) +
             (owner?.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid)) == true
                 ? InfluenceMath.MythicBonus(owner.Progression.MythicLevel) : 0) +
             (HardenedSoul.HasFeature(owner) ? 3 : 0) +
             (SpiritBinder.HasFeature(owner) ? 1 : 0);
+
+        /// <summary>
+        /// A flat 3, plus half the Medium class level, plus the Charisma
+        /// modifier. This is the authoritative cap: <see cref="InfluenceCapPatch"/>
+        /// replaces BlueprintAbilityResource.GetMaxAmount for every influence
+        /// resource, so the blueprint's own Amount block never decides the limit.
+        /// A negative modifier floors at 0 instead of producing a negative cap.
+        /// </summary>
+        internal static int BaseCap(UnitDescriptor owner)
+        {
+            if (owner == null) return 0;
+            int level = 0;
+            var medium = BlueprintGuid.Parse(Guids.Medium);
+            foreach (var data in owner.Progression.Classes)
+                if (data?.CharacterClass != null && data.CharacterClass.AssetGuid == medium)
+                    level += data.Level;
+            int charisma = owner.Stats.GetStat(StatType.Charisma) is ModifiableValueAttributeStat stat
+                ? stat.BonusWithoutTemp : 0;
+            return Math.Max(0, 3 + level / 2 + charisma);
+        }
         internal static bool CanAccept(UnitDescriptor owner, int cost) => owner != null
             && owner.Resources.GetResource(BlueprintTool.Get<BlueprintAbilityResource>(Guids.MediumInfluenceResource)) != null
             && InfluenceMath.CanAccept(Amount(owner), cost, Cap(owner));

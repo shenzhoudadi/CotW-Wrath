@@ -36,6 +36,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 			ApplyModifiers();
 			// A spirit influence mirror on this Medium is clamped against this bonus.
 			MediumSpiritInfluenceAllyComponent.RefreshOwnMirror(Owner);
+			MediumSpiritualDefenseComponent.RefreshFor(Owner);
+			MediumAdvancedWeaponTrainingComponent.RefreshFor(Owner);
 		}
 
 		private void ApplyModifiers()
@@ -61,6 +63,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 		{
 			RemoveOwnModifiers();
 			MediumSpiritInfluenceAllyComponent.RefreshOwnMirror(Owner, ownBonusEnding: true);
+			MediumSpiritualDefenseComponent.RefreshFor(Owner);
+			MediumAdvancedWeaponTrainingComponent.RefreshFor(Owner);
 		}
 
 		private void RemoveOwnModifiers()

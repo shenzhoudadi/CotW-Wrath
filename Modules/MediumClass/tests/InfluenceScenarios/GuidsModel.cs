@@ -1,4 +1,5 @@
 namespace MediumClass.Utilities { internal static class Guids {
+public const string Medium = "b11b2e0b-3076-4b9c-bbf3-ca7f851b5bb4";
 public const string MediumChannelSpiritPrimarySpiritBuff = "ff1cb998-b9c1-4771-b8a5-101a9ab98c94";
 public const string MediumInfluenceDebuff = "7e8990eb-8ed1-4625-a695-8ded5b6e166c";
 public const string MediumInfluenceResource = "8326af03-a110-4071-bce3-26b601c1c28d";

@@ -30,14 +30,10 @@ namespace CallOfTheWild.Wrath.Prototype
     // Native and provider selections are extended, never rebuilt.
     internal static class WizardDiscoveries01435
     {
-        internal const string ForestModule = "Arcane discovery: Forest's Blessing";
         internal const string ResilientModule = "Arcane discovery: Resilient Illusions";
-        internal const string ForestToken = "ForestsBlessingDiscovery";
         internal const string ResilientToken = "ResilientIllusionsDiscovery";
         internal const string WizardId = "ba34257984f4c41408ce1dc2004e342e";
         internal const string ArcanistId = "52dbfd8505e22f84fad8d702611f60b7";
-        internal const string WizardListId = "ba0401fdeb4062f40a7aa95b6f07fe89";
-        internal const string DruidListId = "bad8638d40639d04fa2f80a1cac67d6b";
         internal const string DiscoveryPoolId = "45b72087ac2d4554aec4f44be852eddd";
         internal static readonly string[] CorePoolIds = {
             BlueprintRegistration.BasicFeatsId, "e10c4f18a6c8b4342afe6954bde0587b",
@@ -56,7 +52,7 @@ namespace CallOfTheWild.Wrath.Prototype
             internal string Definition;
         }
         sealed class State {
-            internal readonly Publication Forest = new Publication(), Resilient = new Publication();
+            internal readonly Publication Resilient = new Publication();
             // The additional discovery has its own publication and rollback
             // receipt. It does not change the identities of the 035 leaves.
             internal BlueprintFeature TimeStutter;
@@ -82,12 +78,12 @@ namespace CallOfTheWild.Wrath.Prototype
             return pool;
         }
         static bool OwnRoot(EntryReceipt receipt, BlueprintFeature root) => root != null &&
-            (ReferenceEquals(root, receipt.State.Forest.Root) || ReferenceEquals(root, receipt.State.Resilient.Root) ||
+            (ReferenceEquals(root, receipt.State.Resilient.Root) ||
                 ReferenceEquals(root, receipt.State.TimeStutter));
         internal static bool EligibleArcanist(WizardDiscoveryEntry01436 adapter, FeatureSelectionState selection, UnitDescriptor unit, LevelUpState state)
         {
             if (unit == null || !Entries.TryGetValue(adapter, out var receipt) || receipt.Pool.ComponentsArray?.Contains(adapter) != true) return false;
-            foreach (var root in new[] { receipt.State.Forest.Root, receipt.State.Resilient.Root, receipt.State.TimeStutter }) {
+            foreach (var root in new[] { receipt.State.Resilient.Root, receipt.State.TimeStutter }) {
                 if (root == null || unit.Progression.Features.GetRank(root) >= root.Ranks) continue;
                 // Use the leaf's native class prerequisite, including native
                 // ClassLevelsForPrerequisites semantics. Never add class levels.
@@ -155,9 +151,9 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (!pools.Contains(provider)) pools.Add(provider);
                     originalComponents = provider.ComponentsArray;
                     try { var adapter = Adapt(provider, state); if (adapter != null && !((BlueprintComponent[])originalComponents).Contains(adapter)) added = adapter; }
-                    catch (Exception e) { RestoreComponents(provider, originalComponents); provider = null; LastOptionalDiagnostic = "Arcane discovery provider entry deferred: " + e.Message; }
+                    catch (Exception e) { RestoreComponents(provider, originalComponents); LastOptionalDiagnostic = "Arcane discovery provider entry deferred: " + e.Message; }
                 }
-                var forestId = Id(ForestToken); var resilientId = Id(ResilientToken); var timeStutterId = Id(TimeStutter01437.RootToken);
+                var resilientId = Id(ResilientToken); var timeStutterId = Id(TimeStutter01437.RootToken);
                 foreach (var pool in pools) {
                     before.Add(pool, new[] { Get(pool, "m_Features"), Get(pool, "m_AllFeatures") });
                     // A changed or not-yet-complete provider must not make us
@@ -168,7 +164,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     foreach (string field in new[] { "m_Features", "m_AllFeatures" }) {
                         var previous = Get(pool, field) as BlueprintFeatureReference[];
                         if (previous == null) continue;
-                        var kept = previous.Where(r => r?.Guid != forestId && r?.Guid != resilientId && r?.Guid != timeStutterId).ToArray();
+                        var kept = previous.Where(r => r?.Guid != resilientId && r?.Guid != timeStutterId).ToArray();
                         if (kept.Length != previous.Length) Set(pool, field, kept);
                     }
                 }
@@ -200,49 +196,39 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             return values.Where(v => v != null).Select(v => blueprint.GetValue(v)).OfType<BlueprintFeatureSelection>().ToArray();
         }
-        static void RegisterOne(BlueprintsCache cache, bool forest)
+        static void RegisterOne(BlueprintsCache cache)
         {
             var state = Published.GetValue(cache, _ => new State()); lock (state) {
-                var published = forest ? state.Forest : state.Resilient;
+                var published = state.Resilient;
                 if (published.Root != null) {
                     if (!ReferenceEquals(cache.Load(published.Root.AssetGuid), published.Root) || Layout(published.Root) != published.Definition)
                         throw new InvalidOperationException("Wizard discovery published definition changed: " + published.Root.name);
                     ReconcileAccess(cache, state, published.Root); return;
                 }
-                string token = forest ? ForestToken : ResilientToken;
+                string token = ResilientToken;
                 if (cache.Load(Id(token)) != null) throw new InvalidOperationException("Wizard discovery private identity already exists without this publication: " + token);
                 var f = new PsychicAssets(cache); var cls = f.Native<BlueprintCharacterClass>(WizardId);
-                var level = new PrerequisiteClassLevel { Level = forest ? 5 : 8, Group = Prerequisite.GroupType.Any }; Set(level, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(cls));
-                var arcanist = new PrerequisiteClassLevel { Level = forest ? 10 : 16, Group = Prerequisite.GroupType.Any }; Set(arcanist, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(f.Native<BlueprintCharacterClass>(ArcanistId)));
-                BlueprintComponent logic;
-                if (forest) {
-                    logic = new ForestBlessing01435 {
-                        WizardList = Ref<BlueprintSpellListReference>(f.Native<BlueprintSpellList>(WizardListId)),
-                        DruidList = Ref<BlueprintSpellListReference>(f.Native<BlueprintSpellList>(DruidListId))
-                    };
-                } else {
-                    foreach (var id in PhantasmalIds) {
-                        var spell = f.Native<BlueprintAbility>(id);
-                        if (spell.Type != AbilityType.Spell || spell.School != SpellSchool.Illusion)
-                            throw new InvalidOperationException("Resilient Illusions original disbelief spell changed: " + id);
-                    }
-                    logic = new ResilientIllusions01435();
+                var level = new PrerequisiteClassLevel { Level = 8, Group = Prerequisite.GroupType.Any }; Set(level, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(cls));
+                var arcanist = new PrerequisiteClassLevel { Level = 16, Group = Prerequisite.GroupType.Any }; Set(arcanist, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(f.Native<BlueprintCharacterClass>(ArcanistId)));
+                foreach (var id in PhantasmalIds) {
+                    var spell = f.Native<BlueprintAbility>(id);
+                    if (spell.Type != AbilityType.Spell || spell.School != SpellSchool.Illusion)
+                        throw new InvalidOperationException("Resilient Illusions original disbelief spell changed: " + id);
                 }
-                var root = f.Feature(token, forest ? "Forest's Blessing" : "Resilient Illusions", forest
-                    ? "You cast spells that appear on both the wizard and druid spell lists at +1 caster level and with +1 to their saving throw DC. The casting spellbook does not have to be a wizard spellbook. Select through Arcane Discovery. Requires wizard level 5 or arcanist level 10; these class levels are not added together."
-                    : "When a creature attempts to disbelieve your illusion, roll 1d20 + the illusion's caster level. Its save DC is the higher of its current DC and that result. Applies to native shadow disbelief and the Will disbelief saves of Phantasmal Killer, Weird, Phantasmal Web and Phantasmal Putrefaction; their Fortitude saves and other illusion saves are unchanged. Select through Arcane Discovery. Requires wizard level 8 or arcanist level 16; these class levels are not added together.", level, arcanist, logic);
+                var logic = new ResilientIllusions01435();
+                var root = f.Feature(token, "Resilient Illusions",
+                    "When a creature attempts to disbelieve your illusion, roll 1d20 + the illusion's caster level. Its save DC is the higher of its current DC and that result. Applies to native shadow disbelief and the Will disbelief saves of Phantasmal Killer, Weird, Phantasmal Web and Phantasmal Putrefaction; their Fortitude saves and other illusion saves are unchanged. Select through Arcane Discovery. Requires wizard level 8 or arcanist level 16; these class levels are not added together.", level, arcanist, logic);
                 root.Groups = Array.Empty<FeatureGroup>(); root.IsClassFeature = true;
                 var once = new PrerequisiteNoFeature(); Set(once, "m_Feature", Ref<BlueprintFeatureReference>(root));
                 root.ComponentsArray = root.ComponentsArray.Concat(new[] { once }).ToArray();
-                Set(root, "m_Icon", f.Native<BlueprintAbility>(forest ? "0fd00984a2c0e0a429cf1a911b4ec5ca" : "6717dbaef00c0eb4897a1c908a75dfe5").Icon);
+                Set(root, "m_Icon", f.Native<BlueprintAbility>("6717dbaef00c0eb4897a1c908a75dfe5").Icon);
                 Migration01426.Commit(f, Array.Empty<BlueprintFeatureSelection>(), root);
                 published.Root = (BlueprintFeature)cache.Load(root.AssetGuid); published.Definition = Layout(published.Root);
                 ReconcileAccess(cache, state, published.Root);
             }
         }
-        internal static void RegisterForest(BlueprintsCache cache) => RegisterOne(cache, true);
-        internal static void RegisterResilient(BlueprintsCache cache) => RegisterOne(cache, false);
-        internal static void Register(BlueprintsCache cache) { RegisterForest(cache); RegisterResilient(cache); }
+        internal static void RegisterResilient(BlueprintsCache cache) => RegisterOne(cache);
+        internal static void Register(BlueprintsCache cache) => RegisterResilient(cache);
         internal static void ReconcileTimeStutter(BlueprintsCache cache, BlueprintFeature root)
         {
             if (!TimeStutter01437.IsPublishedRoot(cache, root)) throw new InvalidOperationException("Time Stutter discovery access requires its exact publication receipt.");
@@ -251,7 +237,6 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         internal static void RegisterOptional(BlueprintsCache cache)
         {
-            if (cache.Load(Id(ForestToken)) != null) RegisterForest(cache);
             if (cache.Load(Id(ResilientToken)) != null) RegisterResilient(cache);
         }
     }
@@ -262,7 +247,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal bool WizardEligible(FeatureSelectionState selection, UnitDescriptor unit, LevelUpState state) => unit != null && base.CheckInternal(selection, unit, state);
         protected override bool CheckInternal(FeatureSelectionState selection, UnitDescriptor unit, LevelUpState state) =>
             WizardEligible(selection, unit, state) || WizardDiscoveries01435.EligibleArcanist(this, selection, unit, state);
-        protected override string GetUITextInternal(UnitDescriptor unit) => base.GetUITextInternal(unit) + " OR qualified arcanist (Forest's Blessing: level 10; Resilient Illusions: level 16; Time Stutter: level 20; only these discoveries).";
+        protected override string GetUITextInternal(UnitDescriptor unit) => base.GetUITextInternal(unit) + " OR qualified arcanist (Resilient Illusions: level 16; Time Stutter: level 20; only these discoveries).";
     }
 
     [HarmonyPatch(typeof(BlueprintFeatureSelection), nameof(BlueprintFeatureSelection.CanSelect))]

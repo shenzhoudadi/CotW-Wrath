@@ -62,11 +62,12 @@ namespace MediumClass.Medium
                 .SetDescription(Description)
                 .AddComponent<AbilityRequirementHasSpirit>()
                 .SetActionType(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType.Free)
-                .AddAbilityResourceLogic(amount: 1, requiredResource: Guids.MediumInfluenceResource, isSpendResource: true, costIsCustom: false)
+                // The rework costs two accumulated influence for a single round.
+                .AddAbilityResourceLogic(amount: 2, requiredResource: Guids.MediumInfluenceResource, isSpendResource: true, costIsCustom: false)
                 .AddAbilityEffectRunAction(
                     actions: ActionsBuilder.New()
                         .Add<ContextActionSpiritInfluence>()
-                        .ApplyBuff(buff, ContextDuration.Fixed(5, DurationRate.Rounds),
+                        .ApplyBuff(buff, ContextDuration.Fixed(1, DurationRate.Rounds),
                                     asChild: false, isFromSpell: false, isNotDispelable: true))
                 .Configure();
 

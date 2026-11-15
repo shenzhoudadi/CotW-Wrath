@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
@@ -56,30 +58,48 @@ namespace CallOfTheWild.Wrath.Prototype
             else throw new InvalidOperationException("Unsupported01445 resource: "+bp.name);
             return Authored(new object[]{bp.name,bp.ComponentsArray,shape},new System.Collections.Generic.HashSet<object>(IdentityComparer));
         }
+        static readonly ConcurrentDictionary<Type, FieldInfo[]> AuthoredFieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
+        static FieldInfo[] CachedAuthoredFields(Type type) => AuthoredFieldCache.GetOrAdd(type, t => {
+            var fields = new List<FieldInfo>();
+            for (var c = t; c != null && c != typeof(object) && c != typeof(BlueprintComponent) && c != typeof(UnityEngine.Object); c = c.BaseType)
+                fields.AddRange(c.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
+                    .Where(f => !f.IsStatic && !(f.DeclaringType == typeof(Kingmaker.ElementsSystem.Condition) && f.Name == "<LastResult>k__BackingField") &&
+                        !(f.DeclaringType == typeof(Kingmaker.UnitLogic.Abilities.Components.CasterCheckers.AbilityCasterHasFacts) && f.Name == "m_FactsMissingCache") && !(f.DeclaringType == typeof(Kingmaker.UnitLogic.Abilities.Components.TargetCheckers.AbilityTargetHasFact) && f.Name == "m_FactCache")));
+            return fields.OrderBy(f => f.DeclaringType.FullName + f.Name).ToArray();
+        });
         static string Authored(object value, HashSet<object> path) {
-            if (value == null) return "null";
-            if (value is BlueprintReferenceBase reference) return "ref:" + reference.Guid;
-            if (value is SimpleBlueprint blueprint) return "bp:" + blueprint.AssetGuid;
+            var sb = new StringBuilder(256);
+            AuthoredInto(sb, value, path);
+            return sb.ToString();
+        }
+        static void AuthoredInto(StringBuilder sb, object value, HashSet<object> path) {
+            if (value == null) { sb.Append("null"); return; }
+            if (value is BlueprintReferenceBase reference) { sb.Append("ref:").Append(reference.Guid); return; }
+            if (value is SimpleBlueprint blueprint) { sb.Append("bp:").Append(blueprint.AssetGuid); return; }
             var type = value.GetType();
-            if (type.IsPrimitive || type.IsEnum || value is string || value is decimal) return type.FullName + ":" + value;
-            if (value is UnityEngine.Object) return type.FullName;
-            if (!path.Add(value)) return "cycle:" + type.FullName;
+            if (type.IsPrimitive || type.IsEnum || value is string || value is decimal) { sb.Append(type.FullName).Append(":").Append(value); return; }
+            if (value is UnityEngine.Object) { sb.Append(type.FullName); return; }
+            if (!type.IsValueType && !path.Add(value)) { sb.Append("cycle:").Append(type.FullName); return; }
             try {
-                if (value is IEnumerable items) return "[" + string.Join(",", items.Cast<object>().Select(x => Authored(x, path))) + "]";
-                var fields = new List<FieldInfo>();
-                for (var t = type; t != null && t != typeof(object) && t != typeof(BlueprintComponent) && t != typeof(UnityEngine.Object); t = t.BaseType)
-                    fields.AddRange(t.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
-                        .Where(f => !f.IsStatic && !(f.DeclaringType == typeof(Kingmaker.ElementsSystem.Condition) && f.Name == "<LastResult>k__BackingField") &&
-                            !(f.DeclaringType == typeof(Kingmaker.UnitLogic.Abilities.Components.CasterCheckers.AbilityCasterHasFacts) && f.Name == "m_FactsMissingCache") && !(f.DeclaringType == typeof(Kingmaker.UnitLogic.Abilities.Components.TargetCheckers.AbilityTargetHasFact) && f.Name == "m_FactCache")));
-                return type.FullName + "{" + string.Join(";", fields.OrderBy(f => f.DeclaringType.FullName + f.Name).Select(f => {
+                if (value is IEnumerable items) {
+                    sb.Append("[");
+                    bool first = true;
+                    foreach (var x in items) { if (!first) sb.Append(","); first = false; AuthoredInto(sb, x, path); }
+                    sb.Append("]");
+                    return;
+                }
+                sb.Append(type.FullName).Append("{");
+                var fields = CachedAuthoredFields(type);
+                for (int i = 0; i < fields.Length; i++) {
+                    if (i > 0) sb.Append(";");
+                    var f = fields[i];
                     var fieldValue = f.GetValue(value);
-                    // Native blueprint JSON deserializes a null reference field
-                    // as an empty typed reference. Neither names an asset; an
-                    // actual non-empty GUID remains part of the authored graph.
-                    return f.Name + "=" + (fieldValue == null && typeof(BlueprintReferenceBase).IsAssignableFrom(f.FieldType)
-                        ? "ref:" : Authored(fieldValue, path));
-                })) + "}";
-            } finally { path.Remove(value); }
+                    sb.Append(f.Name).Append("=");
+                    if (fieldValue == null && typeof(BlueprintReferenceBase).IsAssignableFrom(f.FieldType)) sb.Append("ref:");
+                    else AuthoredInto(sb, fieldValue, path);
+                }
+                sb.Append("}");
+            } finally { if (!type.IsValueType) path.Remove(value); }
         }
         static Action Snapshot(Receipt r) {
             var archetypes=Get(r.Class,"m_Archetypes");var groups=r.Progression.UIGroups;var extra=r.ExtraSnapshot?.Invoke();
