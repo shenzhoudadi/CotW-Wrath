@@ -1,6 +1,6 @@
 # COTW-0085 Spiritualist · 基础职业
 
-状态为 **A/C 已完成，待 B 认领，生产实现尚未开始**。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。B 工作分支建议 `feat/cotw-0085-spiritualist`，先做 Anger 原生伙伴链。范围是 Wisdom 六环自发念力施法、Phantom、六种原作基础情绪，以及主人完整职业进度。COTW-0086–0091 变体沿用原状态。原作 `createPhantoms` 实际接通 Anger、Despair、Hatred、Fear、Zeal、Kindness，Whimsy 沿用原作未接通状态。 [施工认领 #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)
+状态为 **A/C/B 已完成，待 D 独立复查**。B 交付见 [B-summary](../COTW-0085/B-summary.md)，分支 `feat/cotw-0085-spiritualist`。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。B 工作分支建议 `feat/cotw-0085-spiritualist`，先做 Anger 原生伙伴链。范围是 Wisdom 六环自发念力施法、Phantom、六种原作基础情绪，以及主人完整职业进度。COTW-0086–0091 变体沿用原状态。原作 `createPhantoms` 实际接通 Anger、Despair、Hatred、Fear、Zeal、Kindness，Whimsy 沿用原作未接通状态。 [施工认领 #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)
 
 - A 已交接。[原作与 Wrath 入口](../COTW-0085/A-spiritualist-map.md) · [蓝图、情绪与私人法表](../COTW-0085/A-spiritualist-assets.json)
 - C 已冻结 `C-0085-20261115-r1`。[生命周期合同](../COTW-0085/C-spiritualist-contract.md) · [18 项待执行用例](../COTW-0085/C-spiritualist-cases.json)

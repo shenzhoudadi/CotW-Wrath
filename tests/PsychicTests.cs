@@ -221,6 +221,29 @@ internal static class PsychicTests
             Console.WriteLine("PASS: " + passed0070 + " Cryptid Scholar 0070 directed assertions. Standalone managed verification, not a game test.");
             return;
         }
+        // COTW-0085: route the directed Spiritualist case directly after the
+        // shared registration fixture. Only the reviewed native rows load; no
+        // historical Psychic behaviour suite, full catalogue or game process.
+        if (Environment.GetEnvironmentVariable("COTW_0085_CASE") == "spiritualist0085")
+        {
+            var rows0085 = JObject.Parse(File.ReadAllText(args[4]));
+            PsychicExpansionTests.LoadNativeRows(f.Cache, rows0085, true);
+            PsychicExpansionTests.HydrateEmptyTables(f.Cache, rows0085);
+            PsychicExpansionTests.HydrateCachedSpellbooks(f.Cache, rows0085);
+            AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, f.Cache);
+            var directed0085 = new Harmony("CotWSpiritualist0085.Directed");
+            int passed0085 = Spiritualist0085Tests.Run(f.Cache, directed0085);
+            var report0085 = new JObject { ["case"] = "spiritualist0085", ["assertionsPassed"] = passed0085,
+                ["scope"] = "Directed 0085 checks only; shared fixture registration and audited native donor rows, no historical Psychic behaviour suites." };
+            if (args[2] == "-") Console.WriteLine(report0085.ToString());
+            else {
+                var path0085 = Path.GetFullPath(args[2]);
+                Directory.CreateDirectory(Path.GetDirectoryName(path0085));
+                File.WriteAllText(path0085, report0085.ToString());
+            }
+            Console.WriteLine("PASS: " + passed0085 + " Spiritualist 0085 directed assertions. Standalone managed verification, not a game test.");
+            return;
+        }
         // D-F07: route the 0060 directed case directly after the shared fixture
         // is registered. Nothing below (casting, expansion, historical toggles)
         // belongs to this work package and must not run under its banner.

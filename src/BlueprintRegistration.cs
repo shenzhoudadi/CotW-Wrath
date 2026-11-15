@@ -178,6 +178,7 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
             RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
             RegisterAvailableModule(SpeakerForThePast0046.ModuleName, () => SpeakerForThePast0046.Register(cache), report);
+            RegisterAvailableModule(Spiritualist0085.ModuleName, () => Spiritualist0085.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -277,6 +278,7 @@ namespace CallOfTheWild.Wrath.Prototype
             // gate defers until the real provider roots are present.
             RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
             RegisterAvailableModule(SpeakerForThePast0046.ModuleName, () => SpeakerForThePast0046.Register(cache), report);
+            RegisterAvailableModule(Spiritualist0085.ModuleName, () => Spiritualist0085.Register(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)
