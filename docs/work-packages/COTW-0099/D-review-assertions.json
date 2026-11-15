@@ -1,0 +1,53 @@
+{
+  "workPackage": "COTW-0099",
+  "stage": "D review of B first slice (Abjuration), production read-only",
+  "candidate": "b6be98b",
+  "contract": "C-0099-20261115-r1",
+  "checkType": "isolated contract reproduction over linked production sources",
+  "nativeWrathEntriesExercised": false,
+  "gameOrUmmLaunched": false,
+  "productionSourcesModified": false,
+  "result": "NEEDS_FIX",
+  "findings": [
+    {
+      "id": "D-F01",
+      "location": "src/Occultist0099Rules.cs:646,650-657",
+      "contractExpectation": "C-0099-20261115-r1 O-S01 native entry / MF11: the same execution identity is charged at most once across class remove\u002Breacquire",
+      "observedSatisfied": false,
+      "actual": "first payment Ok, second payment Ok, Spent=2 (expected at most 1)",
+      "status": "FAIL"
+    },
+    {
+      "id": "D-F02",
+      "location": "src/Occultist0099Spells.cs:133-147,197-209,215-227,318-355",
+      "contractExpectation": "C-0099-20261115-r1 O-S02: learning/casting gate Int \u003E= 10 \u002B circle must be expressible and enforced",
+      "observedSatisfied": false,
+      "actual": "no INT field in SpellState (ClassLevel,NextSequence,Slots,Quotas,Sources,Providers,PublishedLists,DlcAllowed,CotWRootsPublished,ForeignBookRoots,SameBookGrantSources,CotWRegistrationComplete,KnownRootsOverride), Learn(s,slotKey,circle,rootGuid), Candidates(s,slotKey,circle); MaxCircle/Learn use level only",
+      "status": "FAIL"
+    },
+    {
+      "id": "D-F03",
+      "location": "src/Occultist0099Spells.cs:149-162; tests/Occultist0099SliceProgram.cs:431,601-606",
+      "contractExpectation": "C-0099-20261115-r1 O-S01/O-S02: preview cancel byte-for-byte equivalence must be verifiable over all mutable fields",
+      "observedSatisfied": false,
+      "actual": "changing Providers/PublishedLists leaves Fingerprint identical=True; 7 mutable fields are outside the fingerprint",
+      "status": "FAIL"
+    },
+    {
+      "id": "D-F04",
+      "location": "src/Occultist0099Spells.cs:74-85,292-313,318-332",
+      "contractExpectation": "C-0099-20261115-r1 O-S02: canonical/variant identity filtering has both positive and negative cases (Fire Shield warm/cold, sticky touch)",
+      "observedSatisfied": false,
+      "actual": "all 18 roots have CanonicalGuid==Guid and IsVariant=false; r.Guid==r.CanonicalGuid is a tautology in Candidates",
+      "status": "FAIL"
+    },
+    {
+      "id": "D-F05",
+      "location": "src/Occultist0099Spells.cs:506-538; tests/Occultist0099SliceProgram.cs:748-772",
+      "contractExpectation": "C-occultist-cases.json SP08: foreign GUID collision fixture must be able to distinguish foreign data being touched from intact",
+      "observedSatisfied": false,
+      "actual": "ForeignDataTouched is false on both collision and success paths; the assertion has no negative case and the toy object never reads a blueprint cache or a real GUID",
+      "status": "FAIL"
+    }
+  ]
+}

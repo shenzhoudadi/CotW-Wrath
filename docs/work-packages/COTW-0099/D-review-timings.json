@@ -1,0 +1,108 @@
+{
+  "steps": [
+    {
+      "name": "compile",
+      "seconds": 1.545,
+      "exit": 0,
+      "command": "dotnet build CallOfTheWild.Wrath.Prototype.csproj -c Release -p:WrathPath=D:/steam/steamapps/common/Pathfinder Second Adventure --nologo -v:q"
+    },
+    {
+      "name": "targeted-check",
+      "seconds": 2.259,
+      "exit": 0,
+      "command": "dotnet run --project tests/Occultist0099SliceTests.csproj -c Release -p:WrathPath=D:/steam/steamapps/common/Pathfinder Second Adventure -- docs/work-packages/COTW-0099/D-review-evidence.json"
+    },
+    {
+      "name": "dll-type-and-hash",
+      "seconds": 0.213,
+      "exit": 0
+    },
+    {
+      "name": "typeid-audit",
+      "seconds": 0.127,
+      "exit": 0
+    }
+  ],
+  "dll": {
+    "path": "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+    "size": 3261952,
+    "sha256": "E7F5E557CF73C82F50077C699D333C83C3D48947F8D6FEEB77303A7ADC797AB7",
+    "typesFound": [
+      "Occultist0099FocusFact0099",
+      "Occultist0099SpellbookMarker0099",
+      "Occultist0099FocusState",
+      "Occultist0099SpellState",
+      "Occultist0099Ids",
+      "Occultist0099AbjurationCatalog",
+      "Occultist0099Registration",
+      "Occultist0099BookScope"
+    ],
+    "typesChecked": 8
+  },
+  "sha256": {
+    "src/Occultist0099Rules.cs": "AE39E29693D424E1CFB87A462F10B0DD7EBF39F520DC74D14C8E41AFCB5596F0",
+    "src/Occultist0099Spells.cs": "306ACB52DD07C813ED44EFBBF6430E3300C8CBEB7B34A59E36E498398F80F4AA",
+    "src/Occultist0099Ids.cs": "AE0FAB704B2D5036DF28557727AFCAFC969FCE04D77417E30BFC88BFF8B0DBD5",
+    "src/Occultist0099Native.cs": "F32784BC6EC94C5FD47DF336E5D4A8339A8EC0F44F9FB006FA92BE3D22936E8A",
+    "tests/Occultist0099SliceProgram.cs": "F66287DDF709E3D649B4FACECA0D81289CF2681272C02A2EA9739CEA6A6BBEE1",
+    "tests/Occultist0099SliceTests.csproj": "55FDF1E7888EB35688A64505F4ED12E78B74C2E5F683E2BC136D2E8C16E2611D",
+    "docs/work-packages/COTW-0099/B-slice-report.json": "25D740C7165B994B95A97ECB70052B863DA950A186D8922DD0BC761A179422CF",
+    "docs/work-packages/COTW-0099/B-abjuration-slice.md": "F218C85D3F900DD674F5ABE34B7D64DDF2077797C189F96CDBDC6B82D08D1166",
+    "docs/work-packages/COTW-0099/C-occultist-contract.md": "48DA39B44EC994373D383BC6EBACF7F155619264D680D854F0072F5495F7A8EB",
+    "docs/work-packages/COTW-0099/C-occultist-cases.json": "950096C4CB88E78C583E8C3DD7B8494F8A110D8F4D5E4BC17D68081FDEE6B375"
+  },
+  "typeIdAudit": {
+    "total": 365,
+    "badLength": [],
+    "duplicates": {},
+    "occultist": [
+      [
+        "0099c0e1a1b24c0d8e5f600000000001",
+        [
+          "src\\Occultist0099Native.cs"
+        ]
+      ],
+      [
+        "0099c0e1a1b24c0d8e5f600000000002",
+        [
+          "src\\Occultist0099Native.cs"
+        ]
+      ]
+    ]
+  },
+  "assets": {
+    "totalRows": 143,
+    "abjurationRows": 18,
+    "level0Rows": 6
+  },
+  "abjurationCatalogComparison": {
+    "codeRows": 18,
+    "assetRows": 18,
+    "match": true,
+    "assetOnly": [],
+    "codeOnly": [],
+    "knacksMatchAssetsLevel0": true
+  },
+  "dContractReproduction": {
+    "command": "dotnet run --project tests/Occultist0099DReviewTests.csproj -c Release -p:WrathPath=<local game> -- docs/work-packages/COTW-0099/D-review-assertions.json",
+    "seconds": 1.249,
+    "exit": 0,
+    "result": "NEEDS_FIX",
+    "failingIds": [
+      "D-F01",
+      "D-F02",
+      "D-F03",
+      "D-F04",
+      "D-F05"
+    ],
+    "note": "rerun after fixing an over-broad D-F02 predicate; first run 1.487s had 4 FAIL / 5 checks"
+  },
+  "dllHashMismatch": {
+    "bDocumented": "AA9C1F8D6517452DDC59235A8465499A5E3610FBC5B18D7BABD7F94BE134D5EB",
+    "dReproduced": "E7F5E557CF73C82F50077C699D333C83C3D48947F8D6FEEB77303A7ADC797AB7",
+    "deterministicCsproj": true,
+    "stableAcrossRebuild": true,
+    "otherDllCopiesWithBHash": 0,
+    "note": "B documented hash does not reproduce from b6be98b sources; source SHA256 values above are authoritative"
+  }
+}
