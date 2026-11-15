@@ -300,6 +300,21 @@ internal static class Spiritualist0085Tests
         var dr15Value = (Kingmaker.UnitLogic.Mechanics.ContextValue)Get(dr15Comp, "Value");
         Check(dr15Value.Value == 15 && !dr15Comp.BypassedByForm, "level-15 DR implements the contract 15/- (not the original 5/slashing)");
 
+        // ---- C13/C14 exact transfer arithmetic (pure contract function) ----
+        var transferType = T("Phantom0085DamageTransfer");
+        var transferMethod = AccessTools.Method(transferType, "TransferAmount");
+        Func<bool, int, int, int, int, int> transfer = (bond, result, petHp, masterHp, con) =>
+            (int)transferMethod.Invoke(null, new object[] { bond, result, petHp, masterHp, con });
+        Check(transfer(false, 16, 1, 10, 13) == 3, "C13: decisive packet transfers exactly 3 (phantom 1 -> -12, owner 10 -> 7)");
+        Check(transfer(false, 16, 1, 2, 13) == 1, "C13: owner at 2 HP transfers at most 1");
+        Check(transfer(false, 5, 10, 10, 13) == 0, "C13: non-lethal packet transfers zero");
+        Check(transfer(true, 20, 1, 5, 13) == 13, "C14: 20 damage transfers exactly 13 (phantom 1 -> -12, owner 5 -> -2)");
+        Check(transfer(true, 20, 0, 5, 13) == 0, "C14: phantom below 1 HP transfers zero");
+        Check(transfer(true, 3, 10, 5, 13) == 0, "C14: non-lethal-to-owner packet transfers zero");
+        var bondedShield = Load<BlueprintBuff>(cache, Id("BondedManifestationEffect"));
+        Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085ShieldToIncorporealTouch"), "bonded shield transfers to incorporeal touch AC");
+        Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085TendrilDice") == false, "tendril dice live on the temporary attack buff, not the shield");
+
         // ---- Shared roots untouched ----
         Check(ReferenceEquals(cache.Load(inqBook.AssetGuid), inqBook), "Inquisitor spellbook identity preserved");
 

@@ -192,6 +192,8 @@ namespace CallOfTheWild.Wrath.Prototype
             if (pet == null) return;
             var petPart = pet.Get<UnitPartPet>();
             if (petPart == null) return;
+            if (pet.Descriptor.Alignment.ValueRaw != master.Descriptor.Alignment.ValueRaw)
+                pet.Descriptor.Alignment.Set(master.Descriptor.Alignment.ValueRaw);
             if (pet.Descriptor.State.IsFinallyDead) return;
             if (part.Confined)
             {
@@ -550,31 +552,32 @@ namespace CallOfTheWild.Wrath.Prototype
             int result = 0;
             foreach (var value in evt.CalculatedDamage) result += value.FinalValue;
             if (result <= 0) return;
-            int con = pet.Stats.Constitution.ModifiedValue;
-            int amount;
-            UnitEntityData target;
-            if (SpiritualBond)
-            {
-                // C14: keep the master at 1 HP; phantom absorbs down to 1-CON.
-                if (deal.Target != master || pet.Damage < 1) return;
-                int excess = 1 - (master.Damage - result);
-                int capacity = pet.Damage - (1 - con);
-                amount = Math.Min(excess, Math.Max(0, capacity));
-                target = pet;
-            }
-            else
-            {
-                // C13: pull lethal overflow back to 1-CON; master pays down to 1 HP.
-                if (deal.Target != pet) return;
-                int overflow = (1 - con) - (pet.Damage - result);
-                amount = Math.Min(overflow, Math.Max(0, master.Damage - 1));
-                target = master;
-            }
+            int amount = TransferAmount(SpiritualBond, result, pet.HPLeft, master.HPLeft, pet.Stats.Constitution.ModifiedValue);
+            UnitEntityData target = SpiritualBond ? pet : master;
             if (amount <= 0) return;
             // Native redirection is an integer percent of the final Result;
             // round up so the transferred amount is exact below 100 damage.
             deal.RedirectedPercent = (amount * 100 + result - 1) / result;
             deal.RedirectionTarget = target;
+        }
+
+        // Pure contract arithmetic (C13/C14), offline-testable. HP semantics:
+        // current HP may be negative; the death floor is 1-CON.
+        internal static int TransferAmount(bool spiritualBond, int result, int petHp, int masterHp, int con)
+        {
+            if (result <= 0) return 0;
+            int floor = 1 - con;
+            if (spiritualBond)
+            {
+                if (petHp < 1) return 0;
+                int excess = 1 - (masterHp - result);
+                if (excess <= 0) return 0;
+                int capacity = petHp - floor;
+                return Math.Min(excess, Math.Max(0, capacity));
+            }
+            int overflow = floor - (petHp - result);
+            if (overflow <= 0) return 0;
+            return Math.Min(overflow, Math.Max(0, masterHp - 1));
         }
     }
 
@@ -611,9 +614,11 @@ namespace CallOfTheWild.Wrath.Prototype
             var phantom = Context?.MaybeCaster;
             var unit = Target?.Unit;
             var master = phantom?.Get<UnitPartPet>()?.Master;
-            if (master == null || unit == null || !Phantom0085Link.Alive(phantom)) return;
+            if (master == null || unit == null || unit == phantom || !Phantom0085Link.Alive(phantom)) return;
             if (phantom.Descriptor.State.HasCondition(UnitCondition.Helpless) ||
-                phantom.Descriptor.State.HasCondition(UnitCondition.Unconscious)) return;
+                phantom.Descriptor.State.HasCondition(UnitCondition.Unconscious) ||
+                phantom.Get<UnitPartGrappleInitiator>() != null ||
+                phantom.Get<UnitPartGrappleTarget>() != null) return;
             var buff = (unit == master ? OwnerBuff : (Greater ? AllyBuff : null))?.Get();
             if (buff != null && unit.Buffs.GetBuff(buff) == null) unit.Buffs.AddBuff(buff, phantom, TimeSpan.MaxValue, AbilityParams.Empty);
         }
@@ -751,6 +756,21 @@ namespace CallOfTheWild.Wrath.Prototype
                 rerollFact?.Remove();
             }
         }
+    }
+
+    // ---- Bonded shield applies to incorporeal touch attacks (original convention) ----
+    [TypeId("b7e10085a1004500850085008500851b")]
+    public sealed class Phantom0085ShieldToIncorporealTouch : UnitFactComponentDelegate, ITargetRulebookHandler<RuleCalculateAC>, ITargetRulebookSubscriber
+    {
+        private static readonly BlueprintGuid Incorporeal = BlueprintGuid.Parse("c4a7f98d743bc784c9d4cf2105852c39");
+        public void OnEventAboutToTrigger(RuleCalculateAC evt)
+        {
+            if (!evt.AttackType.IsTouch()) return;
+            if (evt.Initiator == null || !evt.Initiator.HasFact(ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(Incorporeal))) return;
+            int shield = Owner.Stats.AC.GetDescriptorBonus(ModifierDescriptor.Shield);
+            if (shield > 0) evt.AddModifier(shield, Fact, ModifierDescriptor.UntypedStackable);
+        }
+        public void OnEventDidTrigger(RuleCalculateAC evt) { }
     }
 
     // ---- Confine / Manifest actions ----

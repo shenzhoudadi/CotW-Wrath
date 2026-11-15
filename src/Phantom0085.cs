@@ -1029,6 +1029,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 "The spiritualist gains an ectoplasmic shield: +4 shield bonus to AC (also against incorporeal touch attacks), increasing to +6 at 13th level. At 8th level she sprouts ectoplasmic tendrils; at 18th level she can attack all creatures in reach with them, rolling twice and taking the better result.",
                 new AddContextStatBonus { name = "Phantom0085BondedShield", Stat = StatType.AC, Descriptor = ModifierDescriptor.Shield, Value = new ContextValue { ValueType = ContextValueType.Rank } },
                 Rank(character, "Custom", 12, 4, 20, 6),
+                new Phantom0085ShieldToIncorporealTouch { name = "Phantom0085BondedIncorporealTouch" },
                 new Phantom0085BondedTendrils { name = "Phantom0085BondedTendrils" });
             var resource = f.Add(new BlueprintAbilityResource(), "BondedManifestationResource", "", "");
             var amount = Get(resource, "m_MaxAmount");

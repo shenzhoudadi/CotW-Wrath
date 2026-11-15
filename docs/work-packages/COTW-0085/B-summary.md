@@ -12,9 +12,9 @@
 
 ## 验证（本机，未启动游戏/UMM）
 
-- 隔离定向：**PASS，202 条断言，0 失败**，19.49 秒（含自行复查新增 9 条）（PsychicTests 宿主，`COTW_0085_CASE=spiritualist0085`，`COTW_ARCANE_01446_ONLY=1`）。覆盖 C01 注册/幂等、主人职业与私法表、137 行目录与源环位、六情绪各一 AddPet 与标记单位、Phantom 职业/进度、主人里程碑、Recall 1/2/3/4 与 Bonded 3+L/3+2L 资源形状、意识加值、Potent 互斥、共享根不变。运行器 `tests/Run-Spiritualist0085.py`，提取器 `tests/Extract-Spiritualist0085.py`（172 行原生供体，A 记录指纹全部核验），定向 `tests/Spiritualist0085Tests.cs`。生成件（B-report/B-result/B-directed 日志/计时）含绝对本机路径，按交接约定只留 `C:/Users/xuenc/agent-tools/spiritualist-next/`。
+- 隔离定向：**PASS，210 条断言，0 失败**，19.38 秒（含两轮复查新增 17 条，C13/C14 精确算术离线验证）（PsychicTests 宿主，`COTW_0085_CASE=spiritualist0085`，`COTW_ARCANE_01446_ONLY=1`）。覆盖 C01 注册/幂等、主人职业与私法表、137 行目录与源环位、六情绪各一 AddPet 与标记单位、Phantom 职业/进度、主人里程碑、Recall 1/2/3/4 与 Bonded 3+L/3+2L 资源形状、意识加值、Potent 互斥、共享根不变。运行器 `tests/Run-Spiritualist0085.py`，提取器 `tests/Extract-Spiritualist0085.py`（172 行原生供体，A 记录指纹全部核验），定向 `tests/Spiritualist0085Tests.cs`。生成件（B-report/B-result/B-directed 日志/计时）含绝对本机路径，按交接约定只留 `C:/Users/xuenc/agent-tools/spiritualist-next/`。
 - 编译：主体重编 **0 警告／0 错误**（首轮全量 4.189 秒）（游戏 Harmony 2.0.4.0 固定引用）。内置 Medium/WayOfTheShield 源码相对 origin/main 无改动，复用 0.14.74 已暂存产物（本机缺 UMM 0.32.4.0 引用，未重编）。
-- 打包与包内核对：**0.602 秒**，23 条目，三个 DLL 从 ZIP 回读 SHA256 一致。主 DLL `5F60A0E82FB3A8649F517AAF752C3066D87CA5A9FA87B867B30DBEC60B8BDFDC`。本地实验包 `D:/work/release-staging/0.14.74/1adfddc2403c41288c98172d0e8e1fe0/CallOfTheWildWrathPrototype-0.14.74-experimental.zip`（未上传 GitHub，未称 TEST 交付）。
+- 打包与包内核对：**0.605 秒**，23 条目，三个 DLL 从 ZIP 回读 SHA256 一致。主 DLL `B5151123BE75C02D31F6B762A4479BD2605CE24E15ABD80CB394780CA1665BB3`。本地实验包见 `C:/Users/xuenc/agent-tools/spiritualist-next/B-package.json`（未上传 GitHub，未称 TEST 交付）。
 - `build.ps1` 未运行：本机无 PowerShell 7.4；以等价 dotnet 编译 + python 打包/回读步骤代替，如实记录。
 
 ## 合同修订与差异记录
@@ -45,11 +45,19 @@
 
 CotW 根 GUID（BurstOfAdrenaline/SavageMaw/ForceSword）经 MD5 盐值核验一致。新增 9 条定向断言覆盖 Recall 扣减、互斥组、Stack、触手授予、Multiattack、DR 15/–。
 
+## 第二轮修复（2026-11-16，继续修复）
+
+1. **转移算术 HP 语义错误**：原用 `Damage`（已受伤害，setter 钳制 ≥0）当当前 HP。改 `HPLeft`（= HitPoints − Damage，可为负）。抽出纯函数 `TransferAmount`，C13/C14 六组数值离线断言精确通过（3／1／0／13／0／0）。
+2. **grappled 门控落地**：Wrath 无 Grappled 条件，改用 `UnitPartGrappleInitiator/Target` 判定，Inference 门控补齐合同要求的抓取状态。
+3. **Inference 幻影自身排除**：enter/round 动作显式 `unit == phantom → return`，幻影自身不获加值（C15）。
+4. **Bonded 护盾对虚体接触**：新增 `Phantom0085ShieldToIncorporealTouch`（ITargetRulebookHandler<RuleCalculateAC>），仅当攻击者具 Incorporeal 特性（c4a7f98d，已入门禁）且为接触攻击时，把护盾描述符加值转入 Touch AC；按原作约定限定虚体。
+5. **阵营同步**：Reproject 时同步幻影阵营到主人（覆盖跨区/休息/复活时机）。
+
 ## 未测边界（D / 玩家 TEST）
 
 - 原生链真实调用：`AddPet → SetMaster → UnitPartPetMaster → AddClassLevels`，及同实例 `SetHidden → TeleportToMaster → RemoveMaster`（C02–C04、C10、C17）。
 - 休息 UI、存读档、重训界面、跨区、世界地图、骑乘按钮、场景放置与动画（C07–C09、C18）。
-- 伤害转移包时序（C13/C14 的 RedirectedDamage 通道）、意识加值刷新、技能等级同步补丁的运行时行为。
+- 伤害转移在难度缩放／MinHP 钳制／临时 HP 下的百分比舍入（≥100 伤害可能 ±1）、意识加值刷新、技能等级同步补丁的运行时行为。
 - 完整六情绪实机成长与主人进度（C16）。
 
 ## 接手
