@@ -1,8 +1,11 @@
 # 工作状态：先认领，避免重复
 
-更新：2026-11-14。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
+更新：2026-11-15。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
 
 ## 🚧 施工中／已认领，请勿重复开发
+
+- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
+- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
 
 ## 本次0.14.69 TEST交付
 
