@@ -14,6 +14,7 @@ using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.Enums;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
@@ -38,6 +39,7 @@ using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Parts;
 using Kingmaker.Utility;
 using Kingmaker.View;
+using Newtonsoft.Json;
 
 // COTW-0085 B-stage directed checks, contract C-0085-20261115-r1.
 // The host enters with COTW_0085_CASE=spiritualist0085 and routes straight
@@ -286,6 +288,7 @@ internal static class Spiritualist0085Tests
             var facts = new EntityFactsManager(unit);
             Set(unit, "Facts", facts);
             Set(unit, "Buffs", facts.EnsureFactProcessor<BuffCollection>());
+            Set(unit, "ActivatableAbilities", facts.EnsureFactProcessor<ActivatableAbilityCollection>());
             var progression = new UnitProgressionData();
             Set(unit.Descriptor, "Progression", progression);
             Set(progression, "Owner", unit.Descriptor);
@@ -357,6 +360,7 @@ internal static class Spiritualist0085Tests
             var omitScene = new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(SkipRecoveryFixtureView));
             native.Patch(AccessTools.Method(typeof(UnitEntityData), "UpdateGroup"), prefix: omitScene);
             native.Patch(AccessTools.Method(typeof(UnitPartPetMaster), "UpdateMountAbility"), prefix: omitScene);
+            native.Patch(AccessTools.Method(typeof(UnitEntityData), "OnIsInGameChanged"), prefix: omitScene);
             native.Patch(AccessTools.Method(typeof(UnitEntityData), nameof(UnitEntityData.SetMaster)),
                 transpiler: new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(BoundFixtureScale)));
             native.Patch(AccessTools.Method(typeof(EntityFact), nameof(EntityFact.Attach)),
@@ -419,6 +423,34 @@ internal static class Spiritualist0085Tests
             sourceA.Runtime.Fact.Reapply();
             Check(FixtureLevelRequests.Count == 0 && Bound(a, partA) == petA,
                 "C03: four unrelated class levels leave the native Phantom request unchanged");
+            var saveSettings = new JsonSerializerSettings { ContractResolver = new OptInContractResolver() };
+            Set(partA, "Confined", true);
+            petA.Get<UnitPartPet>().SetHidden(true);
+            var savedPhantomState = JsonConvert.SerializeObject(partA, saveSettings);
+            petA.RemoveMaster();
+            JsonConvert.PopulateObject(savedPhantomState, partA, saveSettings);
+            Set(a, "m_IsInGame", true);
+            Update(sourceA);
+            Check((bool)Get(partA, "Confined") && (string)Get(partA, "PetId") == petA.UniqueId &&
+                petA.Get<UnitPartPet>().ShouldBeHidden && !petA.IsInGame && Bound(a, partA) == petA,
+                "C08: the native recorded-pet reconnect preserves the saved confinement and the same entity");
+            petA.IsInGame = true;
+            EventBus.RaiseEvent<IAreaLoadingStagesHandler>(handler => handler.OnAreaLoadingComplete());
+            EventBus.RaiseEvent<IAreaLoadingStagesHandler>(handler => handler.OnAreaLoadingComplete());
+            Check(!petA.IsInGame && petA.Get<UnitPartPet>().ShouldBeHidden && a.Pets.Count == 2 && dog.Master == a &&
+                petB.Master == b && !dog.Get<UnitPartPet>().ShouldBeHidden && !petB.Get<UnitPartPet>().ShouldBeHidden,
+                "C08/C17: the native area completion restores a confined phantom even if its hidden flag already exists");
+            petA.State.UpdateLifeState(UnitLifeState.Dead);
+            petA.Get<UnitPartPet>().SetHidden(false);
+            petA.IsInGame = true;
+            EventBus.RaiseEvent<IAreaLoadingStagesHandler>(handler => handler.OnAreaLoadingComplete());
+            Check(petA.State.IsDead && petA.IsInGame && !petA.Get<UnitPartPet>().ShouldBeHidden,
+                "C08: the area visibility projection leaves a native dead phantom available for recovery");
+            petA.State.UpdateLifeState(UnitLifeState.Conscious);
+            dog.RemoveMaster();
+            Update(dogSource);
+            Check(dog.Master == a && dog.IsInGame && !dog.Get<UnitPartPet>().ShouldBeHidden,
+                "C08/C17: native Dog reconnect still inherits its master's scene visibility");
             ownerClass.Level = 20;
             sourceA.Runtime.Fact.Reapply();
             Check(FixtureLevelRequests.SequenceEqual(new[] { (phantomLevels, petA, 18) }) && Bound(a, partA) == petA,
@@ -779,6 +811,11 @@ internal static class Spiritualist0085Tests
         var orphan = (object)default(UnitReference);
         AccessTools.Field(typeof(UnitReference), "m_UniqueId").SetValue(orphan, "saved-phantom-not-yet-loaded");
         const string referencePatch = "Phantom0085Patches+ExistingPetReference";
+        var updatePet = AccessTools.Method(typeof(AddPet), "TryUpdatePet");
+        var updateInstructions = (IEnumerable<CodeInstruction>)Call(referencePatch, "Transpiler",
+            PatchProcessor.GetOriginalInstructions(updatePet), updatePet);
+        Check(updateInstructions.Count(i => i.Calls(AccessTools.Method(T(referencePatch), "TransferNativeVisibility"))) == 1,
+            "C08: the native AddPet reconnect contains exactly one guarded visibility assignment");
         Check((bool)Call(referencePatch, "WaitingForRecordedPet", orphan, null) &&
             !(bool)Call(referencePatch, "WaitingForRecordedPet", default(UnitReference), null) &&
             AccessTools.Property(typeof(AddPet), "Data")?.PropertyType == typeof(AddPetData) &&

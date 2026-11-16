@@ -144,8 +144,8 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // ---- Emotion link: owns the master state and the lifecycle events ----
     [TypeId("b7e10085a10045008500850085008502")]
-    public sealed class Phantom0085Link : UnitFactComponentDelegate, IAreaHandler, IUnitRestHandler, IUnitHandler,
-        IUnitLifeStateChanged, IPetHandler, IGlobalSubscriber
+    public sealed class Phantom0085Link : UnitFactComponentDelegate, IAreaHandler, IAreaLoadingStagesHandler,
+        IUnitRestHandler, IUnitHandler, IUnitLifeStateChanged, IPetHandler, IGlobalSubscriber
     {
         public string Emotion;
 
@@ -175,11 +175,13 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         public void OnAreaBeginUnloading() => Owner?.Get<UnitPartPhantom0085>()?.ClearRecall();
-        public void OnAreaDidLoad()
+        public void OnAreaDidLoad() { }
+        public void OnAreaScenesLoaded() { }
+        public void OnAreaLoadingComplete()
         {
             var master = Owner;
             var part = master?.Get<UnitPartPhantom0085>();
-            if (part != null) Reproject(master, part);
+            if (part?.Emotion == Emotion) Reproject(master, part);
         }
 
         public void HandleUnitRest(UnitEntityData unit)
@@ -308,18 +310,12 @@ namespace CallOfTheWild.Wrath.Prototype
             if (petPart == null) return;
             Phantom0085PetGrant.RefreshAll(master, pet);
             Phantom0085AlignmentSync.Sync(master, pet);
-            if (pet.Descriptor.State.IsFinallyDead) return;
-            if (part.PendingManifest && Alive(pet))
+            if (Alive(pet))
             {
-                ManifestNow(master, pet, part);
-            }
-            else if (part.Confined)
-            {
-                if (!petPart.ShouldBeHidden) petPart.SetHidden(true);
-            }
-            else if (petPart.ShouldBeHidden && Alive(pet))
-            {
-                ManifestNow(master, pet, part);
+                if (part.PendingManifest || (!part.Confined && petPart.ShouldBeHidden))
+                    ManifestNow(master, pet, part);
+                else if (part.Confined && (!petPart.ShouldBeHidden || pet.IsInGame))
+                    petPart.SetHidden(true);
             }
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
@@ -1211,6 +1207,30 @@ namespace CallOfTheWild.Wrath.Prototype
 
             internal static bool RetiredRecordedPet(UnitEntityData pet)
                 => pet != null && pet.DestroyMark && pet.Master == null;
+
+            [HarmonyTranspiler]
+            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source, System.Reflection.MethodBase __originalMethod)
+            {
+                if (__originalMethod.Name != "TryUpdatePet") return source;
+                var instructions = source.ToList();
+                var setInGame = AccessTools.PropertySetter(typeof(EntityDataBase), nameof(EntityDataBase.IsInGame));
+                var calls = instructions.Where(instruction => instruction.Calls(setInGame)).ToArray();
+                if (calls.Length != 1)
+                {
+                    ModEntry.LogSpellDiagnostic("0085 reconnect: native pet visibility assignment was not found.");
+                    return instructions;
+                }
+                calls[0].opcode = OpCodes.Call;
+                calls[0].operand = AccessTools.Method(typeof(ExistingPetReference), nameof(TransferNativeVisibility));
+                return instructions;
+            }
+
+            private static void TransferNativeVisibility(UnitEntityData pet, bool visible)
+            {
+                // SetMaster's add event can already have restored the native hidden flag.
+                var part = pet.Get<UnitPartPet>();
+                pet.IsInGame = visible && !(part?.ShouldBeHidden == true && IsPrivatePhantom(part));
+            }
 
             [HarmonyPrefix]
             private static bool Prefix(AddPet __instance, System.Reflection.MethodBase __originalMethod)
