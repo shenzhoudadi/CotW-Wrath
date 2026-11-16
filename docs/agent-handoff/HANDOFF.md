@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2 已修，252 条定向和六处原生补丁安装探针通过。D3 继续核对阵亡、移除及重训授权清理。玩家场景未运行，安装包未上传。工作分支 `feat/cotw-0085-spiritualist`。[B2 修复及 D3 复查](../work-packages/COTW-0085/B2-D3-spiritualist.md) · [D2 复查](../work-packages/COTW-0085/D2-spiritualist-review.md)。
+- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2/D3 已修，253 条定向和本地 TEST 包回读通过。独立宿主验证主人状态序列化，原生单位构造仍受 Unity ECall 限制。玩家场景未运行，安装包未上传。工作分支 `feat/cotw-0085-spiritualist`。[B/D 记录](../work-packages/COTW-0085/B2-D3-spiritualist.md) · [D2 复查](../work-packages/COTW-0085/D2-spiritualist-review.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 

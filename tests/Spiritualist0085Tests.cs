@@ -386,6 +386,9 @@ internal static class Spiritualist0085Tests
             (BlueprintGuid)Call("Phantom0085DamageTransfer", "OtherToggle", false) == bondActivatable.AssetGuid &&
             (BlueprintGuid)Call("Phantom0085DamageTransfer", "OtherToggle", true) == tetherActivatable.AssetGuid,
             "native groups accept both toggles and mutual exclusion references only the paired 0085 ability");
+        Check(Component(tetherActivatable, "Phantom0085DamageLinkRestriction") != null &&
+            Component(bondActivatable, "Phantom0085DamageLinkRestriction") != null,
+            "both mutual protection toggles use the same active bound phantom condition as damage delivery");
         Check(Load<BlueprintBuff>(cache, Id("SharedConsciousnessSave")).IsClassFeature &&
             Load<BlueprintBuff>(cache, Id("FusedConsciousnessSave")).IsClassFeature, "consciousness buffs opt out of native respec restoration");
         var inferenceOwner = Load<BlueprintBuff>(cache, Id("SpiritualInferenceOwner"));

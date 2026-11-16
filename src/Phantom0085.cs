@@ -1104,6 +1104,10 @@ namespace CallOfTheWild.Wrath.Prototype
             }, token, name, description);
             Set(toggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Free);
             Set(toggle, "m_Buff", Ref<BlueprintBuffReference>(buff));
+            toggle.ComponentsArray = new BlueprintComponent[]
+            {
+                new Phantom0085DamageLinkRestriction { name = "Phantom0085" + token + "RequiresManifestedPet" }
+            };
             return f.Feature(token + "Feature", name, description, Facts(toggle));
         }
 

@@ -5,7 +5,7 @@
 ## 🚧 施工中／已认领，请勿重复开发
 
 - **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2 修复已进入 D3，最新定向 252/252（14.025 秒），本地 TEST 包三个 DLL 回读一致。继续处理阵亡及原生移除的互保清理，玩家场景未运行，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[B2 修复及 D3 复查](docs/work-packages/COTW-0085/B2-D3-spiritualist.md)。
+- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2/D3 已修，阵亡、原生伙伴移除及授权撤销清理已接线。最新定向 253/253（14.102 秒），本地 TEST 包三个 DLL 回读一致。完整原生伙伴链与玩家场景待验，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[B/D 记录](docs/work-packages/COTW-0085/B2-D3-spiritualist.md)。
 
 ## 本次0.14.69 TEST交付
 
