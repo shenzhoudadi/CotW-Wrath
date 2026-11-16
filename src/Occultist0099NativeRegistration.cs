@@ -65,6 +65,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 "AbjurationEffectiveLevel", "AbjurationDCLevel", "EnergyShieldBuff", "EnergyShieldAbility", "EnergyShieldPower",
                 "UnravelingAbility", "UnravelingPower", "GlobeOfNegationBuff", "GlobeOfNegationAbility", "GlobeOfNegationPower"
             };
+            ids.UnionWith(Occultist0099Aegis.Tokens());
             foreach (var school in Schools) ids.Add(school + "ExtraSpellSource");
             for (int index = 0; index < ImplementLevels.Length; index++)
             {
@@ -126,8 +127,9 @@ namespace CallOfTheWild.Wrath.Prototype
                     manifest.Any(id => loaded.Contains(id))) return false;
                 var enchantment = Occultist0099Enchantment.Build(cache, DetachedText);
                 var abjuration = Occultist0099AbjurationPowers.Build(cache, DetachedText);
-                if (enchantment == null || abjuration == null) return false;
-                var graph = BuildGraph(root, alchemist, day, proficiencies, spells, enchantment.Concat(abjuration).ToArray());
+                var aegis = Occultist0099Aegis.Build(cache, DetachedText);
+                if (enchantment == null || abjuration == null || aegis == null) return false;
+                var graph = BuildGraph(root, alchemist, day, proficiencies, spells, enchantment.Concat(abjuration).Concat(aegis).ToArray());
                 var ids = new HashSet<BlueprintGuid>(graph.Assets.Select(asset => asset.AssetGuid));
                 if (ids.Count != graph.Assets.Length || !ids.SetEquals(manifest))
                     throw new InvalidOperationException("Occultist development graph differs from its private identity manifest.");
@@ -267,7 +269,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 FocusResource = Ref<BlueprintAbilityResourceReference>(resource),
                 MindBarrierBuff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("MindBarrierBuff")),
                 AbjurationEffects = new[] { Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("EnergyShieldBuff")),
-                    Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GlobeOfNegationBuff")) },
+                    Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GlobeOfNegationBuff")),
+                    Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("AegisArmorBuff")) },
                 WardingTalisman = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("WardingTalismanBuff")),
                 SchoolResonances = new[] { new Occultist0099SchoolResonance { School = Occultist0099Enchantment.School,
                     Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GloriousPresenceBuff")) } }
@@ -281,6 +284,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 Power("BindingPattern", "Binding Pattern", enchantmentImplement, 7),
                 Power("InspiredAssault", "Inspired Assault", enchantmentImplement),
                 Power("Obey", "Obey", enchantmentImplement),
+                Feature("AegisPower", "Aegis", Requires(abjurationImplement),
+                    GrantPower(abjurationImplement, Mechanic<BlueprintFeature>("AegisOptions"))),
                 Power("EnergyShield", "Energy Shield", abjurationImplement, 3),
                 Power("Unraveling", "Unraveling", abjurationImplement, 5),
                 Power("GlobeOfNegation", "Globe of Negation", abjurationImplement, 11)
@@ -350,7 +355,7 @@ namespace CallOfTheWild.Wrath.Prototype
             return requirement;
         }
 
-        private static Occultist0099SchoolPowerGrant GrantPower(BlueprintFeature implement, BlueprintAbility power)
+        private static Occultist0099SchoolPowerGrant GrantPower(BlueprintFeature implement, BlueprintUnitFact power)
         {
             var grant = new Occultist0099SchoolPowerGrant { name = "OccultistRequires" + implement.name };
             Set(grant, "m_CheckedFact", Ref<BlueprintUnitFactReference>(implement));

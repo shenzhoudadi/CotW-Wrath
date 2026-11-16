@@ -15,6 +15,9 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Blueprints.Items.Armors;
+using Kingmaker.Blueprints.Items.Ecnchantments;
+using Kingmaker.Blueprints.Items.Weapons;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Root;
 using Kingmaker.Controllers;
@@ -23,6 +26,7 @@ using Kingmaker.Controllers.Rest.State;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.DLC;
+using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Persistence.JsonUtility;
@@ -30,6 +34,8 @@ using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.Enums.Damage;
 using Kingmaker.Inspect;
+using Kingmaker.Items;
+using Kingmaker.Items.Slots;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
@@ -59,7 +65,11 @@ internal static class Occultist0099NativeLauncher
 {
     private static int Main(string[] args)
     {
-        if (args.Length != 5) return 2;
+        if (args.Length != 5 || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE")))
+        {
+            Console.Error.WriteLine("Set COTW_0099_AEGIS_FIXTURE to the donor list from ReadOccultist0099ArmorArchive.ps1.");
+            return 2;
+        }
         var runtimePath = Environment.GetEnvironmentVariable("COTW_HARMONY_MATRIX_PATH");
         if (!string.IsNullOrEmpty(runtimePath)) Assembly.LoadFrom(runtimePath);
         AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
@@ -104,11 +114,16 @@ internal static class Occultist0099NativeTests
     private static readonly List<UnitEntityData> world = new List<UnitEntityData>();
     private static int skippedComponents;
     private static int registeredPrivateIdentities;
+    private static int armorArchiveRows;
+    private static EntityService armorFixtureEntities;
     private static int castDispatches;
     private static int pointsAtDispatch;
     private static Action<RuleApplySpell> beforeDispatch;
     private static Action afterBatchRest;
     private static bool applyNativeEffects;
+    private static BlueprintBuff rejectedAegisWard;
+    private static BlueprintItemEnchantment failedAegisEnchantment;
+    private static bool aegisAttachmentInterrupted;
     private static UnitProgressionData respecXpOwner;
     private static BlueprintStatProgression respecXpTable;
     private static TimeSpan currentTime = TimeSpan.FromHours(8);
@@ -526,6 +541,7 @@ internal static class Occultist0099NativeTests
             try { info.SetValue(bp, value.ToObject(info.FieldType)); } catch { }
         }
         foreach (var field in new[] { "m_Parent", "m_SpellList", "m_CharacterClass", "m_SpellsPerDay",
+                                      "m_Type", "m_Enchantments",
                                       "m_SpellsKnown", "m_SpellSlots", "m_BaseAttackBonus", "m_FortitudeSave", "m_WillSave" })
         {
             var info = AccessTools.Field(type, field);
@@ -544,6 +560,18 @@ internal static class Occultist0099NativeTests
 
     private static T Native<T>(string guid) where T : SimpleBlueprint
         => cache.Load(P(guid)) as T;
+
+    private static void LoadAegisDonors(string path)
+    {
+        foreach (var row in JArray.Parse(File.ReadAllText(path)))
+        {
+            var name = (string)row["name"];
+            if (Materialise((JObject)row["blueprint"], name) == null)
+                throw new InvalidDataException("Aegis fixture could not load " + name);
+            armorArchiveRows++;
+        }
+        Eq(37, armorArchiveRows, "HOST loads the 20 signed armor enchantments and their native support rows");
+    }
 
     // ------------------------------------------------------------------
     // Roots the audited game archive does not carry.
@@ -1787,7 +1815,10 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.SpellbookFactTypeId, Occultist0099Ids.FocusPropertyTypeId,
             Occultist0099Ids.FocusOperationTypeId, Occultist0099Ids.ImplementSchoolTypeId,
             Occultist0099Ids.ImplementSlotTypeId, Occultist0099Ids.SchoolValueTypeId, Occultist0099Ids.SameRaceTypeId,
-            Occultist0099Ids.SchoolPowerGrantTypeId, Occultist0099Ids.EnergyShieldTypeId, Occultist0099Ids.GlobeOfNegationTypeId
+            Occultist0099Ids.SchoolPowerGrantTypeId, Occultist0099Ids.EnergyShieldTypeId, Occultist0099Ids.GlobeOfNegationTypeId,
+            Occultist0099Ids.AegisOptionTypeId, Occultist0099Ids.AegisTargetTypeId, Occultist0099Ids.AegisArmorTypeId,
+            Occultist0099Ids.AegisStorageTypeId, Occultist0099Ids.AegisStoreSpellTypeId, Occultist0099Ids.AegisReleaseTypeId,
+            Occultist0099Ids.AegisReleaseActionTypeId, Occultist0099Ids.AegisApplyTypeId, Occultist0099Ids.AegisGrantsTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
                 "GATE private TypeId " + id + " has no native collision");
@@ -2081,6 +2112,334 @@ internal static class Occultist0099NativeTests
         return false;
     }
 
+    private static void AegisNative(BlueprintsCache detached, BlueprintCharacterClass character)
+    {
+        T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
+        var unit = Unit("aegis-wearer", character, 12, 16);
+        var enemy = Unit("aegis-melee-attacker", character, 6, 10);
+        Set(unit.Descriptor, "UISettings", new Kingmaker.UI.UnitSettings.UnitUISettings(unit.Descriptor));
+        var body = Empty<UnitBody>();
+        Set(body, "Owner", unit.Descriptor);
+        var armorSlot = new ArmorSlot(unit.Descriptor);
+        Set(body, "Armor", armorSlot);
+        Set(unit.Descriptor, "Body", body);
+        Set(unit, "IsTurnedOn", true);
+        Set(unit.Progression, "m_Selections", new Dictionary<BlueprintFeatureSelection, FeatureSelectionData>());
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MentalFocusFact"), unit.Descriptor));
+        var implement = new Feature(Asset<BlueprintFeature>("slot-1-Abjuration-Implement"), unit.Descriptor);
+        unit.Facts.Add(implement);
+        var classBook = unit.Descriptor.DemandSpellbook(character.Spellbook);
+        var state = LevelState(classBook);
+        var selection = state.AddSelection(null, character.Progression, Asset<BlueprintFeatureSelection>("FocusPowerSelection"), 1);
+        var pick = new SelectFeature(selection, Asset<BlueprintFeature>("AegisPower"));
+        Check(pick.Check(state, unit.Descriptor), "AEGIS Aegis is a first-level native Focus Power choice for an Abjuration implement");
+        pick.Apply(state, unit.Descriptor);
+        AbilityData Granted(string token) => unit.Abilities.Enumerable.Single(grant => grant.Blueprint == Asset<BlueprintAbility>(token)).Data;
+        var aegis = Granted("AegisAbility");
+        var standard = new AbilityData(aegis, Asset<BlueprintAbility>("AegisStandardAbility"));
+        var swift = new AbilityData(aegis, Asset<BlueprintAbility>("AegisSwiftAbility"));
+        var ward = Asset<BlueprintBuff>("AegisArmorBuff");
+        var pool = unit.Get<Occultist0099FocusPart>().State.Schools["Abjuration"];
+        var numeric2 = Native<BlueprintArmorEnchantment>("758b77a97640fd747abf149f5bf538d0");
+        var fireHeavy = Native<BlueprintArmorEnchantment>("e7af6912cc308df4e9ee63c8824f2738");
+        var armorBlueprint = Native<BlueprintItemArmor>("c65f6fc979d5556489b20e478189cbdd");
+        armorFixtureEntities = new EntityService();
+        var service = AccessTools.PropertyGetter(typeof(EntityService), nameof(EntityService.Instance));
+        var serviceBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ArmorEntityServiceBoundary));
+        harmony.Patch(service, prefix: new HarmonyMethod(serviceBoundary));
+        ItemEntityArmor armor, identical;
+        try
+        {
+            armor = armorBlueprint.CreateEntity<ItemEntityArmor>();
+            identical = armorBlueprint.CreateEntity<ItemEntityArmor>();
+        }
+        finally { harmony.Unpatch(service, serviceBoundary); }
+        var baseline = armor.AddEnchantment(numeric2, null);
+        var level = unit.Progression.GetClassData(character);
+        var budget = AccessTools.Method(Production("Occultist0099Aegis"), "Budget");
+        int Points() => (int)budget.Invoke(null, new object[] { unit });
+        foreach (var pair in new[] { (Level: 1, Points: 1), (Level: 6, Points: 2), (Level: 12, Points: 3), (Level: 18, Points: 4) })
+        {
+            level.Level = pair.Level;
+            Eq(pair.Points, Points(), "AEGIS native actual class level determines enhancement budget");
+        }
+        level.Level = 20;
+        var focus = unit.Get<Occultist0099FocusPart>().State;
+        Occultist0099Focus.SetMastery(focus, "Abjuration");
+        Eq(5, Points(), "AEGIS own mastery unlocks the dedicated fifth tier");
+        focus.MasterySchool = null;
+        level.Level = 12;
+        Check(standard.Blueprint.ActionType == UnitCommand.CommandType.Standard && swift.Blueprint.ActionType == UnitCommand.CommandType.Swift &&
+              standard.ResourceLogic.CalculateCost(standard) == 1 && swift.ResourceLogic.CalculateCost(swift) == 2,
+            "AEGIS original Standard and Swift activation variants cost one and two");
+        var enchantRefresh = AccessTools.Method(typeof(ItemEntityArmor), nameof(ItemEntityArmor.RecalculateStats));
+        var skipVisualStats = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NoReplenish));
+        var enchantDollRoom = AccessTools.PropertyGetter(typeof(ItemEnchantment), "WielderVisibleInInventory");
+        var skipDollRoom = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ArmorDollRoomBoundary));
+        var applyBuffRule = AccessTools.Method(typeof(RuleCanApplyBuff), nameof(RuleCanApplyBuff.OnTrigger));
+        var rejectWard = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(RejectAegisWard));
+        var attachEnchantment = AccessTools.Method(typeof(ItemEntity), "AddEnchantmentInternal",
+            new[] { typeof(BlueprintItemEnchantment), typeof(MechanicsContext), typeof(Rounds?) });
+        var failAttachment = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(FailAegisAttachment));
+        var loggerInstance = AccessTools.PropertyGetter(typeof(Owlcat.Runtime.Core.Logging.Logger), "Instance");
+        var loggerLog = AccessTools.Method(typeof(Owlcat.Runtime.Core.Logging.Logger), "Log");
+        var offlineLogger = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(AegisLoggerInstanceBoundary));
+        var expectedError = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ExpectedAegisFaultLog));
+        var elementReport = AccessTools.Method(typeof(ElementLogicException), "ReportInternal");
+        var reportElement = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(AegisElementReportBoundary));
+        harmony.Patch(enchantRefresh, prefix: new HarmonyMethod(skipVisualStats));
+        harmony.Patch(enchantDollRoom, prefix: new HarmonyMethod(skipDollRoom));
+        harmony.Patch(applyBuffRule, prefix: new HarmonyMethod(rejectWard));
+        harmony.Patch(attachEnchantment, postfix: new HarmonyMethod(failAttachment));
+        harmony.Patch(loggerInstance, prefix: new HarmonyMethod(offlineLogger));
+        harmony.Patch(loggerLog, prefix: new HarmonyMethod(expectedError));
+        harmony.Patch(elementReport, prefix: new HarmonyMethod(reportElement));
+        applyNativeEffects = true;
+        var previousTime = currentTime;
+        try
+        {
+            var invest = Granted("InvestFocusAbility");
+            for (int i = 0; i < 11; i++) CastRule(invest);
+            CastRule(Granted("LockFocusAbility"));
+            Check(CastRule(standard).ForceFail && pool.Remaining == 11, "AEGIS casting without worn armor cannot debit Mental Focus");
+            Equip(armor);
+            armorSlot.Lock.Retain();
+            rejectedAegisWard = ward;
+            CastRule(standard);
+            rejectedAegisWard = null;
+            Check(pool.Remaining == 11 && unit.Buffs.GetBuff(ward) == null && armorSlot.Lock.Count == 1 &&
+                  armor.Enchantments.Count() == 1 && armor.Enchantments.Contains(baseline),
+                "AEGIS native buff rejection leaves focus, the armor and its foreign lock untouched");
+            Check(CastRule(standard).Success && unit.Buffs.GetBuff(ward)?.TimeLeft == TimeSpan.FromMinutes(1) &&
+                  pool.Remaining == 10 && armorSlot.Lock.Count == 2 && !armorSlot.CanRemoveItem(),
+                "AEGIS actual native armor slot is locked for one minute with one paid school point");
+            Eq(5, Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor), "AEGIS actual native combined enhancement is capped at five");
+            var fire = Toggle("AegisFire20Choice");
+            var heavyFortification = Toggle("AegisFortification75Choice");
+            Check(fire.IsAvailable && !heavyFortification.IsAvailable, "AEGIS native property restriction rejects costs above the budget");
+            fire.IsOn = true;
+            Check(fire.IsStarted && !armor.Enchantments.Any(item => item.Blueprint == fireHeavy) &&
+                  Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor) == 5,
+                "AEGIS toggling a property updates the next activation and leaves the current armor snapshot alone");
+            var firstWard = unit.Buffs.GetBuff(ward);
+            failedAegisEnchantment = fireHeavy;
+            CastRule(swift);
+            failedAegisEnchantment = null;
+            Check(aegisAttachmentInterrupted && pool.Remaining == 10 && unit.Buffs.GetBuff(ward) == firstWard &&
+                  unit.Buffs.Enumerable.Count(buff => buff.Blueprint == ward) == 1 && armorSlot.Lock.Count == 2 &&
+                  armor.Enchantments.Contains(baseline) && armor.Enchantments.Count() == 2 &&
+                  Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor) == 5,
+                "AEGIS a late native attachment failure restores the entire prior ward and retains both focus and the foreign lock");
+            Check(CastRule(swift).Success && pool.Remaining == 8 && armor.Enchantments.Contains(baseline) &&
+                  armor.Enchantments.Any(item => item.Blueprint == fireHeavy) &&
+                  Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor) == 3 && armorSlot.Lock.Count == 2,
+                "AEGIS real recast pays two and replaces the exact owned snapshot while retaining the foreign stock enchantment and lock");
+
+            fire.IsOn = false;
+            Toggle("AegisSpellStoringChoice").IsOn = true;
+            CastRule(standard);
+            var holder = unit.Progression.Features.Enumerable.Single(feature => feature.Blueprint == Asset<BlueprintFeature>("AegisStorageFact"));
+            var payload = holder.Components.Single(component => component.SourceBlueprintComponent is Occultist0099AegisStorage)
+                .GetData<Occultist0099AegisStoredSpell>();
+            var fixtureTargetBuff = new BlueprintBuff { name = "0099N.AegisTouchDelivered", AssetGuid = P(Occultist0099Ids.Id("HostAegisTouch")),
+                ComponentsArray = Array.Empty<BlueprintComponent>() };
+            fixtureTargetBuff.OnEnable();
+            var touchSpell = ProviderSpell(Occultist0099Ids.Id("HostAegisTouchSpell"), "0099N.AegisTouchSpell", SpellSchool.Necromancy, fixtureTargetBuff);
+            touchSpell.Range = AbilityRange.Touch;
+            touchSpell.CanTargetEnemies = true;
+            touchSpell.EffectOnEnemy = AbilityEffectOnUnit.Harmful;
+            var spontaneous = StorageBook(true);
+            var known = spontaneous.AddKnown(1, touchSpell, false);
+            var slots = (int[])Get(spontaneous, "m_SpontaneousSlots");
+            slots[1] = 2;
+            AbilityData Conversion(AbilityData original) => original.GetConversions().Single(candidate =>
+                candidate.Blueprint.GetComponent<Occultist0099AegisStoreSpell>() != null);
+            var conversion = Conversion(known);
+            Check(conversion.Fact != null && conversion.Fact.Active && conversion.ConvertedFrom == known && conversion.ParamSpellSlot == null &&
+                  conversion.Blueprint.ActionType == UnitCommand.CommandType.Standard && conversion.SaveSpellbookSlot,
+                "AEGIS the native spontaneous conversion retains its owned fact and a Standard action");
+            var wrongLevel = new AbilityData(touchSpell, spontaneous, 2);
+            slots[2] = 1;
+            Check(!wrongLevel.GetConversions().Any(candidate => candidate.Blueprint.GetComponent<Occultist0099AegisStoreSpell>() != null),
+                "AEGIS an available second-level slot cannot impersonate the same spell only known at first level");
+            var storedCast = CastRule(conversion);
+            Check(storedCast.Success && slots[1] == 1 && payload.Armor == armor && payload.Spell?.Blueprint == touchSpell,
+                "AEGIS storing debits the real spontaneous source once and binds the snapshot to the worn armor");
+            conversion.Blueprint.GetComponent<Occultist0099AegisStoreSpell>().Apply(storedCast.Context, new TargetWrapper(unit));
+            Eq(1, slots[1], "AEGIS a replay of the same storage execution cannot spend another spontaneous slot");
+
+            var prepared = StorageBook(false);
+            var memorized = prepared.AddKnown(1, touchSpell, false);
+            var selected = new SpellSlot(1, SpellSlotType.Common, 0, prepared) { SpellShell = memorized, Available = true };
+            ((List<SpellSlot>[])Get(prepared, "m_MemorizedSpells"))[1] = new List<SpellSlot> { selected };
+            var preparedConversion = Conversion(memorized);
+            var intelligence = unit.Stats.Intelligence;
+            int startingIntelligence = intelligence.BaseValue;
+            intelligence.BaseValue = 10;
+            Check(!preparedConversion.Blueprint.GetComponent<Occultist0099AegisStoreSpell>().IsAbilityRestrictionPassed(preparedConversion) &&
+                  selected.Available, "AEGIS current Intelligence is rechecked against the prepared source before spending");
+            intelligence.BaseValue = startingIntelligence;
+            CastRule(preparedConversion);
+            Check(!selected.Available && slots[1] == 1 && payload.Spell?.Spellbook == prepared && payload.Parameters != null,
+                "AEGIS the prepared conversion consumes the selected preparation and leaves the other book untouched");
+            var stored = payload.Spell;
+            var active = unit.Buffs.GetBuff(ward);
+            currentTime = active.EndTime;
+            unit.Buffs.TickBuff(active, currentTime);
+            Check(unit.Buffs.GetBuff(ward) == null && armorSlot.Lock.Count == 1 && armor.Enchantments.Contains(baseline) &&
+                  !unit.Abilities.Enumerable.Any(ability => ability.Blueprint == Asset<BlueprintAbility>("AegisStoreSpellAbility")) &&
+                  ReferenceEquals(payload.Spell, stored), "AEGIS expiration withdraws the property and one lock but retains the prepared spell and foreign enhancement");
+            armorSlot.Lock.Release();
+            Equip(identical);
+            CastRule(standard);
+            Check(!Toggle("AegisReleaseToggle").IsAvailable && ReferenceEquals(payload.Armor, armor),
+                "AEGIS a different item of the same blueprint cannot release the stored spell");
+            Check(!conversion.Blueprint.GetComponent<Occultist0099AegisStoreSpell>().IsAbilityRestrictionPassed(conversion),
+                "AEGIS a stale conversion from the expired armor's grant cannot write to an identical replacement");
+            unit.Buffs.GetBuff(ward).Remove();
+            Equip(armor);
+            CastRule(standard);
+            var release = Toggle("AegisReleaseToggle");
+            Check(release.IsAvailable && ReferenceEquals(payload.Spell, stored), "AEGIS renewed spell storing on the same armor restores release access");
+            release.IsOn = true;
+            var weaponType = new BlueprintWeaponType { Category = WeaponCategory.Longsword };
+            var weaponBlueprint = new BlueprintItemWeapon();
+            Set(weaponBlueprint, "m_Type", Ref<BlueprintWeaponTypeReference>(weaponType));
+            var weapon = Empty<ItemEntityWeapon>();
+            Set(weapon, "m_Blueprint", weaponBlueprint);
+            var hit = Empty<RuleAttackRoll>();
+            Set(hit, "Result", AttackResult.Hit);
+            var attack = Empty<RuleAttackWithWeapon>();
+            Set(attack, "Weapon", weapon);
+            Set(attack, "Initiator", enemy);
+            Set(attack, "Target", unit);
+            Set(attack, "AttackRoll", hit);
+            release.AppliedBuff.CallComponents<AddTargetAttackWithWeaponTrigger>(component => component.OnEventDidTrigger(attack));
+            Check(enemy.Buffs.GetBuff(fixtureTargetBuff) != null && payload.Spell == null && !release.IsOn &&
+                  !selected.Available && slots[1] == 1, "AEGIS native melee hit releases the stored touch once without spending any second slot");
+            Toggle("AegisSpellStoringChoice").IsOn = false;
+            unit.Buffs.GetBuff(ward).Remove();
+            var armorFeatures = unit.State.Features;
+            armorFeatures.FakeEnhancement.Retain();
+            try
+            {
+                CastRule(standard);
+                Eq(5, Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor),
+                    "AEGIS native Magic Deceiver Fake Enhancement is included once and stays under the combined cap");
+                level.Level = 1;
+                CastRule(standard);
+                Eq(3, Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor),
+                    "AEGIS a native enhancement tier that would overspend the budget leaves the existing value intact");
+                unit.Buffs.GetBuff(ward).Remove();
+            }
+            finally { armorFeatures.FakeEnhancement.Release(); }
+            level.Level = 12;
+            armorFeatures.AdvancedFakeEnhancement.Retain();
+            try
+            {
+                CastRule(standard);
+                Eq(4, Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(armor),
+                    "AEGIS preserves the native True Enhancement when no higher stock donor fits the cap");
+            }
+            finally { armorFeatures.AdvancedFakeEnhancement.Release(); }
+            unit.RemoveFact(implement);
+            Check(unit.Buffs.GetBuff(ward) == null && armorSlot.Lock.Count == 0 && armor.Enchantments.Contains(baseline),
+                "AEGIS loss of the base source releases the active enhancement and preserves the original armor property");
+        }
+        finally
+        {
+            currentTime = previousTime;
+            applyNativeEffects = false;
+            harmony.Unpatch(enchantRefresh, skipVisualStats);
+            harmony.Unpatch(enchantDollRoom, skipDollRoom);
+            harmony.Unpatch(applyBuffRule, rejectWard);
+            harmony.Unpatch(attachEnchantment, failAttachment);
+            harmony.Unpatch(loggerInstance, offlineLogger);
+            harmony.Unpatch(loggerLog, expectedError);
+            harmony.Unpatch(elementReport, reportElement);
+            rejectedAegisWard = null;
+            failedAegisEnchantment = null;
+        }
+        caseStatus["Aegis"] = "native_worn_item_snapshot_lock_and_prepared_spontaneous_storage";
+
+        Kingmaker.UnitLogic.ActivatableAbilities.ActivatableAbility Toggle(string token)
+            => unit.ActivatableAbilities.Enumerable.Single(ability => ability.Blueprint.AssetGuid == P(Occultist0099Ids.Id(token)));
+
+        void Equip(ItemEntityArmor item)
+        {
+            var previous = armorSlot.MaybeArmor;
+            if (previous != null)
+            {
+                previous.HoldingSlot = null;
+                Set(previous, "m_WielderRef", default(EntityRef<UnitEntityData>));
+            }
+            armorSlot.SetFakeItem(item);
+            item.HoldingSlot = armorSlot;
+            Set(item, "m_WielderRef", (EntityRef<UnitEntityData>)unit);
+            item.Facts.TurnOn();
+        }
+
+        Spellbook StorageBook(bool spontaneous)
+        {
+            var bp = new BlueprintSpellbook { AssetGuid = P(Occultist0099Ids.Id("HostAegisBook" + spontaneous)),
+                name = "0099N.AegisBook" + spontaneous, Spontaneous = spontaneous, CastingAttribute = StatType.Intelligence,
+                ComponentsArray = Array.Empty<BlueprintComponent>() };
+            Set(bp, "m_SpellList", Ref<BlueprintSpellListReference>(character.Spellbook.SpellList));
+            Set(bp, "m_SpellsPerDay", Ref<BlueprintSpellsTableReference>(character.Spellbook.SpellsPerDay));
+            bp.OnEnable();
+            var book = unit.Descriptor.DemandSpellbook(bp);
+            Set(book, "m_BaseLevelInternal", 12);
+            return book;
+        }
+    }
+
+    private static bool ArmorEntityServiceBoundary(ref EntityService __result)
+    {
+        __result = armorFixtureEntities;
+        return false;
+    }
+
+    private static bool ArmorDollRoomBoundary(ref bool __result)
+    {
+        __result = false;
+        return false;
+    }
+
+    private static void RejectAegisWard(RuleCanApplyBuff __instance)
+    {
+        if (__instance.Blueprint == rejectedAegisWard) __instance.CanApply = false;
+    }
+
+    private static void FailAegisAttachment(BlueprintItemEnchantment __0, ItemEnchantment __result)
+    {
+        if (__0 != failedAegisEnchantment || __result == null) return;
+        aegisAttachmentInterrupted = __result.Owner.Enchantments.Contains(__result);
+        throw new InvalidOperationException("Injected after native Aegis enchantment attachment.");
+    }
+
+    private static bool AegisLoggerInstanceBoundary(ref Owlcat.Runtime.Core.Logging.Logger __result)
+    {
+        __result = Empty<Owlcat.Runtime.Core.Logging.Logger>();
+        return false;
+    }
+
+    private static bool ExpectedAegisFaultLog(Owlcat.Runtime.Core.Logging.LogSeverity __2, Exception __3, object __4)
+    {
+        if (__2 < Owlcat.Runtime.Core.Logging.LogSeverity.Error) return false;
+        string message = __4?.ToString() ?? "";
+        if (failedAegisEnchantment != null && message.Contains("Injected after native Aegis enchantment attachment."))
+            Console.WriteLine("0099N EXPECTED LOG: native armor attachment failure was rolled back");
+        else
+            HostLog(__3 ?? new InvalidOperationException(message));
+        return false;
+    }
+
+    private static bool AegisElementReportBoundary(ElementLogicException __instance)
+    {
+        HostLog(__instance.InnerException ?? __instance);
+        return false;
+    }
+
     private static void AbjurationPowersNative(BlueprintsCache detached, BlueprintCharacterClass character)
     {
         T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
@@ -2296,9 +2655,10 @@ internal static class Occultist0099NativeTests
         const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
         var rows = catalogue.Where(row => (row.School == "Abjuration" || row.School == "Enchantment" || row.IsKnack) && row.Source != "External").ToArray();
         var coreDonors = (string[])AccessTools.Field(Production("Occultist0099Enchantment"), "DonorIds").GetValue(null);
+        var armorDonors = (string[])AccessTools.Field(Production("Occultist0099Aegis"), "Donors").GetValue(null);
         var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a",
             "143775c49ae6b7446b805d3b2e702298" }
-            .Concat(coreDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
+            .Concat(coreDonors).Concat(armorDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
         LoadRows(expectedDonors);
         foreach (var row in rows.Where(row => row.Source == "CotW" && cache.Load(P(row.Guid)) == null)) StageAbsentRoot(row);
         foreach (var id in expectedDonors)
@@ -2491,6 +2851,7 @@ internal static class Occultist0099NativeTests
         {
             EnchantmentNative(detached, publishedClass);
             AbjurationPowersNative(detached, publishedClass);
+            AegisNative(detached, publishedClass);
         }
         finally
         {
@@ -2536,6 +2897,7 @@ internal static class Occultist0099NativeTests
         cache = new BlueprintsCache();
         AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, cache);
         HostGame();
+        LoadAegisDonors(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE"));
 
         // Load only the audited rows this directed check needs.
         var roots = Occultist0099AbjurationCatalog.Roots.Select(r => r.Guid)
@@ -2597,7 +2959,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B8 Energy Shield, Unraveling and Globe of Negation",
+            ["stage"] = "B9 Aegis equipment and armor-linked spell storage",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -2606,6 +2968,7 @@ internal static class Occultist0099NativeTests
             ["releaseEligible"] = false,
             ["productionBridgesInstalled"] = bridges,
             ["registeredPrivateIdentities"] = registeredPrivateIdentities,
+            ["armorArchiveRows"] = armorArchiveRows,
             ["nativeRootsLoaded"] = loadedRoots,
             ["hostStagedRoots"] = hostStaged,
             ["hostStagedRootNames"] = new JArray(stagedRoots),
@@ -2617,9 +2980,9 @@ internal static class Occultist0099NativeTests
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Detached native Energy Shield reduction, targeted Unraveling and shared Globe of Negation delivery passed alongside existing directed checks."
+                ? "Detached native Aegis activation, rollback, armor identity and spell storage passed alongside earlier directed checks."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Detached BlueprintsCache, native ability choices and focus payments. Energy Shield runs native damage reduction. Unraveling runs native targeted dispel with a supplied roll. Globe uses the normal delivery and area resistance hooks; creating and positioning a scene area is outside scope. Aegis, ordinary startup, full career and disk saves remain outside scope.",
+            ["boundary"] = "Detached BlueprintsCache, native ability choices and focus payments. Aegis uses native armor entities, attachment, slot lock, prepared and spontaneous costs, and the native hit trigger with a supplied attack event and directed touch spell. Item placement and effect dispatch use managed fixture seams. Armor AC recalculation, action bar visuals and the Unity command cleanup path are outside scope. Creating and positioning a scene area for Globe, ordinary startup, full career and disk saves remain outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

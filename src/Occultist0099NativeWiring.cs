@@ -147,6 +147,8 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // Repower Construct spends from the generic pool G, not from a school.
         public bool GenericPool;
+        public bool CheckCasterRestrictions;
+        public bool PayOnEffect;
 
         // The native ability pipeline calls this component OUTSIDE any fact
         // event context, so it must resolve the live runtime and open that
@@ -156,16 +158,20 @@ namespace CallOfTheWild.Wrath.Prototype
         public override int CalculateCost(AbilityData ability) => Amount;
 
         public override bool IsAbilityRestrictionPassed(AbilityData ability)
+            => CanPay(ability, null);
+
+        internal bool CanPay(AbilityData ability, string identity)
         {
+            if (!CasterRestrictionsPass(ability)) return false;
             return Occultist0099NativeScope.InRuntimeContext(Occultist0099NativeScope.FocusRuntime(ability),
                 component =>
                 {
                     var fact = (Occultist0099FocusFact0099)component;
                     var unit = ability.Caster.Unit;
-                    if (GenericPool) return fact.CanPayGeneric(unit, Amount, null);
+                    if (GenericPool) return fact.CanPayGeneric(unit, Amount, identity);
                     if (!string.IsNullOrEmpty(Panoply))
-                        return fact.CanPayPanoply(unit, Panoply, Amount, null);
-                    return fact.CanPaySchool(unit, School, Amount, null);
+                        return fact.CanPayPanoply(unit, Panoply, Amount, identity);
+                    return fact.CanPaySchool(unit, School, Amount, identity);
                 }, false);
         }
 
@@ -176,8 +182,13 @@ namespace CallOfTheWild.Wrath.Prototype
         // delivery). The rule adapter is the only cast payment entry.
         public override void Spend(AbilityData ability) { }
 
+        private bool CasterRestrictionsPass(AbilityData ability)
+            => !CheckCasterRestrictions || (ability?.Caster?.Unit != null &&
+                ability.Blueprint.CasterRestrictions.All(restriction => restriction.IsCasterRestrictionPassed(ability.Caster.Unit)));
+
         internal bool TryPay(AbilityData ability, string identity)
         {
+            if (!CasterRestrictionsPass(ability)) return false;
             return Occultist0099NativeScope.InRuntimeContext(Occultist0099NativeScope.FocusRuntime(ability), component =>
             {
                 var fact = (Occultist0099FocusFact0099)component;
@@ -204,6 +215,9 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal static string IdentityOf(object execution)
             => Identities.GetValue(execution, _ => Guid.NewGuid().ToString("N"));
+
+        internal static bool TryGetPaymentIdentity(AbilityExecutionContext context, out string identity)
+            => Identities.TryGetValue(context, out identity);
 
         internal static RuleCastSpell BindCommand(RuleCastSpell rule, UnitUseAbility command)
         {
@@ -243,6 +257,14 @@ namespace CallOfTheWild.Wrath.Prototype
                 return true;
             }
             var logic = (Occultist0099FocusResourceLogic)spell.ResourceLogic;
+            if (logic.PayOnEffect)
+            {
+                if (duplicate || rule.Context == null) return Reject(rule);
+                string identity = IdentityOf(rule);
+                if (!logic.CanPay(spell, identity)) return Reject(rule);
+                Identities.GetValue(rule.Context, _ => identity);
+                return true;
+            }
             return (!duplicate && logic.TryPay(spell, IdentityOf(rule))) || Reject(rule);
         }
 

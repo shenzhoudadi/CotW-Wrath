@@ -448,6 +448,14 @@ namespace CallOfTheWild.Wrath.Prototype
         public Occultist0099FocusPower MindBarrier(string school)
             => Occultist0099Focus.MindBarrier(State, school, ClassLevel(), IntModifier());
 
+        internal int AegisBudget()
+        {
+            if (!IsOwnedBy(Owner) || !State.Enabled || !State.Schools[Occultist0099Ids.SliceSchool].Present) return 0;
+            int level = ClassLevel();
+            return 1 + Math.Min(3, level / 6) +
+                (level >= 20 && State.MasterySchool == Occultist0099Ids.SliceSchool ? 1 : 0);
+        }
+
         internal bool CanRetainMindBarrier()
             => State.Enabled && State.ClassPresent && State.Locked &&
                State.Schools[Occultist0099Ids.SliceSchool].Present && IsOwnedBy(Owner);

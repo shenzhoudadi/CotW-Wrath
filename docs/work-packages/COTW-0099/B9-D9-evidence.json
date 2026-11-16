@@ -1,0 +1,224 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "01abfd5b8f7f3fced9916fdfa818f2fec2d9b2d5",
+  "stage": "B9 Aegis",
+  "acceptanceScope": "native_entry_points_directed",
+  "playerGameAcceptance": false,
+  "slicePublished": false,
+  "releaseEligible": false,
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "reviewedRun": "native-13.json",
+    "closedFindings": [
+      "Native buff refusal and late attachment preserve the exact prior ward and payment",
+      "Stored source must be live and authorized at the same spell level",
+      "An expired equipment grant or replayed execution cannot spend again",
+      "Magic Deceiver enhancement is counted once without exceeding the Aegis cap"
+    ]
+  },
+  "reuse": {
+    "wrath": "Five numerical, three Fortification and twelve energy resistance donors. Native slot lock, enchantment fact grant, conversion source, spell spend and hit trigger.",
+    "cotw": "Magus enchantment attachment, Skirnir variant/target/source helpers and Psychic parameter-preserving spell delivery.",
+    "providerBoundary": "Original Kingmaker armor storage reviewed. No matching directly loadable Wrath provider found in checked archive and local mod source snapshots."
+  },
+  "fixtureExtraction": {
+    "file": "aegis-armor-entries.json",
+    "archiveRows": 37,
+    "wallSeconds": 0.673,
+    "result": "PASS"
+  },
+  "builds": [
+    {
+      "log": "build-1.log",
+      "wallSeconds": 1.128,
+      "result": "FAIL"
+    },
+    {
+      "log": "build-2.log",
+      "wallSeconds": 1.348,
+      "result": "FAIL"
+    },
+    {
+      "log": "build-3.log",
+      "wallSeconds": 1.911,
+      "result": "PASS"
+    },
+    {
+      "log": "build-4.log",
+      "wallSeconds": 1.325,
+      "result": "FAIL"
+    },
+    {
+      "log": "build-5.log",
+      "wallSeconds": 2.118,
+      "result": "PASS"
+    },
+    {
+      "log": "build-6.log",
+      "wallSeconds": 1.343,
+      "result": "PASS"
+    },
+    {
+      "log": "build-7.log",
+      "wallSeconds": 1.138,
+      "result": "PASS"
+    },
+    {
+      "log": "build-8.log",
+      "wallSeconds": 2.05,
+      "result": "PASS"
+    },
+    {
+      "log": "build-9.log",
+      "wallSeconds": 2.089,
+      "result": "PASS"
+    },
+    {
+      "log": "build-10.log",
+      "wallSeconds": 1.936,
+      "result": "PASS"
+    },
+    {
+      "log": "build-11.log",
+      "wallSeconds": 1.199,
+      "result": "PASS"
+    },
+    {
+      "log": "build-12.log",
+      "wallSeconds": 1.145,
+      "result": "PASS"
+    },
+    {
+      "log": "build-13.log",
+      "wallSeconds": 1.969,
+      "result": "PASS"
+    },
+    {
+      "log": "build-14.log",
+      "wallSeconds": 1.164,
+      "result": "PASS"
+    },
+    {
+      "log": "build-15.log",
+      "wallSeconds": 1.152,
+      "result": "PASS"
+    },
+    {
+      "log": "build-16.log",
+      "wallSeconds": 1.889,
+      "result": "PASS"
+    },
+    {
+      "log": "build-17.log",
+      "wallSeconds": 2.086,
+      "result": "PASS"
+    }
+  ],
+  "nativeRuns": [
+    {
+      "log": "native-1.log",
+      "wallSeconds": 4.302,
+      "result": "ABORTED",
+      "notes": "Framework ZIP member reader failed"
+    },
+    {
+      "log": "native-2.log",
+      "wallSeconds": 0.094,
+      "result": "ABORTED",
+      "notes": "Extra launcher argument was interpreted as an assembly"
+    },
+    {
+      "log": "native-3.log",
+      "wallSeconds": 4.058,
+      "result": "ABORTED",
+      "notes": "Native entity service touched Unity"
+    },
+    {
+      "log": "native-4.log",
+      "wallSeconds": 4.047,
+      "result": "ABORTED",
+      "notes": "Fixture wielding reference had the wrong type"
+    },
+    {
+      "log": "native-5.log",
+      "wallSeconds": 4.117,
+      "result": "ABORTED",
+      "notes": "Option grant absent and fixture inventory presentation incomplete"
+    },
+    {
+      "log": "native-6.log",
+      "wallSeconds": 4.256,
+      "result": "ABORTED",
+      "notes": "Fixture invoked Unity-bearing native SpendFromSpellbook directly"
+    },
+    {
+      "log": "native-7.log",
+      "wallSeconds": 4.164,
+      "result": "FAIL",
+      "notes": "Behavior assertions passed; fixture reported exceptions"
+    },
+    {
+      "log": "native-8.log",
+      "wallSeconds": 4.218,
+      "result": "FAIL",
+      "notes": "Behavior assertions passed; release exposed native mismatched child buff ownership"
+    },
+    {
+      "log": "native-9.log",
+      "wallSeconds": 4.208,
+      "result": "FAIL",
+      "notes": "Behavior assertions passed; production lost-fact subscriber removed itself"
+    },
+    {
+      "log": "native-10.log",
+      "wallSeconds": 4.208,
+      "result": "FAIL",
+      "notes": "Same native lost-fact subscriber diagnostic remained"
+    },
+    {
+      "log": "native-11.log",
+      "wallSeconds": 4.184,
+      "result": "FAIL",
+      "notes": "Captured Subscriber removed while RaiseEvent and isolated the production source"
+    },
+    {
+      "log": "native-12.log",
+      "wallSeconds": 4.436,
+      "result": "PASS",
+      "notes": "356 directed assertions passed before Magic Deceiver fix"
+    },
+    {
+      "log": "native-13.log",
+      "wallSeconds": 4.17,
+      "result": "PASS",
+      "notes": "359 directed assertions passed after Magic Deceiver fix"
+    }
+  ],
+  "final": {
+    "checks": 359,
+    "failures": 0,
+    "hostLoggedExceptions": 0,
+    "registeredPrivateIdentities": 154,
+    "productionBridgesInstalled": 18,
+    "skippedArchiveComponents": 0,
+    "buildErrors": 0,
+    "buildWarnings": 0
+  },
+  "sourceSha256": {
+    "src/Occultist0099Aegis.cs": "289739CD84AD27CEC24A36B3EFF76892B57518722439F97358A6E24B9985497A",
+    "src/Occultist0099AegisStorage.cs": "05D04E2365544D6D2D6BC9C18ADEEBDD86C6D7E9A6F7F94B38BD8AC69A9B8479",
+    "tests/Occultist0099NativeProgram.cs": "F4D622825559F099A474FDBF46004AE0D10381E976B8B5CDA6A52DDD7BAA29AB"
+  },
+  "notRun": [
+    "player game and UMM",
+    "Unity equipment placement and armor AC refresh",
+    "real level-up UI and full respec",
+    "disk save/load",
+    "actual third-party provider load",
+    "full career and public registration",
+    "complete historical test suite",
+    "package build, upload and installation"
+  ]
+}

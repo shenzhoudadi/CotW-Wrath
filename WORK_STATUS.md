@@ -4,7 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成。B7 完成 Enchantment。B8 接通 Energy Shield、Unraveling、Globe of Negation，独立 D8 定向复查通过。沿用 Wrath 的单一抗力池和定向驱散，以及 CotW 的 Globe 入射和区域入口。编译零警告、零错误（1.943 秒），隔离原生 319/319（3.978 秒）。继续 B/D 完成 Aegis、另外六校、四 Panoply、剩余职业特性和普通启动登记。场景区域、实际提供方、存读档、实机及出包未运行，认领仍开放。[B8 / D8 与证据](docs/work-packages/COTW-0099/B8-D8-abjuration-powers.md)。
+- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。B7 完成 Enchantment。B8/D8 接通防护系三项能力，B9/D9 完成 Aegis 与护甲储法。复用 Wrath 的护甲附魔、槽锁、法术转换和受击触发，以及 CotW 的附魔挂载与储法投递。B9 编译零警告、零错误（2.086 秒），隔离原生 359/359（4.170 秒）。继续其余六校、四 Panoply、剩余职业特性及普通启动登记。真实提供方、存读档、实机及出包未运行，认领仍开放。 [B9 / D9 与证据](docs/work-packages/COTW-0099/B9-D9-aegis.md)。
 - **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
 
 ## 本次0.14.69 TEST交付

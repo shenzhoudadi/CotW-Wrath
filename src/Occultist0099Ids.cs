@@ -61,6 +61,15 @@ namespace CallOfTheWild.Wrath.Prototype
         public const string SchoolPowerGrantTypeId = "0099c0e1a1b24c0d8e5f60000000000d";
         public const string EnergyShieldTypeId = "0099c0e1a1b24c0d8e5f60000000000e";
         public const string GlobeOfNegationTypeId = "0099c0e1a1b24c0d8e5f60000000000f";
+        public const string AegisOptionTypeId = "0099c0e1a1b24c0d8e5f600000000010";
+        public const string AegisTargetTypeId = "0099c0e1a1b24c0d8e5f600000000011";
+        public const string AegisArmorTypeId = "0099c0e1a1b24c0d8e5f600000000012";
+        public const string AegisStorageTypeId = "0099c0e1a1b24c0d8e5f600000000013";
+        public const string AegisStoreSpellTypeId = "0099c0e1a1b24c0d8e5f600000000014";
+        public const string AegisReleaseTypeId = "0099c0e1a1b24c0d8e5f600000000015";
+        public const string AegisReleaseActionTypeId = "0099c0e1a1b24c0d8e5f600000000016";
+        public const string AegisApplyTypeId = "0099c0e1a1b24c0d8e5f600000000017";
+        public const string AegisGrantsTypeId = "0099c0e1a1b24c0d8e5f600000000018";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.

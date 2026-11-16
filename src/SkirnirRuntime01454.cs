@@ -193,10 +193,14 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool Eligible(AbilityData spell)
         {
             if(spell?.Spellbook?.Blueprint.AssetGuid!=MagusBatch01454.Identity(Skirnir01454.BookToken)||spell.SourceItem!=null||spell.SpellLevel<1||spell.SpellLevel>6||spell.Blueprint.Type!=AbilityType.Spell||spell.Blueprint.HasVariants)return false;
-            var bp=spell.Blueprint;return bp.EffectOnEnemy==AbilityEffectOnUnit.Harmful&&bp.CanTargetEnemies&&!bp.CanTargetPoint&&bp.Range!=AbilityRange.Personal&&!bp.IsFullRoundAction&&
-                bp.GetComponent<AbilityTargetsAround>()==null&&!bp.ComponentsArray.Any(c=>c.GetType().Name=="TargetsAroundEnemy"||c is AbilityDeliverProjectile p&&p.Type!=AbilityProjectileType.Simple)&&!SpellBatch01447.Elements(bp.ComponentsArray,new HashSet<object>()).Any(e=>e is Kingmaker.UnitLogic.Mechanics.Actions.ContextActionSpawnAreaEffect)&&
+            var bp=spell.Blueprint;return bp.EffectOnEnemy==AbilityEffectOnUnit.Harmful&&bp.CanTargetEnemies&&bp.Range!=AbilityRange.Personal&&!bp.IsFullRoundAction&&
+                IsSingleTargetShape(bp)&&
                 (!spell.RequireMaterialComponent||spell.HasEnoughMaterialComponent);
         }
+        internal static bool IsSingleTargetShape(BlueprintAbility bp)
+            => bp != null && !bp.CanTargetPoint && bp.GetComponent<AbilityTargetsAround>() == null &&
+                !bp.ComponentsArray.Any(c => c.GetType().Name == "TargetsAroundEnemy" || c is AbilityDeliverProjectile p && p.Type != AbilityProjectileType.Simple) &&
+                !SpellBatch01447.Elements(bp.ComponentsArray, null).Any(e => e is Kingmaker.UnitLogic.Mechanics.Actions.ContextActionSpawnAreaEffect);
         public bool IsAbilityRestrictionPassed(AbilityData ability)
         {
             var spell=Selected(ability);var slot=ability?.ParamSpellSlot;return Skirnir01454.Has(ability?.Caster?.Unit,Skirnir01454.StorageToken)&&Skirnir01454.Shield(ability.Caster.Unit)!=null&&Eligible(spell)&&slot.Available&&
