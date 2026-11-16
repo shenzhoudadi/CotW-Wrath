@@ -1,10 +1,11 @@
 """B-stage directed native check: COTW-0099 Occultist, contract C-0099-20261115-r1.
 
-Closure of D-0099-01. Runs ONLY the isolated Occultist0099NativeTests host, which
-enters the real Wrath entry points (AbilityCastRateUtils.SpendResources ->
-AbilityResourceLogic, SelectSpell.Check/Apply, Spellbook.AddKnown,
-RestController.ApplyRest) against the real game Managed assemblies resolved
-through the reviewed engine02 publicized copy by EngineLauncher.
+Runs the isolated Occultist0099NativeTests host against the real game Managed
+assemblies resolved through the reviewed engine02 publicized copy by
+EngineLauncher. The host exercises RuleCastSpell, the resource precheck,
+SelectSpell.Check/Apply, Spellbook.AddKnown, UnitHelper.CopySpellbook and
+RestController.ApplyRest. It verifies that ordinary startup skips the slice
+before installing the development patches explicitly.
 
 The game is never launched, UMM is never loaded, no historical suite runs, and
 the shared 0099 registration chain stays untouched (SlicePublished=false).
@@ -53,12 +54,13 @@ if report.is_file():
 
 # Source fingerprints are the authoritative code identity for this stage; the
 # DLL hashes below are build artefacts only (D-0099-07).
-sources = sorted((out.parent / 'src').glob('Occultist0099*.cs'))
+source_dir = out.parent / 'src'
+sources = [source_dir / 'ModEntry.cs', *sorted(source_dir.glob('Occultist0099*.cs'))]
 result = {
     'workPackage': 'COTW-0099',
     'case': 'occultist0099-native',
     'contract': 'C-0099-20261115-r1',
-    'finding': 'D-0099-01',
+    'findings': ['D-0099-01', 'D2-01', 'D2-02', 'D2-03', 'D2-04', 'D2-05', 'D2-06'],
     'command': cmd,
     'environment': {k: v for k, v in env.items() if k.startswith('COTW_')},
     'exitCode': process.returncode,
@@ -89,7 +91,7 @@ result = {
         'game/UMM startup', 'player gameplay acceptance', 'full historical suites',
         'shared class/spellbook/progression registration',
         'level-up UI and respec controller', 'save/load transport',
-        'packaging (build.ps1 requires PowerShell 7.4; this machine has 5.1)',
+        'packaging',
         'upload and issue closure',
     ],
 }

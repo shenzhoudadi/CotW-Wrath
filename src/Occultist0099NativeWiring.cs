@@ -1,30 +1,9 @@
-// COTW-0099 Occultist, B stage, first vertical slice: Abjuration.
-// D-0099-01 closure: the real native Wrath entry points that read and write the
-// authoritative state in Occultist0099Rules.cs / Occultist0099Spells.cs.
-//
-// Three chains are wired here, and nothing else:
-//   1. Mental Focus payment. Occultist0099FocusResourceLogic is a real
-//      AbilityResourceLogic subclass. The native cast pipeline reaches it via
-//      BlueprintAbility.GetComponent<AbilityResourceLogic>() and
-//      AbilityCastRateUtils.SpendResources -> AbilityData.ResourceLogic.Spend.
-//      The UI precheck (IAbilityRestriction) and the actual execution therefore
-//      call the SAME authoritative logic; there is no mirrored spend counter.
-//   2. Spell learning. Occultist0099LearnGate sits on the private spell roots and
-//      gates the native SelectSpell.Check / Spellbook.AddKnown paths, so a
-//      refused choice never reaches SpellSelectionData.SpendSlot or AddKnown.
-//   3. Rest / level identity. Occultist0099SpellbookFact carries the per-unit
-//      spell state and resynchronises it from the real ClassData.Level and the
-//      real Intelligence stat on rest and on level-up.
-//
-// Ownership boundary: every gate below first proves that the acting spellbook,
-// caster and root belong to the 0099 private slice. Foreign books, foreign
-// resources, items and other units fall through to unchanged native behaviour.
-//
-// This slice is development-only. Nothing here registers a class, spellbook or
-// progression blueprint in the shared registration chain.
+// COTW-0099 development adapter. No class or spellbook is registered here.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -33,11 +12,15 @@ using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.PubSubSystem;
+using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Class.LevelUp.Actions;
+using Kingmaker.UnitLogic.Commands;
 using Newtonsoft.Json;
 
 namespace CallOfTheWild.Wrath.Prototype
@@ -49,36 +32,14 @@ namespace CallOfTheWild.Wrath.Prototype
     // ---------------------------------------------------------------------
     public static class Occultist0099NativeScope
     {
-        // The one fact that owns the authoritative Mental Focus state.
+        // The active fact that exposes the unit's Mental Focus ledger.
         public static Occultist0099FocusFact0099 FocusOf(UnitEntityData unit)
-        {
-            if (unit == null || unit.Descriptor == null) return null;
-            var fact = unit.Descriptor.Progression?.Features?.Enumerable
-                .FirstOrDefault(f => !f.IsDisposed &&
-                    f.Blueprint != null &&
-                    f.Blueprint.AssetGuid.ToString() == Occultist0099Ids.FocusFactGuid);
-            if (fact == null) return null;
-            foreach (var runtime in fact.Components
-                .Where(r => !r.IsDisposed &&
-                            r.SourceBlueprintComponent is Occultist0099FocusFact0099))
-                return (Occultist0099FocusFact0099)runtime.SourceBlueprintComponent;
-            return null;
-        }
+            => RuntimeOf(unit, Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099))
+                ?.SourceBlueprintComponent as Occultist0099FocusFact0099;
 
         public static Occultist0099SpellbookFact0099 BookOf(UnitEntityData unit)
-        {
-            if (unit == null || unit.Descriptor == null) return null;
-            var fact = unit.Descriptor.Progression?.Features?.Enumerable
-                .FirstOrDefault(f => !f.IsDisposed &&
-                    f.Blueprint != null &&
-                    f.Blueprint.AssetGuid.ToString() == Occultist0099Ids.SpellbookFactGuid);
-            if (fact == null) return null;
-            foreach (var runtime in fact.Components
-                .Where(r => !r.IsDisposed &&
-                            r.SourceBlueprintComponent is Occultist0099SpellbookFact0099))
-                return (Occultist0099SpellbookFact0099)runtime.SourceBlueprintComponent;
-            return null;
-        }
+            => RuntimeOf(unit, Occultist0099Ids.SpellbookFactGuid, typeof(Occultist0099SpellbookFact0099))
+                ?.SourceBlueprintComponent as Occultist0099SpellbookFact0099;
 
         // A book is the 0099 private book only when it carries the private
         // marker AND its identity is the private BookGuid. Sharing a spell list
@@ -104,11 +65,11 @@ namespace CallOfTheWild.Wrath.Prototype
         // blueprint component) is what owns the per-unit data and can open the
         // native event context.
         public static EntityFactComponent RuntimeOf(UnitEntityData unit, string factGuid,
-            Type componentType)
+            Type componentType, bool requireActive = true)
         {
             if (unit == null) return null;
             var fact = unit.Descriptor?.Progression?.Features?.Enumerable
-                .FirstOrDefault(f => !f.IsDisposed && f.Blueprint != null &&
+                .FirstOrDefault(f => !f.IsDisposed && (!requireActive || f.Active) && f.Blueprint != null &&
                                      f.Blueprint.AssetGuid.ToString() == factGuid);
             if (fact == null) return null;
             return fact.Components.FirstOrDefault(r => !r.IsDisposed &&
@@ -183,111 +144,160 @@ namespace CallOfTheWild.Wrath.Prototype
         private static EntityFactComponent Runtime(AbilityData ability)
         {
             var unit = ability?.Caster?.Unit;
-            if (unit == null) return null;
+            var granted = ability?.Fact;
+            if (unit == null || granted == null || !granted.Active || granted.Owner != unit)
+                return null;
             var runtime = Occultist0099NativeScope.RuntimeOf(unit,
                 Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099));
             return Occultist0099NativeScope.OwnerOf(runtime) == unit ? runtime : null;
         }
 
-        // Stable per-cast identity. AbilityData.UniqueId is minted once per cast
-        // by the native constructor, so the precheck and the spend of ONE cast
-        // share it, while two different casts never collapse into one charge.
-        private static string ExecutionId(AbilityData ability)
-            => ability == null ? null : ability.UniqueId;
-
         public override int CalculateCost(AbilityData ability) => Amount;
 
         public override bool IsAbilityRestrictionPassed(AbilityData ability)
         {
-            string id = ExecutionId(ability);
+            if (ability?.SourceItem != null) return false;
             return Occultist0099NativeScope.InRuntimeContext(Runtime(ability),
                 component =>
                 {
                     var fact = (Occultist0099FocusFact0099)component;
                     var unit = ability.Caster.Unit;
-                    if (GenericPool) return fact.CanPayGeneric(unit, Amount, id);
+                    if (GenericPool) return fact.CanPayGeneric(unit, Amount, null);
                     if (!string.IsNullOrEmpty(Panoply))
-                        return fact.CanPayPanoply(unit, Panoply, Amount, id);
-                    return fact.CanPaySchool(unit, School, Amount, id);
+                        return fact.CanPayPanoply(unit, Panoply, Amount, null);
+                    return fact.CanPaySchool(unit, School, Amount, null);
                 }, false);
         }
 
         public override string GetAbilityRestrictionUIText()
             => "Not enough mental focus invested in this implement.";
 
-        public override void Spend(AbilityData ability)
+        // Native SpendResources runs after execution (and on held touch
+        // delivery). The rule adapter is the only cast payment entry.
+        public override void Spend(AbilityData ability) { }
+
+        internal bool TryPay(AbilityData ability, string identity)
         {
-            string id = ExecutionId(ability);
-            Occultist0099NativeScope.InRuntimeContext(Runtime(ability), component =>
+            if (ability?.SourceItem != null) return false;
+            return Occultist0099NativeScope.InRuntimeContext(Runtime(ability), component =>
             {
                 var fact = (Occultist0099FocusFact0099)component;
                 var unit = ability.Caster.Unit;
                 Occultist0099Payment payment;
                 if (GenericPool)
-                    payment = fact.TryPayGeneric(unit, Amount, id);
+                    payment = fact.TryPayGeneric(unit, Amount, identity);
                 else if (!string.IsNullOrEmpty(Panoply))
-                    payment = fact.TryPayPanoply(unit, Panoply, Amount, id);
+                    payment = fact.TryPayPanoply(unit, Panoply, Amount, identity);
                 else
-                    payment = fact.TryPaySchool(unit, School, Amount, id);
-                // A refused transaction leaves the authoritative state, the
-                // native mirror and every effect untouched (MF01 / MF11).
-                if (!payment.Applied) return;
-                fact.SyncResourceMirror();
-            });
+                    payment = fact.TryPaySchool(unit, School, Amount, identity);
+                if (payment.Applied) fact.SyncResourceMirror();
+                return payment.Applied;
+            }, false);
         }
     }
 
-    // ---------------------------------------------------------------------
-    // 2. Spell learning gate. Attached to the private spell roots, it is read by
-    // the native SelectSpell.Check postfix and by the Spellbook.AddKnown prefix.
-    // The gate never grants anything by itself: it only refuses, so a rejected
-    // choice cannot reach SpendSlot / AddKnown at all.
-    // ---------------------------------------------------------------------
-    [TypeId(Occultist0099Ids.LearnGateTypeId)]
-    public sealed class Occultist0099LearnGate : BlueprintComponent
+    [HarmonyPatch(typeof(RuleCastSpell), nameof(RuleCastSpell.OnTrigger))]
+    internal static class Occultist0099NativeCast
     {
-        // The private circle of this root. It is the 0099 circle, not the
-        // native circle of the donor spell.
-        public int Circle;
+        private static readonly ConditionalWeakTable<object, string> Identities =
+            new ConditionalWeakTable<object, string>();
+        private static bool paymentHookInstalled;
 
-        // Public so the directed native host can prove the gate really is
-        // attached to the audited root through the native GetComponent path.
-        public static Occultist0099LearnGate For(BlueprintAbility ability)
+        internal static string IdentityOf(object execution)
+            => Identities.GetValue(execution, _ => Guid.NewGuid().ToString("N"));
+
+        internal static RuleCastSpell BindCommand(RuleCastSpell rule, UnitUseAbility command)
         {
-            if (ability == null) return null;
-            if (Occultist0099NativeScope.RootOf(ability) == null) return null;
-            return ability.GetComponent<Occultist0099LearnGate>();
+            if (IsFocusCast(rule.Spell))
+                Identities.GetValue(rule, _ => IdentityOf(command));
+            return rule;
         }
 
-        // A learning attempt is legal only when the acting book is the private
-        // book, the owner actually holds the 0099 spell state, and the
-        // authoritative candidate list still offers this canonical root for one
-        // of the owner's open implement quotas at this circle.
-        // The level-up pipeline calls this OUTSIDE any fact event context, so
-        // the live runtime is resolved first and its own native context opened
-        // before the per-unit spell state is read.
-        internal bool CanLearn(UnitDescriptor owner, BlueprintSpellbook bookBlueprint,
-            int spellLevel)
+        private static bool IsFocusCast(AbilityData spell)
+            => spell?.StickyTouch == null && spell?.ResourceLogic is Occultist0099FocusResourceLogic;
+
+        private static bool Reject(RuleCastSpell rule)
         {
-            if (owner == null || !Occultist0099NativeScope.IsPrivateBook(bookBlueprint))
-                return false;
-            if (spellLevel != Circle) return false;
-            string rootGuid = Occultist0099NativeScope.RootOf(
-                OwnerBlueprint as BlueprintAbility)?.Guid;
-            if (string.IsNullOrEmpty(rootGuid)) return false;
-            var runtime = Occultist0099NativeScope.RuntimeOf(owner.Unit,
-                Occultist0099Ids.SpellbookFactGuid, typeof(Occultist0099SpellbookFact0099));
-            if (Occultist0099NativeScope.OwnerOf(runtime) != owner.Unit) return false;
-            return Occultist0099NativeScope.InRuntimeContext(runtime,
-                component => ((Occultist0099SpellbookFact0099)component).CanLearnRoot(
-                    owner.Unit, owner.GetSpellbook(bookBlueprint), Circle, rootGuid),
-                false);
+            rule.ForceFail = true;
+            rule.SetSuccess(false);
+            return false;
+        }
+
+        private static bool Prefix(RuleCastSpell __instance)
+            => paymentHookInstalled || !IsFocusCast(__instance.Spell) || Reject(__instance);
+
+        private static bool Commit(RuleCastSpell rule)
+        {
+            var spell = rule.Spell;
+            if (!IsFocusCast(spell)) return true;
+            var logic = (Occultist0099FocusResourceLogic)spell.ResourceLogic;
+            return (!rule.IsDuplicateSpellApplied && rule.Context?.IsDuplicateSpellApplied != true &&
+                    logic.TryPay(spell, IdentityOf(rule))) || Reject(rule);
+        }
+
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,
+            ILGenerator il)
+        {
+            var code = instructions.ToList();
+            // The first failure-chance test follows RuleApplySpell.Before,
+            // target validation and UMD. Once here a native spell-failure roll
+            // still counts as an attempt, even if the effects never run.
+            var chance = AccessTools.PropertyGetter(typeof(RuleCastSpell), nameof(RuleCastSpell.SpellFailureChance));
+            int index = code.FindIndex(i => i.Calls(chance)) - 1;
+            paymentHookInstalled = index >= 0 && code[index].opcode == OpCodes.Ldarg_0;
+            if (!paymentHookInstalled) return code;
+
+            var resume = il.DefineLabel();
+            var loadRule = new CodeInstruction(OpCodes.Ldarg_0);
+            loadRule.labels.AddRange(code[index].labels);
+            code[index].labels.Clear();
+            code[index].labels.Add(resume);
+            code.InsertRange(index, new[]
+            {
+                loadRule,
+                new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Occultist0099NativeCast), nameof(Commit))),
+                new CodeInstruction(OpCodes.Brtrue, resume),
+                new CodeInstruction(OpCodes.Ret)
+            });
+            return code;
         }
     }
 
-    // ---------------------------------------------------------------------
-    // 3. Per-unit spell state holder + native resynchronisation.
-    // ---------------------------------------------------------------------
+    [HarmonyPatch(typeof(UnitUseAbility), "OnAction")]
+    internal static class Occultist0099NativeCommandCast
+    {
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            foreach (var instruction in instructions)
+            {
+                if (instruction.operand is System.Reflection.MethodInfo method &&
+                    method.DeclaringType == typeof(Rulebook) && method.Name == nameof(Rulebook.Trigger) &&
+                    method.IsGenericMethod && method.GetGenericArguments()[0] == typeof(RuleCastSpell))
+                {
+                    var load = new CodeInstruction(OpCodes.Ldarg_0);
+                    load.labels.AddRange(instruction.labels);
+                    instruction.labels.Clear();
+                    yield return load;
+                    yield return new CodeInstruction(OpCodes.Call,
+                        AccessTools.Method(typeof(Occultist0099NativeCast), nameof(Occultist0099NativeCast.BindCommand)));
+                }
+                yield return instruction;
+            }
+        }
+    }
+
+    // Concentration failure happens before the engine creates a RuleCastSpell.
+    [HarmonyPatch(typeof(UnitUseAbility), "FailIfConcentrationCheckFailed")]
+    internal static class Occultist0099NativeConcentrationFailure
+    {
+        private static void Postfix(UnitUseAbility __instance, bool __result)
+        {
+            if (!__result || __instance.Ability.StickyTouch != null ||
+                !(__instance.Ability.ResourceLogic is Occultist0099FocusResourceLogic logic)) return;
+            logic.TryPay(__instance.Ability, Occultist0099NativeCast.IdentityOf(__instance));
+        }
+    }
+
     public sealed class Occultist0099SpellbookData
     {
         [JsonProperty] public Occultist0099SpellState State;
@@ -342,40 +352,46 @@ namespace CallOfTheWild.Wrath.Prototype
 
         public void HandleUnitGainLevel() => Sync();
 
-        public bool IsOwnedBy(UnitEntityData unit) => unit != null && unit == Owner;
-
-        // The authoritative candidate check used by the native learning gate.
-        // A root is learnable when at least one open quota of one owned
-        // implement offers it right now.
-        public bool CanLearnRoot(UnitEntityData unit, Spellbook book, int circle,
-            string rootGuid)
+        internal string EligibleSlot(Spellbook book, int index, int circle, BlueprintAbility spell)
         {
-            if (!IsOwnedBy(unit) || string.IsNullOrEmpty(rootGuid)) return false;
-            if (!Occultist0099NativeScope.IsPrivateBook(book)) return false;
-            var state = State;
-            string canonical = Occultist0099Spells.CanonicalOf(state, rootGuid);
-            return state.Slots.Any(slot =>
-                Occultist0099Spells.Candidates(state, slot.Key, circle)
-                    .Any(r => r.Guid == canonical));
-        }
+            if (book?.Owner?.Unit != Owner || !Occultist0099NativeScope.IsPrivateBook(book) ||
+                index < 0 || spell == null || book.IsKnown(spell))
+                return null;
 
-        // Records an accepted native learning choice against the exact quota
-        // that offered it. Called only after the native gate passed.
-        public Occultist0099Outcome RecordLearn(UnitEntityData unit, Spellbook book,
-            int circle, string rootGuid)
-        {
-            if (!IsOwnedBy(unit) || !Occultist0099NativeScope.IsPrivateBook(book))
-                return Occultist0099Outcome.RejectedNotOwned;
+            var root = Occultist0099NativeScope.RootOf(spell);
+            int intelligence = IntelligenceScore();
+            int level = ClassLevel();
+            if (root == null || circle != root.Circle || root.IsKnack || spell.Type != AbilityType.Spell ||
+                spell.Parent != null || spell.GetComponent<SpellComponent>()?.School.ToString() != root.School ||
+                intelligence < 10 + circle || circle > Occultist0099AbjurationCatalog.MaxCircleForLevel(level))
+                return null;
+
             var state = State;
-            string canonical = Occultist0099Spells.CanonicalOf(state, rootGuid);
-            foreach (var slot in state.Slots)
+            if (state.Intelligence != intelligence || state.ClassLevel != level)
             {
-                if (!Occultist0099Spells.Candidates(state, slot.Key, circle)
-                        .Any(r => r.Guid == canonical)) continue;
-                return Occultist0099Spells.Learn(state, slot.Key, circle, canonical);
+                state = state.Clone();
+                Occultist0099Spells.SetLevel(state, level);
+                Occultist0099Spells.SetIntelligence(state, intelligence);
             }
-            return Occultist0099Outcome.RejectedInsufficient;
+            // One private list for the Abjuration slice. Native indices map
+            // to every source quota of the circle, including filled slots.
+            var slot = state.Slots
+                .Where(s => state.Quotas.ContainsKey(Occultist0099Spells.QuotaKey(s.Key, circle)))
+                .ElementAtOrDefault(index);
+            return slot != null && Occultist0099Spells.Candidates(state, slot.Key, circle)
+                .Any(r => r.Guid == root.Guid) ? slot.Key : null;
         }
+
+        internal bool RecordLearn(string slot, int circle, BlueprintAbility spell)
+        {
+            Sync();
+            return Occultist0099Spells.Learn(State, slot, circle, spell.AssetGuid.ToString())
+                == Occultist0099Outcome.Ok;
+        }
+
+        internal Occultist0099SpellState CopyState() => State.Clone();
+
+        internal void RestoreCopiedState(Occultist0099SpellState copy) => Data.State = copy;
 
         public string[] KnownRoots() => Occultist0099Spells.KnownRoots(State);
         public string StateFingerprint() => State.Fingerprint();
@@ -383,54 +399,167 @@ namespace CallOfTheWild.Wrath.Prototype
             => Occultist0099Spells.QuotaCount(State, circle);
     }
 
-    // ---------------------------------------------------------------------
-    // Native bridges. Each one is scoped to the 0099 private identities first;
-    // anything else returns immediately and native behaviour is unchanged.
-    // ---------------------------------------------------------------------
-    [HarmonyPatch(typeof(SelectSpell), nameof(SelectSpell.Check))]
-    internal static class Occultist0099NativeSelectCheck
+    internal static class Occultist0099NativeSelection
     {
-        private static void Postfix(SelectSpell __instance, UnitDescriptor __1,
-            ref bool __result)
+        internal static bool Select(SelectSpell action, LevelUpState levelUp, UnitDescriptor owner, bool commit)
         {
-            if (!__result) return;
-            var gate = Occultist0099LearnGate.For(__instance.Spell);
-            if (gate == null) return;
-            __result = gate.CanLearn(__1, __instance.Spellbook, __instance.SpellLevel);
+            if (levelUp == null || owner == null || action.SpellLevel < 1 || action.SpellLevel > 6 ||
+                action.SpellList == null || action.SpellList != action.Spellbook.SpellList ||
+                action.SpellList.AssetGuid.ToString() != Occultist0099Ids.SpellListGuid)
+                return false;
+            var choice = levelUp.GetSpellSelection(action.Spellbook, action.SpellList);
+            if (choice == null || (commit && !choice.CanSpendSlot(action.SpellLevel, action.SlotIndex)))
+                return false;
+            var runtime = Occultist0099NativeScope.RuntimeOf(owner.Unit,
+                Occultist0099Ids.SpellbookFactGuid, typeof(Occultist0099SpellbookFact0099));
+            if (Occultist0099NativeScope.OwnerOf(runtime) != owner.Unit) return false;
+            var book = owner.GetSpellbook(action.Spellbook);
+            return Occultist0099NativeScope.InRuntimeContext(runtime, component =>
+            {
+                var facts = (Occultist0099SpellbookFact0099)component;
+                string slot = facts.EligibleSlot(book, action.SlotIndex, action.SpellLevel, action.Spell);
+                if (slot == null) return false;
+                return !commit || Learn(facts, book, choice, action, slot);
+            }, false);
+        }
+
+        private sealed class KnownWrite
+        {
+            internal Spellbook Book;
+            internal int Circle;
+            internal BlueprintAbility Spell;
+        }
+
+        [ThreadStatic] private static KnownWrite permittedWrite;
+
+        internal static bool ConsumeWrite(Spellbook book, int circle, BlueprintAbility spell)
+        {
+            var permit = permittedWrite;
+            if (permit == null || permit.Book != book || permit.Circle != circle || permit.Spell != spell)
+                return false;
+            permittedWrite = null;
+            return true;
+        }
+
+        private static bool Learn(Occultist0099SpellbookFact0099 facts, Spellbook book,
+            SpellSelectionData choice, SelectSpell action, string slot)
+        {
+            var previous = permittedWrite;
+            bool committed = false;
+            try
+            {
+                permittedWrite = new KnownWrite { Book = book, Circle = action.SpellLevel, Spell = action.Spell };
+                // Keep observers out of the transaction; notify after both
+                // ledgers and the actual choice slot have been updated.
+                if (book.AddKnown(action.SpellLevel, action.Spell, false) == null ||
+                    !book.IsKnownOnLevel(action.Spell, action.SpellLevel) ||
+                    !choice.CanSpendSlot(action.SpellLevel, action.SlotIndex) ||
+                    !facts.RecordLearn(slot, action.SpellLevel, action.Spell))
+                    return false;
+                choice.SpendSlot(action.SpellLevel, action.Spell, action.SlotIndex);
+                committed = true;
+            }
+            finally
+            {
+                permittedWrite = previous;
+                if (!committed && book.IsKnown(action.Spell))
+                    book.RemoveSpell(action.Spell);
+            }
+            EventBus.RaiseEvent<ILearnSpellHandler>(h => h.HandleLearnSpell());
+            return true;
         }
     }
 
-    // The commit path. LevelUpController.ApplyLevelUpActions calls Check then
-    // Apply; this prefix is the second, independent refusal point so that even a
-    // caller that skips Check cannot make the private book learn an ineligible
-    // root. A refusal returns null and never touches the known-spell lists.
+    [HarmonyPatch(typeof(SelectSpell), nameof(SelectSpell.Check))]
+    internal static class Occultist0099NativeSelectCheck
+    {
+        private static bool Prefix(SelectSpell __instance, ref bool __result)
+        {
+            if (!Occultist0099NativeScope.IsPrivateBook(__instance.Spellbook) ||
+                (__instance.SpellLevel >= 1 && __instance.SpellLevel <= 6)) return true;
+            __result = false;
+            return false;
+        }
+
+        private static void Postfix(SelectSpell __instance, LevelUpState __0, UnitDescriptor __1,
+            ref bool __result)
+        {
+            if (__result && Occultist0099NativeScope.IsPrivateBook(__instance.Spellbook))
+                __result = Occultist0099NativeSelection.Select(__instance, __0, __1, false);
+        }
+    }
+
+    [HarmonyPatch(typeof(SelectSpell), nameof(SelectSpell.Apply))]
+    internal static class Occultist0099NativeSelectApply
+    {
+        private static bool Prefix(SelectSpell __instance, LevelUpState __0, UnitDescriptor __1)
+        {
+            if (!Occultist0099NativeScope.IsPrivateBook(__instance.Spellbook)) return true;
+            Occultist0099NativeSelection.Select(__instance, __0, __1, true);
+            return false;
+        }
+    }
+
     [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.AddKnown))]
     internal static class Occultist0099NativeLearnCommit
     {
-        private static bool Prefix(Spellbook __instance, int __0, BlueprintAbility __1,
-            ref AbilityData __result)
+        private static bool Prefix(Spellbook __instance, int __0, BlueprintAbility __1, ref AbilityData __result)
         {
-            var gate = Occultist0099LearnGate.For(__1);
-            if (gate == null) return true;
             if (!Occultist0099NativeScope.IsPrivateBook(__instance)) return true;
-            var root = Occultist0099NativeScope.RootOf(__1);
-            var unit = __instance.Owner?.Unit;
-            bool allowed = false;
-            bool reached = Occultist0099NativeScope.InFactContext(unit,
-                Occultist0099Ids.SpellbookFactGuid,
-                typeof(Occultist0099SpellbookFact0099),
-                component =>
-                {
-                    var holder = (Occultist0099SpellbookFact0099)component;
-                    allowed = holder.CanLearnRoot(unit, __instance, __0, root.Guid) &&
-                        holder.RecordLearn(unit, __instance, __0, root.Guid) ==
-                            Occultist0099Outcome.Ok;
-                });
-            // No holder, or a refused authoritative transaction: the native
-            // known-spell lists, the selection slots and the quota all stay
-            // exactly as they were.
-            if (!reached || !allowed) { __result = null; return false; }
-            return true;
+            if (Occultist0099NativeSelection.ConsumeWrite(__instance, __0, __1)) return true;
+            if (Occultist0099NativeCopy.Permits(__instance, __0, __1)) return true;
+
+            // Fixed 0-circle career grants are independent of implement choices.
+            if (__0 == 0 && __1 != null && __1.Type == AbilityType.Spell && __1.Parent == null &&
+                Occultist0099AbjurationCatalog.Knacks.Contains(__1.AssetGuid.ToString()))
+                return true;
+
+            __result = null;
+            return false;
         }
+    }
+
+    [HarmonyPatch(typeof(UnitHelper), "CopySpellbook")]
+    internal static class Occultist0099NativeCopy
+    {
+        private sealed class Copy
+        {
+            internal Spellbook Source;
+            internal UnitEntityData Target;
+        }
+
+        [ThreadStatic] private static Copy current;
+
+        private static void Prefix(UnitEntityData __0, UnitEntityData __1, out Copy __state)
+        {
+            __state = current;
+            current = null;
+            if (__0 == null || __1 == null || __0 == __1) return;
+            var source = __0.Descriptor.Spellbooks.FirstOrDefault(Occultist0099NativeScope.IsPrivateBook);
+            if (source != null) current = new Copy { Source = source, Target = __1 };
+        }
+
+        internal static bool Permits(Spellbook book, int circle, BlueprintAbility root)
+            => current != null && root != null && book.Owner.Unit == current.Target &&
+               book.Blueprint == current.Source.Blueprint && current.Source.IsKnownOnLevel(root, circle);
+
+        private static void Postfix()
+        {
+            if (current == null) return;
+            var source = current.Source.Owner.Unit;
+            var target = current.Target;
+            var from = Occultist0099NativeScope.RuntimeOf(source, Occultist0099Ids.SpellbookFactGuid,
+                typeof(Occultist0099SpellbookFact0099));
+            // UnitHelper.Copy turns the new unit on after copying its facts and book.
+            var to = Occultist0099NativeScope.RuntimeOf(target, Occultist0099Ids.SpellbookFactGuid,
+                typeof(Occultist0099SpellbookFact0099), requireActive: false);
+            var state = Occultist0099NativeScope.InRuntimeContext(from,
+                component => ((Occultist0099SpellbookFact0099)component).CopyState(), null);
+            if (state != null)
+                Occultist0099NativeScope.InRuntimeContext(to,
+                    component => ((Occultist0099SpellbookFact0099)component).RestoreCopiedState(state));
+        }
+
+        private static void Finalizer(Copy __state) => current = __state;
     }
 }

@@ -7,160 +7,115 @@
 // progression blueprint in the shared registration chain; that happens once
 // eight schools, four Panoplies and the full private spell table are complete.
 //
-// D-0099-08 fixes:
-//  - Rest identity no longer depends on GameTime.Ticks. A successful rest is
-//    identified by the monotonic CampingState.OverallCampsCount (incremented
-//    once per camp in RestController.CampCoroutine, BEFORE ApplyRest fires
-//    HandleUnitRest), so repeated callbacks of the same rest are idempotent
-//    and two different rests can never collapse into one id.
-//  - OnActivate refuses to build a B=0 cycle when the CharacterClass reference
-//    is unset or the class level is 0; it waits for a real rest/acquisition.
-//  - [TypeId] attributes reference the Ids constants, not hardcoded hex.
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Kingmaker;
+using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.EntitySystem.Entities;
-using Kingmaker.PubSubSystem;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Parts;
 using Newtonsoft.Json;
 
 namespace CallOfTheWild.Wrath.Prototype
 {
     public sealed class Occultist0099NativeData
     {
-        [JsonProperty] public Occultist0099FocusState State = Occultist0099Focus.Create();
+        // Imported if a save from the development adapter still stores fact data.
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public Occultist0099FocusState State;
+    }
+
+    [TypeId(Occultist0099Ids.FocusPartTypeId)]
+    public sealed class Occultist0099FocusPart : UnitPart
+    {
+        [JsonProperty] public Occultist0099FocusState State;
+        [JsonProperty] internal string LastSuccessfulRest;
     }
 
     [TypeId(Occultist0099Ids.FocusFactTypeId)]
     public sealed class Occultist0099FocusFact0099 :
-        UnitFactComponentDelegate<Occultist0099NativeData>,
-        IUnitRestHandler, IRestFinishedHandler, IUnitSubscriber
+        UnitFactComponentDelegate<Occultist0099NativeData>
     {
-        // Set by the eventual registration package. Until then the native fact
-        // is never attached to a blueprint and no in-game behaviour changes.
         public BlueprintCharacterClassReference CharacterClass;
+        public BlueprintAbilityResourceReference FocusResource;
 
-        private Occultist0099FocusState State
+        private Occultist0099FocusPart Ledger
         {
             get
             {
-                if (Data.State == null) Data.State = Occultist0099Focus.Create();
-                return Data.State;
+                var part = Owner.Ensure<Occultist0099FocusPart>();
+                if (part.State == null) part.State = Data.State ?? Occultist0099Focus.Create();
+                Data.State = null;
+                return part;
             }
         }
+
+        private Occultist0099FocusState State => Ledger.State;
 
         private int ClassLevel()
         {
-            var cls = CharacterClass == null ? null : CharacterClass.Get();
-            if (cls == null || Owner == null) return 0;
-            return Owner.Progression.GetClassLevel(cls);
+            var cls = CharacterClass?.Get();
+            return cls == null ? 0 : Owner.Progression.GetClassLevel(cls);
         }
 
-        private int IntModifier()
-        {
-            if (Owner == null || Owner.Stats == null || Owner.Stats.Intelligence == null)
-                return 0;
-            return Owner.Stats.Intelligence.Bonus;
-        }
+        private int IntModifier() => Owner.Stats?.Intelligence?.Bonus ?? 0;
 
-        private int IntelligenceScore()
-        {
-            if (Owner == null || Owner.Stats == null || Owner.Stats.Intelligence == null)
-                return 10;
-            return Owner.Stats.Intelligence.ModifiedValue;
-        }
-
-        // D-0099-08: the rest event identity is the camp serial number, which
-        // RestController increments exactly once per camp before any
-        // HandleUnitRest callback. It is stable across the multiple per-unit
-        // callbacks of one rest and distinct between rests, unlike GameTime
-        // ticks (which advance mid-rest and can be 0 on exception).
-        private string RestEventId()
-        {
-            string unit = Owner == null ? "unknown" : Owner.UniqueId;
-            int camp = -1;
-            try
-            {
-                if (Game.Instance != null && Game.Instance.Player != null &&
-                    Game.Instance.Player.Camping != null)
-                    camp = Game.Instance.Player.Camping.OverallCampsCount;
-            }
-            catch (NullReferenceException) { camp = -1; }
-            return unit + ":camp:" + camp;
-        }
-
-        // First real acquisition: only establish a cycle when the class is
-        // actually present at a positive level. A missing reference or level 0
-        // must NOT create a B=0 cycle that would reject every later invest.
-        protected override void OnActivate()
+        private void BeginCycle(string identity, bool firstAcquisition)
         {
             var state = State;
-            if (string.IsNullOrEmpty(state.LastRestEventId))
-            {
-                int level = ClassLevel();
-                if (CharacterClass != null && CharacterClass.Get() != null && level > 0)
-                {
-                    Occultist0099Focus.BeginCycle(state, level, IntModifier(),
-                        RestEventId(), true);
-                    state.Intelligence = IntelligenceScore();
-                }
-                // else: wait for a real rest / acquisition; do not arm B=0.
-            }
-            else
-            {
-                Occultist0099Focus.ReacquireClass(state); // MF09: no free refill
-            }
-            Occultist0099Focus.Validate(state);
+            if (Occultist0099Focus.BeginCycle(state, ClassLevel(), IntModifier(),
+                    identity, firstAcquisition) == Occultist0099Outcome.Ok)
+                state.Intelligence = Owner.Stats?.Intelligence?.ModifiedValue ?? 10;
         }
 
-        protected override void OnPostLoad()
+        protected override void OnActivate()
         {
-            Occultist0099Focus.Validate(State);
+            if (ClassLevel() <= 0) return;
+            var part = Ledger;
+            if (part.LastSuccessfulRest != null && part.LastSuccessfulRest != part.State.LastRestEventId)
+                BeginCycle(part.LastSuccessfulRest, false);
+            else if (string.IsNullOrEmpty(part.State.LastRestEventId))
+                BeginCycle("first-acquisition", true);
+            else
+                Occultist0099Focus.ReacquireClass(part.State);
+
+            if (ClassLevel() < part.State.Level)
+                Occultist0099Focus.RespecBudgetDown(part.State, ClassLevel(), IntModifier());
+            Occultist0099Focus.Validate(part.State);
+            SyncResourceMirror();
         }
+
+        protected override void OnDeactivate()
+        {
+            var part = Owner.Get<Occultist0099FocusPart>();
+            if (part?.State == null) return;
+            if (ClassLevel() <= 0 && part.State.ClassPresent)
+                foreach (string school in Occultist0099Schools.Order)
+                    Occultist0099Focus.SetSchoolPresent(part.State, school, false);
+            Occultist0099Focus.RemoveClass(part.State);
+        }
+
+        protected override void OnPostLoad() => Occultist0099Focus.Validate(State);
 
         protected override void OnApplyPostLoadFixes()
         {
-            // Read-only recovery: buff rebuild, reload and reattached facts must
-            // restore the existing snapshot without re-arming or recharging.
             Occultist0099Focus.Validate(State);
+            SyncResourceMirror();
         }
 
-        // Successful rest is the only cycle boundary. Duplicate callbacks for
-        // the same rest event are idempotent in the authoritative state because
-        // the camp serial is unchanged across them.
-        public void HandleUnitRest(UnitEntityData unit)
+        internal void Rest(string identity)
         {
-            if (unit == null || unit != Owner) return;
-            var state = State;
-            int level = ClassLevel();
-            if (CharacterClass == null || CharacterClass.Get() == null || level <= 0)
-            {
-                // No valid class yet: do not create a degenerate cycle.
-                Occultist0099Focus.Validate(state);
-                return;
-            }
-            Occultist0099Focus.BeginCycle(state, level, IntModifier(),
-                RestEventId(), false);
-            state.Intelligence = IntelligenceScore();
-            Occultist0099Focus.Validate(state);
+            if (ClassLevel() <= 0) return;
+            BeginCycle(identity, false);
+            Occultist0099Focus.Validate(State);
+            SyncResourceMirror();
         }
 
-        // Rest-finished is a secondary confirmation path. It uses the same camp
-        // serial identity, so it is idempotent with HandleUnitRest and never
-        // re-arms a cycle that the per-unit callback already established.
-        public void HandleRestFinished(RestStatus status)
-        {
-            if (status == null || !status.RestSucceeded) return;
-            var unit = Owner;
-            if (unit == null) return;
-            HandleUnitRest(unit);
-        }
-
-        public bool IsOwnedBy(UnitEntityData unit) => unit != null && unit == Owner;
+        public bool IsOwnedBy(UnitEntityData unit) => unit != null && unit == Owner && ClassLevel() > 0;
 
         public bool CanPaySchool(UnitEntityData caster, string school, int cost,
             string executionId)
@@ -196,12 +151,10 @@ namespace CallOfTheWild.Wrath.Prototype
         // this method writes the authoritative Available into it after each
         // accepted transaction. Nothing here debits the mirror, so the native
         // ConnectResource path cannot produce a second charge.
-        public BlueprintAbilityResourceReference FocusResource;
-
         public void SyncResourceMirror()
         {
             var resource = FocusResource?.Get();
-            var resources = Owner?.Descriptor?.Resources;
+            var resources = Owner.Descriptor.Resources;
             if (resource == null || resources == null) return;
             // PersistantResources is the native serialized view of the same
             // live UnitAbilityResource objects, so this writes the real counter
@@ -209,7 +162,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var native = resources.PersistantResources
                 .FirstOrDefault(r => r.Blueprint == resource);
             if (native == null) return;
-            native.Amount = State.Available;
+            native.Amount = State.ClassPresent && State.Enabled ? State.Available : 0;
         }
 
         public int AuthoritativeAvailable() => State.Available;
@@ -247,6 +200,40 @@ namespace CallOfTheWild.Wrath.Prototype
             => Occultist0099Focus.MindBarrier(State, school);
 
         public string StateFingerprint() => State.Fingerprint();
+    }
+
+    // One identity for a batch of applied rests, including paired units.
+    // Scripted immediate rest uses this same native batch without a camp increment.
+    [HarmonyPatch(typeof(RestController), "ApplyRest", new[] { typeof(List<UnitEntityData>) })]
+    internal static class Occultist0099NativeRestBatch
+    {
+        [ThreadStatic] internal static string Identity;
+
+        private static void Prefix(out string __state)
+        {
+            __state = Identity;
+            if (Identity == null) Identity = Guid.NewGuid().ToString("N");
+        }
+
+        private static void Finalizer(string __state) => Identity = __state;
+    }
+
+    [HarmonyPatch(typeof(RestController), nameof(RestController.ApplyRest), new[] { typeof(UnitDescriptor) })]
+    internal static class Occultist0099NativeRest
+    {
+        private static void Postfix(UnitDescriptor __0)
+        {
+            var unit = __0?.Unit;
+            var part = unit?.Get<Occultist0099FocusPart>();
+            var runtime = Occultist0099NativeScope.RuntimeOf(unit,
+                Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099));
+            if (part == null && runtime == null) return;
+
+            string identity = Occultist0099NativeRestBatch.Identity ?? Guid.NewGuid().ToString("N");
+            if (part != null) part.LastSuccessfulRest = identity;
+            Occultist0099NativeScope.InRuntimeContext(runtime,
+                component => ((Occultist0099FocusFact0099)component).Rest(identity));
+        }
     }
 
     // Private spellbook marker. Only this book may use the private circle

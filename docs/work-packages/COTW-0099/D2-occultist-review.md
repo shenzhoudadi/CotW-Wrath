@@ -2,6 +2,8 @@
 
 **结论：NEEDS_FIX。** 候选为 `77ea03b1e74190a98fab802e31dfd22515b7678a`，合同为 `C-0099-20261115-r1`。本轮由未参与 A/C/B 的独立 D（Codex 审阅代理 `occultist_d`）审阅执行链，协调者复跑两个现有宿主并构造定向反例。以下结论只覆盖 Abjuration 开发切片。切片待 B 修复后复验，保持 `SlicePublished=false`、`releaseEligible=false`，认领继续开放。[原 D 自查](D-occultist-review.md) · [B 修复记录](B-fix-round.md) · [合同](C-occultist-contract.md) · [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)
 
+后续针对这六项的实现和复验见 [B D2 修复与复用复查](B-D2-fix.md)。
+
 ## 原生宿主已复现
 
 ### D2-01 / P1 · 不同施放共用去重键

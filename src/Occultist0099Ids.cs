@@ -47,8 +47,10 @@ namespace CallOfTheWild.Wrath.Prototype
         // D-0099-01: the three native entry-point components wired in
         // Occultist0099NativeWiring.cs. Same private block, same numbering.
         public const string FocusResourceLogicTypeId = "0099c0e1a1b24c0d8e5f600000000003";
+        // Reserved for the retired, development-only donor-root LearnGate.
         public const string LearnGateTypeId = "0099c0e1a1b24c0d8e5f600000000004";
         public const string SpellbookFactTypeId = "0099c0e1a1b24c0d8e5f600000000005";
+        public const string FocusPartTypeId = "0099c0e1a1b24c0d8e5f600000000006";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.
@@ -76,6 +78,8 @@ namespace CallOfTheWild.Wrath.Prototype
         public static string Contract => Occultist0099Ids.Contract;
         public static string School => Occultist0099Ids.SliceSchool;
         public static bool Published => Occultist0099Ids.SlicePublished;
+        public static bool IsRuntimePatch(Type type)
+            => type.Name.StartsWith("Occultist0099Native", StringComparison.Ordinal);
 
         // D-0099-08 fix: SlicePublished is now an ENFORCED registration gate,
         // not an unused flag. The native registration entry point (task #11)

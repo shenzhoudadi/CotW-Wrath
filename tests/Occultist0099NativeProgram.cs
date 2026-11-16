@@ -1,30 +1,4 @@
-// COTW-0099 Occultist, B stage. D-0099-01 directed native check.
-// Contract C-0099-20261115-r1, sections O-S01 (Mental Focus) / O-S02 (spells).
-//
-// SCOPE. This is an isolated managed host, NOT player-game acceptance. It runs
-// the real Wrath entry points against the real game Managed assemblies:
-//   * AbilityCastRateUtils.SpendResources -> AbilityData.ResourceLogic
-//     -> the shipped Occultist0099FocusResourceLogic (a real
-//     AbilityResourceLogic subclass) -> the authoritative state machine.
-//   * SelectSpell.Check / SelectSpell.Apply and Spellbook.AddKnown, with the
-//     shipped Occultist0099NativeSelectCheck / Occultist0099NativeLearnCommit
-//     Harmony bridges installed exactly as production installs them.
-//   * RestController.ApplyRest -> EventBus IUnitRestHandler, with the camp
-//     serial identity read from the real CampingState.OverallCampsCount.
-//   * The real EntityFactsManager / Feature / UnitFactComponentDelegate
-//     lifecycle, so OnActivate and the component event context are native.
-//
-// DECLARED BOUNDARIES. Unity rendering, the level-up UI/VM layer, the whole
-// rest coroutine (sleep phases, encounters, cutscenes), save/load transport,
-// real third-party provider assemblies and the full historical suites are NOT
-// run. UnitDescriptor.Replenish is skipped inside ApplyRest exactly as the
-// reviewed 0081 host does, because it restores every unrelated resource of the
-// descriptor; the 0099 refill is proven through the authoritative state and the
-// real UnitAbilityResourceCollection instead.
-//
-// The private class / spellbook / list / fact blueprints are STAGED at their
-// private 0099 identities for this directed check only. SlicePublished stays
-// false and no shared registration chain is touched.
+// COTW-0099 directed managed host for the unpublished Abjuration slice.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,14 +20,19 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Inspect;
 using Kingmaker.PubSubSystem;
+using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Class.LevelUp.Actions;
+using Kingmaker.UnitLogic.Commands;
+using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.Utility;
 using CallOfTheWild.Wrath.Prototype;
 
 internal static class Occultist0099NativeLauncher
@@ -104,6 +83,10 @@ internal static class Occultist0099NativeTests
     private static JObject nativeRows;
     private static readonly List<UnitEntityData> world = new List<UnitEntityData>();
     private static int skippedComponents;
+    private static int castDispatches;
+    private static int pointsAtDispatch;
+    private static Action<RuleApplySpell> beforeDispatch;
+    private static Action afterBatchRest;
     private static TimeSpan currentTime = TimeSpan.FromHours(8);
 
     // ------------------------------------------------------------------
@@ -150,6 +133,39 @@ internal static class Occultist0099NativeTests
     { __result = "0099N-" + (++serial).ToString("X"); return false; }
     private static bool TimeGetter(ref TimeSpan __result) { __result = currentTime; return false; }
     private static bool NoReplenish() => false;
+
+    private static bool CastContextBoundary(ref AbilityExecutionContext __result)
+    {
+        __result = Empty<AbilityExecutionContext>();
+        return false;
+    }
+
+    private static bool LegalTargetBoundary(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
+
+    private static bool EffectDispatchBoundary(AbilityData __instance)
+    {
+        castDispatches++;
+        var unit = __instance.Caster.Unit;
+        pointsAtDispatch = unit.Get<Occultist0099FocusPart>()?.State.Available ?? -1;
+        // Unity execution/animation is outside this host.
+        return false;
+    }
+
+    private static bool BatchHealBoundary(UnitEntityData unit)
+    {
+        Rest(unit);
+        afterBatchRest?.Invoke();
+        return false;
+    }
+
+    private static void BeforeApplySpell(RuleApplySpell __instance)
+    {
+        beforeDispatch?.Invoke(__instance);
+    }
     private static bool HostLogFirst(Exception __0) { HostLog(__0); return false; }
     private static bool HostLogSecond(object __0, Exception __1) { HostLog(__1); return false; }
     private static void HostLog(Exception error)
@@ -175,6 +191,14 @@ internal static class Occultist0099NativeTests
                 typeof(Kingmaker.Controllers.TimeController), "GameTime"),
             prefix: new HarmonyMethod(AccessTools.Method(
                 typeof(Occultist0099NativeTests), nameof(TimeGetter))));
+        harmony.Patch(AccessTools.Method(typeof(AbilityData), nameof(AbilityData.CreateExecutionContext)),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Occultist0099NativeTests), nameof(CastContextBoundary))));
+        harmony.Patch(AccessTools.Method(typeof(AbilityData), nameof(AbilityData.CanTarget), new[] { typeof(TargetWrapper) }),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Occultist0099NativeTests), nameof(LegalTargetBoundary))));
+        harmony.Patch(AccessTools.Method(typeof(AbilityData), nameof(AbilityData.Cast)),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Occultist0099NativeTests), nameof(EffectDispatchBoundary))));
+        harmony.Patch(AccessTools.Method(typeof(RuleApplySpell), nameof(RuleApplySpell.OnTrigger)),
+            postfix: new HarmonyMethod(AccessTools.Method(typeof(Occultist0099NativeTests), nameof(BeforeApplySpell))));
         foreach (var signature in new[]
         {
             new[] { typeof(Exception), typeof(string), typeof(object[]) },
@@ -198,9 +222,13 @@ internal static class Occultist0099NativeTests
     {
         var assembly = typeof(Occultist0099Ids).Assembly;
         var bridges = assembly.GetTypes()
-            .Where(t => t.Name.StartsWith("Occultist0099Native", StringComparison.Ordinal) &&
+            .Where(t => Occultist0099Slice.IsRuntimePatch(t) &&
                         t.GetCustomAttributes(typeof(HarmonyPatch), false).Any())
             .ToArray();
+        var normalStartup = (IEnumerable<Type>)AccessTools.Method(Production("ModEntry"), "PatchTypes")
+            .Invoke(null, null);
+        Check(normalStartup.Any() && !normalStartup.Any(Occultist0099Slice.IsRuntimePatch),
+            "HOST ordinary startup discovers existing patches without installing the unpublished slice");
         foreach (var type in bridges) harmony.CreateClassProcessor(type).Patch();
         return bridges.Length;
     }
@@ -225,8 +253,7 @@ internal static class Occultist0099NativeTests
         Set(player, "m_PartyAndPetsDetached", new List<UnitEntityData>());
         Set(player, "PartyCharacters", new List<UnitReference>());
         Set(player, "m_CharacterListsValid", true);
-        // The real CampingState: its OverallCampsCount is the rest identity the
-        // production adapter reads. It is a genuine native object, not a stub.
+        // Keep one native camping state to prove distinct rests can share its counter.
         Set(player, "m_Camping", new CampingState());
         AccessTools.Field(typeof(Kingmaker.Game), "TimeController").SetValue(game,
             FormatterServices.GetUninitializedObject(
@@ -677,26 +704,10 @@ internal static class Occultist0099NativeTests
                 }
             }
         }, Occultist0099Ids.MindBarrierAbilityGuid, "0099N.MindBarrier");
-        Set(mindBarrier.GetComponent<AbilityResourceLogic>(), "m_RequiredResource",
-            Ref<BlueprintAbilityResourceReference>(focusResource));
-        Set(mindBarrier.GetComponent<AbilityResourceLogic>(), "m_IsSpendResource", true);
+        // The general display mirror is not the use counter of this specific
+        // school power. The native IAbilityRestriction drives its eligibility.
 
-        // Attach the private learning gate to each audited root at its private
-        // circle. The root's own native components stay exactly as archived.
-        foreach (var root in Occultist0099AbjurationCatalog.Roots)
-        {
-            var ability = Native<BlueprintAbility>(root.Guid);
-            if (ability == null) continue;
-            ability.ComponentsArray = ability.ComponentsArray
-                .Concat(new BlueprintComponent[]
-                {
-                    new Occultist0099LearnGate
-                    {
-                        name = "$0099N$LearnGate", Circle = root.Circle
-                    }
-                }).ToArray();
-            ability.OnEnable();
-        }
+
     }
 
     private static Spellbook Book(UnitEntityData u)
@@ -734,108 +745,119 @@ internal static class Occultist0099NativeTests
         finally { harmony.Unpatch(replenish, prefix); }
     }
 
-    private static void NextCamp()
-        => Kingmaker.Game.Instance.Player.Camping.OverallCampsCount++;
-
-    // ------------------------------------------------------------------
-    // MF01 native: the real AbilityResourceLogic chain.
-    // ------------------------------------------------------------------
-    private static void MF01Native()
+    private static AbilityData GrantMindBarrier(UnitEntityData unit)
     {
-        var u = Unit("mf01", occultistClass, 5, 14);   // M = +2, B = 7
-        u.Facts.Add(new Feature(focusFact, u.Descriptor));
-        var book = Book(u);
-        var fact = Focus(u);
-        Check(fact != null, "MF01N the real fact manager attaches the 0099 focus component");
-
-        // The cycle was established by the native OnActivate through the real
-        // component event context, reading the real ClassData and Int stat.
-        int budget = 0, generic = 0;
-        InFocus(u, f => { budget = f.AuthoritativeAvailable(); generic = budget; });
-        Eq(7, budget, "MF01N native OnActivate builds B = max(0, L + M) = 7");
-
-        InFocus(u, f =>
-        {
-            Occultist0099Focus.SetSchoolPresent(StateOf(f), "Abjuration", true);
-            Occultist0099Focus.Invest(StateOf(f), "Abjuration", 4);
-        });
-
-        var logic = mindBarrier.GetComponent<Occultist0099FocusResourceLogic>();
-        Check(logic != null,
-            "MF01N the native GetComponent<AbilityResourceLogic> resolves the shipped 0099 subclass");
-        Check(mindBarrier.GetComponent<AbilityResourceLogic>() is Occultist0099FocusResourceLogic,
-            "MF01N the shipped cost component IS an AbilityResourceLogic, not a parallel gate");
-
-        var ability = new AbilityData(mindBarrier, u.Descriptor);
-        Check(ReferenceEquals(ability.ResourceLogic, logic),
-            "MF01N AbilityData.ResourceLogic is the shipped 0099 component");
-
-        // PRE-LOCK refusal. The UI precheck and the real spend both run; the
-        // authoritative state, the native mirror and the effects must not move.
-        string before = null;
-        InFocus(u, f => before = f.StateFingerprint());
-        Check(!logic.IsAbilityRestrictionPassed(ability),
-            "MF01N native precheck refuses Mind Barrier before Full Round Lock");
-        int mirrorBefore = u.Resources.GetResourceAmount(focusResource);
-        AbilityCastRateUtils.SpendResources(ability);
-        InFocus(u, f => Stable(before, f.StateFingerprint(),
-            "MF01N a refused native spend changes no authoritative byte"));
-        Eq(mirrorBefore, u.Resources.GetResourceAmount(focusResource),
-            "MF01N a refused native spend charges no native resource");
-
-        // LOCK, then the real spend succeeds and charges exactly one.
-        InFocus(u, f => Eq(Occultist0099Outcome.Ok,
-            Occultist0099Focus.Lock(StateOf(f)), "MF01N Full Round Lock"));
-        var cast = new AbilityData(mindBarrier, u.Descriptor);
-        Check(logic.IsAbilityRestrictionPassed(cast),
-            "MF01N native precheck permits Mind Barrier after lock");
-        int availableBefore = 0;
-        InFocus(u, f => availableBefore = f.AuthoritativeAvailable());
-        AbilityCastRateUtils.SpendResources(cast);
-        int availableAfter = 0;
-        InFocus(u, f => availableAfter = f.AuthoritativeAvailable());
-        Eq(availableBefore - 1, availableAfter,
-            "MF01N the real SpendResources charges exactly one Abjuration point");
-        Eq(availableAfter, u.Resources.GetResourceAmount(focusResource),
-            "MF01N the native resource mirror equals the authoritative available, no double debit");
-
-        // Same execution id twice: the native pipeline may call Spend again for
-        // one cast; the cycle-scoped dedup identity must refuse the second.
-        AbilityCastRateUtils.SpendResources(cast);
-        int availableRepeat = 0;
-        InFocus(u, f => availableRepeat = f.AuthoritativeAvailable());
-        Eq(availableAfter, availableRepeat,
-            "MF01N a repeated spend of the SAME cast id charges nothing (RejectedDuplicate)");
-
-        // A different cast is a different execution id and pays normally.
-        var second = new AbilityData(mindBarrier, u.Descriptor);
-        Check(second.UniqueId != cast.UniqueId,
-            "MF01N the native AbilityData mints a distinct execution identity per cast");
-        AbilityCastRateUtils.SpendResources(second);
-        int availableSecond = 0;
-        InFocus(u, f => availableSecond = f.AuthoritativeAvailable());
-        Eq(availableRepeat - 1, availableSecond,
-            "MF01N a genuinely new cast pays one more point");
-
-        // Exhaust the pool, then prove the refusal is atomic.
-        for (int i = 0; i < 2; i++)
-            AbilityCastRateUtils.SpendResources(new AbilityData(mindBarrier, u.Descriptor));
-        string exhausted = null;
-        InFocus(u, f => exhausted = f.StateFingerprint());
-        var denied = new AbilityData(mindBarrier, u.Descriptor);
-        Check(!logic.IsAbilityRestrictionPassed(denied),
-            "MF01N native precheck refuses when the school pool is exhausted");
-        AbilityCastRateUtils.SpendResources(denied);
-        InFocus(u, f => Stable(exhausted, f.StateFingerprint(),
-            "MF01N an exhausted native spend changes no authoritative byte"));
-
-        caseStatus["MF01"] = "native_ability_resource_logic_pass";
+        var fact = new Ability(mindBarrier, unit.Descriptor);
+        unit.Facts.Add(fact);
+        return fact.Data;
     }
 
-    // The persisted component data of a native fact. Data is declared on the
-    // generic EntityFactComponentDelegate<TEntity, TData> base, so the lookup
-    // walks the base chain; it is only meaningful inside RequestEventContext,
-    // which is exactly how InFocus / InBook call it.
+    private static UnitUseAbility NativeCommand(AbilityData ability, UnitEntityData unit)
+    {
+        // The private test ability carries no metamagic. The native getter
+        // wraps that check in Unity profiling, which the managed host lacks.
+        var target = AccessTools.Method(typeof(AbilityData), nameof(AbilityData.HasMetamagic));
+        var prefix = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NotTacticalCombat));
+        harmony.Patch(target, prefix: new HarmonyMethod(prefix));
+        try { return new UnitUseAbility(ability, unit, UnitCommand.CommandType.Swift); }
+        finally { harmony.Unpatch(target, prefix); }
+    }
+
+    private static RuleCastSpell CastRule(AbilityData ability, UnitUseAbility command = null)
+    {
+        var rule = new RuleCastSpell(ability, ability.Caster.Unit);
+        if (command != null)
+            AccessTools.Method(Production("Occultist0099NativeCast"), "BindCommand").Invoke(null, new object[] { rule, command });
+        return Rulebook.Trigger(rule);
+    }
+
+    private static void InvestAndLock(UnitEntityData unit, int points)
+    {
+        InFocus(unit, f =>
+        {
+            var state = unit.Get<Occultist0099FocusPart>().State;
+            Occultist0099Focus.SetSchoolPresent(state, "Abjuration", true);
+            Eq(Occultist0099Outcome.Ok, Occultist0099Focus.Invest(state, "Abjuration", points), "MF valid investment");
+            Eq(Occultist0099Outcome.Ok, Occultist0099Focus.Lock(state), "MF valid lock");
+        });
+    }
+
+    private static void MF01Native()
+    {
+        var unit = Unit("mf01", occultistClass, 5, 14);
+        var originalFact = new Feature(focusFact, unit.Descriptor);
+        unit.Facts.Add(originalFact);
+        var ledger = unit.Get<Occultist0099FocusPart>().State;
+        var ability = GrantMindBarrier(unit);
+        var logic = ability.ResourceLogic as Occultist0099FocusResourceLogic;
+        Check(logic != null, "MF01 real AbilityData resolves private resource logic");
+        Eq(7, ledger.Available, "MF01 real activation establishes the budget");
+        Eq(7, unit.Resources.GetResourceAmount(focusResource), "MF01 real activation projects the budget");
+        Check(!logic.IsAbilityRestrictionPassed(ability), "MF01 precheck refuses before lock");
+        int startDispatches = castDispatches;
+        Check(CastRule(ability).ForceFail, "MF01 native rule refuses before lock");
+        Eq(startDispatches, castDispatches, "MF01 unpaid rule does not dispatch");
+        Eq(7, ledger.Available, "MF01 unpaid rule leaves balance untouched");
+
+        InvestAndLock(unit, 4);
+        int resonance = Occultist0099Focus.Resonance(ledger, "Abjuration");
+        var first = NativeCommand(ability, unit);
+        var second = NativeCommand(ability, unit);
+        Check(first != second && ReferenceEquals(first.Ability, second.Ability),
+            "D2-01 distinct native commands share the granted Ability.Data");
+        var before = ledger.Fingerprint();
+        Check(logic.IsAbilityRestrictionPassed(first.Ability) &&
+              logic.IsAbilityRestrictionPassed(second.Ability), "D2-01 repeated read-only precheck succeeds");
+        Stable(before, ledger.Fingerprint(), "D2-01 precheck leaves the ledger unchanged");
+
+        Check(CastRule(first.Ability, first).Success, "D2-01 first native rule succeeds");
+        Eq(6, pointsAtDispatch, "D2-05 first rule is paid before dispatch");
+        AbilityCastRateUtils.SpendResources(ability);
+        Eq(6, ledger.Available, "D2-01 native trailing payment does not double charge");
+        Check(CastRule(first.Ability, first).ForceFail, "D2-01 repeated command cannot dispatch or charge twice");
+        Check(logic.IsAbilityRestrictionPassed(second.Ability), "D2-01 second command can precheck same object");
+        Check(CastRule(second.Ability, second).Success, "D2-01 second command succeeds normally");
+        Eq(startDispatches + 2, castDispatches, "D2-01 exactly two distinct effects were dispatched");
+        Eq(5, ledger.Available, "D2-01 two different commands each cost one point");
+        Eq(5, unit.Resources.GetResourceAmount(focusResource), "MF01 authoritative charge updates native mirror");
+        Eq(resonance, Occultist0099Focus.Resonance(ledger, "Abjuration"), "MF01 resonance stays at its locked value");
+
+        unit.Facts.Remove(originalFact);
+        Check(Focus(unit) == null && !ledger.ClassPresent && !logic.IsAbilityRestrictionPassed(ability),
+             "D2-02 removed fact disables payment but retains the detached unit ledger");
+        unit.Facts.Add(new Feature(focusFact, unit.Descriptor));
+        Check(ReferenceEquals(ledger, unit.Get<Occultist0099FocusPart>().State),
+              "D2-02 reattached fact resolves the same unit ledger");
+        Eq(5, ledger.Available, "D2-02 same-day fact replacement does not refund");
+        Check(CastRule(first.Ability, first).ForceFail, "D2-02 prior command stays deduplicated across fact replacement");
+
+        // The real RuleApplySpell.Before path removes the school after UI
+        // precheck. The dispatch boundary must remain untouched.
+        Check(logic.IsAbilityRestrictionPassed(ability), "D2-05 precheck succeeds before invalidation");
+        beforeDispatch = e => Occultist0099Focus.SetSchoolPresent(ledger, "Abjuration", false);
+        try { Check(CastRule(ability).ForceFail, "D2-05 invalidated school fails at the rules entry"); }
+        finally { beforeDispatch = null; }
+        Eq(startDispatches + 2, castDispatches, "D2-05 late refusal dispatches no effect");
+        Eq(2, ledger.Spent, "D2-05 late refusal never debits another pool");
+        Check(!logic.IsAbilityRestrictionPassed(ability) && AbilityCastRateUtils.GetAvailableForCastCount(ability) < 0,
+            "MF01 the generic reserve is neither payable by this school nor displayed as its use count");
+        Check(CastRule(new AbilityData(mindBarrier, unit.Descriptor)).ForceFail,
+            "MF01 a constructed power without a granted native ability cannot execute");
+
+        var failed = Unit("failed", occultistClass, 4, 14);
+        failed.Facts.Add(new Feature(focusFact, failed.Descriptor));
+        InvestAndLock(failed, 2);
+        var failedAbility = GrantMindBarrier(failed);
+        var fizzle = new RuleCastSpell(failedAbility, failed) { SpellFailureChance = 101 };
+        Rulebook.Trigger(fizzle);
+        Check(fizzle.IsSpellFailed && !fizzle.Success, "D2-05 legitimate native spell failure remains a fizzle");
+        Eq(5, failed.Get<Occultist0099FocusPart>().State.Available, "D2-05 an accepted attempt still pays on a fizzle");
+        Eq(startDispatches + 2, castDispatches, "D2-05 native fizzle dispatches no effect");
+        caseStatus["MF01"] = "native_pre_effect_payment_and_command_identity";
+        caseStatus["MF09"] = "native_fact_reattach_only";
+        caseStatus["MF11"] = "native_dedup_and_late_refusal_sticky_touch_not_run";
+    }
+
     private static object ComponentData(object fact)
     {
         for (var type = fact.GetType(); type != null; type = type.BaseType)
@@ -849,13 +871,6 @@ internal static class Occultist0099NativeTests
     }
 
     // The authoritative state behind a native fact, read inside its context.
-    private static Occultist0099FocusState StateOf(Occultist0099FocusFact0099 fact)
-    {
-        var data = (Occultist0099NativeData)ComponentData(fact);
-        if (data.State == null) data.State = Occultist0099Focus.Create();
-        return data.State;
-    }
-
     private static Occultist0099SpellState SpellStateOf(Occultist0099SpellbookFact0099 fact)
     {
         var data = (Occultist0099SpellbookData)ComponentData(fact);
@@ -905,9 +920,8 @@ internal static class Occultist0099NativeTests
         Check(mageShield != null, "SP01N the audited MageShield root is loaded from the game archive");
         Check(mageShield.GetComponent<SpellComponent>()?.School == SpellSchool.Abjuration,
             "SP01N the archived native SpellComponent really is Abjuration");
-        var gate = Occultist0099LearnGate.For(mageShield);
-        Check(gate != null && gate.Circle == 1,
-            "SP01N the shipped learning gate is attached at the private circle 1");
+        Eq(1, Occultist0099NativeScope.RootOf(mageShield).Circle,
+            "SP01N the native root uses the frozen private circle without modifying it");
 
         // POSITIVE: the native SelectSpell.Check permits the eligible choice and
         // Apply really spends the slot and really adds the known spell.
@@ -973,15 +987,62 @@ internal static class Occultist0099NativeTests
         Set(foreign, "m_BaseLevelInternal", 1);
         string beforeForeign = null;
         InBook(u, f => beforeForeign = f.StateFingerprint());
-        var foreignChoice = new SelectSpell(foreignBook, occultistList, 1, resist, 0);
+        var foreignChoice = new SelectSpell(foreignBook, occultistList, 1, mageShield, 0);
         var foreignState = ChoiceState(foreign, 1, 1);
         // The gate only governs the PRIVATE book; a foreign book keeps native
         // behaviour, and the 0099 ledger must not move either way.
+        Check(NativeCheck(foreignChoice, foreignState, u.Descriptor),
+            "D2-03 a shared root still passes foreign SelectSpell.Check");
         foreignChoice.Apply(foreignState, u.Descriptor);
+        Check(foreign.IsKnown(mageShield), "D2-03 a foreign book learns its shared root through native Apply");
         InBook(u, f => Stable(beforeForeign, f.StateFingerprint(),
             "SP01N a foreign spellbook never writes the 0099 quota ledger"));
 
-        caseStatus["SP01"] = "native_select_spell_pass";
+        var wrongRoot = Stage(new BlueprintAbility
+        {
+            Type = AbilityType.Spell,
+            ComponentsArray = new BlueprintComponent[] { new SpellComponent { School = SpellSchool.Evocation } }
+        }, Guid.NewGuid().ToString("N"), "0099N.OffList");
+        var wrongChoice = new SelectSpell(occultistBook, occultistList, 1, wrongRoot, 0);
+        var wrongState = ChoiceState(book, 1, 1);
+        Check(!NativeCheck(wrongChoice, wrongState, u.Descriptor), "D2-04 private Check refuses an off-list root");
+        Check(book.AddKnown(1, wrongRoot) == null && !book.IsKnown(wrongRoot),
+            "D2-04 unapproved private AddKnown refuses the off-list root");
+        new SelectSpell(occultistBook, occultistList, 2, mageShield, 0).Apply(early, u.Descriptor);
+        Check(early.GetSpellSelection(occultistBook, occultistList).CanSpendSlot(2, 0),
+            "D2-04 a directly applied wrong-circle choice leaves the native slot unused");
+
+        InBook(u, f => Occultist0099Spells.AddSlot(SpellStateOf(f), "slot-2", "Abjuration"));
+        var secondSlot = ChoiceState(book, 1, 2);
+        var warding = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.Roots
+            .Single(r => r.Name == "CotWWrathPsychicWardingWeapon").Guid);
+        var occupied = new SelectSpell(occultistBook, occultistList, 1, warding, 0);
+        Check(!NativeCheck(occupied, secondSlot, u.Descriptor),
+            "D2-04 native index 0 cannot borrow the open quota of a different implement slot");
+        var newSource = new SelectSpell(occultistBook, occultistList, 1, warding, 1);
+        Check(NativeCheck(newSource, secondSlot, u.Descriptor), "D2-04 native index 1 selects its exact quota");
+        newSource.Apply(secondSlot, u.Descriptor);
+        InBook(u, f => Eq(warding.AssetGuid.ToString(),
+            SpellStateOf(f).Quotas[Occultist0099Spells.QuotaKey("slot-2", 1)],
+            "D2-04 the ledger records the source of the index selected in the native action"));
+        var preview = Unit("sp01-preview", occultistClass, 1, 16);
+        preview.Facts.Add(new Feature(spellbookFact, preview.Descriptor));
+        var previewBook = Book(preview);
+        Set(preview.Descriptor.DemandSpellbook(foreignBook), "m_BaseLevelInternal", foreign.RawBaseLevel);
+        AccessTools.Method(typeof(UnitHelper), "CopySpellbook").Invoke(null, new object[] { u, preview });
+        Check(previewBook.IsKnown(mageShield) && previewBook.IsKnown(warding),
+            "D2-04 native CopySpellbook retains learned roots in the preview");
+        string sourceBefore = null;
+        InBook(u, f => sourceBefore = f.StateFingerprint());
+        InBook(preview, f =>
+        {
+            Stable(sourceBefore, f.StateFingerprint(), "D2-04 copied book retains implement provenance and filled quotas");
+            Occultist0099Spells.RemoveSlot(SpellStateOf(f), "slot-2");
+        });
+        InBook(u, f => Stable(sourceBefore, f.StateFingerprint(),
+            "D2-04 preview ledger mutations never affect the live book"));
+        caseStatus["SP01"] = "native_select_apply_isolated_book_and_exact_sources";
+        caseStatus["SP03"] = "native_copy_provenance_and_preview_isolation_only";
     }
 
     private static void SP02Native()
@@ -1004,18 +1065,8 @@ internal static class Occultist0099NativeTests
         Check(book.AddKnown(2, resist) == null,
             "SP02N native AddKnown refuses circle 2 while Int is 11");
 
-        // Raise the REAL stat and re-run the real rest entry point.
+        // A live attribute change is seen without requiring a rest.
         SetInt(u, 16);
-        NextCamp();
-        Rest(u);
-        InBook(u, f =>
-        {
-            var s = SpellStateOf(f);
-            Eq(16, s.Intelligence,
-                "SP02N the real rest callback resynchronises Int from the native stat");
-            Eq(2, Occultist0099Spells.MaxCircle(s),
-                "SP02N circle 2 opens once the real Int stat reaches 12+");
-        });
         Check(NativeCheck(new SelectSpell(occultistBook, occultistList, 2, resist, 0),
                 ChoiceState(book, 2, 1), u.Descriptor),
             "SP02N native Check permits circle 2 after the real Int raise");
@@ -1025,7 +1076,12 @@ internal static class Occultist0099NativeTests
         new SelectSpell(occultistBook, occultistList, 2, resist, 0).Apply(state, u.Descriptor);
         Check(book.IsKnown(resist), "SP02N circle 2 root really learned at Int 16");
         SetInt(u, 11);
-        NextCamp();
+        var lowInt = ChoiceState(book, 2, 2);
+        var alliedCloak = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.Roots
+            .Single(r => r.Name == "CotWWrathPsychicAlliedCloak").Guid);
+        InBook(u, f => Occultist0099Spells.AddSlot(SpellStateOf(f), "slot-2", "Abjuration"));
+        Check(!NativeCheck(new SelectSpell(occultistBook, occultistList, 2, alliedCloak, 1),
+                lowInt, u.Descriptor), "D2-04 a temporary Int drop blocks new learning without rest");
         Rest(u);
         InBook(u, f =>
         {
@@ -1039,7 +1095,7 @@ internal static class Occultist0099NativeTests
         Check(dispel != null && book.AddKnown(2, dispel) == null,
             "SP02N a second circle-2 root cannot be learned while Int is 11");
 
-        caseStatus["SP02"] = "native_int_gate_pass";
+        caseStatus["SP02"] = "native_live_int_learning_plus_model_cast_gate";
     }
 
     // ------------------------------------------------------------------
@@ -1047,64 +1103,58 @@ internal static class Occultist0099NativeTests
     // ------------------------------------------------------------------
     private static void RestNative()
     {
-        var u = Unit("rest", occultistClass, 5, 14);
-        u.Facts.Add(new Feature(focusFact, u.Descriptor));
-        Book(u);
-        InFocus(u, f =>
+        var unit = Unit("rest", occultistClass, 5, 14);
+        var fact = new Feature(focusFact, unit.Descriptor);
+        unit.Facts.Add(fact);
+        var state = unit.Get<Occultist0099FocusPart>().State;
+        var ability = GrantMindBarrier(unit);
+        int camp = Game.Instance.Player.Camping.OverallCampsCount;
+
+        InvestAndLock(unit, 3);
+        Check(CastRule(ability).Success, "D2-06 paid ability before first successful rest");
+        Rest(unit);
+        string firstRest = state.LastRestEventId;
+        Eq(7, state.Available, "D2-06 first native ApplyRest restores focus");
+        Eq(7, unit.Resources.GetResourceAmount(focusResource), "D2-06 native rest refreshes the resource mirror");
+        Check(!state.Locked, "D2-06 the next cycle starts unlocked");
+
+        InvestAndLock(unit, 3);
+        Check(CastRule(ability).Success, "D2-06 same granted ability pays in the new cycle");
+        Rest(unit);
+        Eq(camp, Game.Instance.Player.Camping.OverallCampsCount, "D2-06 no camp counter increment in either native rest");
+        Check(firstRest != state.LastRestEventId && state.Available == 7,
+            "D2-06 consecutive successful native ApplyRest calls get distinct identities despite same camp counter");
+
+        var batch = AccessTools.Method(typeof(RestController), "ApplyRest", new[] { typeof(List<UnitEntityData>) });
+        var heal = AccessTools.Method(typeof(RestController), nameof(RestController.HealAndApplyRest));
+        var healBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(BatchHealBoundary));
+        harmony.Patch(heal, prefix: new HarmonyMethod(healBoundary));
+        int applications = 0;
+        afterBatchRest = () =>
         {
-            Occultist0099Focus.SetSchoolPresent(StateOf(f), "Abjuration", true);
-            Occultist0099Focus.Invest(StateOf(f), "Abjuration", 4);
-            Occultist0099Focus.Lock(StateOf(f));
-        });
-        AbilityCastRateUtils.SpendResources(new AbilityData(mindBarrier, u.Descriptor));
-        int spentAvailable = 0;
-        InFocus(u, f => spentAvailable = f.AuthoritativeAvailable());
-
-        // A NEW camp serial really refills.
-        NextCamp();
-        Rest(u);
-        int refilled = 0;
-        InFocus(u, f => refilled = f.AuthoritativeAvailable());
-        Eq(7, refilled, "RESTN a new camp serial really rebuilds B and clears the spend");
-        Check(refilled > spentAvailable, "RESTN the new cycle actually restores focus");
-        InFocus(u, f => Check(!f.IsLocked(),
-            "RESTN the new cycle starts unlocked, so MF01 still gates payment"));
-
-        // The refreshed cycle must be invested and locked again before any
-        // focus power can be paid; that is the frozen MF01 rule, not a fixture
-        // shortcut.
-        InFocus(u, f =>
+            if (++applications != 1) return;
+            InvestAndLock(unit, 3);
+            Check(CastRule(ability).Success, "D2-06 payment follows first application in the batch");
+        };
+        try
         {
-            Occultist0099Focus.SetSchoolPresent(StateOf(f), "Abjuration", true);
-            Occultist0099Focus.Invest(StateOf(f), "Abjuration", 4);
-            Occultist0099Focus.Lock(StateOf(f));
-        });
+            var controller = Empty<RestController>();
+            controller.Status = Empty<RestStatus>();
+            batch.Invoke(controller, new object[] { new List<UnitEntityData> { unit, unit } });
+            Check(applications == 2 && state.Locked && state.Available == 6,
+                "D2-06 repeated per-unit ApplyRest in the real native batch is idempotent");
+        }
+        finally
+        {
+            afterBatchRest = null;
+            harmony.Unpatch(heal, healBoundary);
+        }
 
-        // Repeated callbacks of the SAME camp serial are idempotent.
-        AbilityCastRateUtils.SpendResources(new AbilityData(mindBarrier, u.Descriptor));
-        int afterSpend = 0;
-        InFocus(u, f => afterSpend = f.AuthoritativeAvailable());
-        Eq(6, afterSpend, "RESTN the relocked new cycle really pays one point");
-        Rest(u);
-        Rest(u);
-        int afterRepeat = 0;
-        InFocus(u, f => afterRepeat = f.AuthoritativeAvailable());
-        Eq(afterSpend, afterRepeat,
-            "RESTN repeated rest callbacks of one camp serial never refill again");
-
-        // The dedup identity survives the repeat: the same execution id is still
-        // refused, a new one still pays.
-        var sameId = new AbilityData(mindBarrier, u.Descriptor);
-        AbilityCastRateUtils.SpendResources(sameId);
-        int afterNew = 0;
-        InFocus(u, f => afterNew = f.AuthoritativeAvailable());
-        Eq(afterRepeat - 1, afterNew, "RESTN a new cast after the repeated rest still pays");
-        AbilityCastRateUtils.SpendResources(sameId);
-        int afterDup = 0;
-        InFocus(u, f => afterDup = f.AuthoritativeAvailable());
-        Eq(afterNew, afterDup, "RESTN the same cast id is still refused after the repeated rest");
-
-        caseStatus["MF07"] = "native_rest_camp_identity_pass";
+        unit.Facts.Remove(fact);
+        Rest(unit);
+        unit.Facts.Add(new Feature(focusFact, unit.Descriptor));
+        Eq(7, state.Available, "D2-06 a successful rest during detachment refreshes on reacquisition");
+        caseStatus["MF04"] = "native_rest_identity_and_batch_only";
     }
 
     // ------------------------------------------------------------------
@@ -1125,7 +1175,7 @@ internal static class Occultist0099NativeTests
         foreach (var id in new[]
         {
             Occultist0099Ids.FocusFactTypeId, Occultist0099Ids.SpellbookMarkerTypeId,
-            Occultist0099Ids.FocusResourceLogicTypeId, Occultist0099Ids.LearnGateTypeId,
+            Occultist0099Ids.FocusResourceLogicTypeId, Occultist0099Ids.FocusPartTypeId,
             Occultist0099Ids.SpellbookFactTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
@@ -1210,8 +1260,8 @@ internal static class Occultist0099NativeTests
         // Everything else in the frozen contract is honestly NOT run here.
         foreach (string id in new[]
         {
-            "MF02", "MF03", "MF04", "MF05", "MF06", "MF08", "MF09", "MF10", "MF11",
-            "SP03", "SP04", "SP05", "SP06", "SP07"
+            "MF02", "MF03", "MF05", "MF06", "MF07", "MF08", "MF10",
+            "SP04", "SP05", "SP06", "SP07"
         })
             caseStatus[id] = "not_run_native";
 
@@ -1219,7 +1269,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B directed native check (D-0099-01 closure)",
+            ["stage"] = "B directed native recheck (D2 fixes)",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -1238,9 +1288,9 @@ internal static class Occultist0099NativeTests
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "The real Wrath AbilityResourceLogic payment chain, the real SelectSpell/AddKnown learning chain and the real ApplyRest camp identity executed against the authoritative 0099 state. This is NOT player-game acceptance and NOT a release sign-off."
+                ? "Native RuleCastSpell prior to the mocked dispatch, private SelectSpell and AddKnown, native fact replacement and ApplyRest ran in a managed fixture."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Real: BlueprintsCache and the native polymorphic component deserializer, EntityFactsManager/Feature/UnitFactComponentDelegate activation and event context, AbilityData construction and UniqueId, AbilityCastRateUtils.SpendResources, AbilityResourceLogic subclass dispatch, UnitAbilityResourceCollection, SelectSpell.Check/Apply, SpellSelectionData slot accounting, Spellbook.AddKnown/IsKnown, RestController.ApplyRest RemoveOnRest loop and IUnitRestHandler dispatch, CampingState.OverallCampsCount. Boundaries: constructed Game/Player/unit proxies, no-View scene services, a fixed TimeController clock, LogChannel capture, and UnitDescriptor.Replenish skipped inside ApplyRest (it restores every unrelated descriptor resource). NOT run: Unity rendering, the level-up UI/VM layer, the whole rest coroutine, save/load transport, real third-party provider assemblies, the shared registration chain and the full historical suites.",
+            ["boundary"] = "Real managed Rulebook/RuleApplySpell.Before, RuleCastSpell.OnTrigger, AbilityResourceLogic, EntityFactsManager and per-unit part, SelectSpell, Spellbook and ApplyRest. Host substitutions: no native target scene, minimal execution context, executor dispatch counter, native UnitUseAbility constructed with metamagic profiling disabled, command binding invoked directly, batch heal boundary delegates to the real per-unit ApplyRest, no UnitDescriptor.Replenish. No full command OnAction scene, real effect delivery, full rest coroutine or immediate scripted rest scene.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

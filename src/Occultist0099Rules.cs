@@ -412,7 +412,7 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (s == null || !s.ClassPresent || !s.Enabled || !s.Locked ||
                 !Occultist0099Schools.IsSchool(school) || cost <= 0 ||
-                string.IsNullOrEmpty(executionId) || s.ChargedExecutions.Contains(executionId))
+                (executionId != null && s.ChargedExecutions.Contains(executionId)))
                 return false;
             var st = s.Schools[school];
             if (!st.Present) return false;
@@ -467,8 +467,7 @@ namespace CallOfTheWild.Wrath.Prototype
             int cost, string executionId)
         {
             if (s == null || !s.ClassPresent || !s.Enabled || !s.Locked ||
-                cost <= 0 || string.IsNullOrEmpty(executionId) ||
-                s.ChargedExecutions.Contains(executionId))
+                cost <= 0 || (executionId != null && s.ChargedExecutions.Contains(executionId)))
                 return false;
             string[] members = Occultist0099Schools.MembersOf(panoply);
             if (members == null || !s.PanoplyValid[panoply]) return false;
@@ -491,8 +490,7 @@ namespace CallOfTheWild.Wrath.Prototype
             string executionId)
         {
             if (s == null || !s.ClassPresent || !s.Enabled || cost <= 0 ||
-                string.IsNullOrEmpty(executionId) ||
-                s.ChargedExecutions.Contains(executionId))
+                (executionId != null && s.ChargedExecutions.Contains(executionId)))
                 return false;
             return s.Generic >= cost;
         }

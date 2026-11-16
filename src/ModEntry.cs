@@ -67,6 +67,7 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private static IEnumerable<Type> PatchTypes() => Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => Occultist0099Slice.Published || !Occultist0099Slice.IsRuntimePatch(t))
             .Where(t => t.GetCustomAttributes(typeof(HarmonyPatch), false).Any());
         private static bool IsPsychicPatch(Type type) => type.DeclaringType == typeof(TopplingSpell) || type == typeof(PsychicSpiritualAllyFlankingPatch) || type == typeof(PsychicEyeControlPatch) || type == typeof(PsychicSpiritAttackLogPatch) || type == typeof(PsychicEyeClickPatch) || type == typeof(PsychicEyeHoverPatch) || type.DeclaringType == typeof(PsychicCasting) ||
             type.DeclaringType == typeof(PsychicAmplificationMenu) ||

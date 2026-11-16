@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成，B 防护系首切片待 D 退回修复。2026-11-16 独立 D 复查 **NEEDS_FIX**（候选 77ea03b）。原生宿主 80/80（3.336 秒），旧 D 模型反例 5/5（1.933 秒）；新增原生反例 8/32 失败（3.185 秒），复现独立施放误去重、替换事实丢当日账本、外书共享术阻断、私有书错误接受/先扣槽。另确认施法后扣费及即时脚本休息两项源码问题。主工程及宿主重编译 0 警告/0 错误，3.239 秒。交 B 修复后复查。SP08、真实提供方、实机、打包和安装包上传未运行；切片为开发态，认领保持开放。[D 独立复查](../work-packages/COTW-0099/D2-occultist-review.md) · [证据](../work-packages/COTW-0099/D2-occultist-evidence.json) · [B 修复轮记录](../work-packages/COTW-0099/B-fix-round.md)。
+- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成，B 在分支 `feat/cotw-0099-occultist` 修复 Abjuration 开发切片的 D2-01～06。独立 D 完成源码与 119 条定向证据复核，指出未发布补丁的自动安装，B 补上门禁并复验。主工程和原生宿主编译 0 警告 / 0 错误（1.80 秒），最终隔离原生 120/120（3.198 秒），模型 364/364（2.241 秒）。13 个 Wrath 根、4 个 CotW 构建器及 1 个 TTT 供体均沿用已有来源。升级 UI、重训、存读档、实际提供方、SP08 真实注册、实机、打包和上传未运行。切片为开发态，认领保持开放。[D2 修复与复用复查](../work-packages/COTW-0099/B-D2-fix.md) · [复跑证据](../work-packages/COTW-0099/B-D2-fix-evidence.json)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
