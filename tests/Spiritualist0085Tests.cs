@@ -13,13 +13,18 @@ using Kingmaker.EntitySystem.Stats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
+using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Parts;
 
@@ -398,6 +403,21 @@ internal static class Spiritualist0085Tests
         var bondedGrants = bondedFeature.GetComponents<AddFeatureOnClassLevel>().ToArray();
         Check(bondedGrants.Any(g => g.Level == 8) && bondedGrants.Any(g => g.Level == 18), "tendril attacks granted at 8 and 18");
         Check(bondedGrants.All(g => ((BlueprintFeatureReference)Get(g, "m_Feature")).Get().GetComponent<AddFacts>() != null), "tendril grants carry abilities");
+        var bondedToggle = Load<BlueprintActivatableAbility>(cache, Id("BondedManifestation"));
+        Check(bondedToggle.DeactivateImmediately && bondedToggle.GetComponent<ActivatableAbilityResourceLogic>()?.SpendType ==
+            ActivatableAbilityResourceLogic.ResourceSpendType.NewRound, "Bonded can stop immediately and uses the native round budget");
+        var tendril8 = Load<BlueprintAbility>(cache, Id("BondedTendrils8Ability"));
+        var tendril18 = Load<BlueprintAbility>(cache, Id("BondedTendrils18Ability"));
+        var bondedId = Id("BondedManifestationEffect");
+        Check(new[] { tendril8, tendril18 }.All(a => a.GetComponent<AbilityCasterHasFacts>()?.Facts.Any(f => f.AssetGuid == bondedId) == true),
+            "both tendrils require the Bonded shield through the native caster restriction");
+        Check(tendril18.Range == AbilityRange.Personal && tendril18.IsFullRoundAction &&
+            tendril18.GetComponent<AbilityTargetsAround>()?.Targets.ToString() == "Enemy" &&
+            tendril8.GetComponent<AbilityTargetsAround>() == null, "full-round tendrils use the native hostile area selector centered on the caster");
+        var tendrilDice = Load<BlueprintBuff>(cache, Id("BondedTendrils18Dice")).GetComponent<ContextRankConfig>();
+        var phantomDice = Load<BlueprintFeature>(cache, Id("PhantomSlamDamage")).GetComponent<ContextRankConfig>();
+        Check(Enumerable.Range(1, 20).All(l => Rank(tendrilDice, l) == Rank(phantomDice, l)),
+            "tendril dice and native phantom progression use matching tiers at each level");
         var phantomProg2 = phantomClass.Progression;
         Check(phantomProg2.LevelEntries[6].Features.Any(f => f.AssetGuid == BlueprintGuid.Parse("a634f97d23662b347872ffcf580495b3")), "phantom level 7 grants the native Multiattack donor");
         var dr15 = Load<BlueprintFeature>(cache, Id("PhantomDR15"));
@@ -463,6 +483,33 @@ internal static class Spiritualist0085Tests
         int restQueue = restIl.FindIndex(i => i.Calls(AccessTools.Method(restPatch, "GetResurrectionUnits")));
         Check(restQueue >= 0 && restIl.Count(i => i.Calls(nativeRest)) == 1 &&
             restQueue < restIl.FindIndex(i => i.Calls(nativeRest)), "only the native resurrection loop receives the augmented queue");
+        var reroll = (RuleRollD20)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(RuleRollD20));
+        reroll.Override(4);
+        AccessTools.PropertySetter(typeof(RuleRollDice), nameof(RuleRollDice.RollHistory))
+            .Invoke(reroll, new object[] { new List<int> { 4 } });
+        Call("Phantom0085Reroll", "UseReplacement", reroll, 12);
+        bool improved = reroll.Result == 12;
+        Call("Phantom0085Reroll", "UseReplacement", reroll, 2);
+        Check(improved && reroll.Result == 2 && reroll.RollHistory.SequenceEqual(new[] { 4, 12, 2 }),
+            "Zeal uses the newly rolled result whether higher or lower and keeps the native history");
+        foreach (var area in new[] { "AngerAuraOfFuryArea", "DespairAuraOfDespairArea", "HatredHatefulAuraArea", "ZealDeterminationAuraArea" })
+        {
+            var effect = Load<BlueprintAbilityAreaEffect>(cache, Id(area));
+            var applyAreaBuff = effect?.GetComponent<AbilityAreaEffectBuff>();
+            Check(applyAreaBuff?.Buff?.Stacking == StackingType.Stack && effect.GetComponent<AbilityAreaEffectRunAction>() == null,
+                area + " uses the native source-owned area buff");
+        }
+        var hatedAction = Load<BlueprintAbility>(cache, Id("HatredHatedTargetAbility"))
+            .GetComponent<AbilityEffectRunAction>().Actions.Actions.OfType<ContextActionApplyBuff>().Single();
+        var hated = hatedAction.Buff;
+        Check(hatedAction.Permanent && Component(hated, "UniqueBuff") != null && Component(hated, "AddFactContextActions") != null &&
+            Component(Load<BlueprintFeature>(cache, Id("HatredSneakAttack")), "Phantom0085HatredSneakAttack") != null,
+            "Hatred mark persists and owns its shared and target-specific sneak attack effects");
+        var fearArea = Load<BlueprintAbilityAreaEffect>(cache, Id("FearIncreaseFearArea"));
+        var exitFear = fearArea.GetComponent<AbilityAreaEffectRunAction>().UnitExit.Actions.OfType<ContextActionRemoveBuff>().Single();
+        Check(exitFear.OnlyFromCaster && exitFear.Buff.AssetGuid == Id("FearIncreaseFearAuraBuff") &&
+            fearArea.GetComponent<AbilityAreaEffectBuff>()?.Buff.AssetGuid == Id("FearShelterAlliesEffect"),
+            "Fear exit only removes its frightened effect and Sheltering uses the native area-owned buff");
         var bondedShield = Load<BlueprintBuff>(cache, Id("BondedManifestationEffect"));
         Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085ShieldToIncorporealTouch"), "bonded shield transfers to incorporeal touch AC");
         Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085TendrilDice") == false, "tendril dice live on the temporary attack buff, not the shield");

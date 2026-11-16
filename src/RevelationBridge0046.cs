@@ -512,7 +512,7 @@ namespace CallOfTheWild.Wrath.Prototype
             return null;
         }
 
-        static bool Failed(RuleRollD20 evt, RulebookEvent previous, RuleType ruleType)
+        internal static bool Failed(RuleRollD20 evt, RulebookEvent previous, RuleType ruleType)
         {
             int first = evt.PreRollDice();
             switch (ruleType)

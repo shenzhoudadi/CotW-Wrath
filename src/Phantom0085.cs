@@ -118,7 +118,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var slamDice = f.Feature("PhantomSlamDamage", "Slam Damage",
                 "Phantoms have two slam natural weapon attacks. Medium phantom slam damage is 1d6 at levels 1-3, 1d8 at 4-6, 1d10 at 7-9, 2d6 at 10-12 and 2d8 at 13+.",
                 new Phantom0085SlamDice { name = "Phantom0085SlamDice", Large = false },
-                Rank(phantomClass, "Custom", 3, 0, 6, 1, 9, 2, 12, 3, 20, 4));
+                SlamRank(phantomClass));
             var magicAttacks = f.Feature("PhantomMagicAttacks", "Magic Attacks",
                 "Starting from 3rd level, the phantom treats its slam attacks as magic for the purpose of overcoming damage reduction.",
                 new WeaponMagic { name = "Phantom0085MagicAttacks" });
@@ -256,7 +256,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var largeSlam = f.Feature("AngerPhantomSlamDamage", "Anger Phantom Slam Damage",
                     "Anger phantom slam damage is 1d8 at levels 1-3, 2d6 at 4-6, 2d8 at 7-9, 3d6 at 10-12 and 3d8 at 13+.",
                     new Phantom0085SlamDice { name = "Phantom0085AngerSlamDice", Large = true },
-                    Rank(phantomClass, "Custom", 3, 0, 6, 1, 9, 2, 12, 3, 20, 4));
+                    SlamRank(phantomClass));
                 var strCha = BuildAttributeGrowth(f, "PhantomStrChaGrowth", StatType.Strength);
                 add[0] = Entry(1, skillFeature, baseTrait, largeSlam);
                 foreach (var level in GrowthLevels) add.Add(Entry(level, strCha));
@@ -355,16 +355,22 @@ namespace CallOfTheWild.Wrath.Prototype
             return action;
         }
 
-        private static ContextActionRemoveBuff Remove(BlueprintBuff buff, string name)
+        private static AbilityAreaEffectBuff AreaBuff(BlueprintBuff buff, string name, params Condition[] conditions)
         {
-            var action = new ContextActionRemoveBuff { name = name };
-            Set(action, "m_Buff", Ref<BlueprintBuffReference>(buff));
-            return action;
+            buff.Stacking = StackingType.Stack;
+            var area = new AbilityAreaEffectBuff
+            {
+                name = name,
+                Condition = new ConditionsChecker { Conditions = conditions },
+                CheckConditionEveryRound = conditions.Length > 0
+            };
+            Set(area, "m_Buff", Ref<BlueprintBuffReference>(buff));
+            return area;
         }
 
         private static ContextActionRemoveBuff RemoveFromCaster(BlueprintBuff buff, string name)
         {
-            var action = new ContextActionRemoveBuff { name = name, ToCaster = true };
+            var action = new ContextActionRemoveBuff { name = name, OnlyFromCaster = true };
             Set(action, "m_Buff", Ref<BlueprintBuffReference>(buff));
             return action;
         }
@@ -432,15 +438,8 @@ namespace CallOfTheWild.Wrath.Prototype
         private static ContextRankConfig Rank(BlueprintCharacterClass cls, string progression, params int[] thresholds)
             => ArchetypeBatch01445.Rank(cls, progression, thresholds);
 
-        private static ContextRankConfig StatBonusRank(BlueprintCharacterClass cls, StatType stat)
-        {
-            var r = new ContextRankConfig();
-            SetEnum(r, "m_BaseValueType", "StatBonus");
-            SetEnum(r, "m_Progression", "AsIs");
-            Set(r, "m_Class", new[] { Ref<BlueprintCharacterClassReference>(cls) });
-            Set(r, "m_Stat", stat);
-            return r;
-        }
+        private static ContextRankConfig SlamRank(BlueprintCharacterClass cls)
+            => Rank(cls, "Custom", 3, 0, 6, 1, 9, 2, 12, 3, 20, 4);
 
         private static ContextRankConfig RankMulti(BlueprintCharacterClass[] classes, string progression)
         {
@@ -515,7 +514,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var furyAura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 20.Feet(), AffectEnemies = true,
-                ComponentsArray = new BlueprintComponent[] { new AbilityAreaEffectRunAction { name = "Phantom0085FuryAura", UnitEnter = PsychicAssets.Actions(Apply(furyBuff, new ContextDurationValue(), "Phantom0085FuryApply")), UnitExit = PsychicAssets.Actions(Remove(furyBuff, "Phantom0085FuryRemove")) } }
+                ComponentsArray = new BlueprintComponent[] { AreaBuff(furyBuff, "Phantom0085FuryAura") }
             }, "AngerAuraOfFuryArea", "Aura of Fury", "");
             var auraOfFury = AuraFeature(f, "AngerAuraOfFury", "Aura of Fury",
                 "When the spiritualist reaches 7th level, as a swift action, the phantom can emit a 20-foot-radius aura of fury. Creatures within the aura gain a +2 bonus on melee attack rolls but take a -2 penalty to AC. Ending the aura is a free action.",
@@ -662,7 +661,10 @@ namespace CallOfTheWild.Wrath.Prototype
             var despairAura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 20.Feet(), AffectEnemies = true,
-                ComponentsArray = new BlueprintComponent[] { new AbilityAreaEffectRunAction { name = "Phantom0085DespairAura", UnitEnter = PsychicAssets.Actions(Apply(despairBuff, new ContextDurationValue(), "Phantom0085DespairApply")), UnitExit = PsychicAssets.Actions(Remove(despairBuff, "Phantom0085DespairRemove")) } }
+                ComponentsArray = new BlueprintComponent[]
+                {
+                    AreaBuff(despairBuff, "Phantom0085DespairAura", new ContextConditionIsEnemy { name = "Phantom0085DespairEnemy" })
+                }
             }, "DespairAuraOfDespairArea", "Aura of Despair", "");
             var auraOfDespair = AuraFeature(f, "DespairAuraOfDespair", "Aura of Despair",
                 "When the spiritualist reaches 7th level, as a swift action, the phantom can emit a 20-foot aura of despair. Enemies within the aura take a -2 penalty on all saving throws. This is a fear effect. Deactivating the aura is a free action.",
@@ -686,37 +688,36 @@ namespace CallOfTheWild.Wrath.Prototype
                 RankMulti(both, "Div2"),
                 new UniqueBuff { name = "Phantom0085HatedUnique" });
             SetEnum(hatedBuff, "m_Flags", "RemoveOnRest");
+            hatedBuff.Stacking = StackingType.Stack;
+            var markTarget = Apply(hatedBuff, new ContextDurationValue(), "Phantom0085HatedApply");
+            markTarget.Permanent = true;
             var hatedMove = f.Ability("HatredHatedTargetAbility", "Hated Target",
                 "The phantom can take a move action to designate one creature within its line of sight as a hated target. At 7th level, this becomes a swift action.",
                 AbilityType.Supernatural, UnitCommand.CommandType.Move, AbilityRange.Medium,
-                PsychicAssets.Run(Apply(hatedBuff, new ContextDurationValue(), "Phantom0085HatedApply")));
+                PsychicAssets.Run(markTarget));
             hatedMove.CanTargetEnemies = true;
-            var hatedSwift = CopyBlueprint(hatedMove);
-            hatedSwift.AssetGuid = Id("HatredHatedTargetSwiftAbility");
-            hatedSwift.name = Spiritualist0085Ids.AssetPrefix + "HatredHatedTargetSwiftAbility";
-            hatedSwift.ActionType = UnitCommand.CommandType.Swift;
-            Set(hatedSwift, "m_DisplayName", Text("HatredHatedTargetSwiftAbility", "name", "Hated Target (Swift)"));
-            f.Register(hatedSwift, "HatredHatedTargetSwiftAbility");
-            var hatedTarget = f.Feature("HatredHatedTarget", "Hated Target", NameOf(hatedMove), Facts(hatedMove),
-                ClassLevelGrant(character, 7, f.Feature("HatredHatedTargetSwiftFeature", "Hated Target (Swift)", DescOf(hatedSwift), Facts(hatedSwift)), "Phantom0085HatedSwift"));
+            hatedMove.CanTargetFriends = false;
+            var hatedTarget = f.Feature("HatredHatedTarget", "Hated Target", NameOf(hatedMove), Facts(hatedMove));
 
             var hatefulBuff = f.Buff("HatredHatefulAuraEffect", "Hateful Aura",
                 "Enemies within the aura that deal damage to the spiritualist or the phantom take damage equal to the phantom's Charisma bonus. This is a mind-affecting pain effect.",
                 new Phantom0085HatefulAura { name = "Phantom0085HatefulAura" },
-                StatBonusRank(phantomClass, StatType.Charisma),
                 new SpellDescriptorComponent { name = "Phantom0085HatefulDescriptor", Descriptor = Kingmaker.Blueprints.Classes.Spells.SpellDescriptor.MindAffecting });
             var hatefulAura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 20.Feet(), AffectEnemies = true,
-                ComponentsArray = new BlueprintComponent[] { new AbilityAreaEffectRunAction { name = "Phantom0085HatefulArea", UnitEnter = PsychicAssets.Actions(Apply(hatefulBuff, new ContextDurationValue(), "Phantom0085HatefulApply")), UnitExit = PsychicAssets.Actions(Remove(hatefulBuff, "Phantom0085HatefulRemove")) } }
+                ComponentsArray = new BlueprintComponent[]
+                {
+                    AreaBuff(hatefulBuff, "Phantom0085HatefulArea", new ContextConditionIsEnemy { name = "Phantom0085HatefulEnemy" })
+                }
             }, "HatredHatefulAuraArea", "Hateful Aura", "");
             var hatefulAuraFeature = AuraFeature(f, "HatredHatefulAura", "Hateful Aura",
                 "When the spiritualist reaches 7th level, as a swift action, the phantom can emit a 20-foot-radius aura that inflicts pain upon the minds of those who dare damage it or its master.",
                 hatefulAura, UnitCommand.CommandType.Swift);
 
             var sneakAttack = f.Feature("HatredSneakAttack", "Sneak Attack",
-                "At 12th level, the phantom gains the sneak attack ability, dealing extra precision damage when flanking or catching its target flat-footed.",
-                new AddContextStatBonus { name = "Phantom0085SneakAttack", Stat = StatType.SneakAttack, Descriptor = ModifierDescriptor.Feat, Value = new ContextValue { ValueType = ContextValueType.Rank } },
+                "The phantom deals sneak attack damage when it flanks or catches its hated target flat-footed.",
+                new Phantom0085HatredSneakAttack { name = "Phantom0085SneakAttack", Hated = Ref<BlueprintBuffReference>(hatedBuff) },
                 Rank(phantomClass, "Custom", 13, 3, 20, 5));
 
             var sharedBuff = f.Buff("HatredSharedHatredEffect", "Shared Hatred",
@@ -724,10 +725,15 @@ namespace CallOfTheWild.Wrath.Prototype
                 new AttackBonusAgainstTarget { name = "Phantom0085SharedAttack", Value = new ContextValue { Value = 2 }, CheckCasterFriend = true },
                 new DamageBonusAgainstTarget { name = "Phantom0085SharedDamage", Value = new ContextValue { Value = 4 }, CheckCasterFriend = true });
             var sharedHatred = f.Feature("HatredSharedHatred", "Shared Hatred", NameOf(sharedBuff));
-            // The hated-target application carries the shared grant when present.
-            var apply = hatedMove.GetComponent<AbilityEffectRunAction>();
-            var sharedConditional = Cond("Phantom0085SharedConditional", new Condition[] { HasFact(sharedHatred, "Phantom0085SharedCheck") }, PsychicAssets.Actions(Apply(sharedBuff, new ContextDurationValue(), "Phantom0085SharedApply", asChild: true)), PsychicAssets.Actions());
-            apply.Actions = PsychicAssets.Actions(apply.Actions.Actions.Concat(new GameAction[] { sharedConditional }).ToArray());
+            sharedBuff.Stacking = StackingType.Stack;
+            var grantShared = Apply(sharedBuff, new ContextDurationValue(), "Phantom0085SharedApply", asChild: true);
+            grantShared.Permanent = true;
+            var sharedConditional = Cond("Phantom0085SharedConditional", new Condition[] { HasFact(sharedHatred, "Phantom0085SharedCheck") },
+                PsychicAssets.Actions(grantShared), PsychicAssets.Actions());
+            hatedBuff.ComponentsArray = hatedBuff.ComponentsArray.Concat(new BlueprintComponent[]
+            {
+                new AddFactContextActions { name = "Phantom0085ShareHatedTarget", Activated = PsychicAssets.Actions(sharedConditional) }
+            }).ToArray();
             return new[] { hatedTarget, hatefulAuraFeature, sneakAttack, sharedHatred };
         }
 
@@ -760,10 +766,12 @@ namespace CallOfTheWild.Wrath.Prototype
             // Increase Fear aura: shaken enemies save or become frightened;
             // successful saves grant 24h immunity; allies gain fear shelter at 17.
             var immuneBuff = f.Buff("FearIncreaseFearImmune", "", "", new Phantom0085NoOp { name = "Phantom0085FearImmuneMarker" });
-            SetEnum(immuneBuff, "m_Flags", "RemoveOnRest, HiddenInUi");
+            SetEnum(immuneBuff, "m_Flags", "HiddenInUi");
+            immuneBuff.Stacking = StackingType.Stack;
             var frightenedAura = CopyBlueprint(frightened);
             frightenedAura.AssetGuid = Id("FearIncreaseFearAuraBuff");
             frightenedAura.name = Spiritualist0085Ids.AssetPrefix + "FearIncreaseFearAuraBuff";
+            frightenedAura.Stacking = StackingType.Stack;
             f.Register(frightenedAura, "FearIncreaseFearAuraBuff");
             var shelterBuff = f.Buff("FearShelterAlliesEffect", "Shelter Allies",
                 "Allies within the phantom's increase fear aura are immune to fear as long as they are within the aura.",
@@ -773,14 +781,24 @@ namespace CallOfTheWild.Wrath.Prototype
                 new SpellImmunityToSpellDescriptor { name = "Phantom0085ShelterSpell", Descriptor = Kingmaker.Blueprints.Classes.Spells.SpellDescriptor.Shaken | Kingmaker.Blueprints.Classes.Spells.SpellDescriptor.Frightened });
             var shelterAllies = f.Feature("FearShelterAllies", "Shelter Allies", NameOf(shelterBuff));
 
+            var fearDifficulty = f.Add(new BlueprintUnitProperty
+            {
+                ComponentsArray = new BlueprintComponent[] { new Phantom0085FearDifficulty { name = "Phantom0085FearDC" } }
+            }, "FearIncreaseFearDifficulty", "", "");
+            var difficulty = new ContextValue { ValueType = ContextValueType.CasterCustomProperty };
+            Set(difficulty, "m_CustomProperty", Ref<BlueprintUnitPropertyReference>(fearDifficulty));
+            var fearImmunity = Apply(immuneBuff, new ContextDurationValue { Rate = DurationRate.Days, BonusValue = 1 },
+                "Phantom0085IncreaseFearImmuneApply");
+            var amplifyFear = Apply(frightenedAura, new ContextDurationValue(), "Phantom0085IncreaseFearFrightenedApply", asChild: true);
+            amplifyFear.Permanent = true;
             var enemySave = new ContextActionSavingThrow
             {
-                name = "Phantom0085IncreaseFearSave", Type = SavingThrowType.Will,
+                name = "Phantom0085IncreaseFearSave", Type = SavingThrowType.Will, HasCustomDC = true, CustomDC = difficulty,
                 Actions = PsychicAssets.Actions(new ContextActionConditionalSaved
                 {
                     name = "Phantom0085IncreaseFearSaved",
-                    Succeed = PsychicAssets.Actions(Apply(immuneBuff, new ContextDurationValue(), "Phantom0085IncreaseFearImmuneApply")),
-                    Failed = PsychicAssets.Actions(Apply(frightenedAura, new ContextDurationValue(), "Phantom0085IncreaseFearFrightenedApply"))
+                    Succeed = PsychicAssets.Actions(fearImmunity),
+                    Failed = PsychicAssets.Actions(amplifyFear)
                 })
             };
             var enemyEffect = Cond("Phantom0085IncreaseFearEnemyCheck",
@@ -796,22 +814,17 @@ namespace CallOfTheWild.Wrath.Prototype
                     new Condition[] { new ContextConditionHasBuffWithDescriptor { name = "Phantom0085IncreaseFearShaken", SpellDescriptor = Kingmaker.Blueprints.Classes.Spells.SpellDescriptor.Shaken } },
                     PsychicAssets.Actions(enemyEffect),
                     PsychicAssets.Actions(RemoveFromCaster(frightenedAura, "Phantom0085IncreaseFearRemoveFrightened")))),
-                PsychicAssets.Actions(Cond("Phantom0085IncreaseFearShelterCheck",
-                    new Condition[] { HasFact(shelterAllies, "Phantom0085IncreaseFearHasShelter") },
-                    PsychicAssets.Actions(Apply(shelterBuff, new ContextDurationValue(), "Phantom0085IncreaseFearShelterApply")),
-                    PsychicAssets.Actions())));
-            var removeAction = Cond("Phantom0085IncreaseFearRemove",
-                new Condition[] { new ContextConditionIsEnemy { name = "Phantom0085IncreaseFearRemoveIsEnemy" } },
-                PsychicAssets.Actions(
-                    RemoveFromCaster(immuneBuff, "Phantom0085IncreaseFearRemoveImmune"),
-                    RemoveFromCaster(frightenedAura, "Phantom0085IncreaseFearRemoveFrightened2")),
-                PsychicAssets.Actions(RemoveFromCaster(shelterBuff, "Phantom0085IncreaseFearRemoveShelter")));
+                PsychicAssets.Actions());
+            var removeAction = RemoveFromCaster(frightenedAura, "Phantom0085IncreaseFearRemoveFrightened2");
             var increaseAura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 20.Feet(), AffectEnemies = true,
                 ComponentsArray = new BlueprintComponent[]
                 {
-                    new AbilityAreaEffectRunAction { name = "Phantom0085IncreaseFearArea", UnitEnter = PsychicAssets.Actions(auraAction), UnitExit = PsychicAssets.Actions(removeAction), Round = PsychicAssets.Actions(auraAction) }
+                    new AbilityAreaEffectRunAction { name = "Phantom0085IncreaseFearArea", UnitEnter = PsychicAssets.Actions(auraAction), UnitExit = PsychicAssets.Actions(removeAction), Round = PsychicAssets.Actions(auraAction) },
+                    AreaBuff(shelterBuff, "Phantom0085IncreaseFearShelterCheck",
+                        new ContextConditionIsAlly { name = "Phantom0085IncreaseFearIsAlly" },
+                        HasFact(shelterAllies, "Phantom0085IncreaseFearHasShelter"))
                 }
             }, "FearIncreaseFearArea", "Increase Fear", "");
             var increaseFear = AuraFeature(f, "FearIncreaseFear", "Increase Fear",
@@ -844,7 +857,10 @@ namespace CallOfTheWild.Wrath.Prototype
             var determinationAura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 20.Feet(), AffectEnemies = true,
-                ComponentsArray = new BlueprintComponent[] { new AbilityAreaEffectRunAction { name = "Phantom0085DeterminationArea", UnitEnter = PsychicAssets.Actions(Apply(determinationBuff, new ContextDurationValue(), "Phantom0085DeterminationApply")), UnitExit = PsychicAssets.Actions(Remove(determinationBuff, "Phantom0085DeterminationRemove")) } }
+                ComponentsArray = new BlueprintComponent[]
+                {
+                    AreaBuff(determinationBuff, "Phantom0085DeterminationArea", new ContextConditionIsAlly { name = "Phantom0085DeterminationAlly" })
+                }
             }, "ZealDeterminationAuraArea", "Determination Aura", "");
             var determinationAuraFeature = AuraFeature(f, "ZealDeterminationAura", "Determination Aura",
                 "When the spiritualist reaches 7th level, as a swift action, the phantom can emit a 20-foot radius aura that grants its zeal to nearby allies. Allies within the aura gain a +2 competence bonus on attack rolls and saving throws.",
@@ -878,7 +894,6 @@ namespace CallOfTheWild.Wrath.Prototype
             var resolveAttackToggle = f.Add(new BlueprintActivatableAbility { ActivationType = AbilityActivationType.Immediately, DeactivateImmediately = true },
                 "ZealZealsResolveAttack", "Zeal's Resolve: Attack Roll",
                 "Three times per day as a free action, when the phantom misses with an attack roll, it can reroll the failed attack. It must take the new result, even if worse.");
-            Set(resolveAttackToggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Free);
             Set(resolveAttackToggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Free);
             Set(resolveAttackToggle, "m_Buff", Ref<BlueprintBuffReference>(resolveAttackBuff));
             var resolveSaveToggle = f.Add(new BlueprintActivatableAbility { ActivationType = AbilityActivationType.Immediately, DeactivateImmediately = true },
@@ -1118,8 +1133,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 "The spiritualist gains an ectoplasmic shield: +4 shield bonus to AC (also against incorporeal touch attacks), increasing to +6 at 13th level. At 8th level she sprouts ectoplasmic tendrils; at 18th level she can attack all creatures in reach with them, rolling twice and taking the better result.",
                 new AddContextStatBonus { name = "Phantom0085BondedShield", Stat = StatType.AC, Descriptor = ModifierDescriptor.Shield, Value = new ContextValue { ValueType = ContextValueType.Rank } },
                 Rank(character, "Custom", 12, 4, 20, 6),
-                new Phantom0085ShieldToIncorporealTouch { name = "Phantom0085BondedIncorporealTouch" },
-                new Phantom0085BondedTendrils { name = "Phantom0085BondedTendrils" });
+                new Phantom0085ShieldToIncorporealTouch { name = "Phantom0085BondedIncorporealTouch" });
             var resource = f.Add(new BlueprintAbilityResource(), "BondedManifestationResource", "", "");
             var amount = Get(resource, "m_MaxAmount");
             Set(amount, "BaseValue", 3);
@@ -1133,6 +1147,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 ActivationType = AbilityActivationType.WithUnitCommand,
                 DeactivateIfOwnerDisabled = true,
+                DeactivateImmediately = true,
                 ComponentsArray = new BlueprintComponent[]
                 {
                     BondedCost(resource),
@@ -1141,10 +1156,10 @@ namespace CallOfTheWild.Wrath.Prototype
             }, "BondedManifestation", "Bonded Manifestation", DescOf(shieldBuff));
             Set(toggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Swift);
             Set(toggle, "m_Buff", Ref<BlueprintBuffReference>(shieldBuff));
-            var tendril8 = BuildTendril(f, character, phantomClass, "BondedTendrils8", "Tendrils Attack",
+            var tendril8 = BuildTendril(f, character, shieldBuff, "BondedTendrils8", "Tendrils Attack",
                 "At 8th level, the spiritualist sprouts ectoplasmic tendrils. As a swift action, she can attack a creature within her melee reach with them, using the damage dice of her manifested phantom.",
                 UnitCommand.CommandType.Swift, fullRound: false);
-            var tendril18 = BuildTendril(f, character, phantomClass, "BondedTendrils18", "Tendrils Attack II",
+            var tendril18 = BuildTendril(f, character, shieldBuff, "BondedTendrils18", "Tendrils Attack II",
                 "At 18th level, as a full-round action, the spiritualist can attack all creatures within her melee reach with her tendrils, rolling the attack roll twice and taking the better result.",
                 UnitCommand.CommandType.Standard, fullRound: true);
             var bonded = f.Feature("BondedManifestationFeature", "Bonded Manifestation", DescOf(shieldBuff),
@@ -1161,16 +1176,13 @@ namespace CallOfTheWild.Wrath.Prototype
             return bonded;
         }
 
-        private static BlueprintFeature BuildTendril(FactoryShim f, BlueprintCharacterClass character, BlueprintCharacterClass phantomClass,
+        private static BlueprintFeature BuildTendril(FactoryShim f, BlueprintCharacterClass character, BlueprintBuff shieldBuff,
             string token, string name, string description, UnitCommand.CommandType action, bool fullRound)
         {
             var diceBuff = f.Buff(token + "Dice", "", "",
                 new Phantom0085TendrilDice { name = "Phantom0085TendrilDice" + token },
-                Rank(character, "DelayedStartPlusDivStep"));
+                SlamRank(character));
             SetEnum(diceBuff, "m_Flags", "HiddenInUi");
-            var diceRank = diceBuff.GetComponent<ContextRankConfig>();
-            Set(diceRank, "m_StepLevel", 3);
-            Set(diceRank, "m_StartLevel", 4);
             BlueprintBuff rerollBuff = null;
             if (fullRound)
             {
@@ -1179,16 +1191,28 @@ namespace CallOfTheWild.Wrath.Prototype
                 SetEnum(rerollBuff, "m_Flags", "HiddenInUi");
             }
             var slam = f.Native<BlueprintItemWeapon>(Spiritualist0085Ids.SlamWeaponId);
-            var ability = f.Ability(token + "Ability", name, description, AbilityType.Supernatural, action, AbilityRange.Touch,
+            var requiresShield = new AbilityCasterHasFacts { name = "Phantom0085" + token + "RequiresBonded" };
+            Set(requiresShield, "m_Facts", new[] { Ref<BlueprintUnitFactReference>(shieldBuff) });
+            var ability = f.Ability(token + "Ability", name, description, AbilityType.Supernatural, action,
+                fullRound ? AbilityRange.Personal : AbilityRange.Touch, requiresShield,
                 PsychicAssets.Run(new Phantom0085TendrilAttack
                 {
-                    name = "Phantom0085Tendril" + token, FullRound = fullRound,
+                    name = "Phantom0085Tendril" + token,
                     DiceBuff = Ref<BlueprintBuffReference>(diceBuff),
                     RerollBuff = rerollBuff != null ? Ref<BlueprintBuffReference>(rerollBuff) : null,
                     Slam = Ref<BlueprintItemWeaponReference>(slam)
                 }));
-            ability.CanTargetEnemies = true;
-            if (fullRound) Set(ability, "m_IsFullRoundAction", true);
+            ability.CanTargetFriends = false;
+            ability.CanTargetEnemies = !fullRound;
+            if (fullRound)
+            {
+                var area = new AbilityTargetsAround { name = "Phantom0085TendrilsEnemies" };
+                Set(area, "m_Radius", 7.Feet());
+                Set(area, "m_TargetType", TargetType.Enemy);
+                Set(area, "m_Condition", new ConditionsChecker { Conditions = Array.Empty<Condition>() });
+                ability.ComponentsArray = ability.ComponentsArray.Concat(new BlueprintComponent[] { area }).ToArray();
+                Set(ability, "m_IsFullRoundAction", true);
+            }
             return f.Feature(token, name, description, Facts(ability));
         }
 

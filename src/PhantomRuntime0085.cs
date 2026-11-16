@@ -300,6 +300,14 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static Buff BondedEffect(UnitEntityData master)
             => master?.Buffs.Enumerable.FirstOrDefault(b => b.Blueprint.AssetGuid == Spiritualist0085Ids.Id("BondedManifestationEffect"));
 
+        internal static UnitEntityData ConfinedPet(UnitEntityData master)
+        {
+            var part = master?.Get<UnitPartPhantom0085>();
+            if (part?.Confined != true || !Alive(master)) return null;
+            var pet = part.BoundPet(master);
+            return Alive(pet) ? pet : null;
+        }
+
         internal static void ClearBonded(UnitEntityData master)
         {
             var ability = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>(Spiritualist0085Ids.Id("BondedManifestation"));
@@ -347,13 +355,14 @@ namespace CallOfTheWild.Wrath.Prototype
         public bool Large;
         private static readonly DiceFormula[] Standard = { new DiceFormula(1, DiceType.D6), new DiceFormula(1, DiceType.D8), new DiceFormula(1, DiceType.D10), new DiceFormula(2, DiceType.D6), new DiceFormula(2, DiceType.D8) };
         private static readonly DiceFormula[] Anger = { new DiceFormula(1, DiceType.D8), new DiceFormula(2, DiceType.D6), new DiceFormula(2, DiceType.D8), new DiceFormula(3, DiceType.D6), new DiceFormula(3, DiceType.D8) };
+        internal static DiceFormula Dice(bool large, int rank)
+            => (large ? Anger : Standard)[Math.Max(0, Math.Min(rank, Standard.Length - 1))];
+
         public void OnEventAboutToTrigger(RuleCalculateWeaponStats evt) { }
         public void OnEventDidTrigger(RuleCalculateWeaponStats evt)
         {
             if (evt.Weapon?.Blueprint?.Category != WeaponCategory.OtherNaturalWeapons) return;
-            var rank = Math.Max(0, Math.Min(4, Context?[AbilityRankType.Default] ?? 0));
-            var dice = (Large ? Anger : Standard)[rank];
-            evt.WeaponDamageDice.Modify(dice, Fact);
+            evt.WeaponDamageDice.Modify(Dice(Large, Context?[AbilityRankType.Default] ?? 0), Fact);
         }
     }
 
@@ -413,22 +422,48 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // ---- Hateful Aura: retaliation damage on attackers of pet or master ----
     [TypeId("b7e10085a10045008500850085008507")]
-    public sealed class Phantom0085HatefulAura : UnitFactComponentDelegate, IGlobalRulebookHandler<RuleDealDamage>, IGlobalSubscriber
+    public sealed class Phantom0085HatefulAura : UnitBuffComponentDelegate,
+        IInitiatorRulebookHandler<RuleDealDamage>, IInitiatorRulebookSubscriber
     {
         public void OnEventAboutToTrigger(RuleDealDamage evt) { }
         public void OnEventDidTrigger(RuleDealDamage evt)
         {
-            var attacker = evt.Initiator;
-            var target = evt.Target;
-            if (attacker == null || target == null || !attacker.HasFact(Fact)) return;
-            var phantom = Owner;
+            if (evt.IsFake || evt.Result <= 0 || evt.Initiator != Owner || !Buff.IsTurnedOn || Buff.IsSuppressed ||
+                evt.Reason.Context?.AssociatedBlueprint?.GetComponent<Phantom0085HatefulAura>() != null) return;
+            var phantom = Buff.Context.MaybeCaster;
             var master = phantom?.Get<UnitPartPet>()?.Master;
-            if (target != phantom && target != master) return;
-            if (attacker.DistanceTo(phantom) > 20.Feet().Meters) return;
+            if (!ReferenceEquals(Phantom0085DamageTransfer.ActivePet(master), phantom) || phantom == null ||
+                !Owner.IsEnemy(phantom) || (evt.Target != phantom && evt.Target != master) ||
+                Owner.DistanceTo(phantom) > 20.Feet().Meters) return;
             int bonus = Math.Max(0, phantom.Stats.Charisma.Bonus);
             if (bonus > 0)
-                Rulebook.Trigger(new RuleDealDamage(phantom, attacker, new DamageBundle(new DirectDamage(DiceFormula.Zero, bonus))));
+                Buff.Context.TriggerRule(new RuleDealDamage(phantom, Owner, new DirectDamage(DiceFormula.Zero, bonus)) { Reason = Buff.Context });
         }
+    }
+
+    [TypeId("b7e10085a10045008500850085008523")]
+    public sealed class Phantom0085HatredSneakAttack : UnitFactComponentDelegate,
+        IInitiatorRulebookHandler<RuleAttackWithWeapon>, IInitiatorRulebookSubscriber
+    {
+        public BlueprintBuffReference Hated;
+
+        public void OnEventAboutToTrigger(RuleAttackWithWeapon evt)
+        {
+            var mark = Hated?.Get();
+            var dice = Context?[AbilityRankType.Default] ?? 0;
+            if (mark == null || dice <= 0 || evt.Target == null ||
+                !evt.Target.Buffs.Enumerable.Any(b => b.Blueprint == mark && b.IsTurnedOn &&
+                    !b.IsSuppressed && ReferenceEquals(b.Context.MaybeCaster, Owner))) return;
+            evt.AddTemporaryModifier(Owner.Stats.SneakAttack.AddModifier(dice, Runtime, ModifierDescriptor.Feat));
+        }
+        public void OnEventDidTrigger(RuleAttackWithWeapon evt) { }
+    }
+
+    [TypeId("b7e10085a10045008500850085008524")]
+    public sealed class Phantom0085FearDifficulty : PropertyValueGetter
+    {
+        protected override int GetBaseValue(UnitEntityData unit)
+            => unit == null ? 0 : 10 + unit.Progression.CharacterLevel / 2 + unit.Stats.Charisma.Bonus;
     }
 
     // ---- Zeal's Resolve: reroll failed attack/save, spend resource ----
@@ -440,23 +475,25 @@ namespace CallOfTheWild.Wrath.Prototype
         public void OnEventAboutToTrigger(RuleRollD20 evt) { }
         public void OnEventDidTrigger(RuleRollD20 evt)
         {
-            if (!Buff.IsTurnedOn || Buff.IsSuppressed || evt.IsFake || evt.Initiator != Owner) return;
-            if (evt.Rerolls?.Any(r => ReferenceEquals(r.Source, Fact)) == true) return;
+            if (!Buff.IsTurnedOn || Buff.IsSuppressed || evt.IsFake || evt.Initiator != Owner ||
+                !(evt.RollHistory?.Count > 0)) return;
             var previous = Rulebook.CurrentContext?.PreviousEvent;
             if (Rule == RuleType.AttackRoll)
             {
-                var attack = previous as RuleAttackRoll;
-                if (attack == null || attack.IsHit) return;
+                if (!(previous is RuleAttackRoll attack) || attack.AutoHit || attack.AutoMiss || attack.D20 != null) return;
             }
-            else
-            {
-                var save = previous as RuleSavingThrow;
-                if (save == null || save.IsPassed) return;
-            }
+            else if (!(previous is RuleSavingThrow)) return;
             var resource = Resource?.Get();
-            if (resource == null || Owner.Resources.GetResourceAmount(resource) <= 0) return;
+            if (resource == null || Owner.Resources.GetResourceAmount(resource) <= 0 ||
+                !SpeakerFailedReroll0046.Failed(evt, previous, Rule)) return;
             Owner.Resources.Spend(resource, 1);
-            evt.AddReroll(1, true, Fact);
+            UseReplacement(evt, RulebookEvent.Dice.D(evt.DiceFormula));
+        }
+
+        internal static void UseReplacement(RuleRollD20 evt, int roll)
+        {
+            evt.Override(roll == 1 && evt.ReplaceOneWithMax ? evt.DiceFormula.MaxValue(0) : roll);
+            evt.RollHistory.Add(roll);
         }
     }
 
@@ -775,24 +812,10 @@ namespace CallOfTheWild.Wrath.Prototype
         }
     }
 
-    // ---- Bonded Manifestation: tendrils and confinement restriction ----
-    [TypeId("b7e10085a10045008500850085008510")]
-    public sealed class Phantom0085BondedTendrils : UnitFactComponentDelegate
-    {
-        // Tendril attacks are granted by the master progression at 8/18; the
-        // buff only carries the shield. Scene attack visuals are player TEST.
-    }
-
     [TypeId("b7e10085a10045008500850085008511")]
     public sealed class Phantom0085BondedRestriction : ActivatableAbilityRestriction
     {
-        protected override bool IsAvailable()
-        {
-            var master = Owner;
-            var part = master?.Get<UnitPartPhantom0085>();
-            var pet = part?.BoundPet(master);
-            return part != null && part.Confined && pet != null && Phantom0085Link.Alive(pet);
-        }
+        protected override bool IsAvailable() => Phantom0085Link.ConfinedPet(Owner) != null;
     }
 
     // ---- Spiritual Inference aura: owner/ally buffs, condition gated ----
@@ -992,23 +1015,19 @@ namespace CallOfTheWild.Wrath.Prototype
     [TypeId("b7e10085a10045008500850085008519")]
     public sealed class Phantom0085TendrilDice : UnitFactComponentDelegate, IInitiatorRulebookHandler<RuleCalculateWeaponStats>, IInitiatorRulebookSubscriber
     {
-        private static readonly DiceFormula[] Standard = { new DiceFormula(1, DiceType.D6), new DiceFormula(1, DiceType.D8), new DiceFormula(1, DiceType.D10), new DiceFormula(2, DiceType.D6), new DiceFormula(2, DiceType.D8) };
-        private static readonly DiceFormula[] Anger = { new DiceFormula(1, DiceType.D8), new DiceFormula(2, DiceType.D6), new DiceFormula(2, DiceType.D8), new DiceFormula(3, DiceType.D6), new DiceFormula(3, DiceType.D8) };
         public void OnEventAboutToTrigger(RuleCalculateWeaponStats evt) { }
         public void OnEventDidTrigger(RuleCalculateWeaponStats evt)
         {
             if (evt.Weapon?.Blueprint?.Category != WeaponCategory.OtherNaturalWeapons) return;
             var part = Owner?.Get<UnitPartPhantom0085>();
             bool large = part != null && part.Emotion == "Anger";
-            var rank = Math.Max(0, Math.Min(4, Context?[AbilityRankType.Default] ?? 0));
-            evt.WeaponDamageDice.Modify((large ? Anger : Standard)[rank], Fact);
+            evt.WeaponDamageDice.Modify(Phantom0085SlamDice.Dice(large, Context?[AbilityRankType.Default] ?? 0), Fact);
         }
     }
 
     [TypeId("b7e10085a1004500850085008500851a")]
     public sealed class Phantom0085TendrilAttack : ContextAction
     {
-        public bool FullRound;
         public BlueprintBuffReference DiceBuff;
         public BlueprintBuffReference RerollBuff;
         public BlueprintItemWeaponReference Slam;
@@ -1016,7 +1035,10 @@ namespace CallOfTheWild.Wrath.Prototype
         public override void RunAction()
         {
             var caster = Context?.MaybeCaster;
-            if (caster == null) return;
+            var target = Target?.Unit;
+            if (Phantom0085Link.ConfinedPet(caster) == null ||
+                Phantom0085Link.BondedEffect(caster) is not Buff bonded || !bonded.IsTurnedOn || bonded.IsSuppressed ||
+                target == null || target.State.IsDead || !target.IsEnemy(caster)) return;
             var slamBlueprint = Slam?.Get();
             var dice = DiceBuff?.Get();
             if (slamBlueprint == null || dice == null) return;
@@ -1024,25 +1046,11 @@ namespace CallOfTheWild.Wrath.Prototype
             var diceFact = caster.Buffs.AddBuff(dice, caster, TimeSpan.MaxValue, AbilityParams.Empty);
             Buff rerollFact = null;
             var reroll = RerollBuff?.Get();
-            if (FullRound && reroll != null)
+            if (reroll != null)
                 rerollFact = caster.Buffs.AddBuff(reroll, caster, TimeSpan.MaxValue, AbilityParams.Empty);
             try
             {
-                if (FullRound)
-                {
-                    foreach (var unit in Game.Instance.Player.AllCharacters)
-                    {
-                        if (unit == caster || !unit.IsEnemy(caster) || unit.State.IsDead) continue;
-                        if (unit.DistanceTo(caster) > 5.Feet().Meters) continue;
-                        Rulebook.Trigger(new RuleAttackWithWeapon(caster, unit, slam, 0) { Reason = new RuleReason(Context) });
-                    }
-                }
-                else
-                {
-                    var target = Target?.Unit;
-                    if (target != null && !target.State.IsDead)
-                        Rulebook.Trigger(new RuleAttackWithWeapon(caster, target, slam, 0) { Reason = new RuleReason(Context) });
-                }
+                Context.TriggerRule(new RuleAttackWithWeapon(caster, target, slam, 0) { Reason = new RuleReason(Context) });
             }
             finally
             {
@@ -1111,6 +1119,23 @@ namespace CallOfTheWild.Wrath.Prototype
     // ---- Native damage, action, mount and rest integration ----
     internal static class Phantom0085Patches
     {
+        [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.TryStart))]
+        internal static class BondedFirstRound
+        {
+            [HarmonyPrefix]
+            private static void Prefix(ActivatableAbility __instance, out bool __state)
+                => __state = !__instance.IsStarted && __instance.Blueprint.AssetGuid == Spiritualist0085Ids.Id("BondedManifestation");
+
+            [HarmonyPostfix]
+            private static void Postfix(ActivatableAbility __instance, bool __state)
+            {
+                if (!__state || !__instance.IsStarted) return;
+                // Advance the game's scheduled first tick so switching off before it cannot yield a free activation.
+                __instance.OnNewRound();
+                if (__instance.IsStarted) __instance.TimeToNextRound = 6f;
+            }
+        }
+
         [HarmonyPatch(typeof(RuleDealDamage), nameof(RuleDealDamage.OnTrigger))]
         internal static class ExactDamageTransfer
         {
@@ -1206,6 +1231,8 @@ namespace CallOfTheWild.Wrath.Prototype
         private static readonly BlueprintGuid ExpandedContentSwiftAid = BlueprintGuid.Parse("840e53983d9843489554f76cc764b776");
         private static readonly BlueprintGuid NativeSkillAbilities = BlueprintGuid.Parse("e4c33ff99d638744686112e2a5f49856");
         private static readonly BlueprintGuid FallbackAid = Spiritualist0085Ids.Id("KindnessAidAnother");
+        private static readonly BlueprintGuid HatedTargetAbility = Spiritualist0085Ids.Id("HatredHatedTargetAbility");
+        private static readonly BlueprintGuid PhantomClass = Spiritualist0085Ids.Id("PhantomClass");
         private static readonly HashSet<BlueprintGuid> ProviderAidBuffs = new HashSet<BlueprintGuid>
         {
             BlueprintGuid.Parse("31f151cd84d54ffcbf522cd7f4325bb6"),
@@ -1239,6 +1266,15 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (__result != UnitCommand.CommandType.Standard && __result != UnitCommand.CommandType.Move) return;
                 var ability = __instance.Blueprint;
                 var root = (ability.Parent ?? ability).AssetGuid;
+                if (root == HatedTargetAbility)
+                {
+                    var unit = __instance.Caster?.Unit;
+                    if (Phantom0085Marker.IsPhantom(unit) &&
+                        ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(PhantomClass) is BlueprintCharacterClass cls &&
+                        unit.Progression.GetClassLevel(cls) >= 7)
+                        __result = UnitCommand.CommandType.Swift;
+                    return;
+                }
                 if (root != ExpandedContentAid && root != ExpandedContentSwiftAid && root != FallbackAid) return;
                 var caster = __instance.Caster?.Unit;
                 if (!Phantom0085Marker.IsPhantom(caster)) return;
