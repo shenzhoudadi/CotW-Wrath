@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。B7 完成 Enchantment。B8/D8 接通防护系三项能力，B9/D9 完成 Aegis 与护甲储法。复用 Wrath 的护甲附魔、槽锁、法术转换和受击触发，以及 CotW 的附魔挂载与储法投递。B9 编译零警告、零错误（2.086 秒），隔离原生 359/359（4.170 秒）。继续其余六校、四 Panoply、剩余职业特性及普通启动登记。真实提供方、存读档、实机及出包未运行，认领仍开放。 [B9 / D9 与证据](../work-packages/COTW-0099/B9-D9-aegis.md)。
+- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。防护、惑控、预言三校已通过独立定向复查。B10/D10 复用原版触摸与掷骰组件、CotW 的 Arcane Eye 和预言超魔。编译零警告、零错误（1.948 秒），隔离原生 393/393（4.411 秒）。其余五校、四 Panoply、剩余职业特性及普通启动登记继续施工。真实提供方、存读档、实机及出包未运行，认领仍开放。 [B10 / D10 与证据](../work-packages/COTW-0099/B10-D10-divination.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 

@@ -77,7 +77,9 @@ namespace CallOfTheWild.Wrath.Prototype
         [DataMember] public int Invested;            // A, ordinary investment for this cycle
         [DataMember] public int Remaining;           // R, unspent ordinary points
         [DataMember] public int LockedInvestment;    // A frozen at Full Round Lock
+        [DataMember] public int LockedLevel;
         [DataMember] public int Resonance;           // computed from the locked snapshot
+        [DataMember] public int ResonanceTier;
         [DataMember] public bool ResonanceValid;
 
         public Occultist0099SchoolState Clone()
@@ -85,7 +87,8 @@ namespace CallOfTheWild.Wrath.Prototype
             return new Occultist0099SchoolState
             {
                 Present = Present, Invested = Invested, Remaining = Remaining,
-                LockedInvestment = LockedInvestment, Resonance = Resonance,
+                LockedInvestment = LockedInvestment, LockedLevel = LockedLevel,
+                Resonance = Resonance, ResonanceTier = ResonanceTier,
                 ResonanceValid = ResonanceValid
             };
         }
@@ -155,7 +158,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 var s = Schools[school];
                 parts.Add(school + ":" + (s.Present ? 1 : 0) + ":" + s.Invested + ":" +
-                          s.Remaining + ":" + s.LockedInvestment + ":" + s.Resonance +
+                          s.Remaining + ":" + s.LockedInvestment + ":" + s.LockedLevel + ":" + s.Resonance + ":" + s.ResonanceTier +
                           ":" + (s.ResonanceValid ? 1 : 0));
             }
             foreach (string panoply in Occultist0099Schools.PanoplyOrder)
@@ -221,7 +224,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 var st = s.Schools[school];
                 if (st.Invested < 0 || st.Remaining < 0 || st.Remaining > st.Invested ||
-                    st.LockedInvestment < 0) return false;
+                    st.LockedInvestment < 0 || st.LockedLevel < 0 || st.ResonanceTier < 0 || st.ResonanceTier > 3) return false;
             }
             if (s.MasterySchool != null && !Occultist0099Schools.IsSchool(s.MasterySchool))
                 return false;
@@ -286,7 +289,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 st.Invested = 0;
                 st.Remaining = 0;
                 st.LockedInvestment = 0;
+                st.LockedLevel = 0;
                 st.Resonance = 0;
+                st.ResonanceTier = 0;
                 st.ResonanceValid = false;
             }
             foreach (string panoply in Occultist0099Schools.PanoplyOrder)
@@ -374,9 +379,11 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 var st = s.Schools[school];
                 st.LockedInvestment = st.Present ? st.Invested : 0;
+                st.LockedLevel = st.Present ? classLevel ?? s.Level : 0;
                 st.Resonance = WardingTalismanResonance(classLevel ?? s.Level, st.LockedInvestment);
                 st.ResonanceValid = st.Present && st.LockedInvestment > 0;
             }
+            CaptureThirdEye(s);
             foreach (string panoply in Occultist0099Schools.PanoplyOrder)
             {
                 string[] members = Occultist0099Schools.MembersOf(panoply);
@@ -404,6 +411,23 @@ namespace CallOfTheWild.Wrath.Prototype
                 !Occultist0099Schools.IsSchool(school)) return 0;
             var st = s.Schools[school];
             return st.ResonanceValid ? st.Resonance : 0;
+        }
+
+        internal static int ResonanceTier(Occultist0099FocusState s, string school)
+            => Resonance(s, school) > 0 ? s.Schools[school].ResonanceTier : 0;
+
+        private static void CaptureThirdEye(Occultist0099FocusState state)
+        {
+            const string school = "Divination";
+            var source = state.Schools[school];
+            if (!source.Present || source.LockedLevel <= 0) return;
+            int mastery = state.MasterySchool == school ? 4 : 0;
+            int level = source.LockedLevel + mastery;
+            int invested = source.LockedInvestment + mastery;
+            source.ResonanceValid = invested > 0;
+            source.Resonance = Math.Min(level, invested / 2);
+            source.ResonanceTier = level >= 19 && invested >= 15 ? 3 :
+                level >= 13 && invested >= 12 ? 2 : level >= 7 && invested >= 9 ? 1 : 0;
         }
 
         public static int PanoplyResonance(Occultist0099FocusState s, string panoply)
@@ -626,6 +650,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!s.Schools[school].Present)
                 return Occultist0099Outcome.RejectedNotOwned;
             s.MasterySchool = school;
+            if (s.Locked) CaptureThirdEye(s);
             return Occultist0099Outcome.Ok;
         }
 
@@ -634,15 +659,17 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var g = Guard(s);
             if (g != Occultist0099Outcome.Ok) return g;
-            if (!Occultist0099Schools.IsSchool(newSchool))
-                return Occultist0099Outcome.RejectedUnknownSchool;
-            if (!s.Schools[newSchool].Present)
-                return Occultist0099Outcome.RejectedNotOwned;
+            if (newSchool != null)
+            {
+                if (!Occultist0099Schools.IsSchool(newSchool)) return Occultist0099Outcome.RejectedUnknownSchool;
+                if (!s.Schools[newSchool].Present) return Occultist0099Outcome.RejectedNotOwned;
+            }
             // T is carried into the new school; H never exceeds 4-T. Old
             // mastery-only rank/DC contributions are not virtual level patches,
             // so dropping the identity removes them.
             s.MasterySchool = newSchool;
             s.MasteryRemaining = Math.Min(s.MasteryRemaining, 4 - s.MasterySpent);
+            if (s.Locked) CaptureThirdEye(s);
             return Occultist0099Outcome.Ok;
         }
 
@@ -650,7 +677,9 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var st = s.Schools[school];
             st.LockedInvestment = 0;
+            st.LockedLevel = 0;
             st.Resonance = 0;
+            st.ResonanceTier = 0;
             st.ResonanceValid = false;
             foreach (string panoply in Occultist0099Schools.PanopliesUsing(school))
             {

@@ -171,6 +171,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintBuffReference WardingTalisman;
         public BlueprintBuffReference MindBarrierBuff;
         public BlueprintBuffReference[] AbjurationEffects = Array.Empty<BlueprintBuffReference>();
+        public BlueprintBuffReference[] DivinationEffects = Array.Empty<BlueprintBuffReference>();
         public Occultist0099SchoolResonance[] SchoolResonances = Array.Empty<Occultist0099SchoolResonance>();
 
         private Occultist0099FocusPart Ledger
@@ -239,7 +240,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 // The rebuilt class will bind its actual mastery selection.
                 // Until then only the spent and remaining mastery points survive.
-                part.State.MasterySchool = null;
+                Occultist0099Focus.RespecMastery(part.State, null);
                 Occultist0099Focus.RespecBudgetDown(part.State, level, IntModifier());
             }
             SyncResourceMirror();
@@ -254,6 +255,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (ClassLevel() <= 0) Occultist0099Focus.RetireClass(part.State);
             else Occultist0099Focus.RemoveClass(part.State);
             RemoveAbjurationEffects();
+            RemoveDivinationEffects();
             SyncResonance();
         }
 
@@ -276,7 +278,11 @@ namespace CallOfTheWild.Wrath.Prototype
             bool reset = BeginCycle(identity, false);
             Occultist0099Focus.Validate(State);
             SyncResourceMirror();
-            if (reset) RemoveAbjurationEffects();
+            if (reset)
+            {
+                RemoveAbjurationEffects();
+                RemoveDivinationEffects();
+            }
             SyncResonance();
         }
 
@@ -288,6 +294,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (result != Occultist0099Outcome.Ok) return;
             SyncResourceMirror();
             if (!present && school == Occultist0099Ids.SliceSchool) RemoveAbjurationEffects();
+            if (!present && school == "Divination") RemoveDivinationEffects();
             SyncResonance();
         }
 
@@ -297,6 +304,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!state.Enabled)
             {
                 RemoveAbjurationEffects();
+                RemoveDivinationEffects();
                 return;
             }
             var active = new HashSet<string>(Owner.Progression.Features.Enumerable.Where(f => f.Active)
@@ -309,6 +317,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 else Occultist0099Focus.RespecRemoveSchool(state, school);
             }
             if (!CanRetainMindBarrier()) RemoveAbjurationEffects();
+            if (!state.Locked || !state.Schools["Divination"].Present) RemoveDivinationEffects();
         }
 
         internal bool Operate(Occultist0099FocusAction action, string school, string executionId, bool commit)
@@ -347,20 +356,39 @@ namespace CallOfTheWild.Wrath.Prototype
             }
         }
 
+        private void RemoveDivinationEffects()
+        {
+            if (Occultist0099Divination.HoldsFortune(Owner.Get<Kingmaker.UnitLogic.Parts.UnitPartTouch>()))
+                Owner.Remove<Kingmaker.UnitLogic.Parts.UnitPartTouch>();
+            foreach (var reference in DivinationEffects)
+            {
+                var effect = reference?.Get();
+                if (effect != null) Owner.Buffs.GetBuff(effect)?.Remove();
+            }
+        }
+
         private void SyncResonance()
         {
             SyncResonanceBuff(Occultist0099Ids.SliceSchool, WardingTalisman?.Get());
-            foreach (var resonance in SchoolResonances) SyncResonanceBuff(resonance.School, resonance.Buff?.Get());
+            foreach (var resonance in SchoolResonances)
+                SyncResonanceBuff(resonance.School, resonance.Buff?.Get(), resonance.Tier);
         }
 
-        private void SyncResonanceBuff(string school, BlueprintBuff blueprint)
+        private void SyncResonanceBuff(string school, BlueprintBuff blueprint, int tier = 0)
         {
             if (blueprint == null) return;
             var current = Owner.Buffs.GetBuff(blueprint);
-            if (WardingTalismanResonance(school) <= 0)
+            int amount = WardingTalismanResonance(school);
+            if (amount <= 0 || (tier > 0 && Occultist0099Focus.ResonanceTier(State, school) != tier))
                 current?.Remove();
             else if (current == null)
                 Owner.Buffs.AddBuff(blueprint, Owner, (TimeSpan?)null);
+            else if (school == "Divination" && tier == 0 &&
+                current.Context[Kingmaker.Enums.AbilityRankType.Default] != amount)
+            {
+                current.Remove();
+                Owner.Buffs.AddBuff(blueprint, Owner, (TimeSpan?)null);
+            }
         }
 
         public bool IsOwnedBy(UnitEntityData unit)
@@ -468,6 +496,7 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         public string School;
         public BlueprintBuffReference Buff;
+        public int Tier;
     }
 
     // One identity for a batch of applied rests, including paired units.

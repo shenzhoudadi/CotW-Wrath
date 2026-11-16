@@ -12,12 +12,14 @@ the shared 0099 registration chain stays untouched (SlicePublished=false).
 This is NOT player-game acceptance and NOT a release sign-off.
 """
 from pathlib import Path
-import hashlib, json, os, subprocess, sys, time
+import hashlib, json, os, subprocess, sys, tempfile, time
 
 root = Path('D:/CodexProjects/CotW-Wrath')
 game = Path('D:/steam/steamapps/common/Pathfinder Second Adventure')
-out = Path(__file__).resolve().parent
-package = out.parent / 'docs/work-packages/COTW-0099'
+test_dir = Path(__file__).resolve().parent
+out = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else test_dir
+out.mkdir(parents=True, exist_ok=True)
+package = test_dir.parent / 'docs/work-packages/COTW-0099'
 launcher = root / 'work/repair01456/engine-launcher/bin/Release/net472/EngineLauncher.exe'
 engine = root / 'work/repair01456/engine02'
 host = root / 'work/prototype-build/Occultist0099NativeTests/bin/Release/net472/Occultist0099NativeTests.exe'
@@ -25,9 +27,10 @@ candidate = root / 'work/prototype-build/CallOfTheWild.Wrath.Prototype/bin/Relea
 managed = game / 'Wrath_Data/Managed'
 evidence = package / 'A-occultist-assets.json'
 native = root / 'work/prototype-build/spirit-guide-0060-native-ext.json'
+archive_reader = test_dir / 'ReadOccultist0099Archive.ps1'
 sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest().upper()
 
-for p in (launcher, host, candidate, evidence, native, engine / 'Assembly-CSharp.dll'):
+for p in (launcher, host, candidate, evidence, native, archive_reader, engine / 'Assembly-CSharp.dll'):
     if not Path(p).is_file():
         raise SystemExit('missing input: %s' % p)
 
@@ -40,10 +43,19 @@ for stale in (report, log):
         stale.unlink()
 cmd = [str(launcher), str(engine), str(host), str(managed), str(candidate),
        str(report), str(evidence), str(native)]
-started = time.time()
-with log.open('wb') as f:
-    process = subprocess.run(cmd, cwd=str(root), env=env, stdout=f, stderr=subprocess.STDOUT)
-elapsed = time.time() - started
+archive_fixtures = {}
+with tempfile.TemporaryDirectory(prefix='cotw-0099-') as fixture_dir:
+    for group in ('Aegis', 'Divination'):
+        file = Path(fixture_dir) / f'{group}.json'
+        started = time.perf_counter()
+        subprocess.run(['pwsh', '-NoProfile', '-File', str(archive_reader),
+                        '-WrathPath', str(game), '-OutputPath', str(file), '-Group', group], check=True)
+        archive_fixtures[group] = {'sha256': sha(file), 'seconds': round(time.perf_counter() - started, 3)}
+        env[f'COTW_0099_{group.upper()}_FIXTURE'] = str(file)
+    started = time.perf_counter()
+    with log.open('wb') as f:
+        process = subprocess.run(cmd, cwd=str(root), env=env, stdout=f, stderr=subprocess.STDOUT)
+    elapsed = time.perf_counter() - started
 text = log.read_text(encoding='utf-8-sig', errors='replace')
 inventory = None
 if report.is_file():
@@ -54,7 +66,7 @@ if report.is_file():
 
 # Source fingerprints are the authoritative code identity for this stage; the
 # DLL hashes below are build artefacts only (D-0099-07).
-source_dir = out.parent / 'src'
+source_dir = test_dir.parent / 'src'
 sources = [source_dir / 'ModEntry.cs', *sorted(source_dir.glob('Occultist0099*.cs'))]
 result = {
     'workPackage': 'COTW-0099',
@@ -66,7 +78,7 @@ result = {
     'exitCode': process.returncode,
     'seconds': round(elapsed, 2),
     'sourceSHA256': {p.name: sha(p) for p in sources},
-    'hostSourceSHA256': sha(out / 'Occultist0099NativeProgram.cs'),
+    'hostSourceSHA256': sha(test_dir / 'Occultist0099NativeProgram.cs'),
     'hostSHA256': sha(host),
     'candidateSHA256': sha(candidate),
     'engineSHA256': sha(engine / 'Assembly-CSharp.dll'),
@@ -74,6 +86,7 @@ result = {
     'harmonySHA256': sha(managed / '0Harmony.dll'),
     'evidenceSHA256': sha(evidence),
     'nativeFixtureSHA256': sha(native),
+    'archiveFixtures': archive_fixtures,
     'log': str(log),
     'logSHA256': sha(log),
     'report': str(report) if report.is_file() else None,

@@ -48,10 +48,12 @@ using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 namespace CallOfTheWild.Wrath.Prototype {
  internal static class PsychicSpiritWeapons {
   internal static readonly string[] Tokens={"SpiritualWeapon","SpiritualAlly","MagesSword","TwilightKnife","ArcaneEye"};
-  internal static void Build(PsychicAssets f){
-   var donor=f.Native<BlueprintUnit>("34df84245e875364b9a8832256bc349f");var ghost=f.Native<BlueprintUnit>("655ac57b330918c4aadc78a00fb2ccaf");var human=f.Native<BlueprintUnit>("e9c2bef81c166654088e27dea05e4fbd");var wisp=f.Native<BlueprintUnit>("24719a49b84c5cd43b894268d22d9c89");
+  internal static void Build(PsychicAssets f) => BuildRange(f, 0);
+  internal static void BuildArcaneEye(PsychicAssets f) => BuildRange(f, 4);
+  private static void BuildRange(PsychicAssets f, int firstKind){
+   var donor=firstKind==0?f.Native<BlueprintUnit>("34df84245e875364b9a8832256bc349f"):null;var ghost=firstKind==0?f.Native<BlueprintUnit>("655ac57b330918c4aadc78a00fb2ccaf"):null;var human=firstKind==0?f.Native<BlueprintUnit>("e9c2bef81c166654088e27dea05e4fbd"):null;var wisp=f.Native<BlueprintUnit>("24719a49b84c5cd43b894268d22d9c89");
    var blankBrain=f.Clone(f.Native<BlueprintBrain>("5abc8884c6f15204c8604cb01a2efbab"),"SpiritualWeaponBrain","","Only the spell controller gives attack orders.");Set(blankBrain,"m_Actions",Array.Empty<BlueprintAiActionReference>());
-   for(int kind=0;kind<5;kind++){
+   for(int kind=firstKind;kind<Tokens.Length;kind++){
     string token=Tokens[kind],title=new[]{"Spiritual Weapon","Spiritual Ally","Mage's Sword","Twilight Knife","Arcane Eye"}[kind];bool eye=kind==4;
     var icon=kind==0?PsychicOriginalIcons.Load("SpiritualWeapon"):kind==1?PsychicOriginalIcons.Load("SpiritualAlly"):kind==2?PsychicOriginalIcons.Load("MagesSword"):kind==3?PsychicOriginalIcons.Load("TwilightKnife"):f.Native<BlueprintAbility>("41cf93453b027b94886901dbfc680cb9").Icon;
     string desc=eye?"Create an invisible, directly controllable floating sensor for 1 minute per caster level. It moves at speed 30 and reveals the area around it along walkable paths. Use a party member for object and door interactions. Select the eye alone to move it. It cannot attack or cast spells. Dismissing the spell or replacing your eye removes the sensor and its vision. The sensor follows the game's walkable navigation, not unrestricted three-dimensional flight.":

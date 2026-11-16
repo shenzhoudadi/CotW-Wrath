@@ -221,7 +221,8 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal static RuleCastSpell BindCommand(RuleCastSpell rule, UnitUseAbility command)
         {
-            if (IsFocusCast(rule.Spell) || FocusOperation(rule.Spell) != null)
+            if (IsFocusCast(rule.Spell) || FocusOperation(rule.Spell) != null ||
+                Occultist0099NativeScope.IsPrivateBook(rule.Spell?.Spellbook))
                 Identities.GetValue(rule, _ => IdentityOf(command));
             return rule;
         }
@@ -246,7 +247,11 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var spell = rule.Spell;
             var operation = FocusOperation(spell);
-            if (operation == null && !IsFocusCast(spell)) return true;
+            if (operation == null && !IsFocusCast(spell))
+            {
+                Occultist0099Divination.TryEmpower(rule);
+                return true;
+            }
             bool duplicate = rule.IsDuplicateSpellApplied || rule.Context?.IsDuplicateSpellApplied == true;
             if (operation != null)
             {

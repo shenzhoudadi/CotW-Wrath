@@ -65,9 +65,10 @@ internal static class Occultist0099NativeLauncher
 {
     private static int Main(string[] args)
     {
-        if (args.Length != 5 || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE")))
+        if (args.Length != 5 || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE")) ||
+            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_DIVINATION_FIXTURE")))
         {
-            Console.Error.WriteLine("Set COTW_0099_AEGIS_FIXTURE to the donor list from ReadOccultist0099ArmorArchive.ps1.");
+            Console.Error.WriteLine("Set COTW_0099_AEGIS_FIXTURE and COTW_0099_DIVINATION_FIXTURE using ReadOccultist0099Archive.ps1.");
             return 2;
         }
         var runtimePath = Environment.GetEnvironmentVariable("COTW_HARMONY_MATRIX_PATH");
@@ -121,6 +122,7 @@ internal static class Occultist0099NativeTests
     private static Action<RuleApplySpell> beforeDispatch;
     private static Action afterBatchRest;
     private static bool applyNativeEffects;
+    private static bool skipFortuneDelivery;
     private static BlueprintBuff rejectedAegisWard;
     private static BlueprintItemEnchantment failedAegisEnchantment;
     private static bool aegisAttachmentInterrupted;
@@ -222,7 +224,8 @@ internal static class Occultist0099NativeTests
         }
         bool recalculate = __instance.ResourceLogic is Occultist0099FocusResourceLogic &&
             __instance.Blueprint.GetComponent<ContextCalculateAbilityParams>() != null;
-        __result = new AbilityExecutionContext(__instance, __1 ?? (recalculate ? __instance.CalculateParams() : AbilityParams.Empty), __0);
+        __result = new AbilityExecutionContext(__instance, __1 ?? __instance.Fact?.OverrideParams ??
+            (recalculate ? __instance.CalculateParams() : AbilityParams.Empty), __0);
         if (recalculate) __result.Recalculate();
         return false;
     }
@@ -238,7 +241,8 @@ internal static class Occultist0099NativeTests
         castDispatches++;
         var unit = __instance.Caster.Unit;
         pointsAtDispatch = unit.Get<Occultist0099FocusPart>()?.State.Available ?? -1;
-        if (applyNativeEffects)
+        if (applyNativeEffects && !(skipFortuneDelivery &&
+            __instance.Blueprint.AssetGuid.ToString() == Occultist0099Ids.Id("DivinersFortuneDelivery")))
             foreach (var effect in __instance.Blueprint.GetComponents<AbilityApplyEffect>())
                 effect.Apply(__0, __0.MainTarget);
         // The headless host dispatches the managed effects without animation.
@@ -561,16 +565,17 @@ internal static class Occultist0099NativeTests
     private static T Native<T>(string guid) where T : SimpleBlueprint
         => cache.Load(P(guid)) as T;
 
-    private static void LoadAegisDonors(string path)
+    private static int LoadArchiveDonors(string path)
     {
+        int count = 0;
         foreach (var row in JArray.Parse(File.ReadAllText(path)))
         {
             var name = (string)row["name"];
             if (Materialise((JObject)row["blueprint"], name) == null)
-                throw new InvalidDataException("Aegis fixture could not load " + name);
-            armorArchiveRows++;
+                throw new InvalidDataException("Archive fixture could not load " + name);
+            count++;
         }
-        Eq(37, armorArchiveRows, "HOST loads the 20 signed armor enchantments and their native support rows");
+        return count;
     }
 
     // ------------------------------------------------------------------
@@ -659,6 +664,32 @@ internal static class Occultist0099NativeTests
                 var entries = (System.Collections.IEnumerable)AccessTools.Method(Production("PsychicWardingSpells"), "Build")
                     .Invoke(null, new[] { factory });
                 built = entries.Cast<object>().Select(entry => (BlueprintAbility)Get(entry, "Ability")).Single(ability => ability.AssetGuid == P(root.Guid));
+            }
+            else if (root.Name == "CotWWrathPsychicLocateWeakness")
+            {
+                var entries = (System.Collections.IEnumerable)AccessTools.Method(Production("PsychicInsightSpells"), "Build")
+                    .Invoke(null, new[] { factory });
+                built = entries.Cast<object>().Select(entry => (BlueprintAbility)Get(entry, "Ability"))
+                    .Single(ability => ability.AssetGuid == P(root.Guid));
+            }
+            else if (root.Name == "CotWWrathPsychicBattlemindLink")
+            {
+                LoadRows("e84fc922ccf952943b5240293669b171", "47808d23c67033d4bbab86a1070fd62f",
+                    "6e81a6679a0889a429dec9cedcf3729c", "0d657aa811b310e4bbd8586e60156a2d");
+                AccessTools.Method(Production("PsychicLinkedWard"), "Build").Invoke(null, new[] { factory });
+                built = (BlueprintAbility)((System.Collections.IDictionary)Get(factory, "Assets"))["BattlemindLink"];
+            }
+            else if (root.Name == "CotWWrathPsychicArcaneEye")
+            {
+                LoadRows("5abc8884c6f15204c8604cb01a2efbab", "41cf93453b027b94886901dbfc680cb9");
+                AccessTools.Method(Production("PsychicSpiritWeapons"), "BuildArcaneEye").Invoke(null, new[] { factory });
+                var assets = (System.Collections.IDictionary)Get(factory, "Assets");
+                built = (BlueprintAbility)assets["ArcaneEye"];
+                foreach (var asset in assets.Values.Cast<BlueprintScriptableObject>().Where(asset => asset != built))
+                {
+                    asset.OnEnable();
+                    cache.AddCachedBlueprint(asset.AssetGuid, asset);
+                }
             }
             Check(built != null && built.AssetGuid.ToString() == root.Guid,
                 "HOST the real CotW builder publishes " + root.Name +
@@ -1818,7 +1849,8 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.SchoolPowerGrantTypeId, Occultist0099Ids.EnergyShieldTypeId, Occultist0099Ids.GlobeOfNegationTypeId,
             Occultist0099Ids.AegisOptionTypeId, Occultist0099Ids.AegisTargetTypeId, Occultist0099Ids.AegisArmorTypeId,
             Occultist0099Ids.AegisStorageTypeId, Occultist0099Ids.AegisStoreSpellTypeId, Occultist0099Ids.AegisReleaseTypeId,
-            Occultist0099Ids.AegisReleaseActionTypeId, Occultist0099Ids.AegisApplyTypeId, Occultist0099Ids.AegisGrantsTypeId
+            Occultist0099Ids.AegisReleaseActionTypeId, Occultist0099Ids.AegisApplyTypeId, Occultist0099Ids.AegisGrantsTypeId,
+            Occultist0099Ids.ProphecyReadyTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
                 "GATE private TypeId " + id + " has no native collision");
@@ -1921,8 +1953,9 @@ internal static class Occultist0099NativeTests
               progression.LevelEntries.SelectMany(entry => entry.Features.OfType<BlueprintFeatureSelection>()
                   .Where(selection => selection != powers).Select(_ => entry.Level)).SequenceEqual(new[] { 1, 1, 2, 6, 10, 14, 18 }),
             "ENCH native progression schedules the seven distinct implement choices and ten focus-power choices at the audited levels");
-        Check(slots.Length == 26 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length,
-            "ENCH all school and slot alternatives have distinct stable native learning lists");
+        Check(slots.Length == 39 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length &&
+              slots.GroupBy(slot => slot.School).All(school => school.Count() == 13),
+            "HOST all three school and slot alternatives have distinct stable native learning lists");
         var command = Native<BlueprintAbility>("feb70aab86cc17f4bb64432c83737ac2");
         var massDaze = Native<BlueprintAbility>("f48b6e526d69d694507e0d0c4d954eb8");
         var source = slots.Single(slot => slot.SlotKey == "slot-1" && slot.School == "Enchantment").List.Get();
@@ -2110,6 +2143,219 @@ internal static class Occultist0099NativeTests
         __result = Empty<RuleRollD20>();
         Set(__result, "m_Result", 20);
         return false;
+    }
+
+    private static int prophecyRoll;
+    private static bool HostilePair(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
+
+    private static bool ProphecyDiceBoundary(ref RuleRollD100 __result)
+    {
+        __result = Empty<RuleRollD100>();
+        Set(__result, "m_Result", prophecyRoll);
+        return false;
+    }
+
+    private static void DivinationNative(BlueprintsCache detached, BlueprintCharacterClass character)
+    {
+        T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
+        var unit = Unit("divination-caster", character, 19, 16);
+        var recipient = Unit("divination-recipient", character, 4, 10);
+        Set(unit.Descriptor, "UISettings", new Kingmaker.UI.UnitSettings.UnitUISettings(unit.Descriptor));
+        Set(unit.Progression, "m_Selections", new Dictionary<BlueprintFeatureSelection, FeatureSelectionData>());
+        var perception = new ModifiableValueSkill(unit.Stats, unit.Stats.Wisdom, StatType.SkillPerception);
+        unit.Stats.AllStats.Add(perception);
+        Set(unit.Stats, "SkillPerception", perception);
+        foreach (var caster in new[] { unit, recipient })
+        {
+            var attack = new ModifiableValue(caster.Stats, StatType.AdditionalAttackBonus);
+            caster.Stats.AllStats.Add(attack);
+            Set(caster.Stats, "AdditionalAttackBonus", attack);
+            foreach (var stat in StatTypeHelper.Skills.Where(stat => caster.Stats.GetStat(stat) == null))
+            {
+                var skill = new ModifiableValueSkill(caster.Stats, caster.Stats.Wisdom, stat);
+                caster.Stats.AllStats.Add(skill);
+                Set(caster.Stats, stat.ToString(), skill);
+            }
+        }
+        var armorClass = new ModifiableValueArmorClass(unit.Stats);
+        Set(unit.Stats, "AC", armorClass);
+        unit.Stats.AllStats.Add(armorClass);
+
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MentalFocusFact"), unit.Descriptor));
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("OccultistSpellbookFact"), unit.Descriptor));
+        var implement = new Feature(Asset<BlueprintFeature>("slot-1-Divination-Implement"), unit.Descriptor);
+        unit.Facts.Add(implement);
+        var book = unit.Descriptor.DemandSpellbook(character.Spellbook);
+        Set(book, "m_BaseLevelInternal", 19);
+        var leveling = LevelState(book);
+        var powers = Asset<BlueprintFeatureSelection>("FocusPowerSelection");
+        foreach (var choice in new[] { (Token: "DivinersFortune", Level: 1), (Token: "DangerSight", Level: 3),
+            (Token: "MindEye", Level: 5), (Token: "Prophecy", Level: 9) })
+        {
+            var selection = leveling.AddSelection(null, character.Progression, powers, choice.Level);
+            var pick = new SelectFeature(selection, Asset<BlueprintFeature>(choice.Token + "Power"));
+            Check(pick.Check(leveling, unit.Descriptor), "DIV native selection allows " + choice.Token);
+            pick.Apply(leveling, unit.Descriptor);
+        }
+        var list = character.Spellbook.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists
+            .Single(slot => slot.SlotKey == "slot-1" && slot.School == "Divination").List.Get();
+        var divinationRows = ((Occultist0099SpellRoot[])AccessTools.Field(Production("Occultist0099SpellCatalog"), "Roots").GetValue(null))
+            .Where(row => row.School == "Divination" && !row.IsKnack).ToArray();
+        Check(divinationRows.Length == 8 && divinationRows.All(row => list.GetSpells(row.Circle).Any(spell => spell.AssetGuid == P(row.Guid))) &&
+              list.SpellsByLevel.Sum(row => row.Spells.Count()) == 8, "DIV the native learning source publishes exactly the eight audited roots at their Occultist circles");
+        var trueStrike = Native<BlueprintAbility>("2c38da66e5a599347ac95b3294acbe00");
+        var learn = new SelectSpell(character.Spellbook, list, 1, trueStrike, 0);
+        Check(NativeCheck(learn, leveling, unit.Descriptor), "DIV a genuine native Divination source offers True Strike");
+        learn.Apply(leveling, unit.Descriptor);
+        Check(book.IsKnown(trueStrike), "DIV the selected native root enters the private Occultist book");
+
+        AbilityData Granted(string token) => unit.Abilities.Enumerable.Single(ability => ability.Blueprint == Asset<BlueprintAbility>(token)).Data;
+        var focus = unit.Get<Occultist0099FocusPart>().State;
+        var pool = focus.Schools["Divination"];
+        var dice = AccessTools.PropertyGetter(typeof(RulebookEvent.Dice), "D100");
+        var controlledRoll = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ProphecyDiceBoundary));
+        var enemyTest = AccessTools.Method(typeof(UnitEntityData), nameof(UnitEntityData.IsEnemy), new[] { typeof(UnitEntityData) });
+        var hostilityBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(HostilePair));
+        applyNativeEffects = true;
+        harmony.Patch(dice, prefix: new HarmonyMethod(controlledRoll));
+        harmony.Patch(enemyTest, prefix: new HarmonyMethod(hostilityBoundary));
+        try
+        {
+            for (int i = 0; i < 15; i++) CastRule(Granted("DivinationInvestFocusAbility"));
+            CastRule(Granted("LockFocusAbility"));
+            Check(perception.ModifiedValue == 7 && unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeBlindsight")) != null &&
+                  unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeBlindsense")) == null &&
+                  unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeSeeInvisibility")) == null &&
+                  Asset<BlueprintBuff>("ThirdEyeBuff").StayOnDeath && Asset<BlueprintBuff>("ThirdEyeBlindsight").StayOnDeath,
+                "DIV 19/15 locks +7 Perception, native blindsight and an exclusive tier");
+            var insight = Granted("SuddenInsightAbility");
+            CastRule(insight);
+            var insightBuff = unit.Buffs.GetBuff(Asset<BlueprintBuff>("SuddenInsightBuff"));
+            var miss = Empty<RuleAttackRoll>();
+            var weaponType = new BlueprintWeaponType { Category = WeaponCategory.Longsword };
+            var weaponBlueprint = new BlueprintItemWeapon();
+            Set(weaponBlueprint, "m_Type", Ref<BlueprintWeaponTypeReference>(weaponType));
+            var weapon = Empty<ItemEntityWeapon>();
+            Set(weapon, "m_Blueprint", weaponBlueprint);
+            var weaponStats = Empty<RuleCalculateWeaponStats>();
+            Set(weaponStats, "Weapon", weapon);
+            Set(miss, "WeaponStats", weaponStats);
+            Set(miss, "Initiator", unit);
+            Set(miss, "Target", recipient);
+            Set(miss, "Result", AttackResult.Miss);
+            Set(miss, "Reason", new RuleReason(insightBuff.Context));
+            Check(insightBuff != null && unit.Stats.AdditionalAttackBonus.ModifiedValue == 9 && pool.Remaining == 14,
+                "DIV paid Sudden Insight applies the native attack bonus at half the Occultist level");
+            insightBuff?.CallComponents<AddInitiatorAttackRollTrigger>(trigger => trigger.OnEventDidTrigger(miss));
+            Check(unit.Buffs.GetBuff(Asset<BlueprintBuff>("SuddenInsightBuff")) == null && unit.Stats.AdditionalAttackBonus.ModifiedValue == 0,
+                "DIV the first real attack consumes Sudden Insight even when it misses");
+
+            var fortune = Granted("DivinersFortuneAbility");
+            skipFortuneDelivery = true;
+            CastRule(fortune);
+            skipFortuneDelivery = false;
+            var held = unit.Get<Kingmaker.UnitLogic.Parts.UnitPartTouch>();
+            Check(held?.Ability?.Data.StickyTouch == fortune && pool.Remaining == 13 &&
+                unit.Buffs.GetBuff(Asset<BlueprintBuff>("DivinersFortuneBuff")) == null,
+                "DIV native sticky touch creates a paid hold while the supplied miss withholds the effect");
+            var delivery = held.Ability.Data;
+            Rulebook.Trigger(new RuleCastSpell(delivery, recipient));
+            var fortuneBuff = recipient.Buffs.GetBuff(Asset<BlueprintBuff>("DivinersFortuneBuff"));
+            Check(delivery.Blueprint.GetComponent<AbilityDeliverTouch>() != null && fortuneBuff?.TimeLeft == TimeSpan.FromSeconds(6) &&
+                  recipient.Stats.SaveWill.ModifiedValue == 9 && pool.Remaining == 13,
+                "DIV the held delivery gives the recipient its original half-level bonus without another charge");
+            Set(unit.Descriptor, "Brain", new UnitBrain());
+            var combat = Empty<Kingmaker.Controllers.Combat.UnitCombatState>();
+            Set(combat, "Unit", unit);
+            Set(combat, "m_ManualTarget", recipient);
+            Set(unit, "CombatState", combat);
+            held.HandleObjectLeaveCombat(unit);
+            Check(unit.Get<Kingmaker.UnitLogic.Parts.UnitPartTouch>() == null && combat.ManualTarget == null && pool.Remaining == 13,
+                "DIV native combat exit discards the hold and clears its target before bypassing slot refund");
+
+            CastRule(Granted("DangerSightAbility"));
+            var defense = unit.Buffs.GetBuff(Asset<BlueprintBuff>("DangerSightBuff"));
+            Set(miss, "Initiator", recipient);
+            Set(miss, "Target", unit);
+            Check(defense?.TimeLeft == TimeSpan.FromMinutes(1) && unit.Stats.SaveReflex.ModifiedValue == 9 && pool.Remaining == 12,
+                "DIV Danger Sight arms its shared next-attack-or-save bonus for one minute");
+            defense?.CallComponents<AddTargetAttackRollTrigger>(trigger => trigger.OnEventDidTrigger(miss));
+            Check(unit.Buffs.GetBuff(Asset<BlueprintBuff>("DangerSightBuff")) == null && unit.Stats.SaveReflex.ModifiedValue == 0,
+                "DIV a missed incoming attack removes the entire native Danger Sight benefit");
+
+            var eye = Granted("MindEyeAbility");
+            var eyeDonor = Native<BlueprintAbility>("7873f6a427a61105c544507323662f63");
+            var spawn = eye.Blueprint.GetComponent<AbilityEffectRunAction>().Actions.Actions.OfType<Kingmaker.UnitLogic.Mechanics.Actions.ContextActionSpawnMonster>().Single();
+            var originalSpawn = eyeDonor.GetComponent<AbilityEffectRunAction>().Actions.Actions.OfType<Kingmaker.UnitLogic.Mechanics.Actions.ContextActionSpawnMonster>().Single();
+            Check(eye.Blueprint.CanTargetPoint && eye.Blueprint.ActionType == UnitCommand.CommandType.Standard && spawn != originalSpawn &&
+                  spawn.IsDirectlyControllable && RefGuid(spawn, "m_Blueprint") == RefGuid(originalSpawn, "m_Blueprint") &&
+                  eye.ResourceLogic.CalculateCost(eye) == 1, "DIV Mind Eye reuses the genuine CotW Arcane Eye entity and controller with a private focus cost");
+
+            var toggle = unit.ActivatableAbilities.Enumerable.Single(ability => ability.Blueprint == Asset<Kingmaker.UnitLogic.ActivatableAbilities.BlueprintActivatableAbility>("ProphecyAbility"));
+            toggle.IsOn = true;
+            var dummy = new BlueprintAbility { name = "0099N.EmpowerEligible", AssetGuid = P(Occultist0099Ids.Id("HostProphecySpell")),
+                Type = AbilityType.Spell, Range = AbilityRange.Personal, CanTargetSelf = true, AvailableMetamagic = Metamagic.Empower,
+                ComponentsArray = new BlueprintComponent[] { new SpellComponent { School = SpellSchool.Evocation } } };
+            dummy.OnEnable();
+            var foreignBlueprint = new BlueprintSpellbook { AssetGuid = P(Occultist0099Ids.Id("HostProphecyForeignBook")),
+                name = "0099N.ProphecyForeignBook", Spontaneous = true, IsArcane = false, CastingAttribute = StatType.Intelligence,
+                ComponentsArray = Array.Empty<BlueprintComponent>() };
+            Set(foreignBlueprint, "m_SpellList", Ref<BlueprintSpellListReference>(book.Blueprint.SpellList));
+            Set(foreignBlueprint, "m_SpellsPerDay", Ref<BlueprintSpellsTableReference>(book.Blueprint.SpellsPerDay));
+            foreignBlueprint.OnEnable();
+            var foreign = new AbilityData(dummy, unit.Descriptor.DemandSpellbook(foreignBlueprint), 1);
+            var privateSpell = new AbilityData(dummy, book, 1);
+            prophecyRoll = 1;
+            var excluded = CastRule(foreign);
+            Check(excluded.Success && toggle.IsOn && pool.Remaining == 12 && (excluded.Context.Params.Metamagic & Metamagic.Empower) == 0,
+                "DIV an Empower-compatible spell in a foreign book does not spend, fizzle or acquire Occultist Empower");
+            var ineligible = new BlueprintAbility { name = "0099N.EmpowerIneligible", AssetGuid = P(Occultist0099Ids.Id("HostIneligibleSpell")),
+                Type = AbilityType.Spell, Range = AbilityRange.Personal, CanTargetSelf = true, ComponentsArray = Array.Empty<BlueprintComponent>() };
+            ineligible.OnEnable();
+            CastRule(new AbilityData(ineligible, book, 1));
+            Check(toggle.IsOn && pool.Remaining == 12, "DIV a private spell that cannot be empowered does not claim the armed option");
+            var failed = CastRule(privateSpell);
+            Check(failed.IsSpellFailed && !failed.Success && !toggle.IsOn && pool.Remaining == 11 &&
+                  failed.Context.Params.SpellLevel == 1, "DIV a paid prophecy can fizzle and never changes the spell circle");
+            toggle.IsOn = true;
+            prophecyRoll = 100;
+            var success = CastRule(privateSpell);
+            Check(success.Success && pool.Remaining == 10 && !toggle.IsOn &&
+                  (success.Context.Params.Metamagic & Metamagic.Empower) != 0,
+                "DIV a surviving private cast delivers Empower and spends exactly one focus point");
+            Check(perception.ModifiedValue == 7, "DIV spending the school changes its balance without reducing locked Third Eye");
+
+            unit.Progression.GetClassData(character).Level = 20;
+            Rest(unit);
+            for (int i = 0; i < 11; i++) CastRule(Granted("DivinationInvestFocusAbility"));
+            Occultist0099Focus.SetMastery(focus, "Divination");
+            CastRule(Granted("LockFocusAbility"));
+            Check(perception.ModifiedValue == 7 && unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeBlindsight")) != null,
+                "DIV locked eleven ordinary points plus mastery qualify for the highest Third Eye tier");
+            var copied = TransferRespecSurvivors(unit);
+            SignalRespecCommitted(unit);
+            Check(copied.State.MasterySchool == null && perception.ModifiedValue == 5 &&
+                unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeBlindsight")) == null &&
+                unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeSeeInvisibility")) != null,
+                "DIV actual respec withdrawal drops its obsolete mastery-only resonance while preserving ordinary investment");
+        }
+        finally
+        {
+            applyNativeEffects = false;
+            skipFortuneDelivery = false;
+            harmony.Unpatch(dice, controlledRoll);
+            harmony.Unpatch(enemyTest, hostilityBoundary);
+        }
+        unit.RemoveFact(implement);
+        Check(unit.Buffs.GetBuff(Asset<BlueprintBuff>("ThirdEyeBlindsight")) == null && perception.ModifiedValue == 0,
+            "DIV removing the native source withdraws both the perception and sense resonance");
+        caseStatus["Divination"] = "native_choice_learning_third_eye_roll_benefits_and_paid_prophecy";
+
+        BlueprintGuid RefGuid(object target, string field) => ((BlueprintReferenceBase)Get(target, field)).Guid;
     }
 
     private static void AegisNative(BlueprintsCache detached, BlueprintCharacterClass character)
@@ -2653,12 +2899,14 @@ internal static class Occultist0099NativeTests
         Check(!TryRegister(cache), "SP08 the production development entry refuses the ordinary process cache");
         const string alchemistClassId = "0937bec61c0dabc468428f496580c721";
         const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
-        var rows = catalogue.Where(row => (row.School == "Abjuration" || row.School == "Enchantment" || row.IsKnack) && row.Source != "External").ToArray();
+        var implementedSchools = new HashSet<string> { "Abjuration", "Enchantment", "Divination" };
+        var rows = catalogue.Where(row => (implementedSchools.Contains(row.School) || row.IsKnack) && row.Source != "External").ToArray();
         var coreDonors = (string[])AccessTools.Field(Production("Occultist0099Enchantment"), "DonorIds").GetValue(null);
         var armorDonors = (string[])AccessTools.Field(Production("Occultist0099Aegis"), "Donors").GetValue(null);
+        var divinationDonors = (string[])AccessTools.Field(Production("Occultist0099Divination"), "DonorIds").GetValue(null);
         var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a",
             "143775c49ae6b7446b805d3b2e702298" }
-            .Concat(coreDonors).Concat(armorDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
+            .Concat(coreDonors).Concat(armorDonors).Concat(divinationDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
         LoadRows(expectedDonors);
         foreach (var row in rows.Where(row => row.Source == "CotW" && cache.Load(P(row.Guid)) == null)) StageAbsentRoot(row);
         foreach (var id in expectedDonors)
@@ -2760,11 +3008,12 @@ internal static class Occultist0099NativeTests
         var baseList = publishedBook.SpellList;
         var sourceList = publishedBook.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists[0].List.Get();
         var listsBefore = baseList.SpellsByLevel;
-        Check(publishedBook.CharacterClass == publishedClass && publishedBook.Spontaneous &&
+        Check(publishedBook.CharacterClass == publishedClass && publishedBook.Spontaneous && !publishedBook.IsArcane &&
+              publishedBook.GetComponent<PsychicSpellbookMarker>()?.MaximumSpellLevel == 6 &&
               publishedBook.SpellsPerDay == Native<BlueprintSpellsTable>(donorTable) &&
               publishedClass.Progression.LevelEntries.Single(entry => entry.Level == 1).Features.OfType<BlueprintFeatureSelection>().Count() == 3 &&
               baseList.GetSpells(0).Count == 6 && baseList.SpellsByLevel.Length == 11,
-            "SP08 the real graph links its spontaneous Alchemist-table book, both implement choices and six fixed knacks");
+            "SP08 the real graph links its Psychic-marked spontaneous Alchemist-table book, two initial implement choices and six fixed knacks");
         Check(TryRegister(detached) && entries.SequenceEqual(privateIds.Select(detached.Load)) &&
               ReferenceEquals(listsBefore, baseList.SpellsByLevel) && root.Progression.CharacterClasses.Count() == 2,
             "SP08 retry preserves object identities, class entry count and unchanged row arrays");
@@ -2852,6 +3101,7 @@ internal static class Occultist0099NativeTests
             EnchantmentNative(detached, publishedClass);
             AbjurationPowersNative(detached, publishedClass);
             AegisNative(detached, publishedClass);
+            DivinationNative(detached, publishedClass);
         }
         finally
         {
@@ -2860,7 +3110,7 @@ internal static class Occultist0099NativeTests
             harmony.Unpatch(visual, noVisual);
             EnchantmentFixtureRoot = null;
         }
-        caseStatus["SP08"] = "native_atomic_detached_abjuration_and_enchantment_graph_only_full_class_not_run";
+        caseStatus["SP08"] = "native_atomic_detached_three_school_graph_only_full_class_not_run";
         caseStatus["SP03"] = "native_copy_serialization_and_last_registered_implement_revoke_only";
     }
 
@@ -2897,7 +3147,10 @@ internal static class Occultist0099NativeTests
         cache = new BlueprintsCache();
         AccessTools.Field(typeof(ResourcesLibrary), "BlueprintsCache").SetValue(null, cache);
         HostGame();
-        LoadAegisDonors(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE"));
+        armorArchiveRows = LoadArchiveDonors(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE"));
+        Eq(37, armorArchiveRows, "HOST loads the 20 signed armor enchantments and their native support rows");
+        int divinationArchiveRows = LoadArchiveDonors(Environment.GetEnvironmentVariable("COTW_0099_DIVINATION_FIXTURE"));
+        Eq(10, divinationArchiveRows, "HOST loads the signed Divination ability, resonance and native spell rows");
 
         // Load only the audited rows this directed check needs.
         var roots = Occultist0099AbjurationCatalog.Roots.Select(r => r.Guid)
@@ -2959,7 +3212,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B9 Aegis equipment and armor-linked spell storage",
+            ["stage"] = "B10 Divination focus powers, resonance and native learning rows",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -2969,20 +3222,21 @@ internal static class Occultist0099NativeTests
             ["productionBridgesInstalled"] = bridges,
             ["registeredPrivateIdentities"] = registeredPrivateIdentities,
             ["armorArchiveRows"] = armorArchiveRows,
+            ["divinationArchiveRows"] = divinationArchiveRows,
             ["nativeRootsLoaded"] = loadedRoots,
             ["hostStagedRoots"] = hostStaged,
             ["hostStagedRootNames"] = new JArray(stagedRoots),
             ["skippedArchiveComponents"] = skippedComponents,
-            ["rootFixtureBoundary"] = "The Abjuration roots use 13 Wrath archive entries, 4 existing CotW Psychic builders and a host-staged TTT Cloak. Enchantment uses 11 non-knack Wrath roots and the existing CotW Mass Daze builder. The two optional ExpandedContent candidates stay absent. The detached cache also stages Cloak and Fire Shield reciprocal publications. Actual provider assemblies were not loaded.",
+            ["rootFixtureBoundary"] = "Abjuration uses 13 Wrath archive roots, four existing CotW Psychic builders and a host-staged TTT Cloak. Enchantment uses 11 non-knack Wrath roots and the existing CotW Mass Daze builder. Divination uses five non-knack Wrath roots and the existing Locate Weakness, Arcane Eye and Battlemind Link builders. The detached cache stages external reciprocal publications. Actual provider assemblies were not loaded.",
             ["checks"] = checks,
             ["failures"] = new JArray(failures),
             ["hostLoggedExceptions"] = hostLogs,
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Detached native Aegis activation, rollback, armor identity and spell storage passed alongside earlier directed checks."
+                ? "Detached native Divination choice, learning, resonance, one-shot roll effects and paid Prophecy passed alongside earlier directed checks."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Detached BlueprintsCache, native ability choices and focus payments. Aegis uses native armor entities, attachment, slot lock, prepared and spontaneous costs, and the native hit trigger with a supplied attack event and directed touch spell. Item placement and effect dispatch use managed fixture seams. Armor AC recalculation, action bar visuals and the Unity command cleanup path are outside scope. Creating and positioning a scene area for Globe, ordinary startup, full career and disk saves remain outside scope.",
+            ["boundary"] = "Detached BlueprintsCache, native choices, learn entry and cast payment. Divination injects already-resolved attack events and prescribes Prophecy dice; Mind Eye checks the genuine spawn and controller graph without spawning. Aegis retains its managed armor and hit fixture. Unity scene, equipment presentation and targeting navigation, ordinary startup, full career and disk saves remain outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

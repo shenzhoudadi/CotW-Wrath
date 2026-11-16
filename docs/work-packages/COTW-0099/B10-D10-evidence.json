@@ -1,0 +1,223 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "05a256d9cfec7cfff0f3f6a24353b7df69f24452",
+  "stage": "B10 Divination",
+  "acceptanceScope": "native_entry_points_directed",
+  "slicePublished": false,
+  "releaseEligible": false,
+  "playerGameAcceptance": false,
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "firstResult": "NEEDS_FIX",
+    "finalResult": "PASS_IN_DIRECTED_SCOPE",
+    "fixes": [
+      "RespecMastery clears stale Third Eye before syncing native buffs",
+      "Native held touch preserves Focus payment and its parameters on delivery",
+      "Third Eye main and sense buffs have native StayOnDeath",
+      "Native combat exit still clears targeting before skipping only the private delivery's spell slot refund"
+    ],
+    "reviewedRun": "native-11.json"
+  },
+  "sources": {
+    "roots": {
+      "native": 5,
+      "cotw": 3,
+      "knacksAlreadyShared": 1
+    },
+    "reused": [
+      "Wrath DivinationSchoolBaseAbility/Buff, GuidanceBuff, senses, and AbilityEffectStickyTouch",
+      "CotW Locate Weakness, Battlemind Link, Arcane Eye, ProphecyAccordance01431 and PsychicSpellbookMarker"
+    ]
+  },
+  "runs": {
+    "builds": [
+      {
+        "log": "build-1.log",
+        "wallSeconds": 1.481,
+        "result": "FAIL"
+      },
+      {
+        "log": "build-2.log",
+        "wallSeconds": 2,
+        "result": "PASS"
+      },
+      {
+        "log": "build-3.log",
+        "wallSeconds": 2.208,
+        "result": "PASS"
+      },
+      {
+        "log": "build-4.log",
+        "wallSeconds": 1.201,
+        "result": "PASS"
+      },
+      {
+        "log": "build-5.log",
+        "wallSeconds": 1.187,
+        "result": "PASS"
+      },
+      {
+        "log": "build-6.log",
+        "wallSeconds": 1.238,
+        "result": "PASS"
+      },
+      {
+        "log": "build-7.log",
+        "wallSeconds": 1.174,
+        "result": "PASS"
+      },
+      {
+        "log": "build-8.log",
+        "wallSeconds": 1.163,
+        "result": "PASS"
+      },
+      {
+        "log": "build-9.log",
+        "wallSeconds": 2.024,
+        "result": "PASS"
+      },
+      {
+        "log": "build-10.log",
+        "wallSeconds": 2.085,
+        "result": "PASS"
+      },
+      {
+        "log": "build-11.log",
+        "wallSeconds": 2.107,
+        "result": "PASS"
+      },
+      {
+        "log": "build-12.log",
+        "wallSeconds": 1.973,
+        "result": "PASS"
+      },
+      {
+        "log": "build-13.log",
+        "wallSeconds": 2.053,
+        "result": "PASS"
+      },
+      {
+        "log": "build-14.log",
+        "wallSeconds": 1.948,
+        "result": "PASS"
+      }
+    ],
+    "native": [
+      {
+        "log": "native-1.log",
+        "wallSeconds": 4.342,
+        "result": "FAIL",
+        "notes": "Two-school count still present in the fixture"
+      },
+      {
+        "log": "native-2.log",
+        "wallSeconds": 4.441,
+        "result": "ABORTED",
+        "notes": "Fixture omitted native skill stats and attack weapon"
+      },
+      {
+        "log": "native-3.log",
+        "wallSeconds": 4.287,
+        "result": "ABORTED",
+        "notes": "Fixture used a null rule reason"
+      },
+      {
+        "log": "native-4.log",
+        "wallSeconds": 4.359,
+        "result": "ABORTED",
+        "notes": "Fixture attack lacked native weapon stats"
+      },
+      {
+        "log": "native-5.log",
+        "wallSeconds": 4.304,
+        "result": "ABORTED",
+        "notes": "Fixture omitted the foreign slot donor"
+      },
+      {
+        "log": "native-6.log",
+        "wallSeconds": 4.351,
+        "result": "FAIL",
+        "notes": "Native default Arcane property exposed a private book configuration issue"
+      },
+      {
+        "log": "native-7.log",
+        "wallSeconds": 4.335,
+        "result": "PASS",
+        "notes": "387 checks passed before D fixes"
+      },
+      {
+        "log": "native-8.log",
+        "wallSeconds": 4.403,
+        "result": "PASS",
+        "notes": "391 checks passed after mastery fix"
+      },
+      {
+        "log": "native-9.log",
+        "wallSeconds": 4.393,
+        "result": "PASS",
+        "notes": "393 checks passed after sticky touch and death flags"
+      },
+      {
+        "log": "native-10.log",
+        "wallSeconds": 4.483,
+        "result": "ABORTED",
+        "notes": "Native fact disposal clears StickyTouch before the refund branch"
+      },
+      {
+        "log": "native-11.log",
+        "wallSeconds": 4.411,
+        "result": "PASS",
+        "notes": "Native combat exit clears the supplied manual target and omits private refund"
+      }
+    ],
+    "model": [
+      {
+        "wallSeconds": 0.691,
+        "result": "ABORTED",
+        "note": "Missing WrathPath in invocation"
+      },
+      {
+        "wallSeconds": 1.823,
+        "result": "MODEL_ONLY_PASS",
+        "checks": 344,
+        "scope": "Before D10 mastery withdrawal correction"
+      }
+    ],
+    "fixtureRunner": {
+      "wallSeconds": 6.317,
+      "nativeSeconds": 4.46,
+      "archiveReadSeconds": {
+        "Aegis": 0.824,
+        "Divination": 0.818
+      },
+      "scope": "Runner verification before the final combat-exit fix"
+    }
+  },
+  "final": {
+    "nativeSeconds": 4.411,
+    "checks": 393,
+    "failures": 0,
+    "hostLoggedExceptions": 0,
+    "registeredPrivateIdentities": 204,
+    "productionBridgesInstalled": 19,
+    "skippedArchiveComponents": 0,
+    "buildErrors": 0,
+    "buildWarnings": 0,
+    "buildSeconds": 1.948
+  },
+  "notRun": [
+    "real Mind Eye spawn and navigation",
+    "actual attack roll and full touch command delivery",
+    "level-up UI and full respec",
+    "disk save/load",
+    "actual external providers",
+    "game and UMM",
+    "packaging and upload"
+  ],
+  "sourceSha256": {
+    "src/Occultist0099Divination.cs": "41FB2B444E78018DDA8D7DA35457B388CC2E16F8C00C0407D0DE5F422B6D9493",
+    "src/Occultist0099Rules.cs": "4FB04644861B77B86C2E396E75604A7F588F2EB91D2C8CAD617BD743BCBDA4AC",
+    "tests/Occultist0099NativeProgram.cs": "7EE1C5F63F65FF2BC152A7EF545A9B162325DB34BA6F2DEE5A3D7131F2FA1DD5"
+  }
+}

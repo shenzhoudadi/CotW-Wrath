@@ -40,7 +40,7 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private static readonly ConditionalWeakTable<BlueprintsCache, Graph> Published = new ConditionalWeakTable<BlueprintsCache, Graph>();
-        private static readonly string[] Schools = { Occultist0099Ids.SliceSchool, Occultist0099Enchantment.School };
+        private static readonly string[] Schools = { Occultist0099Ids.SliceSchool, Occultist0099Enchantment.School, Occultist0099Divination.School };
         private static readonly int[] ImplementLevels = { 1, 1, 2, 6, 10, 14, 18 };
         private static readonly Occultist0099SpellRoot[] Rows = Occultist0099SpellCatalog.Roots
             .Where(row => row.IsKnack || Schools.Contains(row.School)).ToArray();
@@ -66,6 +66,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 "UnravelingAbility", "UnravelingPower", "GlobeOfNegationBuff", "GlobeOfNegationAbility", "GlobeOfNegationPower"
             };
             ids.UnionWith(Occultist0099Aegis.Tokens());
+            ids.UnionWith(Occultist0099Divination.Tokens);
             foreach (var school in Schools) ids.Add(school + "ExtraSpellSource");
             for (int index = 0; index < ImplementLevels.Length; index++)
             {
@@ -128,8 +129,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 var enchantment = Occultist0099Enchantment.Build(cache, DetachedText);
                 var abjuration = Occultist0099AbjurationPowers.Build(cache, DetachedText);
                 var aegis = Occultist0099Aegis.Build(cache, DetachedText);
-                if (enchantment == null || abjuration == null || aegis == null) return false;
-                var graph = BuildGraph(root, alchemist, day, proficiencies, spells, enchantment.Concat(abjuration).Concat(aegis).ToArray());
+                var divination = Occultist0099Divination.Build(cache, DetachedText);
+                if (enchantment == null || abjuration == null || aegis == null || divination == null) return false;
+                var graph = BuildGraph(root, alchemist, day, proficiencies, spells, enchantment.Concat(abjuration).Concat(aegis).Concat(divination).ToArray());
                 var ids = new HashSet<BlueprintGuid>(graph.Assets.Select(asset => asset.AssetGuid));
                 if (ids.Count != graph.Assets.Length || !ids.SetEquals(manifest))
                     throw new InvalidOperationException("Occultist development graph differs from its private identity manifest.");
@@ -248,11 +250,13 @@ namespace CallOfTheWild.Wrath.Prototype
             }, "ZeroSpellsKnown", "", "", null);
             var book = Identify(new BlueprintSpellbook
             {
-                Name = character.LocalizedName, Spontaneous = true, CastingAttribute = StatType.Intelligence, CantripsType = CantripsType.Cantrips,
-                ComponentsArray = new BlueprintComponent[] { new Occultist0099SpellbookMarker0099
+                Name = character.LocalizedName, Spontaneous = true, IsArcane = false,
+                CastingAttribute = StatType.Intelligence, CantripsType = CantripsType.Cantrips,
+                ComponentsArray = new BlueprintComponent[]
                 {
-                    name = "OccultistPrivateBook", ImplementLists = descriptors.ToArray()
-                } }
+                    new Occultist0099SpellbookMarker0099 { name = "OccultistPrivateBook", ImplementLists = descriptors.ToArray() },
+                    new PsychicSpellbookMarker { name = "OccultistPsychicThoughtEmotionComponents", MaximumSpellLevel = 6 }
+                }
             }, "OccultistSpellbook", "", "", null);
             Set(book, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(character));
             Set(book, "m_SpellList", Ref<BlueprintSpellListReference>(list));
@@ -271,14 +275,20 @@ namespace CallOfTheWild.Wrath.Prototype
                 AbjurationEffects = new[] { Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("EnergyShieldBuff")),
                     Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GlobeOfNegationBuff")),
                     Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("AegisArmorBuff")) },
+                DivinationEffects = new[] { "SuddenInsightBuff", "DangerSightBuff", "ProphecyBuff" }
+                    .Select(token => Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token))).ToArray(),
                 WardingTalisman = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("WardingTalismanBuff")),
                 SchoolResonances = new[] { new Occultist0099SchoolResonance { School = Occultist0099Enchantment.School,
-                    Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GloriousPresenceBuff")) } }
+                    Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GloriousPresenceBuff")) } }.Concat(
+                    new[] { "ThirdEyeBuff", "ThirdEyeSeeInvisibility", "ThirdEyeBlindsense", "ThirdEyeBlindsight" }
+                        .Select((token, tier) => new Occultist0099SchoolResonance { School = Occultist0099Divination.School,
+                            Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token)), Tier = tier })).ToArray()
             }, Facts(Mechanic<BlueprintAbility>("ResetFocusAbility"), Mechanic<BlueprintAbility>("LockFocusAbility")));
             var learning = Feature("OccultistSpellbookFact", "Implement Spells", new Occultist0099SpellbookFact0099
                 { name = "OccultistSpellSourceAuthority", CharacterClass = Ref<BlueprintCharacterClassReference>(character) });
             var enchantmentImplement = Mechanic<BlueprintFeature>("EnchantmentImplementFocus");
             var abjurationImplement = Mechanic<BlueprintFeature>("AbjurationImplementFocus");
+            var divinationImplement = Mechanic<BlueprintFeature>("DivinationImplementFocus");
             var powers = new[]
             {
                 Power("BindingPattern", "Binding Pattern", enchantmentImplement, 7),
@@ -288,11 +298,15 @@ namespace CallOfTheWild.Wrath.Prototype
                     GrantPower(abjurationImplement, Mechanic<BlueprintFeature>("AegisOptions"))),
                 Power("EnergyShield", "Energy Shield", abjurationImplement, 3),
                 Power("Unraveling", "Unraveling", abjurationImplement, 5),
-                Power("GlobeOfNegation", "Globe of Negation", abjurationImplement, 11)
+                Power("GlobeOfNegation", "Globe of Negation", abjurationImplement, 11),
+                Power("DivinersFortune", "Diviner's Fortune", divinationImplement),
+                Power("DangerSight", "Danger Sight", divinationImplement, 3),
+                Power("MindEye", "Mind Eye", divinationImplement, 5),
+                Power("Prophecy", "In Accordance with the Prophecy", divinationImplement, 9)
             };
             BlueprintFeature Power(string token, string label, BlueprintFeature implement, int minimum = 0)
             {
-                var components = new List<BlueprintComponent> { Requires(implement), GrantPower(implement, Mechanic<BlueprintAbility>(token + "Ability")) };
+                var components = new List<BlueprintComponent> { Requires(implement), GrantPower(implement, Mechanic<BlueprintUnitFact>(token + "Ability")) };
                 if (minimum > 0)
                 {
                     var prerequisite = new PrerequisiteClassLevel { name = "Occultist" + token + "Level", Level = minimum };
