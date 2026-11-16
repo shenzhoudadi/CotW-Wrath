@@ -144,7 +144,8 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // ---- Emotion link: owns the master state and the lifecycle events ----
     [TypeId("b7e10085a10045008500850085008502")]
-    public sealed class Phantom0085Link : UnitFactComponentDelegate, IAreaHandler, IUnitRestHandler, IUnitHandler, IPetHandler, IGlobalSubscriber
+    public sealed class Phantom0085Link : UnitFactComponentDelegate, IAreaHandler, IUnitRestHandler, IUnitHandler,
+        IUnitLifeStateChanged, IPetHandler, IGlobalSubscriber
     {
         public string Emotion;
 
@@ -249,6 +250,28 @@ namespace CallOfTheWild.Wrath.Prototype
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
 
+        public void HandleUnitLifeStateChanged(UnitEntityData unit, UnitLifeState prevLifeState)
+        {
+            var master = Owner;
+            if (prevLifeState != UnitLifeState.Dead || master == null || !Alive(unit) || unit.Master != master) return;
+            var part = master.Get<UnitPartPhantom0085>();
+            if (part?.Emotion == Emotion && part.BoundPet(master) == unit)
+                RestoreAfterRecovery(master, unit, part);
+        }
+
+        internal static void RestoreAfterRecovery(UnitEntityData master, UnitEntityData pet, UnitPartPhantom0085 part)
+        {
+            part.Confined = false;
+            part.PendingManifest = !SameLocalArea(master, pet) || !master.IsPlayerFaction;
+            if (!part.PendingManifest && pet.Get<UnitPartPet>() is UnitPartPet petPart &&
+                (petPart.ShouldBeHidden || !pet.IsInGame))
+            {
+                petPart.SetHidden(false);
+                part.PendingManifest = !pet.IsInGame;
+            }
+            Phantom0085ConsciousnessGrant.RefreshAll(master);
+        }
+
         internal static bool CanPlace(UnitEntityData master)
             => Alive(master) && master.IsInGame && master.HoldingState != null &&
                Game.Instance?.CurrentlyLoadedArea != null && !Game.Instance.IsModeActive(GameModeType.GlobalMap);
@@ -285,8 +308,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (petPart == null) return;
             Phantom0085Patches.MountSuppression.SuppressWithoutOtherNativeMountSource(master, pet);
             Phantom0085PetGrant.RefreshAll(master, pet);
-            if (pet.Descriptor.Alignment.ValueRaw != master.Descriptor.Alignment.ValueRaw)
-                pet.Descriptor.Alignment.Set(master.Descriptor.Alignment.ValueRaw);
+            Phantom0085AlignmentSync.Sync(master, pet);
             if (pet.Descriptor.State.IsFinallyDead) return;
             if (part.PendingManifest && Alive(pet))
             {
@@ -306,8 +328,10 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool ManifestNow(UnitEntityData master, UnitEntityData pet, UnitPartPhantom0085 part)
         {
             var petPart = pet.Get<UnitPartPet>();
-            if (petPart == null || !TryMoveNearMaster(master, pet, requireMovement: false)) return false;
+            if (petPart == null || !master.IsPlayerFaction || !TryMoveNearMaster(master, pet, requireMovement: false))
+                return false;
             petPart.SetHidden(false);
+            if (!pet.IsInGame) return false;
             part.Confined = false;
             part.PendingManifest = false;
             return true;
@@ -354,7 +378,11 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var master = Owner;
             var part = master?.Get<UnitPartPhantom0085>();
-            var pet = part?.BoundPet(master);
+            Sync(master, part?.BoundPet(master));
+        }
+
+        internal static void Sync(UnitEntityData master, UnitEntityData pet)
+        {
             if (pet != null && pet.Descriptor.Alignment.ValueRaw != master.Descriptor.Alignment.ValueRaw)
                 pet.Descriptor.Alignment.Set(master.Descriptor.Alignment.ValueRaw);
         }
@@ -1502,11 +1530,12 @@ namespace CallOfTheWild.Wrath.Prototype
                     var part = master?.Get<UnitPartPhantom0085>();
                     bool recovery = unit.Descriptor.State.IsFinallyDead && part?.BoundPet(master) == unit;
                     yield return unit;
-                    if (!recovery || !Phantom0085Link.Alive(unit)) continue;
-                    part.Confined = false;
-                    part.PendingManifest = !Phantom0085Link.CanPlace(master);
-                    if (!part.PendingManifest && unit.Get<UnitPartPet>() is UnitPartPet petPart && petPart.ShouldBeHidden)
-                        petPart.SetHidden(false);
+                    // The native rest loop can set Conscious directly if its usual life-state
+                    // event did not run. Only revisit visibility when recovery still needs it.
+                    if (recovery && Phantom0085Link.Alive(unit) && !part.PendingManifest &&
+                        (part.Confined || !unit.IsInGame || unit.Get<UnitPartPet>()?.ShouldBeHidden == true ||
+                            !Phantom0085Link.SameLocalArea(master, unit)) && part.BoundPet(master) == unit)
+                        Phantom0085Link.RestoreAfterRecovery(master, unit, part);
                 }
             }
         }

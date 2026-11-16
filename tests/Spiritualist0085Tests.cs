@@ -14,6 +14,7 @@ using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
+using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
@@ -126,6 +127,78 @@ internal static class Spiritualist0085Tests
         AccessTools.Method(cache.GetType(), "Clear").Invoke(cache, null);
         return false;
     }
+
+    private static void CheckRecoveryVisibility(Harmony harmony)
+    {
+        TFact Empty<TFact>() => (TFact)FormatterServices.GetUninitializedObject(typeof(TFact));
+        UnitEntityData Unit(string id)
+        {
+            var unit = Empty<UnitEntityData>();
+            var descriptor = Empty<UnitDescriptor>();
+            Set(unit, "UniqueId", id);
+            Set(unit, "Descriptor", descriptor);
+            Set(descriptor, "Unit", unit);
+            Set(descriptor, "State", new UnitState(descriptor));
+            Set(unit, "Parts", new EntityPartsManager(unit));
+            return unit;
+        }
+
+        var master = Unit("0085-recovery-master");
+        var pet = Unit("0085-recovery-pet");
+        var proxy = FormatterServices.GetUninitializedObject(AccessTools.Inner(typeof(EntityService), "Proxy"));
+        Set(proxy, "Entity", master);
+        Set(master, "Proxy", proxy);
+        Set(master, "m_IsInGame", true);
+        Set(master.Descriptor, "m_IsPlayerFactionCached", true);
+        Set(master.Descriptor, "AttackFactions", new UnitAttackFactions(master.Descriptor));
+        var petPart = pet.Ensure<UnitPartPet>();
+        Set(petPart, "m_MasterRef", new EntityPartRef<UnitEntityData, UnitPartPetMaster>(master));
+        Set(petPart, "m_ShouldBeHidden", true);
+
+        var link = T("Phantom0085Link");
+        Check(typeof(IUnitLifeStateChanged).IsAssignableFrom(link),
+            "C06: the primary emotion link listens to native life-state recovery");
+        var part = Activator.CreateInstance(T("UnitPartPhantom0085"));
+        Set(part, "Confined", true);
+        Call("Phantom0085Link", "RestoreAfterRecovery", master, pet, part);
+        Check(!(bool)Get(part, "Confined") && (bool)Get(part, "PendingManifest") && petPart.ShouldBeHidden && !pet.IsInGame,
+            "C06/C07: recovery without a local scene clears confinement and defers visibility");
+
+        var local = Empty<SceneEntitiesState>();
+        Set(master, "HoldingState", local);
+        Set(pet, "HoldingState", local);
+        var sceneCheck = AccessTools.Method(link, "CanPlace");
+        var viewRefresh = AccessTools.Method(typeof(UnitEntityData), "OnIsInGameChanged");
+        var allowScene = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(AllowRecoveryFixturePlacement));
+        var skipView = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(SkipRecoveryFixtureView));
+        harmony.Patch(sceneCheck, prefix: new HarmonyMethod(allowScene));
+        harmony.Patch(viewRefresh, prefix: new HarmonyMethod(skipView));
+        try
+        {
+            Set(master.Descriptor, "m_IsPlayerFactionCached", false);
+            Call("Phantom0085Link", "RestoreAfterRecovery", master, pet, part);
+            Check((bool)Get(part, "PendingManifest") && petPart.ShouldBeHidden && !pet.IsInGame,
+                "C06: the recovery bridge respects native visibility eligibility for the master");
+            Set(master.Descriptor, "m_IsPlayerFactionCached", true);
+            Call("Phantom0085Link", "RestoreAfterRecovery", master, pet, part);
+            Call("Phantom0085Link", "RestoreAfterRecovery", master, pet, part);
+            Check(!(bool)Get(part, "PendingManifest") && !petPart.ShouldBeHidden && pet.IsInGame && petPart.Master == master,
+                "C06/C07: native SetHidden restores the same linked pet and recovery replay keeps it visible");
+        }
+        finally
+        {
+            harmony.Unpatch(viewRefresh, skipView);
+            harmony.Unpatch(sceneCheck, allowScene);
+        }
+    }
+
+    private static bool AllowRecoveryFixturePlacement(ref bool __result)
+    {
+        __result = true;
+        return false;
+    }
+
+    private static bool SkipRecoveryFixtureView() => false;
 
     private static void FailPrivateInsert(SimpleBlueprint __1)
     {
@@ -738,6 +811,7 @@ internal static class Spiritualist0085Tests
                 .All(effect => effect.CheckConditionEveryRound && effect.Condition.Conditions.Single().GetType() == T("Phantom0085InferenceCondition")),
             "C15: both auras use native area ownership with per-round phantom eligibility");
         CheckInferenceExit(greaterEffects.Single(effect => effect.Buff == inferenceAlly), harmony);
+        CheckRecoveryVisibility(harmony);
         var curse = Load<BlueprintAbility>(cache, Id("HatredSla2"));
         var children = curse.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityVariants>()?.Variants.ToArray();
         Check(children != null && children.Length > 0 && children.All(child => child.Parent == curse &&

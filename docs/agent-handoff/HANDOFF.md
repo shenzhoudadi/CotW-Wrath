@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D7 复用 Inference 原生光环载体及按实例清理，补齐伤害转移的原生目标门控。350 条定向及 12 个原生方法补丁安装通过。完整伙伴链及玩家场景待验，安装包未上传。工作分支 `feat/cotw-0085-spiritualist`。[D7/B7](../work-packages/COTW-0085/D7-B7-spiritualist.md) · [D6/B6](../work-packages/COTW-0085/D6-B6-spiritualist.md)。
+- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D8 通过原生生命状态事件处理同源幻影恢复，统一阵营同步。354 条定向通过，本地 TEST 包三个 DLL 回读一致。完整伙伴链及玩家场景待验，安装包未上传。工作分支 `feat/cotw-0085-spiritualist`。[D8/B8](../work-packages/COTW-0085/D8-B8-spiritualist.md) · [D7/B7](../work-packages/COTW-0085/D7-B7-spiritualist.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
