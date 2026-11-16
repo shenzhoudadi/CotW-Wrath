@@ -1,5 +1,7 @@
 # COTW-0099 Occultist · B 首切片 D 复查（维护者指定自查）
 
+2026-11-16 独立 D 已复查修复版，最新结论见 [D2 独立复查](D2-occultist-review.md)。下文保留 b6be98b 自查原件。
+
 日期：2026-11-15。合同：`C-0099-20261115-r1`（未改）。候选：`b6be98b`，分支 `feat/cotw-0099-occultist`，A/C `eb20191`。认领 [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15) 保持开放。分工与规格：[OCCULTIST.md](../OCCULT-BASE-CLASSES/OCCULTIST.md) · [C 用例](C-occultist-cases.json) · [B 交接](B-abjuration-slice.md)。
 
 **结论：NEEDS_FIX。** 不得据 `b6be98b` 判定 B 首切片「验收通过」，不得发布 TEST 包，不得关闭 #15，不得把 279 条隔离断言当作玩家验收。开发态草稿可保留，但合同明列的原生入口与下列阻断项闭环前，B 首切片不算完成。

@@ -1,8 +1,8 @@
 # COTW-0099 Occultist · 基础职业
 
-状态为 **A/C 已完成，生产实现待 B 开工**。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。工作分支 `feat/cotw-0099-occultist`。范围是 Intelligence 六环自发念力施法、法器学派与 Panoply、Mental Focus 与职业本体进度。COTW-0056 同名 Arcanist 变体、COTW-0100–0105 与 Relic Hunter（0140）沿用原状态。 [施工认领 #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)
+状态为 **A/C 已完成，B 防护系首切片经独立 D 复查退回修复**。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。工作分支 `feat/cotw-0099-occultist`。范围是 Intelligence 六环自发念力施法、法器学派与 Panoply、Mental Focus 与职业本体进度。COTW-0056 同名 Arcanist 变体、COTW-0100–0105 与 Relic Hunter（0140）沿用原状态。 [施工认领 #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)
 
-[A 盘点](../COTW-0099/A-occultist-map.md) · [A 根和供体](../COTW-0099/A-occultist-assets.json) · [C 冻结合同](../COTW-0099/C-occultist-contract.md) · [C 待执行用例](../COTW-0099/C-occultist-cases.json)。B 首切片为 Abjuration，单一整合负责人由维护者指定。
+[A 盘点](../COTW-0099/A-occultist-map.md) · [A 根和供体](../COTW-0099/A-occultist-assets.json) · [C 冻结合同](../COTW-0099/C-occultist-contract.md) · [C 待执行用例](../COTW-0099/C-occultist-cases.json)。B 首切片为 Abjuration，单一整合负责人由维护者指定。[D 独立复查与修复要求](../COTW-0099/D2-occultist-review.md)。
 
 每个角色开始先读本页与 `AGENTS.md`。阶段原件写入本机 `C:/Users/xuenc/agent-tools/occultist-next/`，保留来源路径、GUID 与失败原件。A 和 C 可读原作、当前仓库及本机合法游戏元数据，不提交第三方程序集或原生蓝图。B 不启动游戏或 UMM，不跑整套测试。D 以新增编译、离线注册和本职业定向检查为准，实机存读档／重训界面等未测边界如实列明。
 

@@ -1,0 +1,226 @@
+{
+  "candidate": "77ea03b1e74190a98fab802e31dfd22515b7678a",
+  "contract": "C-0099-20261115-r1",
+  "date": "2026-11-16",
+  "acceptanceScope": "independent_d_review_development_slice",
+  "result": "NEEDS_FIX",
+  "releaseEligible": false,
+  "independentReviewer": true,
+  "reviewRole": "Separate reviewer (occultist_d) performed the source review; the coordinating session executed and documented the directed probes.",
+  "sourceSHA256": {
+    "src/Occultist0099Ids.cs": "476E41F20404C1147BCCE5CC41B13AF6375CF8F8081A2AD333820A7480FE0716",
+    "src/Occultist0099Native.cs": "5EBDF9813C2501E47A366830927AE0DD8B239840343DC262B950D10077F269F3",
+    "src/Occultist0099NativeWiring.cs": "40644DB4C38EC055EFA8AF6B15383DCB71A83446FB7A1DCCCFDDCFEB31EE6E32",
+    "src/Occultist0099Rules.cs": "872B7F6DCD859B6FE3F73834F30652A4F8F9D3AD73C44D5FBAFB26FB9A528F02",
+    "src/Occultist0099Spells.cs": "DC644CA5A7A127F4BC96F9A1A0E4159CC9F5C5DA91D565C5CDECF45CE165EED8"
+  },
+  "artifactSHA256": {
+    "candidateDLL": "4180DA3380C637FD72F49C460E4CE178B1110A52C987903840F65F03D8FC61A0",
+    "nativeHost": "17860D021602677B879EC187A1038BD5C77A5CCB67D8E7FB5A7FE8D524CE85AC",
+    "probeHost": "FEFE5B6A8618281B085DA5D0A42590C182C33D9E5B84F31972328EBF8818D345",
+    "AAssets": "247C988FDD28E365E419F90D834D5C389A21CC70DF070C5FFB9A88FCB3DA6C59",
+    "gameAssembly": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+    "gameHarmony": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5",
+    "isolatedEngine": "3A85EDDC5D21CE98779C54F549BDD471D3DEF061948AEE2E85988E9782B82E80",
+    "launcher": "764AF33A42AE8E2DDD37E07B090F6DF5414863AF977CBB9AC2525C27854C34B2",
+    "nativeFixture": "0CE753666FAE00A56359C17375169652195EDBBF5D54DA77C565D04B0165C06D",
+    "probeDiff": "96493D4665EA6DDA760A827528C23DDCE89B7097A06DFD143E9984457893A83C",
+    "probeProject": "1F16A45CB18E0217137287947AEA4341B08FD43DD11A56A0F253F396812034F9"
+  },
+  "rawLogSHA256": {
+    "build.log": "7CE3CA1B8EA2317C92CE3AADA034325CA27BD4A27EA457D5F7326B7F39ED197C",
+    "model-counterexamples.log": "4CD06186085AC0878BDE578414C36499FC55374653228B38C33F1661A1929C1B",
+    "native-probe-attempt1.log": "336AE068B10687C6F24F8E59FB312EAA54510ADE893D2F43E24BA380F8A51780",
+    "native-probe-attempt2.log": "095910620DF9DFE6CD873AA1F62A8E3C14D78594F4666AD746513E2CFE0C2213",
+    "native-probe.log": "EFB062803BDFD082141BA44FDB58C6C5F07526BF56FC4B632B8DC177660E382A",
+    "native.log": "AAC9384FE7B3F93664AC1CDC6419805143CE80FD225CF2BC95B053D23B9C81CE",
+    "probe-build.log": "11AFF8EF68A0080FABDE9BF7CF36C3FC7DEAA3BE1E900885DF7617A0153B2C7A",
+    "probe-build2.log": "5D059D40688A455A95B88F35146062073F397B4C32F0B4D0859E74023E17EEDF",
+    "probe-build3.log": "D3C921575F48850A41CABC5D796D909C36BB0D5AF638EE8A7EE804EFA8AE4F9C"
+  },
+  "commandContext": {
+    "buildCwd": "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099",
+    "nativeCwd": "D:\\CodexProjects\\CotW-Wrath",
+    "COTW_HARMONY_MATRIX_PATH": "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed\\0Harmony.dll",
+    "probeReconstruction": "Place the archived probe csproj at tests/work/D-77ea03b. Apply native-probe.diff to the original host source and save as DNativeProgram.cs next to the csproj."
+  },
+  "recheck": [
+    {
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/Occultist0099NativeTests.csproj",
+        "-t:Rebuild",
+        "-c",
+        "Release",
+        "-p:WrathPath=D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data",
+        "--nologo",
+        "-v:q"
+      ],
+      "seconds": 3.239,
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099NativeTests\\bin\\Release\\net472\\Occultist0099NativeTests.exe",
+        "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+        "C:\\Users\\xuenc\\agent-tools\\occultist-next\\D-77ea03b\\native.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+      ],
+      "seconds": 3.336,
+      "exitCode": 0,
+      "checks": 80,
+      "failures": [],
+      "result": "NATIVE_DIRECTED_PASS"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "run",
+        "--project",
+        "tests/Occultist0099DReviewTests.csproj",
+        "-c",
+        "Release",
+        "-p:WrathPath=D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data",
+        "--",
+        "C:\\Users\\xuenc\\agent-tools\\occultist-next\\D-77ea03b\\model-counterexamples.json"
+      ],
+      "seconds": 1.933,
+      "exitCode": 0,
+      "checks": 5,
+      "failures": [],
+      "result": "REVIEW_PASS model only"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/work/D-77ea03b/Occultist0099DNativeProbe.csproj",
+        "-c",
+        "Release",
+        "-p:WrathPath=D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data",
+        "--nologo",
+        "-v:q"
+      ],
+      "seconds": 1.289,
+      "exitCode": 0,
+      "attempt": 1
+    },
+    {
+      "argv": [
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099DNativeProbe\\bin\\Release\\net472\\Occultist0099DNativeProbe.exe",
+        "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+        "C:\\Users\\xuenc\\agent-tools\\occultist-next\\D-77ea03b\\native-probe.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+      ],
+      "seconds": 3.247,
+      "exitCode": 1,
+      "attempt": 1,
+      "result": "Aborted at Unity profiling in RuntimeActionType; no verdict"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/work/D-77ea03b/Occultist0099DNativeProbe.csproj",
+        "-c",
+        "Release",
+        "-p:WrathPath=D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data",
+        "--nologo",
+        "-v:q"
+      ],
+      "seconds": 1.1,
+      "exitCode": 0,
+      "attempt": 2
+    },
+    {
+      "argv": [
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099DNativeProbe\\bin\\Release\\net472\\Occultist0099DNativeProbe.exe",
+        "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+        "C:\\Users\\xuenc\\agent-tools\\occultist-next\\D-77ea03b\\native-probe.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+      ],
+      "seconds": 3.209,
+      "exitCode": 1,
+      "attempt": 2,
+      "result": "Aborted at Unity profiling in HasMetamagic; no verdict"
+    },
+    {
+      "argv": [
+        "dotnet",
+        "build",
+        "tests/work/D-77ea03b/Occultist0099DNativeProbe.csproj",
+        "-c",
+        "Release",
+        "-p:WrathPath=D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data",
+        "--nologo",
+        "-v:q"
+      ],
+      "seconds": 1.047,
+      "exitCode": 0,
+      "attempt": 3
+    },
+    {
+      "argv": [
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099DNativeProbe\\bin\\Release\\net472\\Occultist0099DNativeProbe.exe",
+        "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+        "C:\\Users\\xuenc\\agent-tools\\occultist-next\\D-77ea03b\\native-probe.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+        "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+      ],
+      "seconds": 3.185,
+      "exitCode": 1,
+      "attempt": 3,
+      "checks": 32,
+      "failures": [
+        "D2-01 second native command must remain usable with three school points left",
+        "D2-01 two separate commands using the granted fact must charge two points total (expected 5, actual 6)",
+        "D2-02 reacquiring the focus fact on the same camp must preserve spent focus",
+        "D2-02 previous execution remains charged after replacing the runtime fact",
+        "D2-03 a shared Abjuration root must remain selectable by a foreign book",
+        "D2-04 selection must refuse an unaudited off-school root in the private book",
+        "D2-04 private AddKnown must refuse an unaudited off-school root",
+        "D2-04 rejected AddKnown from direct Apply must leave the native selection slot unspent"
+      ],
+      "result": "NATIVE_DIRECTED_FAIL"
+    }
+  ],
+  "staticOnly": [
+    "D2-05 late rejection after RuleCastSpell",
+    "D2-06 immediate scripted rest identity"
+  ],
+  "notRun": [
+    "SP08 production atomic registration",
+    "full game or UMM",
+    "player acceptance",
+    "full cast action/end-to-end application",
+    "level-up UI",
+    "save/load and respec controller",
+    "actual provider assembly load",
+    "package build",
+    "package upload"
+  ],
+  "scratchCleanup": {
+    "result": "blocked by policy",
+    "paths": [
+      "tests/work/D-77ea03b",
+      "D:/CodexProjects/CotW-Wrath/work/prototype-build/Occultist0099DNativeProbe"
+    ],
+    "note": "The checked recursive Remove-Item command was refused before execution. Scratch remains local."
+  }
+}
