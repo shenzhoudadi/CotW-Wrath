@@ -1,0 +1,139 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "40f39e2bdd5789f4abc3ec587abed970f02ca161",
+  "stage": "B11 Illusion",
+  "acceptanceScope": "native_entry_points_directed",
+  "slicePublished": false,
+  "releaseEligible": false,
+  "playerGameAcceptance": false,
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "reviewedRun": "native-8.log",
+    "closedFindings": [
+      "HP adjustment uses a non-shadow context",
+      "Overlapping aura buffs have separate area identity",
+      "Miss diagnostics retain the failed roll instead of a higher passing chance"
+    ]
+  },
+  "reuse": {
+    "native": [
+      "Blinding Ray and blind/dazzle buff actions",
+      "Greater Invisibility",
+      "Sticky touch",
+      "Summon Monster and Summon Elemental",
+      "Shadow disbelief and reality rules"
+    ],
+    "cotw": [
+      "Phantasm Terror and Bedeveling Aura",
+      "Ether independent miss-roll helper",
+      "private held-touch combat-exit cleanup"
+    ],
+    "signedIllusionLearningRoots": 8,
+    "signedSummonRoots": 15,
+    "signedSummonLeaves": 48,
+    "archiveRows": 78
+  },
+  "failedBuilds": [
+    1,
+    2,
+    6,
+    7,
+    8
+  ],
+  "nativeRuns": [
+    {
+      "log": "native-1.log",
+      "wallSeconds": 4.421,
+      "result": "ABORTED",
+      "note": "Unity localization invoked by donor display name"
+    },
+    {
+      "log": "native-2.log",
+      "wallSeconds": 4.865,
+      "result": "PASS",
+      "checks": 396,
+      "note": "Four-school registration, before Illusion behavioral probes"
+    },
+    {
+      "log": "native-5.log",
+      "wallSeconds": 4.907,
+      "result": "ABORTED",
+      "note": "Fixture omitted native MissChance object"
+    },
+    {
+      "log": "native-6.log",
+      "wallSeconds": 4.92,
+      "result": "ABORTED",
+      "note": "Fixture omitted two attack stats and production health context reused its own Buff as a parent"
+    },
+    {
+      "log": "native-7.log",
+      "wallSeconds": 5.175,
+      "result": "FAIL",
+      "checks": 425,
+      "note": "Fixture expected the wrong unmodified HP"
+    },
+    {
+      "log": "native-8.log",
+      "wallSeconds": 4.855,
+      "result": "PASS",
+      "checks": 425
+    }
+  ],
+  "model": {
+    "result": "MODEL_ONLY_PASS",
+    "checks": 344,
+    "wallSeconds": 2.542
+  },
+  "final": {
+    "result": "NATIVE_DIRECTED_PASS",
+    "buildWallSeconds": 1.25,
+    "runnerWallSeconds": 7.502,
+    "nativeWallSeconds": 4.68,
+    "initialIllusionExtractionWallSeconds": 0.67,
+    "fixtureRunnerReadSeconds": {
+      "Aegis": 0.872,
+      "Divination": 0.841,
+      "Illusion": 0.895
+    },
+    "registeredPrivateIdentities": 303,
+    "productionBridgesInstalled": 20,
+    "checks": 425,
+    "failures": 0,
+    "hostLoggedExceptions": 0,
+    "skippedArchiveComponents": 0,
+    "buildWarnings": 0,
+    "buildErrors": 0
+  },
+  "sourceSha256": {
+    "src/Occultist0099Illusion.cs": "7B9B45D9C9E654DABB992BAFED6868784F4E2B17CE5199E74A413A355DFF872F",
+    "src/Occultist0099ShadowBeasts.cs": "8C6B83A102226B55D46EEE7921532CAAE8E3369C631F4A343C48AA5300C6AE2B",
+    "src/Phantasm01447.cs": "1CD7A72B8D4939ACF2014C9EB63C1CD7C1C10BFFF4F203A95E70542DC16BD44D",
+    "src/PsychicEtherMiss.cs": "392708B762D14924279B815C95FEFA0DB102D559272776164F43100D7BE59687",
+    "tests/Occultist0099NativeProgram.cs": "5EFEE6A7759F7DA157E4C8731975FB4D871BFD89FCCB38378AA71C836FA3B758"
+  },
+  "notRun": [
+    "Scene shadow summoning, disbelief damage packets and aura positioning",
+    "Real terror engagement and touch or projectile combat delivery",
+    "Full class and game startup",
+    "UI, disk save/load, actual providers",
+    "Packaging and upload"
+  ],
+  "buildWallSecondsByRun": [
+    1.704,
+    2.537,
+    3.214,
+    2.675,
+    2.214,
+    1.279,
+    1.458,
+    1.388,
+    2.186,
+    1.312,
+    2.222,
+    2.091,
+    1.25
+  ]
+}

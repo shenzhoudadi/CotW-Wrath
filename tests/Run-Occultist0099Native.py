@@ -45,7 +45,7 @@ cmd = [str(launcher), str(engine), str(host), str(managed), str(candidate),
        str(report), str(evidence), str(native)]
 archive_fixtures = {}
 with tempfile.TemporaryDirectory(prefix='cotw-0099-') as fixture_dir:
-    for group in ('Aegis', 'Divination'):
+    for group in ('Aegis', 'Divination', 'Illusion'):
         file = Path(fixture_dir) / f'{group}.json'
         started = time.perf_counter()
         subprocess.run(['pwsh', '-NoProfile', '-File', str(archive_reader),

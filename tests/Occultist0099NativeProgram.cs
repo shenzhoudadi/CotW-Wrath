@@ -66,9 +66,10 @@ internal static class Occultist0099NativeLauncher
     private static int Main(string[] args)
     {
         if (args.Length != 5 || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE")) ||
-            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_DIVINATION_FIXTURE")))
+            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_DIVINATION_FIXTURE")) ||
+            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_ILLUSION_FIXTURE")))
         {
-            Console.Error.WriteLine("Set COTW_0099_AEGIS_FIXTURE and COTW_0099_DIVINATION_FIXTURE using ReadOccultist0099Archive.ps1.");
+            Console.Error.WriteLine("Set the Aegis, Divination and Illusion fixtures using ReadOccultist0099Archive.ps1.");
             return 2;
         }
         var runtimePath = Environment.GetEnvironmentVariable("COTW_HARMONY_MATRIX_PATH");
@@ -537,7 +538,7 @@ internal static class Occultist0099NativeTests
         bp.ComponentsArray = loaded.ToArray();
         foreach (var field in new[] { "Type", "ActionType", "Range", "Spontaneous",
                                       "AllSpellsKnown", "CastingAttribute", "IsArcane",
-                                      "SpellsPerLevel", "CantripsType", "IsMythic", "HitDie", "SkillPoints" })
+                                      "SpellsPerLevel", "CantripsType", "IsMythic", "HitDie", "SkillPoints", "CanTargetPoint", "CustomRange" })
         {
             var info = AccessTools.Field(type, field);
             var value = data[field];
@@ -557,6 +558,8 @@ internal static class Occultist0099NativeTests
             Set(bp, "m_Icon", Empty<UnityEngine.Sprite>());
         if (bp is BlueprintSpellsTable table && data["Levels"] != null)
             table.Levels = data["Levels"].ToObject<SpellsLevelEntry[]>();
+        if (bp is BlueprintSpellList list && data["SpellsByLevel"] != null)
+            list.SpellsByLevel = data["SpellsByLevel"].ToObject<SpellLevelList[]>(Json.Serializer);
         bp.OnEnable();
         cache.AddCachedBlueprint(bp.AssetGuid, bp);
         return bp;
@@ -1850,7 +1853,8 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.AegisOptionTypeId, Occultist0099Ids.AegisTargetTypeId, Occultist0099Ids.AegisArmorTypeId,
             Occultist0099Ids.AegisStorageTypeId, Occultist0099Ids.AegisStoreSpellTypeId, Occultist0099Ids.AegisReleaseTypeId,
             Occultist0099Ids.AegisReleaseActionTypeId, Occultist0099Ids.AegisApplyTypeId, Occultist0099Ids.AegisGrantsTypeId,
-            Occultist0099Ids.ProphecyReadyTypeId
+            Occultist0099Ids.ProphecyReadyTypeId, Occultist0099Ids.ShadowTierTypeId, Occultist0099Ids.ShadowHealthTypeId,
+            Occultist0099Ids.ShadowHealthActionTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
                 "GATE private TypeId " + id + " has no native collision");
@@ -1953,9 +1957,9 @@ internal static class Occultist0099NativeTests
               progression.LevelEntries.SelectMany(entry => entry.Features.OfType<BlueprintFeatureSelection>()
                   .Where(selection => selection != powers).Select(_ => entry.Level)).SequenceEqual(new[] { 1, 1, 2, 6, 10, 14, 18 }),
             "ENCH native progression schedules the seven distinct implement choices and ten focus-power choices at the audited levels");
-        Check(slots.Length == 39 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length &&
+        Check(slots.Length == 52 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length &&
               slots.GroupBy(slot => slot.School).All(school => school.Count() == 13),
-            "HOST all three school and slot alternatives have distinct stable native learning lists");
+            "HOST all four school and slot alternatives have distinct stable native learning lists");
         var command = Native<BlueprintAbility>("feb70aab86cc17f4bb64432c83737ac2");
         var massDaze = Native<BlueprintAbility>("f48b6e526d69d694507e0d0c4d954eb8");
         var source = slots.Single(slot => slot.SlotKey == "slot-1" && slot.School == "Enchantment").List.Get();
@@ -2356,6 +2360,199 @@ internal static class Occultist0099NativeTests
         caseStatus["Divination"] = "native_choice_learning_third_eye_roll_benefits_and_paid_prophecy";
 
         BlueprintGuid RefGuid(object target, string field) => ((BlueprintReferenceBase)Get(target, field)).Guid;
+    }
+
+    private static int distortionRoll, distortionRolls, shadowSpawnCalls;
+
+    private static bool IllusionRollBoundary(RuleRollDice __instance)
+    {
+        if (!(__instance is RuleRollD100)) return true;
+        Set(__instance, "m_Result", distortionRoll);
+        distortionRolls++;
+        return false;
+    }
+
+    private static bool ShadowSpawnBoundary()
+    {
+        shadowSpawnCalls++;
+        return false;
+    }
+
+    private static void IllusionNative(BlueprintsCache detached, BlueprintCharacterClass character)
+    {
+        T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
+        var unit = Unit("illusion-caster", character, 9, 16);
+        var sameLevel = Unit("illusion-equal-hd", character, 9, 12);
+        var higher = Unit("illusion-higher-hd", character, 10, 12);
+        foreach (var actor in new[] { unit, sameLevel, higher })
+        {
+            actor.SetStealthData(new UnitStealth());
+            var stealth = new ModifiableValueSkill(actor.Stats, actor.Stats.Dexterity, StatType.SkillStealth);
+            var perception = new ModifiableValueSkill(actor.Stats, actor.Stats.Wisdom, StatType.SkillPerception);
+            var attack = new ModifiableValue(actor.Stats, StatType.AdditionalAttackBonus);
+            actor.Stats.AllStats.AddRange(new ModifiableValue[] { stealth, perception, attack });
+            Set(actor.Stats, "SkillStealth", stealth);
+            Set(actor.Stats, "SkillPerception", perception);
+            Set(actor.Stats, "AdditionalAttackBonus", attack);
+        }
+        Set(unit.Progression, "m_Selections", new Dictionary<BlueprintFeatureSelection, FeatureSelectionData>());
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MentalFocusFact"), unit.Descriptor));
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("OccultistSpellbookFact"), unit.Descriptor));
+        var implement = new Feature(Asset<BlueprintFeature>("slot-1-Illusion-Implement"), unit.Descriptor);
+        unit.Facts.Add(implement);
+        var book = unit.Descriptor.DemandSpellbook(character.Spellbook);
+        Set(book, "m_BaseLevelInternal", 9);
+        var leveling = LevelState(book);
+        var powers = Asset<BlueprintFeatureSelection>("FocusPowerSelection");
+        foreach (var option in new[] { (Token: "Terror", Level: 1), (Token: "Unseen", Level: 7),
+            (Token: "BedevelingAura", Level: 9), (Token: "ShadowBeasts", Level: 9) })
+        {
+            var selection = leveling.AddSelection(null, character.Progression, powers, option.Level);
+            var pick = new SelectFeature(selection, Asset<BlueprintFeature>(option.Token + "Power"));
+            Check(pick.Check(leveling, unit.Descriptor), "ILL native selection admits " + option.Token);
+            pick.Apply(leveling, unit.Descriptor);
+        }
+        var list = character.Spellbook.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists
+            .Single(slot => slot.SlotKey == "slot-1" && slot.School == "Illusion").List.Get();
+        var illusionRows = ((Occultist0099SpellRoot[])AccessTools.Field(Production("Occultist0099SpellCatalog"), "Roots").GetValue(null))
+            .Where(row => row.School == "Illusion" && !row.IsKnack).ToArray();
+        Check(illusionRows.Length == 8 && illusionRows.All(row => list.GetSpells(row.Circle).Any(spell => spell.AssetGuid == P(row.Guid))) &&
+              list.SpellsByLevel.Sum(row => row.Spells.Count()) == 8, "ILL all eight learning candidates retain their signed native root and circle");
+        var vanish = Native<BlueprintAbility>("f001c73999fb5a543a199f890108d936");
+        var learn = new SelectSpell(character.Spellbook, list, 1, vanish, 0);
+        Check(NativeCheck(learn, leveling, unit.Descriptor), "ILL native Illusion source offers Vanish");
+        learn.Apply(leveling, unit.Descriptor);
+        Check(book.IsKnown(vanish), "ILL the selected root enters the private Occultist book");
+
+        AbilityData Granted(string token) => unit.Abilities.Enumerable.Single(ability => ability.Blueprint == Asset<BlueprintAbility>(token)).Data;
+        var focus = unit.Get<Occultist0099FocusPart>().State;
+        var pool = focus.Schools["Illusion"];
+        var d100 = AccessTools.Method(typeof(RuleRollDice), nameof(RuleRollDice.OnTrigger));
+        var fixedRoll = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(IllusionRollBoundary));
+        var spawn = AccessTools.Method(typeof(Kingmaker.UnitLogic.Mechanics.Actions.ContextActionSpawnMonster), "RunAction");
+        var countSpawn = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ShadowSpawnBoundary));
+        var activateArea = AccessTools.Method(typeof(Kingmaker.UnitLogic.Buffs.Components.AddAreaEffect), "OnActivate");
+        var noScene = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NoReplenish));
+        applyNativeEffects = true;
+        harmony.Patch(d100, prefix: new HarmonyMethod(fixedRoll));
+        harmony.Patch(spawn, prefix: new HarmonyMethod(countSpawn));
+        harmony.Patch(activateArea, prefix: new HarmonyMethod(noScene));
+        try
+        {
+            for (int i = 0; i < 11; i++) CastRule(Granted("IllusionInvestFocusAbility"));
+            CastRule(Granted("LockFocusAbility"));
+            var distortion = Asset<BlueprintBuff>("DistortionBuff");
+            Check(unit.Buffs.GetBuff(distortion) != null && distortion.StayOnDeath,
+                "ILL locking the school establishes the native permanent Distortion buff");
+            var attack = Empty<RuleAttackRoll>();
+            Set(attack, "Initiator", sameLevel);
+            Set(attack, "Target", unit);
+            Set(attack, "AttackType", AttackType.Melee);
+            Set(attack, "IgnoreConcealment", true);
+            Set(attack, "missChance", new MissChance());
+            var higherPassedRoll = Empty<RuleRollD100>();
+            Set(higherPassedRoll, "m_Result", 80);
+            Set(attack, "MissChanceValue", 20);
+            Set(attack, "MissChanceRoll", higherPassedRoll);
+            var checkMiss = AccessTools.Method(typeof(RuleAttackRoll), "TryOvercomeTargetConcealmentAndMissChance");
+            distortionRoll = 9;
+            Check(!(bool)checkMiss.Invoke(attack, null) && attack.MissChanceValue == 9 && distortionRolls == 1,
+                "ILL capped Distortion rolls separately and reports the actual failing roll ahead of a higher passed chance");
+            sameLevel.State.AddCondition(UnitCondition.SeeInvisibility);
+            Check((bool)checkMiss.Invoke(attack, null) && distortionRolls == 1, "ILL native See Invisibility bypasses Distortion without rolling");
+            sameLevel.State.RemoveCondition(UnitCondition.SeeInvisibility);
+            sameLevel.State.AddCondition(UnitCondition.TrueSeeing);
+            Check((bool)checkMiss.Invoke(attack, null) && distortionRolls == 1, "ILL native True Seeing also bypasses it");
+            sameLevel.State.RemoveCondition(UnitCondition.TrueSeeing);
+
+            var beam = Granted("ColorBeamAbility");
+            Rulebook.Trigger(new RuleCastSpell(beam, sameLevel));
+            Rulebook.Trigger(new RuleCastSpell(beam, higher));
+            Check(beam.Blueprint.GetComponent<AbilityDeliverProjectile>() != null && beam.Blueprint.CustomRange.Value == 30 &&
+                sameLevel.Buffs.GetBuff(Native<BlueprintBuff>("187f88d96a0ef464280706b63635f2af"))?.TimeLeft == TimeSpan.FromSeconds(6) &&
+                higher.Buffs.GetBuff(Native<BlueprintBuff>("df6d1025da07524429afbae248845ecc"))?.TimeLeft == TimeSpan.FromSeconds(6) &&
+                pool.Remaining == 9, "ILL the original ray graph blinds at exactly the Occultist level and dazzles above it");
+            var terror = Granted("TerrorAbility");
+            var terrorDelivery = terror.Blueprint.GetComponent<AbilityEffectStickyTouch>().TouchDeliveryAbility;
+            Check(terrorDelivery.GetComponent<AbilityDeliverTouch>() != null &&
+                terrorDelivery.GetComponent<AbilityEffectRunAction>().Actions.Actions.Single() is PhantasmTerror01447 action &&
+                action.AlliesOnly && action.SharedLevel != null && terror.ResourceLogic.CalculateCost(terror) == 1 &&
+                terrorDelivery.GetComponent<AbilityResourceLogic>() == null,
+                "ILL Terror reuses the allied opportunity action and pays only on the held-touch root");
+
+            var nativeInvisibility = Native<BlueprintBuff>("e6b35473a237a6045969253beb09777c");
+            var unseen = Granted("UnseenAbility");
+            var unseenLeaves = unseen.GetConversions().ToArray();
+            CastRule(unseenLeaves.Single(variant => variant.Blueprint == Asset<BlueprintAbility>("UnseenSelfAbility")));
+            Rulebook.Trigger(new RuleCastSpell(unseenLeaves.Single(variant => variant.Blueprint == Asset<BlueprintAbility>("UnseenAllyAbility")), sameLevel));
+            Check(unit.Buffs.GetBuff(nativeInvisibility)?.TimeLeft == TimeSpan.FromMinutes(1) &&
+                sameLevel.Buffs.GetBuff(nativeInvisibility)?.TimeLeft == TimeSpan.FromMinutes(1) &&
+                sameLevel.State.HasCondition(UnitCondition.GreaterInvisibility) && pool.Remaining == 6,
+                "ILL native Greater Invisibility is reused for one minute with one-point self and two-point ally variants");
+
+            var aura = Granted("BedevelingAuraAbility");
+            CastRule(aura);
+            var emitter = unit.Buffs.GetBuff(Asset<BlueprintBuff>("BedevelingAuraBuff"));
+            var area = emitter.Blueprint.GetComponent<Kingmaker.UnitLogic.Buffs.Components.AddAreaEffect>().AreaEffect;
+            var areaBuff = area.GetComponent<AbilityAreaEffectBuff>();
+            Check(emitter.TimeLeft == TimeSpan.FromSeconds(24) && area.Size.Value == 30 && area.AffectEnemies &&
+                areaBuff.CheckConditionEveryRound && areaBuff.Buff.GetComponent<PhantasmFlanked01447>() != null && pool.Remaining == 5,
+                "ILL paid Bedeveling Aura uses the shared Phantasm enemy aura for half the native Occultist level");
+            var firstAura = higher.Buffs.AddBuff(areaBuff.Buff, unit, (TimeSpan?)null);
+            var secondAura = higher.Buffs.AddBuff(areaBuff.Buff, sameLevel, (TimeSpan?)null);
+            firstAura.SourceAreaEffectId = "0099N.aura.1";
+            secondAura.SourceAreaEffectId = "0099N.aura.2";
+            firstAura.Remove();
+            Check(firstAura != secondAura && higher.Buffs.GetBuff(areaBuff.Buff) == secondAura &&
+                higher.State.HasCondition(UnitCondition.Slowed), "ILL an overlapping aura keeps its independent source after the other ends");
+
+            var shadows = Granted("ShadowBeastsAbility");
+            var summonChoices = shadows.GetConversions().ToArray();
+            var classData = unit.Progression.GetClassData(character);
+            foreach (var tier in new[] { (Level: 9, Visible: 24), (Level: 11, Visible: 31), (Level: 13, Visible: 38),
+                (Level: 15, Visible: 45), (Level: 17, Visible: 48) })
+            {
+                classData.Level = tier.Level;
+                Eq(tier.Visible, summonChoices.Count(variant => variant.IsVisible()), "ILL native menu filters the signed summon family at level " + tier.Level);
+            }
+            classData.Level = 9;
+            Check(summonChoices.Length == 48 && summonChoices.All(variant => ReferenceEquals(variant.ConvertedFrom, shadows) &&
+                variant.ShadowSpellSettings?.Factor?.GetInt(unit) == 60 && !variant.RequireFullRoundAction),
+                "ILL all 48 direct native conversions inherit 60% reality and remain standard actions");
+            var ninth = summonChoices.First(variant => variant.Blueprint.GetComponent<Occultist0099ShadowTier>().Minimum == 17);
+            Check(Rulebook.Trigger(new RuleCastSpell(ninth, new TargetWrapper(UnityEngine.Vector3.zero))).ForceFail && pool.Remaining == 5,
+                "ILL a directly submitted higher-tier native variant cannot bypass the UI level restriction or debit focus");
+            var lowest = summonChoices.Single(variant => variant.Blueprint == Asset<BlueprintAbility>("ShadowBeasts-8fd74eddd9b6c224693d9ab241f25e84"));
+            var cast = Rulebook.Trigger(new RuleCastSpell(lowest, new TargetWrapper(UnityEngine.Vector3.zero)));
+            Check(cast.Success && pool.Remaining == 4 && cast.Context.ShadowFactorPercents == 60 &&
+                cast.Context.Params.CasterLevel == 9 && cast.Context.Params.DC == 17 && shadowSpawnCalls == 1,
+                "ILL the paid native cast supplies 60% shadow reality and the signed Occultist CL/DC to the existing summon action");
+
+            var shadow = Unit("shadow-health-target", character, 1, 10);
+            var hp = shadow.Stats.HitPoints;
+            hp.BaseValue = 99; // Native level-one HP adds one to this fixture's base.
+            var healthBlueprint = Asset<BlueprintBuff>("ShadowBeastsHealth");
+            var shadowAction = new Occultist0099ShadowHealthAction { Effect = Ref<BlueprintBuffReference>(healthBlueprint) };
+            using (cast.Context.GetDataScope(shadow)) shadowAction.RunAction();
+            var health = shadow.Buffs.GetBuff(healthBlueprint);
+            Eq(60, hp.ModifiedValue, "ILL a private shadow beast gets 60 percent of maximum HP using a native modifier");
+            Check(health != null && health.IsNotDispelable && !health.Context.IsShadow,
+                "ILL the inherent HP adjustment cannot be rejected by the stock shadow disbelief gate");
+            health.Remove();
+            Eq(100, hp.ModifiedValue, "ILL removing the shadow health modifier restores the baseline exactly");
+        }
+        finally
+        {
+            applyNativeEffects = false;
+            harmony.Unpatch(d100, fixedRoll);
+            harmony.Unpatch(spawn, countSpawn);
+            harmony.Unpatch(activateArea, noScene);
+        }
+        unit.RemoveFact(implement);
+        Check(unit.Buffs.GetBuff(Asset<BlueprintBuff>("DistortionBuff")) == null &&
+            unit.Buffs.GetBuff(Asset<BlueprintBuff>("BedevelingAuraBuff")) == null,
+            "ILL removing the school withdraws the passive miss chance and active emitter");
+        caseStatus["Illusion"] = "native_learning_private_miss_roll_paid_variants_and_shadow_context";
     }
 
     private static void AegisNative(BlueprintsCache detached, BlueprintCharacterClass character)
@@ -2899,14 +3096,17 @@ internal static class Occultist0099NativeTests
         Check(!TryRegister(cache), "SP08 the production development entry refuses the ordinary process cache");
         const string alchemistClassId = "0937bec61c0dabc468428f496580c721";
         const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
-        var implementedSchools = new HashSet<string> { "Abjuration", "Enchantment", "Divination" };
+        var implementedSchools = new HashSet<string> { "Abjuration", "Enchantment", "Divination", "Illusion" };
         var rows = catalogue.Where(row => (implementedSchools.Contains(row.School) || row.IsKnack) && row.Source != "External").ToArray();
         var coreDonors = (string[])AccessTools.Field(Production("Occultist0099Enchantment"), "DonorIds").GetValue(null);
         var armorDonors = (string[])AccessTools.Field(Production("Occultist0099Aegis"), "Donors").GetValue(null);
         var divinationDonors = (string[])AccessTools.Field(Production("Occultist0099Divination"), "DonorIds").GetValue(null);
+        var illusionDonors = (string[])AccessTools.Field(Production("Occultist0099Illusion"), "DonorIds").GetValue(null);
+        var shadowDonors = (string[])AccessTools.Field(Production("Occultist0099ShadowBeasts"), "DonorIds").GetValue(null);
         var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a",
             "143775c49ae6b7446b805d3b2e702298" }
-            .Concat(coreDonors).Concat(armorDonors).Concat(divinationDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
+            .Concat(coreDonors).Concat(armorDonors).Concat(divinationDonors).Concat(illusionDonors).Concat(shadowDonors)
+            .Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
         LoadRows(expectedDonors);
         foreach (var row in rows.Where(row => row.Source == "CotW" && cache.Load(P(row.Guid)) == null)) StageAbsentRoot(row);
         foreach (var id in expectedDonors)
@@ -3102,6 +3302,7 @@ internal static class Occultist0099NativeTests
             AbjurationPowersNative(detached, publishedClass);
             AegisNative(detached, publishedClass);
             DivinationNative(detached, publishedClass);
+            IllusionNative(detached, publishedClass);
         }
         finally
         {
@@ -3110,7 +3311,7 @@ internal static class Occultist0099NativeTests
             harmony.Unpatch(visual, noVisual);
             EnchantmentFixtureRoot = null;
         }
-        caseStatus["SP08"] = "native_atomic_detached_three_school_graph_only_full_class_not_run";
+        caseStatus["SP08"] = "native_atomic_detached_four_school_graph_only_full_class_not_run";
         caseStatus["SP03"] = "native_copy_serialization_and_last_registered_implement_revoke_only";
     }
 
@@ -3151,6 +3352,8 @@ internal static class Occultist0099NativeTests
         Eq(37, armorArchiveRows, "HOST loads the 20 signed armor enchantments and their native support rows");
         int divinationArchiveRows = LoadArchiveDonors(Environment.GetEnvironmentVariable("COTW_0099_DIVINATION_FIXTURE"));
         Eq(10, divinationArchiveRows, "HOST loads the signed Divination ability, resonance and native spell rows");
+        int illusionArchiveRows = LoadArchiveDonors(Environment.GetEnvironmentVariable("COTW_0099_ILLUSION_FIXTURE"));
+        Eq(78, illusionArchiveRows, "HOST loads the signed Illusion effects, spell roots, summon families and Wizard list");
 
         // Load only the audited rows this directed check needs.
         var roots = Occultist0099AbjurationCatalog.Roots.Select(r => r.Guid)
@@ -3212,7 +3415,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B10 Divination focus powers, resonance and native learning rows",
+            ["stage"] = "B11 Illusion focus powers, resonance and native shadow summons",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -3223,20 +3426,21 @@ internal static class Occultist0099NativeTests
             ["registeredPrivateIdentities"] = registeredPrivateIdentities,
             ["armorArchiveRows"] = armorArchiveRows,
             ["divinationArchiveRows"] = divinationArchiveRows,
+            ["illusionArchiveRows"] = illusionArchiveRows,
             ["nativeRootsLoaded"] = loadedRoots,
             ["hostStagedRoots"] = hostStaged,
             ["hostStagedRootNames"] = new JArray(stagedRoots),
             ["skippedArchiveComponents"] = skippedComponents,
-            ["rootFixtureBoundary"] = "Abjuration uses 13 Wrath archive roots, four existing CotW Psychic builders and a host-staged TTT Cloak. Enchantment uses 11 non-knack Wrath roots and the existing CotW Mass Daze builder. Divination uses five non-knack Wrath roots and the existing Locate Weakness, Arcane Eye and Battlemind Link builders. The detached cache stages external reciprocal publications. Actual provider assemblies were not loaded.",
+            ["rootFixtureBoundary"] = "Illusion uses eight native learning roots, plus fifteen signed summon families with 48 leaves. Other registered schools retain their existing managed donors and staged publications. Actual external provider assemblies were not loaded.",
             ["checks"] = checks,
             ["failures"] = new JArray(failures),
             ["hostLoggedExceptions"] = hostLogs,
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Detached native Divination choice, learning, resonance, one-shot roll effects and paid Prophecy passed alongside earlier directed checks."
+                ? "Detached native Illusion learn, Distortion, paid variants, overlapping aura facts and shadow cast context passed alongside the current Occultist checks."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Detached BlueprintsCache, native choices, learn entry and cast payment. Divination injects already-resolved attack events and prescribes Prophecy dice; Mind Eye checks the genuine spawn and controller graph without spawning. Aegis retains its managed armor and hit fixture. Unity scene, equipment presentation and targeting navigation, ordinary startup, full career and disk saves remain outside scope.",
+            ["boundary"] = "Detached BlueprintsCache, native choice, spellbook and cast payment. Illusion injects the Distortion roll and calls native roll entry; Color Beam applies the reused actions after supplied delivery; native overlap is checked at the buff collection. Shadow Beasts uses native cast, context and HP modifier with a scene spawn boundary. Terror graph is checked without combat engagement. Unity scenes, UI, ordinary startup, full career and disk saves remain outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

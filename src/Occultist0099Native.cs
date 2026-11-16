@@ -172,6 +172,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintBuffReference MindBarrierBuff;
         public BlueprintBuffReference[] AbjurationEffects = Array.Empty<BlueprintBuffReference>();
         public BlueprintBuffReference[] DivinationEffects = Array.Empty<BlueprintBuffReference>();
+        public BlueprintBuffReference IllusionAura;
         public Occultist0099SchoolResonance[] SchoolResonances = Array.Empty<Occultist0099SchoolResonance>();
 
         private Occultist0099FocusPart Ledger
@@ -256,6 +257,7 @@ namespace CallOfTheWild.Wrath.Prototype
             else Occultist0099Focus.RemoveClass(part.State);
             RemoveAbjurationEffects();
             RemoveDivinationEffects();
+            RemoveIllusionEffects();
             SyncResonance();
         }
 
@@ -282,6 +284,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 RemoveAbjurationEffects();
                 RemoveDivinationEffects();
+                RemoveIllusionEffects();
             }
             SyncResonance();
         }
@@ -295,6 +298,7 @@ namespace CallOfTheWild.Wrath.Prototype
             SyncResourceMirror();
             if (!present && school == Occultist0099Ids.SliceSchool) RemoveAbjurationEffects();
             if (!present && school == "Divination") RemoveDivinationEffects();
+            if (!present && school == Occultist0099Illusion.School) RemoveIllusionEffects();
             SyncResonance();
         }
 
@@ -305,6 +309,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 RemoveAbjurationEffects();
                 RemoveDivinationEffects();
+                RemoveIllusionEffects();
                 return;
             }
             var active = new HashSet<string>(Owner.Progression.Features.Enumerable.Where(f => f.Active)
@@ -318,6 +323,7 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             if (!CanRetainMindBarrier()) RemoveAbjurationEffects();
             if (!state.Locked || !state.Schools["Divination"].Present) RemoveDivinationEffects();
+            if (!state.Locked || !state.Schools[Occultist0099Illusion.School].Present) RemoveIllusionEffects();
         }
 
         internal bool Operate(Occultist0099FocusAction action, string school, string executionId, bool commit)
@@ -365,6 +371,13 @@ namespace CallOfTheWild.Wrath.Prototype
                 var effect = reference?.Get();
                 if (effect != null) Owner.Buffs.GetBuff(effect)?.Remove();
             }
+        }
+
+        private void RemoveIllusionEffects()
+        {
+            if (Occultist0099Illusion.HoldsTerror(Owner.Get<UnitPartTouch>())) Owner.Remove<UnitPartTouch>();
+            var aura = IllusionAura?.Get();
+            if (aura != null) Owner.Buffs.GetBuff(aura)?.Remove();
         }
 
         private void SyncResonance()

@@ -234,7 +234,7 @@ namespace CallOfTheWild.Wrath.Prototype
     }
 
     [HarmonyPatch(typeof(UnitPartTouch), nameof(UnitPartTouch.HandleObjectLeaveCombat))]
-    internal static class Occultist0099NativeFortuneCleanup
+    internal static class Occultist0099NativeHeldFocusCleanup
     {
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator labels)
         {
@@ -245,7 +245,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 throw new InvalidOperationException("The native held touch refund entry changed.");
 
             // Native removal clears the originating spell from the fact. Its
-            // delivery blueprint still identifies Fortune at the refund step.
+            // private delivery blueprint still identifies the focus power at the refund step.
             // The caster is already on the stack for this lookup.
             var lookup = code[refund];
             var normalRefund = labels.DefineLabel();
@@ -255,11 +255,14 @@ namespace CallOfTheWild.Wrath.Prototype
             lookup.labels.Add(normalRefund);
             code.InsertRange(refund, new[]
             {
-                held, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Occultist0099Divination), nameof(Occultist0099Divination.HoldsFortune))),
+                held, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Occultist0099NativeHeldFocusCleanup), nameof(IsFocusTouch))),
                 new CodeInstruction(OpCodes.Brfalse, normalRefund), new CodeInstruction(OpCodes.Pop), new CodeInstruction(OpCodes.Ret)
             });
             return code;
         }
+
+        private static bool IsFocusTouch(UnitPartTouch part)
+            => Occultist0099Divination.HoldsFortune(part) || Occultist0099Illusion.HoldsTerror(part);
     }
 
     [TypeId(Occultist0099Ids.ProphecyReadyTypeId)]

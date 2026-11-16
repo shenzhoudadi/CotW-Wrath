@@ -19,6 +19,7 @@ using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.Enums;
 using static CallOfTheWild.Wrath.Prototype.Occultist0099Abjuration;
 using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
@@ -40,7 +41,8 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private static readonly ConditionalWeakTable<BlueprintsCache, Graph> Published = new ConditionalWeakTable<BlueprintsCache, Graph>();
-        private static readonly string[] Schools = { Occultist0099Ids.SliceSchool, Occultist0099Enchantment.School, Occultist0099Divination.School };
+        private static readonly string[] Schools = { Occultist0099Ids.SliceSchool, Occultist0099Enchantment.School,
+            Occultist0099Divination.School, Occultist0099Illusion.School };
         private static readonly int[] ImplementLevels = { 1, 1, 2, 6, 10, 14, 18 };
         private static readonly Occultist0099SpellRoot[] Rows = Occultist0099SpellCatalog.Roots
             .Where(row => row.IsKnack || Schools.Contains(row.School)).ToArray();
@@ -67,6 +69,8 @@ namespace CallOfTheWild.Wrath.Prototype
             };
             ids.UnionWith(Occultist0099Aegis.Tokens());
             ids.UnionWith(Occultist0099Divination.Tokens);
+            ids.UnionWith(Occultist0099Illusion.Tokens);
+            ids.UnionWith(Occultist0099ShadowBeasts.Tokens());
             foreach (var school in Schools) ids.Add(school + "ExtraSpellSource");
             for (int index = 0; index < ImplementLevels.Length; index++)
             {
@@ -130,8 +134,14 @@ namespace CallOfTheWild.Wrath.Prototype
                 var abjuration = Occultist0099AbjurationPowers.Build(cache, DetachedText);
                 var aegis = Occultist0099Aegis.Build(cache, DetachedText);
                 var divination = Occultist0099Divination.Build(cache, DetachedText);
-                if (enchantment == null || abjuration == null || aegis == null || divination == null) return false;
-                var graph = BuildGraph(root, alchemist, day, proficiencies, spells, enchantment.Concat(abjuration).Concat(aegis).Concat(divination).ToArray());
+                var illusion = Occultist0099Illusion.Build(cache, DetachedText);
+                if (enchantment == null || abjuration == null || aegis == null || divination == null || illusion == null) return false;
+                BlueprintUnitProperty IllusionProperty(string token)
+                    => illusion.OfType<BlueprintUnitProperty>().Single(property => property.AssetGuid == BlueprintGuid.Parse(Occultist0099Ids.Id(token)));
+                var shadows = Occultist0099ShadowBeasts.Build(cache, IllusionProperty("IllusionEffectiveLevel"), IllusionProperty("IllusionDCLevel"), DetachedText);
+                if (shadows == null) return false;
+                var graph = BuildGraph(root, alchemist, day, proficiencies, spells,
+                    enchantment.Concat(abjuration).Concat(aegis).Concat(divination).Concat(illusion).Concat(shadows).ToArray());
                 var ids = new HashSet<BlueprintGuid>(graph.Assets.Select(asset => asset.AssetGuid));
                 if (ids.Count != graph.Assets.Length || !ids.SetEquals(manifest))
                     throw new InvalidOperationException("Occultist development graph differs from its private identity manifest.");
@@ -277,9 +287,14 @@ namespace CallOfTheWild.Wrath.Prototype
                     Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("AegisArmorBuff")) },
                 DivinationEffects = new[] { "SuddenInsightBuff", "DangerSightBuff", "ProphecyBuff" }
                     .Select(token => Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token))).ToArray(),
+                IllusionAura = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("BedevelingAuraBuff")),
                 WardingTalisman = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("WardingTalismanBuff")),
-                SchoolResonances = new[] { new Occultist0099SchoolResonance { School = Occultist0099Enchantment.School,
-                    Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GloriousPresenceBuff")) } }.Concat(
+                SchoolResonances = new[] {
+                    new Occultist0099SchoolResonance { School = Occultist0099Enchantment.School,
+                        Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GloriousPresenceBuff")) },
+                    new Occultist0099SchoolResonance { School = Occultist0099Illusion.School,
+                        Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("DistortionBuff")) }
+                }.Concat(
                     new[] { "ThirdEyeBuff", "ThirdEyeSeeInvisibility", "ThirdEyeBlindsense", "ThirdEyeBlindsight" }
                         .Select((token, tier) => new Occultist0099SchoolResonance { School = Occultist0099Divination.School,
                             Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token)), Tier = tier })).ToArray()
@@ -289,6 +304,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var enchantmentImplement = Mechanic<BlueprintFeature>("EnchantmentImplementFocus");
             var abjurationImplement = Mechanic<BlueprintFeature>("AbjurationImplementFocus");
             var divinationImplement = Mechanic<BlueprintFeature>("DivinationImplementFocus");
+            var illusionImplement = Mechanic<BlueprintFeature>("IllusionImplementFocus");
             var powers = new[]
             {
                 Power("BindingPattern", "Binding Pattern", enchantmentImplement, 7),
@@ -302,7 +318,11 @@ namespace CallOfTheWild.Wrath.Prototype
                 Power("DivinersFortune", "Diviner's Fortune", divinationImplement),
                 Power("DangerSight", "Danger Sight", divinationImplement, 3),
                 Power("MindEye", "Mind Eye", divinationImplement, 5),
-                Power("Prophecy", "In Accordance with the Prophecy", divinationImplement, 9)
+                Power("Prophecy", "In Accordance with the Prophecy", divinationImplement, 9),
+                Power("Terror", "Terror", illusionImplement),
+                Power("Unseen", "Unseen", illusionImplement, 7),
+                Power("BedevelingAura", "Bedeveling Aura", illusionImplement, 9),
+                Power("ShadowBeasts", "Shadow Beasts", illusionImplement, 9)
             };
             BlueprintFeature Power(string token, string label, BlueprintFeature implement, int minimum = 0)
             {

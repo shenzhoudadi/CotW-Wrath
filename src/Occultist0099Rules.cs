@@ -383,7 +383,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 st.Resonance = WardingTalismanResonance(classLevel ?? s.Level, st.LockedInvestment);
                 st.ResonanceValid = st.Present && st.LockedInvestment > 0;
             }
-            CaptureThirdEye(s);
+            CaptureSchoolResonance(s);
             foreach (string panoply in Occultist0099Schools.PanoplyOrder)
             {
                 string[] members = Occultist0099Schools.MembersOf(panoply);
@@ -415,6 +415,18 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal static int ResonanceTier(Occultist0099FocusState s, string school)
             => Resonance(s, school) > 0 ? s.Schools[school].ResonanceTier : 0;
+
+        private static void CaptureSchoolResonance(Occultist0099FocusState state)
+        {
+            CaptureThirdEye(state);
+            const string school = "Illusion";
+            var source = state.Schools[school];
+            if (!source.Present || source.LockedLevel <= 0) return;
+            int mastery = state.MasterySchool == school ? 4 : 0;
+            int invested = source.LockedInvestment + mastery;
+            source.ResonanceValid = invested > 0;
+            source.Resonance = Math.Min(source.LockedLevel + mastery, invested);
+        }
 
         private static void CaptureThirdEye(Occultist0099FocusState state)
         {
@@ -650,7 +662,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!s.Schools[school].Present)
                 return Occultist0099Outcome.RejectedNotOwned;
             s.MasterySchool = school;
-            if (s.Locked) CaptureThirdEye(s);
+            if (s.Locked) CaptureSchoolResonance(s);
             return Occultist0099Outcome.Ok;
         }
 
@@ -669,7 +681,7 @@ namespace CallOfTheWild.Wrath.Prototype
             // so dropping the identity removes them.
             s.MasterySchool = newSchool;
             s.MasteryRemaining = Math.Min(s.MasteryRemaining, 4 - s.MasterySpent);
-            if (s.Locked) CaptureThirdEye(s);
+            if (s.Locked) CaptureSchoolResonance(s);
             return Occultist0099Outcome.Ok;
         }
 

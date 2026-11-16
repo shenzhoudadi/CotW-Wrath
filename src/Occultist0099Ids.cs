@@ -71,6 +71,9 @@ namespace CallOfTheWild.Wrath.Prototype
         public const string AegisApplyTypeId = "0099c0e1a1b24c0d8e5f600000000017";
         public const string AegisGrantsTypeId = "0099c0e1a1b24c0d8e5f600000000018";
         public const string ProphecyReadyTypeId = "0099c0e1a1b24c0d8e5f600000000019";
+        public const string ShadowTierTypeId = "0099c0e1a1b24c0d8e5f60000000001a";
+        public const string ShadowHealthTypeId = "0099c0e1a1b24c0d8e5f60000000001b";
+        public const string ShadowHealthActionTypeId = "0099c0e1a1b24c0d8e5f60000000001c";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.
