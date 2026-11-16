@@ -1,53 +1,59 @@
 {
   "workPackage": "COTW-0099",
-  "stage": "D review of B first slice (Abjuration), production read-only",
-  "candidate": "b6be98b",
+  "stage": "D counterexample reproduction, rerun after the B fix round",
+  "reviewedCandidate": "b6be98b",
+  "recheckTarget": "B fix-round working tree on feat/cotw-0099-occultist",
   "contract": "C-0099-20261115-r1",
   "checkType": "isolated contract reproduction over linked production sources",
+  "acceptanceScope": "d_counterexample_reproduction_only",
+  "nativeEntryPointsExercised": false,
   "nativeWrathEntriesExercised": false,
   "gameOrUmmLaunched": false,
   "productionSourcesModified": false,
-  "result": "NEEDS_FIX",
+  "releaseEligible": false,
+  "independentReviewer": false,
+  "resultMeaning": "Each D finding is reproduced against the frozen contract on the current production sources. PASS means the counterexample no longer reproduces; it is NOT native-entry acceptance and NOT an independent D sign-off (the reviewer is also the B implementer). See the native host report for entry-point evidence.",
+  "result": "REVIEW_PASS",
   "findings": [
     {
       "id": "D-F01",
       "location": "src/Occultist0099Rules.cs:646,650-657",
       "contractExpectation": "C-0099-20261115-r1 O-S01 native entry / MF11: the same execution identity is charged at most once across class remove\u002Breacquire",
-      "observedSatisfied": false,
-      "actual": "first payment Ok, second payment Ok, Spent=2 (expected at most 1)",
-      "status": "FAIL"
+      "observedSatisfied": true,
+      "actual": "first payment Ok, second payment RejectedDuplicate, Spent=1 (expected at most 1)",
+      "status": "PASS"
     },
     {
       "id": "D-F02",
-      "location": "src/Occultist0099Spells.cs:133-147,197-209,215-227,318-355",
+      "location": "src/Occultist0099Spells.cs (MaxCircle/IntAllowsCircle/CanCast/SetIntelligence/Learn)",
       "contractExpectation": "C-0099-20261115-r1 O-S02: learning/casting gate Int \u003E= 10 \u002B circle must be expressible and enforced",
-      "observedSatisfied": false,
-      "actual": "no INT field in SpellState (ClassLevel,NextSequence,Slots,Quotas,Sources,Providers,PublishedLists,DlcAllowed,CotWRootsPublished,ForeignBookRoots,SameBookGrantSources,CotWRegistrationComplete,KnownRootsOverride), Learn(s,slotKey,circle,rootGuid), Candidates(s,slotKey,circle); MaxCircle/Learn use level only",
-      "status": "FAIL"
+      "observedSatisfied": true,
+      "actual": "INT field present=True; L4/Int10 maxCircle=0, circle2 quota absent=True, learn=RejectedInsufficient; L4/Int16 maxCircle=2, learn=Ok, cast=True; Int drop to 11 blocks cast=True, keeps established quota=True; Int restored casts again=True",
+      "status": "PASS"
     },
     {
       "id": "D-F03",
-      "location": "src/Occultist0099Spells.cs:149-162; tests/Occultist0099SliceProgram.cs:431,601-606",
+      "location": "src/Occultist0099Spells.cs (Fingerprint/Clone/CancelPreview); tests/Occultist0099SliceProgram.cs MF09/SP03",
       "contractExpectation": "C-0099-20261115-r1 O-S01/O-S02: preview cancel byte-for-byte equivalence must be verifiable over all mutable fields",
-      "observedSatisfied": false,
-      "actual": "changing Providers/PublishedLists leaves Fingerprint identical=True; 7 mutable fields are outside the fingerprint",
-      "status": "FAIL"
+      "observedSatisfied": true,
+      "actual": "changing Providers/PublishedLists leaves Fingerprint identical=False; mutable fields still outside the fingerprint=none (10 fields probed)",
+      "status": "PASS"
     },
     {
       "id": "D-F04",
-      "location": "src/Occultist0099Spells.cs:74-85,292-313,318-332",
+      "location": "src/Occultist0099Spells.cs (AddVariantRoot/CanonicalOf/Candidates/Learn/IsKnown)",
       "contractExpectation": "C-0099-20261115-r1 O-S02: canonical/variant identity filtering has both positive and negative cases (Fire Shield warm/cold, sticky touch)",
-      "observedSatisfied": false,
-      "actual": "all 18 roots have CanonicalGuid==Guid and IsVariant=false; r.Guid==r.CanonicalGuid is a tautology in Candidates",
-      "status": "FAIL"
+      "observedSatisfied": true,
+      "actual": "variant registered=True, variant excluded from candidates=True, canonical present=True, learn via variant=Ok, quota records canonical=True, single source=True, variant known=True; catalog itself has no variants (correct for Abjuration)",
+      "status": "PASS"
     },
     {
       "id": "D-F05",
-      "location": "src/Occultist0099Spells.cs:506-538; tests/Occultist0099SliceProgram.cs:748-772",
+      "location": "src/Occultist0099Spells.cs (Occultist0099Registration); tests/Occultist0099SliceProgram.cs SP08",
       "contractExpectation": "C-occultist-cases.json SP08: foreign GUID collision fixture must be able to distinguish foreign data being touched from intact",
-      "observedSatisfied": false,
-      "actual": "ForeignDataTouched is false on both collision and success paths; the assertion has no negative case and the toy object never reads a blueprint cache or a real GUID",
-      "status": "FAIL"
+      "observedSatisfied": true,
+      "actual": "tamperDetected=True, collisionMarksForeign=False, successMarksForeign=False; gate now diffs real foreign entries over an owner-token cache",
+      "status": "PASS"
     }
   ]
 }

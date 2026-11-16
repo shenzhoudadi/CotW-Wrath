@@ -68,49 +68,66 @@ internal static class Occultist0099SliceProgram
         {
             MF01(); MF02(); MF03(); MF04(); MF05(); MF06(); MF08();
             MF09(); MF10();
-            SP01(); SP02(); SP03(); SP04(); SP05(); SP06(); SP07(); SP08();
+            SP01(); SP02(); SP03(); SP04(); SP05(args); SP06(); SP07(); SP08();
             Identity();
+            // D-fix regressions: positive AND negative cases for every
+            // closed finding, run over the same linked production sources.
+            DFix02(); DFix03(); DFix05(); DFix06();
         }
         catch (Exception e)
         {
             failures.Add("EXCEPTION: " + e.GetType().Name + ": " + e.Message);
         }
 
-        // MF07 (Spell Power arm/spend-on-cast), MF11 (armed re-entry, invalidated
-        // source, StickyTouch delivery) need the Panoply abilities and native
-        // cast event chain that are deferred to later school packages.
+        // MF07 (Spell Power arm/spend-on-cast) needs the Panoply abilities and
+        // the native cast event chain deferred to later school packages.
         caseStatus["MF07"] = "not_run";
-        caseStatus["MF11"] = "not_run";
+        // MF11 is PARTIAL: DFix02 covers "same execution identity is charged at
+        // most once" (including class remove+reacquire) with both directions.
+        // Armed re-entry, invalidated Panoply member and StickyTouch delivery
+        // are still not run, so this is NOT a full MF11 pass.
+        caseStatus["MF11"] = "partial_model_dedup_only_reentry_stickytouch_not_run";
         foreach (string id in new[] { "MF01", "MF02", "MF03", "MF04", "MF05",
             "MF06", "MF08", "MF09", "MF10", "SP01", "SP02", "SP03", "SP04",
             "SP05", "SP06", "SP07", "SP08" })
             if (!caseStatus.ContainsKey(id)) caseStatus[id] = "model_assertions";
 
         bool pass = failures.Count == 0;
+        // D-0099-04 fix: the machine-readable result is scoped. This host only
+        // exercises the numeric state model; native Wrath entry points are NOT
+        // run here, so this can never be an acceptance or release verdict.
         var report = new Dictionary<string, object>
         {
             ["workPackage"] = "COTW-0099",
             ["stage"] = "B first vertical slice (Abjuration), development only",
             ["contract"] = Occultist0099Ids.Contract,
             ["checkType"] = "isolated numeric state model over production sources",
+            ["acceptanceScope"] = "model_supplement_only",
             ["nativeWrathEntriesExercised"] = false,
+            ["nativeEntryPointsExercised"] = false,
             ["gameOrUmmLaunched"] = false,
+            ["releaseEligible"] = false,
             ["assertions"] = assertions,
             ["failures"] = failures,
             ["cases"] = caseStatus,
             ["assertionSeconds"] = Math.Round((DateTime.UtcNow - started).TotalSeconds, 3),
             ["timingNote"] = "Host assertion time only. The full dotnet run command " +
                 "including its build is recorded separately in B-abjuration-slice.md.",
-            ["result"] = pass ? "PASS" : "FAIL"
+            ["result"] = pass ? "MODEL_ONLY_PASS" : "MODEL_ONLY_FAIL",
+            ["resultMeaning"] = "Numeric state-model assertions over linked production " +
+                "sources. NOT native-entry acceptance; native Wrath payment/learning " +
+                "entry points were not exercised by this host. See the native host " +
+                "report for entry-point evidence."
         };
         var json = JsonSerializer.Serialize(report, new JsonSerializerOptions
         { WriteIndented = true });
         var full = Path.GetFullPath(reportPath);
         Directory.CreateDirectory(Path.GetDirectoryName(full));
         File.WriteAllText(full, json);
-        Console.WriteLine((pass ? "PASS" : "FAIL") + ": " + assertions +
-            " isolated state-model assertions. Native Wrath entries, in-game " +
-            "level-up UI, save/load and respec were NOT exercised.");
+        Console.WriteLine((pass ? "MODEL_ONLY_PASS" : "MODEL_ONLY_FAIL") + ": " +
+            assertions + " isolated state-model assertions (model supplement only; " +
+            "NOT native-entry acceptance). Native Wrath entries, in-game level-up " +
+            "UI, save/load and respec were NOT exercised. releaseEligible=false.");
         if (!pass)
         {
             foreach (string f in failures.Take(20)) Console.WriteLine("  " + f);
@@ -452,6 +469,15 @@ internal static class Occultist0099SliceProgram
         string beforeClass = focus.Fingerprint();
         Occultist0099Focus.RemoveClass(focus);
         Check(!focus.Enabled, "MF09 removing class closes payment/resonance");
+        Check(!focus.ClassPresent, "MF09 ClassPresent cleared on removal");
+        // D-0099-02 fix: removal no longer clears dedup identities, so the
+        // observable record is the closed payment gate, not a fingerprint diff.
+        string removedSnapshot = focus.Fingerprint();
+        Outcome(Occultist0099Outcome.RejectedClassRemoved,
+            Occultist0099Focus.PaySchool(focus, "Abjuration", 1, "mf9-while-removed").Outcome,
+            "MF09 payment rejected while class removed");
+        Str(removedSnapshot, focus.Fingerprint(),
+            "MF09 rejected payment while removed changes nothing");
         Occultist0099Focus.ReacquireClass(focus);
         Outcome(Occultist0099Outcome.Noop,
             Occultist0099Focus.BeginCycle(focus, 8, 2, "r9", true),
@@ -459,8 +485,14 @@ internal static class Occultist0099SliceProgram
         Eq(3, focus.Invalidated, "MF09 no new daily budget");
         Eq(0, Occultist0099Focus.Resonance(focus, "Abjuration"),
             "MF09 no free old snapshot");
-        Check(!focus.Fingerprint().Equals(beforeClass),
-            "MF09 class removal recorded");
+        Check(focus.ClassPresent && focus.Enabled,
+            "MF09 reacquire reopens the gate without a new budget");
+        // D-0099-02 fix: with dedup identities retained, remove+reacquire is a
+        // pure gate cycle that restores the exact prior state (no free refill,
+        // no lost dedup). The meaningful record is the rejection while removed
+        // (asserted above), not a spurious fingerprint diff.
+        Str(beforeClass, focus.Fingerprint(),
+            "MF09 remove+reacquire restores exact state, no refill no dedup loss");
         caseStatus["MF09"] = "model_assertions";
     }
 
@@ -654,14 +686,43 @@ internal static class Occultist0099SliceProgram
         caseStatus["SP04"] = "model_assertions";
     }
 
-    // SP05: catalog ledger check. The full 143-row / Spirit-Bound Blade part
-    // belongs to the later school packages and stays untested here.
-    private static void SP05()
+    // SP05: catalog ledger check. D-0099-04 fix: row counts are now derived
+    // INDEPENDENTLY from A-occultist-assets.json (the A asset file), not from
+    // the production constant they are compared against. The full 143-row /
+    // Spirit-Bound Blade part belongs to later packages and stays not_run.
+    private static void SP05(string[] args)
     {
-        Eq(143, Occultist0099AbjurationCatalog.TotalCatalogRows,
-            "SP05 A catalog row count");
-        Eq(18, Occultist0099AbjurationCatalog.SliceRows,
+        string assetsPath = args != null && args.Length > 1 ? args[1] :
+            "docs/work-packages/COTW-0099/A-occultist-assets.json";
+        int assetRows = -1, assetAbj = 0, assetZero = 0;
+        try
+        {
+            using (var doc = JsonDocument.Parse(File.ReadAllText(assetsPath)))
+            {
+                var roots = doc.RootElement.GetProperty("spellRoots");
+                assetRows = roots.GetArrayLength();
+                foreach (var r in roots.EnumerateArray())
+                {
+                    if (r.GetProperty("school").GetString() == "Abjuration") assetAbj++;
+                    if (r.GetProperty("level").GetInt32() == 0) assetZero++;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            failures.Add("SP05 A asset file unreadable: " + e.Message);
+        }
+        Check(assetRows > 0, "SP05 A asset file loaded with spellRoots");
+        Eq(assetRows, Occultist0099AbjurationCatalog.TotalCatalogRows,
+            "SP05 catalog rows match A asset (independent source)");
+        Eq(assetAbj, Occultist0099AbjurationCatalog.SliceRows,
+            "SP05 Abjuration rows match A asset (independent source)");
+        Eq(assetZero, Occultist0099AbjurationCatalog.Knacks.Length,
+            "SP05 six level-0 knacks match A asset (independent source)");
+        Eq(18, Occultist0099AbjurationCatalog.Roots.Length,
             "SP05 Abjuration slice row count");
+        Eq(1, Occultist0099AbjurationCatalog.Roots.Count(r => r.IsKnack),
+            "SP05 exactly one Abjuration root is a knack (Resistance)");
         Eq(1, Occultist0099AbjurationCatalog.Find(
             Occultist0099AbjurationCatalog.MageShield).Circle,
             "SP05 MageShield private circle 1");
@@ -744,50 +805,355 @@ internal static class Occultist0099SliceProgram
         caseStatus["SP07"] = "model_assertions";
     }
 
-    // SP08: registration atomicity, collision, no duplicate completion.
+    // SP08: registration atomicity over REAL private GUIDs and an explicit
+    // cache with owner tokens (D-0099-06 fix). ForeignDataTouched is a genuine
+    // diff, proven distinguishable by an injected-mutation negative case.
+    // The native BlueprintsCache fixture itself is task #11; until it runs,
+    // SP08 acceptance stays not_run.
     private static void SP08()
     {
         var r = new Occultist0099Registration();
-        string[] mandatory = { "core-a", "core-b" };
-        string[] missing = { "core-a" };
-        Check(!r.TryPublish(mandatory, missing, false, 3),
+        string[] mandatory =
+        {
+            Occultist0099AbjurationCatalog.MageShield,
+            Occultist0099AbjurationCatalog.ResistEnergy
+        };
+        string[] missing = { Occultist0099AbjurationCatalog.MageShield };
+        var cache = new Dictionary<string, string>
+        {
+            ["foreign-wizard-book"] = "wizard",
+            ["foreign-psychic-book"] = "psychic"
+        };
+        var foreignBefore = new Dictionary<string, string>(cache);
+        Check(!r.TryPublish(mandatory, missing, cache, 3),
             "SP08 missing donor fails");
         Eq(0, r.ClassEntries, "SP08 no class entry");
         Eq(0, r.SpellbookEntries, "SP08 no spellbook entry");
-        Check(!r.ForeignDataTouched, "SP08 foreign data intact");
+        Check(!r.ForeignDataTouched, "SP08 foreign data intact on missing donor");
         Check(!r.PreviewLedgerPresent, "SP08 no lingering preview ledger");
-        Check(!r.TryPublish(mandatory, mandatory, true, 3),
+        Check(cache.Count == 2 && cache["foreign-wizard-book"] == "wizard",
+            "SP08 failed attempt wrote nothing");
+
+        // Foreign GUID collision: another owner already holds our class GUID.
+        var collided = new Dictionary<string, string>(cache)
+        {
+            [Occultist0099Ids.ClassGuid] = "some-other-mod"
+        };
+        Check(!r.TryPublish(mandatory, mandatory, collided, 3),
             "SP08 foreign GUID collision fails");
         Check(!r.Published, "SP08 still unpublished");
-        Check(r.TryPublish(mandatory, mandatory, false, 3),
+        Check(collided[Occultist0099Ids.ClassGuid] == "some-other-mod",
+            "SP08 collision leaves the foreign owner untouched");
+        Check(!collided.ContainsKey(Occultist0099Ids.BookGuid),
+            "SP08 collision writes no private entry");
+
+        // Negative case proving the diff is real: a foreign entry mutated
+        // DURING publication MUST be detected as ForeignDataTouched=true.
+        var probeCache = new Dictionary<string, string>(cache);
+        var probe = new Occultist0099Registration();
+        bool probePublished = probe.TryPublish(mandatory, mandatory, probeCache, 3,
+            () => probeCache["foreign-wizard-book"] = "tampered");
+        Check(probePublished && probe.ForeignDataTouched,
+            "SP08 injected foreign mutation is detected (negative case)");
+
+        Check(r.TryPublish(mandatory, mandatory, cache, 3),
             "SP08 complete map publishes");
         Eq(1, r.ClassEntries, "SP08 exactly one class entry");
         Eq(1, r.SpellbookEntries, "SP08 exactly one spellbook");
         Eq(3, r.ChoiceEntries, "SP08 complete choices");
-        Check(r.TryPublish(mandatory, mandatory, false, 3),
+        Check(!r.ForeignDataTouched, "SP08 success path keeps foreign data intact");
+        Check(cache["foreign-wizard-book"] == "wizard" &&
+              cache["foreign-psychic-book"] == "psychic",
+            "SP08 foreign entries byte-identical after publish");
+        Check(Occultist0099Registration.PrivateGuids.All(g =>
+                  cache.ContainsKey(g) && cache[g] == "0099"),
+            "SP08 all private identities registered under the 0099 owner");
+        Check(r.TryPublish(mandatory, mandatory, cache, 3),
             "SP08 repeated completion succeeds");
         Eq(1, r.ClassEntries, "SP08 no duplicate class registration");
         Eq(1, r.SpellbookEntries, "SP08 no duplicate spellbook registration");
         Check(!r.PreviewLedgerPresent, "SP08 preview ledger cleared");
-        caseStatus["SP08"] = "model_assertions";
+        caseStatus["SP08"] = "model_gate_only_native_cache_not_run";
     }
+
 
     private static void Identity()
     {
         Check(Occultist0099Ids.ClassGuid != Occultist0099Ids.BookGuid,
             "identity: class and book GUIDs differ");
-        Check(Occultist0099Ids.Id("OccultistClass").Length == 32,
+        // D-0099-04 fix: determinism is checked against an INDEPENDENT MD5
+        // computation, not Id() compared with itself.
+        string expected;
+        using (var md5 = System.Security.Cryptography.MD5.Create())
+        {
+            byte[] hash = md5.ComputeHash(System.Text.Encoding.UTF8.GetBytes(
+                Occultist0099Ids.Salt + "OccultistClass"));
+            expected = string.Concat(hash.Select(b => b.ToString("x2")));
+        }
+        Str(expected, Occultist0099Ids.ClassGuid,
+            "identity: ClassGuid equals independent salted MD5");
+        Check(Occultist0099Ids.ClassGuid.Length == 32,
             "identity: 32-hex private GUID");
-        Str(Occultist0099Ids.Id("OccultistClass"),
-            Occultist0099Ids.Id("OccultistClass"), "identity: deterministic GUID");
-        Check(!Occultist0099Ids.Id("OccultistClass").Equals(
+        Check(!Occultist0099Ids.ClassGuid.Equals(
             "1b76f3c73aa84f91a1c65513fb23aa01"),
             "identity: Kingmaker original GUID not reused");
-        Check(!Occultist0099Ids.SlicePublished,
-            "slice is development-only, not registered");
+        // Distinct tokens must give distinct ids (negative case for collision).
+        Check(Occultist0099Ids.SliceTokens.Select(t => Occultist0099Ids.Id(t))
+                  .Distinct().Count() == Occultist0099Ids.SliceTokens.Length,
+            "identity: all slice tokens map to distinct GUIDs");
         Str("Abjuration", Occultist0099Ids.SliceSchool, "slice school");
         Str("C-0099-20261115-r1", Occultist0099Ids.Contract, "frozen contract id");
-        Check(Occultist0099Ids.TypeId(1).Length == 32,
-            "identity: 32-hex TypeId");
+        Check(Occultist0099Ids.TypeId(1).Length == 32 &&
+              Occultist0099Ids.TypeId(2).Length == 32 &&
+              Occultist0099Ids.TypeId(1) != Occultist0099Ids.TypeId(2),
+            "identity: 32-hex TypeIds, distinct per index");
+        // D-0099-08: native [TypeId] constants equal the computed TypeId block.
+        Str(Occultist0099Ids.TypeId(1), Occultist0099Ids.FocusFactTypeId,
+            "identity: FocusFactTypeId constant matches TypeId(1)");
+        Str(Occultist0099Ids.TypeId(2), Occultist0099Ids.SpellbookMarkerTypeId,
+            "identity: SpellbookMarkerTypeId constant matches TypeId(2)");
+        // D-0099-08: SlicePublished is an enforced gate, not an unused flag.
+        Check(!Occultist0099Ids.SlicePublished,
+            "identity: slice is development-only, not published");
+        Check(!Occultist0099Slice.CanRegister(true),
+            "identity: unpublished slice blocks registration even with full map");
+        Check(!Occultist0099Slice.CanRegister(false),
+            "identity: incomplete map blocks registration");
+    }
+
+    // D-0099-02 regression: dedup identities survive class remove+reacquire
+    // within the same cycle; only a genuinely new rest cycle clears them.
+    private static void DFix02()
+    {
+        var s = Cycle(8, 2, "fix02-rest", "Abjuration");
+        Occultist0099Focus.Invest(s, "Abjuration", 4);
+        Occultist0099Focus.Lock(s);
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Focus.PaySchool(s, "Abjuration", 1, "fix02-exec").Outcome,
+            "DFix02 first payment");
+        Eq(1, s.Spent, "DFix02 U=1");
+        Occultist0099Focus.RemoveClass(s);
+        Check(s.ChargedExecutions.Contains("fix02-exec"),
+            "DFix02 dedup identity retained across RemoveClass");
+        Occultist0099Focus.ReacquireClass(s);
+        string before = s.Fingerprint();
+        Outcome(Occultist0099Outcome.RejectedDuplicate,
+            Occultist0099Focus.PaySchool(s, "Abjuration", 1, "fix02-exec").Outcome,
+            "DFix02 same execution id rejected after reacquire");
+        Stable(s, before, "DFix02 rejected duplicate changes nothing");
+        Eq(1, s.Spent, "DFix02 U unchanged after duplicate attempt");
+        Eq(3, s.Schools["Abjuration"].Remaining, "DFix02 R unchanged");
+        Check(!Occultist0099Focus.CanPaySchool(s, "Abjuration", 1, "fix02-exec"),
+            "DFix02 availability false for the charged id");
+        // Positive case: a DIFFERENT execution id still pays after reacquire.
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Focus.PaySchool(s, "Abjuration", 1, "fix02-other").Outcome,
+            "DFix02 different execution id still pays");
+        Eq(2, s.Spent, "DFix02 U=2 after second distinct payment");
+        // Corpse dedup survives too.
+        var c = Cycle(8, 2, "fix02c-rest", "Abjuration");
+        Occultist0099Focus.RepowerConstruct(c, "fix02-corpse");
+        Occultist0099Focus.RemoveClass(c);
+        Occultist0099Focus.ReacquireClass(c);
+        Outcome(Occultist0099Outcome.RejectedTargetInvalid,
+            Occultist0099Focus.RepowerConstruct(c, "fix02-corpse"),
+            "DFix02 consumed corpse still rejected after reacquire");
+        // A genuinely new rest cycle clears the identities and re-arms payment.
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Focus.BeginCycle(s, 8, 2, "fix02-rest-2", false),
+            "DFix02 new rest cycle");
+        Check(!s.ChargedExecutions.Contains("fix02-exec"),
+            "DFix02 new cycle clears dedup identities");
+        Occultist0099Focus.Invest(s, "Abjuration", 4);
+        Occultist0099Focus.Lock(s);
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Focus.PaySchool(s, "Abjuration", 1, "fix02-exec").Outcome,
+            "DFix02 same id pays again only in the new cycle");
+        Conservation(s, "DFix02");
+    }
+
+    // D-0099-03 regression: Int >= 10 + circle gates opening, learning and
+    // casting; temporary Int drops never delete established quotas/sources.
+    private static void DFix03()
+    {
+        // Low Int: level 4 but Int 11 -> only circle 1 reachable.
+        var low = Occultist0099Spells.Create(4, 11);
+        Occultist0099Spells.AddSlot(low, "low-slot", "Abjuration");
+        Eq(1, Occultist0099Spells.MaxCircle(low), "DFix03 Int 11 caps at circle 1");
+        Eq(0, Occultist0099Spells.QuotaCount(low, 2),
+            "DFix03 circle 2 not opened at Int 11");
+        Outcome(Occultist0099Outcome.RejectedInsufficient,
+            Occultist0099Spells.Learn(low, "low-slot", 2,
+                Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 circle 2 not learnable at Int 11 (not open)");
+        Eq(0, Occultist0099Spells.Candidates(low, "low-slot", 2).Length,
+            "DFix03 no circle-2 candidates at Int 11");
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Spells.Learn(low, "low-slot", 1,
+                Occultist0099AbjurationCatalog.MageShield),
+            "DFix03 circle 1 learnable at Int 11");
+        Check(Occultist0099Spells.CanCast(low, Occultist0099AbjurationCatalog.MageShield),
+            "DFix03 circle 1 castable at Int 11");
+
+        // Raise Int to 16: circle 2 opens and becomes learnable/castable.
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Spells.SetIntelligence(low, 16), "DFix03 raise Int to 16");
+        Eq(2, Occultist0099Spells.MaxCircle(low), "DFix03 Int 16 reaches circle 2");
+        Eq(1, Occultist0099Spells.QuotaCount(low, 2),
+            "DFix03 circle 2 opened after Int raise");
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Spells.Learn(low, "low-slot", 2,
+                Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 circle 2 learnable at Int 16");
+        Check(Occultist0099Spells.CanCast(low, Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 circle 2 castable at Int 16");
+
+        // Temporary Int drop to 11: casting circle 2 blocked, quota/source kept.
+        string established = low.Fingerprint();
+        Occultist0099Spells.SetIntelligence(low, 11);
+        Check(!Occultist0099Spells.CanCast(low, Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 temporary Int drop blocks circle-2 cast");
+        Check(Occultist0099Spells.IsKnown(low, Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 established source survives Int drop");
+        Eq(1, Occultist0099Spells.QuotaCount(low, 2),
+            "DFix03 established quota survives Int drop");
+        Check(low.Quotas[Occultist0099Spells.QuotaKey("low-slot", 2)] ==
+              Occultist0099AbjurationCatalog.ResistEnergy,
+            "DFix03 quota content survives Int drop");
+        Occultist0099Spells.SetIntelligence(low, 16);
+        Check(Occultist0099Spells.CanCast(low, Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 Int recovery restores casting");
+        Str(established, low.Fingerprint(),
+            "DFix03 Int down-up cycle leaves state byte-identical");
+
+        // Learn rejection code when the quota exists but Int is too low.
+        var mid = Occultist0099Spells.Create(4, 16);
+        Occultist0099Spells.AddSlot(mid, "mid-slot", "Abjuration");
+        Occultist0099Spells.SetIntelligence(mid, 11);
+        Outcome(Occultist0099Outcome.RejectedIntTooLow,
+            Occultist0099Spells.Learn(mid, "mid-slot", 2,
+                Occultist0099AbjurationCatalog.ResistEnergy),
+            "DFix03 open quota + low Int gives RejectedIntTooLow");
+        Check(!Occultist0099Spells.CanCast(mid, Occultist0099AbjurationCatalog.MageShield),
+            "DFix03 unknown root never castable");
+    }
+
+    // D-0099-05 regression: fingerprint covers every mutable field; a leak in
+    // any previously-missed field is detected, and cancel restores all fields.
+    private static void DFix05()
+    {
+        var s = Occultist0099Spells.Create(4);
+        Occultist0099Spells.AddSlot(s, "fp-slot", "Abjuration");
+        Occultist0099Spells.Learn(s, "fp-slot", 1, Occultist0099AbjurationCatalog.MageShield);
+        Occultist0099Spells.AddSameBookGrant(s, "fp-grant",
+            Occultist0099AbjurationCatalog.MageShield, 1);
+        string baseline = s.Fingerprint();
+
+        // Each previously-missed field must change the fingerprint.
+        var probes = new Dictionary<string, Action<Occultist0099SpellState>>
+        {
+            ["Providers"] = x => Occultist0099Spells.SetProvider(x, "TabletopTweaks-Base", true, false),
+            ["PublishedLists"] = x => Occultist0099Spells.SetProvider(x, "TabletopTweaks-Base", false, true),
+            ["DlcAllowed"] = x => x.DlcAllowed.Remove(Occultist0099AbjurationCatalog.MageShield),
+            ["CotWRootsPublished"] = x => x.CotWRootsPublished.Remove(Occultist0099AbjurationCatalog.WardingWeapon),
+            ["SameBookGrantSources"] = x => Occultist0099Spells.RemoveSameBookGrant(x, "fp-grant"),
+            ["CotWRegistrationComplete"] = x => Occultist0099Spells.SetCotWRegistrationComplete(x, false),
+            ["Intelligence"] = x => Occultist0099Spells.SetIntelligence(x, 12),
+            ["VariantRoots"] = x => Occultist0099Spells.AddVariantRoot(x,
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa01", Occultist0099AbjurationCatalog.MageShield)
+        };
+        foreach (var kv in probes)
+        {
+            var copy = s.Clone();
+            kv.Value(copy);
+            Check(!copy.Fingerprint().Equals(baseline),
+                "DFix05 fingerprint detects change in " + kv.Key);
+        }
+
+        // Negative case: mutate a previously-missed field inside a preview,
+        // then cancel; the restored state must equal the pre-preview state.
+        var live = Occultist0099Spells.Create(4);
+        Occultist0099Spells.AddSlot(live, "pv-slot", "Abjuration");
+        Occultist0099Spells.AddSameBookGrant(live, "pv-grant",
+            Occultist0099AbjurationCatalog.MageShield, 1);
+        string liveBefore = live.Fingerprint();
+        var preview = Occultist0099Spells.BeginPreview(live);
+        Occultist0099Spells.SetProvider(live, "TabletopTweaks-Base", true, true);
+        Occultist0099Spells.RemoveSameBookGrant(live, "pv-grant");
+        Occultist0099Spells.SetCotWRegistrationComplete(live, false);
+        Occultist0099Spells.SetIntelligence(live, 12);
+        Check(!live.Fingerprint().Equals(liveBefore),
+            "DFix05 preview really mutated the missed fields");
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Spells.CancelPreview(live, preview), "DFix05 cancel preview");
+        Str(liveBefore, live.Fingerprint(),
+            "DFix05 cancel restores ALL fields byte-for-byte");
+    }
+
+    // D-0099-06 regression: canonical/variant filtering has real positive and
+    // negative cases; CotWRegistrationComplete is a real gate with a write point.
+    private static void DFix06()
+    {
+        var s = Occultist0099Spells.Create(4);
+        Occultist0099Spells.AddSlot(s, "cv-slot", "Abjuration");
+        // Register a variant of MageShield (warm/cold-style pair identity).
+        string variant = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbb02";
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Spells.AddVariantRoot(s, variant,
+                Occultist0099AbjurationCatalog.MageShield),
+            "DFix06 variant registered");
+        // Negative: a catalog root cannot be demoted to a variant.
+        Outcome(Occultist0099Outcome.RejectedInvalidArgument,
+            Occultist0099Spells.AddVariantRoot(s,
+                Occultist0099AbjurationCatalog.ResistEnergy,
+                Occultist0099AbjurationCatalog.MageShield),
+            "DFix06 catalog root cannot become a variant");
+        // Negative: non-hex / self-referential variant rejected.
+        Outcome(Occultist0099Outcome.RejectedInvalidArgument,
+            Occultist0099Spells.AddVariantRoot(s, "not-a-guid",
+                Occultist0099AbjurationCatalog.MageShield),
+            "DFix06 non-hex variant rejected");
+        // Candidates still list the canonical root, never the variant GUID.
+        var cands = Occultist0099Spells.Candidates(s, "cv-slot", 1);
+        Check(cands.Any(r => r.Guid == Occultist0099AbjurationCatalog.MageShield),
+            "DFix06 canonical root stays a candidate");
+        Check(!cands.Any(r => r.Guid == variant),
+            "DFix06 variant GUID never a candidate");
+        // Learning via the variant GUID records the canonical identity.
+        Outcome(Occultist0099Outcome.Ok,
+            Occultist0099Spells.Learn(s, "cv-slot", 1, variant),
+            "DFix06 learn via variant GUID");
+        Str(Occultist0099AbjurationCatalog.MageShield,
+            s.Quotas[Occultist0099Spells.QuotaKey("cv-slot", 1)],
+            "DFix06 quota records canonical GUID");
+        Check(Occultist0099Spells.IsKnown(s, variant),
+            "DFix06 variant counts as known via canonical");
+        Check(Occultist0099Spells.IsKnown(s, Occultist0099AbjurationCatalog.MageShield),
+            "DFix06 canonical known");
+        Eq(1, s.Sources.Count, "DFix06 variant consumes exactly one quota/source");
+        // The canonical root is now excluded from further candidates (known).
+        Check(!Occultist0099Spells.Candidates(s, "cv-slot", 1)
+                .Any(r => r.Guid == Occultist0099AbjurationCatalog.MageShield),
+            "DFix06 known canonical excluded from candidates");
+
+        // CotWRegistrationComplete is a real gate: flipping it off removes CotW
+        // roots from candidates; flipping it back restores them.
+        var g = Occultist0099Spells.Create(1);
+        Occultist0099Spells.AddSlot(g, "gate-slot", "Abjuration");
+        Check(Occultist0099Spells.Candidates(g, "gate-slot", 1)
+                .Any(r => r.Guid == Occultist0099AbjurationCatalog.WardingWeapon),
+            "DFix06 CotW root candidate when registration complete");
+        Occultist0099Spells.SetCotWRegistrationComplete(g, false);
+        Check(!Occultist0099Spells.Candidates(g, "gate-slot", 1)
+                .Any(r => r.Guid == Occultist0099AbjurationCatalog.WardingWeapon),
+            "DFix06 CotW root excluded when registration incomplete");
+        Outcome(Occultist0099Outcome.RejectedInvalidArgument,
+            Occultist0099Spells.Learn(g, "gate-slot", 1,
+                Occultist0099AbjurationCatalog.WardingWeapon),
+            "DFix06 CotW root not learnable when registration incomplete");
+        Occultist0099Spells.SetCotWRegistrationComplete(g, true);
+        Check(Occultist0099Spells.Candidates(g, "gate-slot", 1)
+                .Any(r => r.Guid == Occultist0099AbjurationCatalog.WardingWeapon),
+            "DFix06 CotW root restored when registration complete again");
     }
 }

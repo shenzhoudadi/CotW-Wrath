@@ -25,6 +25,7 @@ namespace CallOfTheWild.Wrath.Prototype
         RejectedNotLocked,
         RejectedAlreadyLocked,
         RejectedInsufficient,
+        RejectedIntTooLow,
         RejectedFull,
         RejectedDuplicate,
         RejectedInvalidArgument,
@@ -96,6 +97,10 @@ namespace CallOfTheWild.Wrath.Prototype
         public bool Enabled;                 // false closes payment and resonance
         public int Level;                    // actual Occultist level L
         public int IntModifier;              // effective INT modifier M at cycle start
+        // Effective Intelligence score at cycle start (score = 10 + 2*M for
+        // the model fixtures; the native adapter passes the real stat). The
+        // O-S02 learning/casting gate Int >= 10 + circle reads this.
+        public int Intelligence;
         public int Budget;                   // B = max(0, L + M)
         public int Generic;                  // G
         public int Spent;                    // U, ordinary points actually paid
@@ -134,7 +139,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var parts = new List<string>
             {
                 ClassPresent ? "1" : "0", Enabled ? "1" : "0", Level.ToString(),
-                IntModifier.ToString(), Budget.ToString(), Generic.ToString(),
+                IntModifier.ToString(), Intelligence.ToString(),
+                Budget.ToString(), Generic.ToString(),
                 Spent.ToString(), Invalidated.ToString(), MasterySpent.ToString(),
                 MasteryRemaining.ToString(), MasterySchool ?? "-",
                 PhysicalAttribute ?? "-", Locked ? "1" : "0",
@@ -160,7 +166,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var copy = new Occultist0099FocusState
             {
                 ClassPresent = ClassPresent, Enabled = Enabled, Level = Level,
-                IntModifier = IntModifier, Budget = Budget, Generic = Generic,
+                IntModifier = IntModifier, Intelligence = Intelligence,
+                Budget = Budget, Generic = Generic,
                 Spent = Spent, Invalidated = Invalidated, MasterySpent = MasterySpent,
                 MasteryRemaining = MasteryRemaining, MasterySchool = MasterySchool,
                 PhysicalAttribute = PhysicalAttribute, Locked = Locked,
@@ -254,6 +261,7 @@ namespace CallOfTheWild.Wrath.Prototype
             s.Enabled = true;
             s.Level = level;
             s.IntModifier = intModifier;
+            s.Intelligence = 10 + 2 * intModifier;   // model convention
             s.Budget = budget;
             s.Generic = budget;
             s.Spent = 0;
@@ -452,6 +460,63 @@ namespace CallOfTheWild.Wrath.Prototype
         // takes the member with the highest current R, ties by A JSON order.
         // The full vector is computed before any balance is touched, and no
         // second debit (the Kingmaker ConnectResource path) is allowed.
+        // D-0099-01: read-only Panoply availability. It runs the SAME highest-R
+        // projection as PayPanoply over a working copy, so the UI precheck and
+        // the atomic payment can never disagree, and it mutates nothing.
+        public static bool CanPayPanoply(Occultist0099FocusState s, string panoply,
+            int cost, string executionId)
+        {
+            if (s == null || !s.ClassPresent || !s.Enabled || !s.Locked ||
+                cost <= 0 || string.IsNullOrEmpty(executionId) ||
+                s.ChargedExecutions.Contains(executionId))
+                return false;
+            string[] members = Occultist0099Schools.MembersOf(panoply);
+            if (members == null || !s.PanoplyValid[panoply]) return false;
+            var working = members.ToDictionary(m => m, m => s.Schools[m].Remaining);
+            for (int i = 0; i < cost; i++)
+            {
+                string chosen = null;
+                foreach (string m in members)
+                    if (chosen == null || working[m] > working[chosen]) chosen = m;
+                if (working[chosen] <= 0) return false;
+                working[chosen]--;
+            }
+            return true;
+        }
+
+        // D-0099-01: explicit general expenditure from G (the Repower Construct
+        // class of powers). Unlike a school payment it is allowed before lock,
+        // and it shares the cycle-scoped execution dedup identity.
+        public static bool CanPayGeneric(Occultist0099FocusState s, int cost,
+            string executionId)
+        {
+            if (s == null || !s.ClassPresent || !s.Enabled || cost <= 0 ||
+                string.IsNullOrEmpty(executionId) ||
+                s.ChargedExecutions.Contains(executionId))
+                return false;
+            return s.Generic >= cost;
+        }
+
+        public static Occultist0099Payment PayGeneric(Occultist0099FocusState s,
+            int cost, string executionId)
+        {
+            var charge = new Occultist0099Payment();
+            var g = Guard(s);
+            if (g != Occultist0099Outcome.Ok) { charge.Outcome = g; return charge; }
+            if (cost <= 0 || string.IsNullOrEmpty(executionId))
+            { charge.Outcome = Occultist0099Outcome.RejectedInvalidArgument; return charge; }
+            if (s.ChargedExecutions.Contains(executionId))
+            { charge.Outcome = Occultist0099Outcome.RejectedDuplicate; return charge; }
+            if (s.Generic < cost)
+            { charge.Outcome = Occultist0099Outcome.RejectedInsufficient; return charge; }
+            s.Generic -= cost;
+            s.Spent += cost;
+            s.ChargedExecutions.Add(executionId);
+            charge.Outcome = Occultist0099Outcome.Ok;
+            charge.FromOrdinary = cost;
+            return charge;
+        }
+
         public static Occultist0099Payment PayPanoply(Occultist0099FocusState s,
             string panoply, int cost, string executionId)
         {
@@ -643,7 +708,11 @@ namespace CallOfTheWild.Wrath.Prototype
             if (s == null) return Occultist0099Outcome.RejectedInvalidState;
             s.ClassPresent = false;
             s.Enabled = false;                    // payments and resonance closed
-            s.ChargedExecutions.Clear();          // drop self-owned pending modes
+            // D-0099-02 fix (C:22-23, MF11): cycle-scoped dedup identities
+            // (charged executions, consumed corpses) are part of the minimal
+            // cycle record and MUST survive class removal. Clearing them here
+            // let the same execution id pay twice after same-day reacquire.
+            // Only BeginCycle (a genuinely new rest cycle) clears them.
             return Occultist0099Outcome.Ok;
         }
 

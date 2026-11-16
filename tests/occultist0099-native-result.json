@@ -1,0 +1,81 @@
+{
+  "workPackage": "COTW-0099",
+  "case": "occultist0099-native",
+  "contract": "C-0099-20261115-r1",
+  "finding": "D-0099-01",
+  "command": [
+    "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+    "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+    "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099NativeTests\\bin\\Release\\net472\\Occultist0099NativeTests.exe",
+    "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+    "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+    "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\tests\\occultist0099-native-report.json",
+    "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+    "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+  ],
+  "environment": {
+    "COTW_HARMONY_MATRIX_PATH": "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed\\0Harmony.dll"
+  },
+  "exitCode": 0,
+  "seconds": 3.51,
+  "sourceSHA256": {
+    "Occultist0099Ids.cs": "476E41F20404C1147BCCE5CC41B13AF6375CF8F8081A2AD333820A7480FE0716",
+    "Occultist0099Native.cs": "5EBDF9813C2501E47A366830927AE0DD8B239840343DC262B950D10077F269F3",
+    "Occultist0099NativeWiring.cs": "40644DB4C38EC055EFA8AF6B15383DCB71A83446FB7A1DCCCFDDCFEB31EE6E32",
+    "Occultist0099Rules.cs": "872B7F6DCD859B6FE3F73834F30652A4F8F9D3AD73C44D5FBAFB26FB9A528F02",
+    "Occultist0099Spells.cs": "DC644CA5A7A127F4BC96F9A1A0E4159CC9F5C5DA91D565C5CDECF45CE165EED8"
+  },
+  "hostSourceSHA256": "94B0DF463671CDA0FF431CFDC4403BC44931E13E8F7895817B803CE0A4A97F66",
+  "hostSHA256": "E5DA651910E817F334E12E4BC5912D1D817D6D4D44B557932B40614FC70B4218",
+  "candidateSHA256": "3F17C68F09E97B3EF91BE2CD52DBE3BD2131E2A8F871AA493E9DFF9EC2D81FF9",
+  "engineSHA256": "3A85EDDC5D21CE98779C54F549BDD471D3DEF061948AEE2E85988E9782B82E80",
+  "gameAssemblySHA256": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+  "harmonySHA256": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5",
+  "evidenceSHA256": "247C988FDD28E365E419F90D834D5C389A21CC70DF070C5FFB9A88FCB3DA6C59",
+  "nativeFixtureSHA256": "0CE753666FAE00A56359C17375169652195EDBBF5D54DA77C565D04B0165C06D",
+  "log": "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\tests\\occultist0099-native.log",
+  "logSHA256": "D3708E6C0E822F4FF915E1ADAA471AF08EAAF048EE6F2F7DE4FBF3590233CF77",
+  "report": "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\tests\\occultist0099-native-report.json",
+  "result": "NATIVE_DIRECTED_PASS",
+  "checks": 80,
+  "failures": [],
+  "caseStatus": {
+    "MF01": "native_ability_resource_logic_pass",
+    "SP01": "native_select_spell_pass",
+    "SP02": "native_int_gate_pass",
+    "MF07": "native_rest_camp_identity_pass",
+    "SP08": "native_gate_only_registration_not_run",
+    "MF02": "not_run_native",
+    "MF03": "not_run_native",
+    "MF04": "not_run_native",
+    "MF05": "not_run_native",
+    "MF06": "not_run_native",
+    "MF08": "not_run_native",
+    "MF09": "not_run_native",
+    "MF10": "not_run_native",
+    "MF11": "not_run_native",
+    "SP03": "not_run_native",
+    "SP04": "not_run_native",
+    "SP05": "not_run_native",
+    "SP06": "not_run_native",
+    "SP07": "not_run_native"
+  },
+  "slicePublished": false,
+  "passedLine": [
+    "PASS: 0099 native directed check"
+  ],
+  "failedLine": [],
+  "gameLaunched": false,
+  "ummLaunched": false,
+  "scope": "Isolated managed native host only; not player-game acceptance.",
+  "notRun": [
+    "game/UMM startup",
+    "player gameplay acceptance",
+    "full historical suites",
+    "shared class/spellbook/progression registration",
+    "level-up UI and respec controller",
+    "save/load transport",
+    "packaging (build.ps1 requires PowerShell 7.4; this machine has 5.1)",
+    "upload and issue closure"
+  ]
+}

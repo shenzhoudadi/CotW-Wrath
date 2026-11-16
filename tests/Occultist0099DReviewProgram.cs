@@ -56,78 +56,179 @@ internal static class Occultist0099DReviewProgram
             ", Spent=" + focus.Spent + " (expected at most 1)");
 
         // D-F02: C:31 "Int >= 10 + circle" gate for learning and casting.
-        // Neither the state nor any learning/candidate entry carries INT.
+        // Field presence alone was a weak assertion (D-0099-04); this now runs
+        // the real gate behaviourally, both directions, on the same level.
         var stateFields = typeof(Occultist0099SpellState).GetFields()
             .Select(f => f.Name).ToArray();
         bool hasIntState = stateFields.Any(n =>
             n.IndexOf("Intelligence", StringComparison.OrdinalIgnoreCase) >= 0 ||
             n.IndexOf("IntModifier", StringComparison.OrdinalIgnoreCase) >= 0);
-        var learnParams = typeof(Occultist0099Spells).GetMethod("Learn")
-            .GetParameters().Select(p => p.Name).ToArray();
-        var candidateParams = typeof(Occultist0099Spells).GetMethod("Candidates")
-            .GetParameters().Select(p => p.Name).ToArray();
-        Contract("D-F02", "src/Occultist0099Spells.cs:133-147,197-209,215-227,318-355",
+        var lowInt = Occultist0099Spells.Create(4, 10);
+        Occultist0099Spells.AddSlot(lowInt, "int-gate", "Abjuration");
+        int lowCircle = Occultist0099Spells.MaxCircle(lowInt);
+        bool lowHasNoCircle2 = !lowInt.Quotas.ContainsKey(
+            Occultist0099Spells.QuotaKey("int-gate", 2));
+        // circle 2 root, so the ONLY difference between the two characters is Int
+        string circle2Root = Occultist0099AbjurationCatalog.ResistEnergy;
+        var lowLearn = Occultist0099Spells.Learn(lowInt, "int-gate", 2, circle2Root);
+        var highInt = Occultist0099Spells.Create(4, 16);
+        Occultist0099Spells.AddSlot(highInt, "int-gate", "Abjuration");
+        int highCircle = Occultist0099Spells.MaxCircle(highInt);
+        var highLearn = Occultist0099Spells.Learn(highInt, "int-gate", 2, circle2Root);
+        bool highCanCast = Occultist0099Spells.CanCast(highInt, circle2Root);
+        Occultist0099Spells.SetIntelligence(highInt, 11);
+        bool dropBlocksCast = !Occultist0099Spells.CanCast(highInt, circle2Root);
+        bool dropKeepsQuota = highInt.Quotas[
+            Occultist0099Spells.QuotaKey("int-gate", 2)] == circle2Root;
+        Occultist0099Spells.SetIntelligence(highInt, 16);
+        bool restoreCasts = Occultist0099Spells.CanCast(highInt, circle2Root);
+        Contract("D-F02", "src/Occultist0099Spells.cs (MaxCircle/IntAllowsCircle/" +
+            "CanCast/SetIntelligence/Learn)",
             "C-0099-20261115-r1 O-S02: learning/casting gate Int >= 10 + circle " +
             "must be expressible and enforced",
-            hasIntState,
-            "no INT field in SpellState (" + string.Join(",", stateFields) +
-            "), Learn(" + string.Join(",", learnParams) + "), Candidates(" +
-            string.Join(",", candidateParams) + "); MaxCircle/Learn use level only");
+            hasIntState && lowCircle == 0 && lowHasNoCircle2 &&
+            lowLearn != Occultist0099Outcome.Ok && highCircle == 2 &&
+            highLearn == Occultist0099Outcome.Ok && highCanCast &&
+            dropBlocksCast && dropKeepsQuota && restoreCasts,
+            "INT field present=" + hasIntState +
+            "; L4/Int10 maxCircle=" + lowCircle + ", circle2 quota absent=" +
+            lowHasNoCircle2 + ", learn=" + lowLearn +
+            "; L4/Int16 maxCircle=" + highCircle + ", learn=" + highLearn +
+            ", cast=" + highCanCast +
+            "; Int drop to 11 blocks cast=" + dropBlocksCast +
+            ", keeps established quota=" + dropKeepsQuota +
+            "; Int restored casts again=" + restoreCasts);
 
         // D-F03: C:22 preview cancel must restore every field, and the
         // byte-for-byte assertions in the B host rely on SpellState.Fingerprint.
-        var spells = Occultist0099Spells.Create(4);
+        // Every mutable field is now probed, not just Providers/PublishedLists.
+        var spells = Occultist0099Spells.Create(4, 16);
+        Occultist0099Spells.AddSlot(spells, "fp", "Abjuration");
+        var mutations = new Dictionary<string, Action<Occultist0099SpellState>>
+        {
+            ["ClassLevel"] = x => Occultist0099Spells.SetLevel(x, 7),
+            ["Intelligence"] = x => Occultist0099Spells.SetIntelligence(x, 18),
+            ["Providers"] = x => Occultist0099Spells.SetProvider(x,
+                "TabletopTweaks-Base", true, true),
+            ["DlcAllowed"] = x => x.DlcAllowed.Add("dlc-probe"),
+            ["CotWRootsPublished"] = x => x.CotWRootsPublished.Add("cotw-probe"),
+            ["ForeignBookRoots"] = x => Occultist0099Spells.AddForeignBookRoot(x,
+                "ffffffffffffffffffffffffffffff01"),
+            ["CotWRegistrationComplete"] = x =>
+                Occultist0099Spells.SetCotWRegistrationComplete(x, false),
+            ["VariantRoots"] = x => Occultist0099Spells.AddVariantRoot(x,
+                "ffffffffffffffffffffffffffffff02",
+                Occultist0099AbjurationCatalog.MageShield),
+            ["Quotas+Sources"] = x => Occultist0099Spells.Learn(x, "fp", 1,
+                Occultist0099AbjurationCatalog.MageShield),
+            ["SameBookGrantSources"] = x => Occultist0099Spells.AddSameBookGrant(x,
+                "grant-probe", Occultist0099AbjurationCatalog.MageShield, 1)
+        };
+        var uncovered = new List<string>();
+        foreach (var probe in mutations)
+        {
+            var live = Occultist0099Spells.Create(4, 16);
+            Occultist0099Spells.AddSlot(live, "fp", "Abjuration");
+            string baseline = live.Fingerprint();
+            probe.Value(live);
+            if (live.Fingerprint() == baseline) uncovered.Add(probe.Key);
+        }
         string before = spells.Fingerprint();
         Occultist0099Spells.SetProvider(spells, "TabletopTweaks-Base", true, true);
         string after = spells.Fingerprint();
-        Contract("D-F03", "src/Occultist0099Spells.cs:149-162; " +
-            "tests/Occultist0099SliceProgram.cs:431,601-606",
+        Contract("D-F03", "src/Occultist0099Spells.cs (Fingerprint/Clone/" +
+            "CancelPreview); tests/Occultist0099SliceProgram.cs MF09/SP03",
             "C-0099-20261115-r1 O-S01/O-S02: preview cancel byte-for-byte " +
             "equivalence must be verifiable over all mutable fields",
-            before != after,
+            before != after && uncovered.Count == 0,
             "changing Providers/PublishedLists leaves Fingerprint identical=" +
-            (before == after) + "; 7 mutable fields are outside the fingerprint");
+            (before == after) + "; mutable fields still outside the fingerprint=" +
+            (uncovered.Count == 0 ? "none" : string.Join(",", uncovered)) +
+            " (" + mutations.Count + " fields probed)");
 
-        // D-F04: C:32-33 canonical root / variant / sticky-touch filtering.
-        // Every slice root is its own canonical with IsVariant=false, so the
-        // canonical filter in Candidates has no negative case.
-        bool hasVariantData = Occultist0099AbjurationCatalog.Roots.Any(r =>
-            r.IsVariant || r.Guid != r.CanonicalGuid);
-        Contract("D-F04", "src/Occultist0099Spells.cs:74-85,292-313,318-332",
+        // D-F04: C:32-33 canonical root / variant / sticky-touch filtering must
+        // have a real negative case. The Abjuration catalog legitimately has no
+        // variants (Fire Shield is Evocation, later package), so the fix adds a
+        // writable variant mechanism; verify it actually filters and resolves.
+        var cv = Occultist0099Spells.Create(4);
+        Occultist0099Spells.AddSlot(cv, "cv", "Abjuration");
+        string variantGuid = "cccccccccccccccccccccccccccccc03";
+        var addVariant = Occultist0099Spells.AddVariantRoot(cv, variantGuid,
+            Occultist0099AbjurationCatalog.MageShield);
+        bool variantExcluded = !Occultist0099Spells.Candidates(cv, "cv", 1)
+            .Any(r => r.Guid == variantGuid);
+        bool canonicalPresent = Occultist0099Spells.Candidates(cv, "cv", 1)
+            .Any(r => r.Guid == Occultist0099AbjurationCatalog.MageShield);
+        var learnViaVariant = Occultist0099Spells.Learn(cv, "cv", 1, variantGuid);
+        bool quotaCanonical = cv.Quotas[Occultist0099Spells.QuotaKey("cv", 1)] ==
+            Occultist0099AbjurationCatalog.MageShield;
+        bool oneSource = cv.Sources.Count == 1;
+        bool variantKnown = Occultist0099Spells.IsKnown(cv, variantGuid);
+        Contract("D-F04", "src/Occultist0099Spells.cs (AddVariantRoot/CanonicalOf/" +
+            "Candidates/Learn/IsKnown)",
             "C-0099-20261115-r1 O-S02: canonical/variant identity filtering has " +
             "both positive and negative cases (Fire Shield warm/cold, sticky touch)",
-            hasVariantData,
-            "all " + Occultist0099AbjurationCatalog.Roots.Length +
-            " roots have CanonicalGuid==Guid and IsVariant=false; " +
-            "r.Guid==r.CanonicalGuid is a tautology in Candidates");
+            addVariant == Occultist0099Outcome.Ok && variantExcluded &&
+            canonicalPresent && learnViaVariant == Occultist0099Outcome.Ok &&
+            quotaCanonical && oneSource && variantKnown,
+            "variant registered=" + (addVariant == Occultist0099Outcome.Ok) +
+            ", variant excluded from candidates=" + variantExcluded +
+            ", canonical present=" + canonicalPresent +
+            ", learn via variant=" + learnViaVariant +
+            ", quota records canonical=" + quotaCanonical +
+            ", single source=" + oneSource + ", variant known=" + variantKnown +
+            "; catalog itself has no variants (correct for Abjuration)");
 
-        // D-F05: SP08 registration atomicity is asserted against a self-made
-        // toy object. ForeignDataTouched is never set true on any path, so
-        // "foreign data intact" has no distinguishing negative case.
+        // D-F05: SP08 registration atomicity must distinguish foreign data
+        // being touched from intact. The fixed gate works over real GUIDs and
+        // an owner-token cache; an injected foreign mutation during publish
+        // must be flagged, while collision/success keep foreign data intact.
+        string[] mandatory = { Occultist0099AbjurationCatalog.MageShield };
         var reg = new Occultist0099Registration();
-        reg.TryPublish(new[] { "core-a" }, new[] { "core-a" }, true, 3);
+        var collisionCache = new Dictionary<string, string>
+        {
+            ["foreign-book"] = "wizard",
+            [Occultist0099Ids.ClassGuid] = "other-mod"
+        };
+        reg.TryPublish(mandatory, mandatory, collisionCache, 3);
         bool collisionMarksForeign = reg.ForeignDataTouched;
-        reg.TryPublish(new[] { "core-a" }, new[] { "core-a" }, false, 3);
+        var successCache = new Dictionary<string, string> { ["foreign-book"] = "wizard" };
+        reg.TryPublish(mandatory, mandatory, successCache, 3);
         bool successMarksForeign = reg.ForeignDataTouched;
-        Contract("D-F05", "src/Occultist0099Spells.cs:506-538; " +
-            "tests/Occultist0099SliceProgram.cs:748-772",
+        var tamperCache = new Dictionary<string, string> { ["foreign-book"] = "wizard" };
+        reg.TryPublish(mandatory, mandatory, tamperCache, 3,
+            () => tamperCache["foreign-book"] = "tampered");
+        bool tamperDetected = reg.ForeignDataTouched;
+        Contract("D-F05", "src/Occultist0099Spells.cs (Occultist0099Registration); " +
+            "tests/Occultist0099SliceProgram.cs SP08",
             "C-occultist-cases.json SP08: foreign GUID collision fixture must be " +
             "able to distinguish foreign data being touched from intact",
-            collisionMarksForeign || successMarksForeign,
-            "ForeignDataTouched is false on both collision and success paths; " +
-            "the assertion has no negative case and the toy object never reads " +
-            "a blueprint cache or a real GUID");
+            tamperDetected && !collisionMarksForeign && !successMarksForeign,
+            "tamperDetected=" + tamperDetected + ", collisionMarksForeign=" +
+            collisionMarksForeign + ", successMarksForeign=" + successMarksForeign +
+            "; gate now diffs real foreign entries over an owner-token cache");
 
         var report = new Dictionary<string, object>
         {
             ["workPackage"] = "COTW-0099",
-            ["stage"] = "D review of B first slice (Abjuration), production read-only",
-            ["candidate"] = "b6be98b",
+            ["stage"] = "D counterexample reproduction, rerun after the B fix round",
+            ["reviewedCandidate"] = "b6be98b",
+            ["recheckTarget"] = "B fix-round working tree on feat/cotw-0099-occultist",
             ["contract"] = Occultist0099Ids.Contract,
             ["checkType"] = "isolated contract reproduction over linked production sources",
+            ["acceptanceScope"] = "d_counterexample_reproduction_only",
+            ["nativeEntryPointsExercised"] = false,
             ["nativeWrathEntriesExercised"] = false,
             ["gameOrUmmLaunched"] = false,
             ["productionSourcesModified"] = false,
+            ["releaseEligible"] = false,
+            ["independentReviewer"] = false,
+            ["resultMeaning"] = "Each D finding is reproduced against the frozen " +
+                "contract on the current production sources. PASS means the " +
+                "counterexample no longer reproduces; it is NOT native-entry " +
+                "acceptance and NOT an independent D sign-off (the reviewer is " +
+                "also the B implementer). See the native host report for " +
+                "entry-point evidence.",
             ["result"] = findings.All(f => (string)f["status"] == "PASS")
                 ? "REVIEW_PASS" : "NEEDS_FIX",
             ["findings"] = findings

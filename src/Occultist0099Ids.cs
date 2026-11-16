@@ -40,6 +40,20 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // Private TypeId block for the 0099 runtime components. Kept in one
         // place so later school packages cannot collide with other packages.
+        // D-0099-08 fix: the native components reference these CONSTANTS in
+        // their [TypeId] attributes instead of hardcoding the hex strings.
+        public const string FocusFactTypeId = "0099c0e1a1b24c0d8e5f600000000001";
+        public const string SpellbookMarkerTypeId = "0099c0e1a1b24c0d8e5f600000000002";
+        // D-0099-01: the three native entry-point components wired in
+        // Occultist0099NativeWiring.cs. Same private block, same numbering.
+        public const string FocusResourceLogicTypeId = "0099c0e1a1b24c0d8e5f600000000003";
+        public const string LearnGateTypeId = "0099c0e1a1b24c0d8e5f600000000004";
+        public const string SpellbookFactTypeId = "0099c0e1a1b24c0d8e5f600000000005";
+
+        // The per-unit spell-state holder fact (O-S02). Distinct from the
+        // Mental Focus fact so the two state machines stay separable.
+        public static readonly string SpellbookFactGuid = Id("OccultistSpellbookFact");
+
         public static string TypeId(int index)
             => "0099c0e1a1b24c0d8e5f6000" + index.ToString("x8");
 
@@ -49,7 +63,7 @@ namespace CallOfTheWild.Wrath.Prototype
             "MentalFocusFact", "MentalFocusResource", "LockFocusAbility",
             "ResetFocusAbility", "InvestFocusAbility", "ReplenishFocusAbility",
             "WardingTalismanBuff", "MindBarrierAbility", "ImplementSelection",
-            "OccultistProgression"
+            "OccultistProgression", "OccultistSpellbookFact"
         };
     }
 
@@ -62,6 +76,16 @@ namespace CallOfTheWild.Wrath.Prototype
         public static string Contract => Occultist0099Ids.Contract;
         public static string School => Occultist0099Ids.SliceSchool;
         public static bool Published => Occultist0099Ids.SlicePublished;
+
+        // D-0099-08 fix: SlicePublished is now an ENFORCED registration gate,
+        // not an unused flag. The native registration entry point (task #11)
+        // calls CanRegister() before touching the shared registration chain;
+        // while the slice is unpublished it returns false and no class,
+        // spellbook or progression is registered. Flipping SlicePublished to
+        // true is necessary but not sufficient: the full map must also be
+        // complete (eight schools, four Panoplies, progression, 143 rows).
+        public static bool CanRegister(bool fullMapComplete)
+            => Occultist0099Ids.SlicePublished && fullMapComplete;
 
         public static string[] NativeEntryPoints =
         {

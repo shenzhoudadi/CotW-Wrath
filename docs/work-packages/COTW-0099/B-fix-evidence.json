@@ -1,0 +1,143 @@
+{
+  "workPackage": "COTW-0099",
+  "stage": "B fix round for D-0099-01..09 on the Abjuration first slice, development only",
+  "contract": "C-0099-20261115-r1",
+  "reviewedCandidate": "b6be98b",
+  "slicePublished": false,
+  "releaseEligible": false,
+  "playerGameAcceptance": false,
+  "gameOrUmmLaunched": false,
+  "result": "MODEL_ONLY_PASS + NATIVE_DIRECTED_PASS (scoped, not a release sign-off)",
+  "resultMeaning": "Two scoped evidence layers: 364 isolated state-model assertions (contract supplement only) and 80 assertions driven through the real Wrath AbilityResourceLogic payment chain, the real SelectSpell/AddKnown learning chain and the real ApplyRest camp identity. Neither layer is player-game acceptance. The slice stays unregistered (SlicePublished=false) and is not release eligible.",
+  "evidenceLayers": {
+    "model": {
+      "report": "docs/work-packages/COTW-0099/B-slice-report.json",
+      "host": "tests/Occultist0099SliceTests.csproj (net9.0, links production sources, no game assemblies)",
+      "acceptanceScope": "model_supplement_only",
+      "nativeEntryPointsExercised": false,
+      "result": "MODEL_ONLY_PASS",
+      "assertions": 364,
+      "failures": [],
+      "assertionSeconds": 0.042,
+      "commandSeconds": 2.819,
+      "resultMeaning": "Numeric state-model assertions over linked production sources. NOT native-entry acceptance."
+    },
+    "native": {
+      "report": "tests/occultist0099-native-report.json",
+      "runRecord": "tests/occultist0099-native-result.json",
+      "host": "tests/Occultist0099NativeTests.csproj (net472, real Wrath Managed assemblies, EngineLauncher + publicized engine)",
+      "runner": "tests/Run-Occultist0099Native.py",
+      "acceptanceScope": "native_entry_points_directed",
+      "nativeEntryPointsExercised": true,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 80,
+      "failures": [],
+      "hostLoggedExceptions": 0,
+      "skippedArchiveComponents": 0,
+      "productionBridgesInstalled": 2,
+      "nativeRootsLoaded": 13,
+      "hostStagedRoots": 5,
+      "runnerSeconds": 3.976,
+      "hostSeconds": 3.51,
+      "resultMeaning": "The real Wrath AbilityResourceLogic payment chain, the real SelectSpell/AddKnown learning chain and the real ApplyRest camp identity executed against the authoritative 0099 state. This is NOT player-game acceptance and NOT a release sign-off."
+    },
+    "dCounterexamples": {
+      "report": "docs/work-packages/COTW-0099/D-review-assertions.json",
+      "host": "tests/Occultist0099DReviewTests.csproj",
+      "acceptanceScope": "d_counterexample_reproduction_only",
+      "independentReviewer": false,
+      "result": "REVIEW_PASS",
+      "failCount": 0,
+      "checks": 5,
+      "commandSeconds": 2.715,
+      "note": "The reviewer is also the B implementer, so this is NOT an independent D sign-off. D-F02 was strengthened from field presence to behavioural Int-gate positive/negative cases; D-F03 now probes all 10 mutable fields instead of only Providers/PublishedLists.",
+      "supersededRuns": [
+        {
+          "name": "d-counterexample-recheck",
+          "seconds": 1.249,
+          "note": "First rerun of this round; D-F02/D-F03 still carried failure-era wording and weak predicates."
+        },
+        {
+          "name": "d-counterexample-recheck-strengthened",
+          "seconds": 2.677,
+          "note": "After strengthening: D-F02 FAILED because the probe learned the circle-1 MageShield into a circle-2 slot. Fixture defect, fixed by using the circle-2 root ResistEnergy."
+        }
+      ]
+    }
+  },
+  "authoritativeFingerprint": {
+    "basis": "source SHA256 (D-0099-07 closure). The DLL hash is a build artifact only: it varies with toolchain and intermediate outputs, so it is NOT the authoritative identity of this slice. The previously recorded AA9C1F8D...D5EB in B-abjuration-slice.md was an intermediate artifact from before the TypeId width fix and is withdrawn.",
+    "sourceSHA256": {
+      "src/Occultist0099Ids.cs": "476E41F20404C1147BCCE5CC41B13AF6375CF8F8081A2AD333820A7480FE0716",
+      "src/Occultist0099Native.cs": "5EBDF9813C2501E47A366830927AE0DD8B239840343DC262B950D10077F269F3",
+      "src/Occultist0099NativeWiring.cs": "40644DB4C38EC055EFA8AF6B15383DCB71A83446FB7A1DCCCFDDCFEB31EE6E32",
+      "src/Occultist0099Rules.cs": "872B7F6DCD859B6FE3F73834F30652A4F8F9D3AD73C44D5FBAFB26FB9A528F02",
+      "src/Occultist0099Spells.cs": "DC644CA5A7A127F4BC96F9A1A0E4159CC9F5C5DA91D565C5CDECF45CE165EED8"
+    },
+    "hostSourceSHA256": {
+      "tests/Occultist0099SliceProgram.cs": "69F3A2C17056B79E0B75D5B03F967250D61412435351C8E35B28FDACD58C0B57",
+      "tests/Occultist0099DReviewProgram.cs": "C47EC47AD41C88FD23D86E98616C0D0145B3EB4059D099E0DC4415ECE2C84004",
+      "tests/Occultist0099NativeProgram.cs": "94B0DF463671CDA0FF431CFDC4403BC44931E13E8F7895817B803CE0A4A97F66"
+    },
+    "buildArtifact": {
+      "dllPath": "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+      "dllSize": 3276800,
+      "dllSHA256": "3F17C68F09E97B3EF91BE2CD52DBE3BD2131E2A8F871AA493E9DFF9EC2D81FF9",
+      "typesChecked": 28,
+      "note": "Produced by dotnet build -t:Rebuild -c Release in this round. Matches the candidateSHA256 recorded independently by tests/Run-Occultist0099Native.py. All 28 Occultist0099* types are present in the assembly.",
+      "hashSeconds": 0.035
+    },
+    "environmentSHA256": {
+      "harmony": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5",
+      "gameAssembly": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+      "engine": "3A85EDDC5D21CE98779C54F549BDD471D3DEF061948AEE2E85988E9782B82E80",
+      "aEvidence": "247C988FDD28E365E419F90D834D5C389A21CC70DF070C5FFB9A88FCB3DA6C59",
+      "nativeFixture": "0CE753666FAE00A56359C17375169652195EDBBF5D54DA77C565D04B0165C06D"
+    }
+  },
+  "timings": {
+    "compile-main": { "seconds": 1.007, "exit": 0, "note": "incremental, 0 warnings / 0 errors" },
+    "compile-main-repeat": { "seconds": 0.973, "exit": 0, "note": "no source change, 0 warnings / 0 errors" },
+    "rebuild-main-full": { "seconds": 4.508, "exit": 0, "note": "-t:Rebuild, full compile of all 0099 files, 0 warnings / 0 errors" },
+    "build-native-host": { "seconds": 1.116, "exit": 0, "note": "0 warnings / 0 errors" },
+    "rebuild-main-final": { "seconds": 2.899, "exit": 0, "note": "-t:Rebuild after the D-0099-09 comment correction; authoritative build for the fingerprints above" },
+    "model-directed-check-final": { "seconds": 2.819, "exit": 0, "note": "dotnet run incl. host build; 364 assertions / 0 failures, host assertion time 0.042s. Final run after the MF11 case-status correction." },
+    "d-counterexample-recheck-final": { "seconds": 2.715, "exit": 0, "note": "dotnet run incl. host build; 5 checks / 0 FAIL" },
+    "native-directed-check-final": { "seconds": 3.976, "exit": 0, "note": "python runner wall time; host process itself 3.51s, 80 checks / 0 failures" },
+    "dll-type-and-hash": { "seconds": 0.035, "exit": 0, "note": "28/28 types present" }
+  },
+  "cases": {
+    "MF01": "model_assertions + native_ability_resource_logic_pass",
+    "MF02": "model_assertions (native not_run)",
+    "MF03": "model_assertions (native not_run)",
+    "MF04": "model_assertions (native not_run)",
+    "MF05": "model_assertions (native not_run)",
+    "MF06": "model_assertions (native not_run)",
+    "MF07": "native_rest_camp_identity_pass (Spell Power / armed re-entry still not_run)",
+    "MF08": "model_assertions (native not_run)",
+    "MF09": "model_assertions (native not_run)",
+    "MF10": "model_assertions (native not_run)",
+    "MF11": "partial_model_dedup_only_reentry_stickytouch_not_run (D-F01 counterexample closed; native not_run)",
+    "SP01": "model_assertions + native_select_spell_pass",
+    "SP02": "model_assertions + native_int_gate_pass",
+    "SP03": "model_assertions (native not_run)",
+    "SP04": "model_assertions (native not_run)",
+    "SP05": "partial_model_full_143_rows_not_run",
+    "SP06": "partial_model_fireshield_variants_not_run",
+    "SP07": "model_assertions (native not_run)",
+    "SP08": "model_gate_only_native_cache_not_run"
+  },
+  "rootFixtureBoundary": "13 of the 18 audited Abjuration roots come from the reviewed Wrath archive fixture. The 4 CotW roots are built by this project's own production builders (PsychicWardingSpells / PsychicGlobeSpells / PsychicSupportSpells.Cloak) against real archived native donors; only PsychicOriginalIcons.Load is substituted because ImageConversion is a Unity native call. The 1 External root (CloakOfWindsAbility, TabletopTweaks-Base) is host-staged at its frozen A identity with a real Abjuration SpellComponent and a real executable effect path; the real provider assembly is NOT loaded, so its provider gate is exercised only through the authoritative state, never through a real third-party blueprint.",
+  "notRun": [
+    "game/UMM startup",
+    "player gameplay acceptance",
+    "full historical suites",
+    "shared class/spellbook/progression registration",
+    "level-up UI and respec controller",
+    "save/load transport",
+    "real TabletopTweaks / other provider assembly load",
+    "packaging and version bump (build.ps1 requires PowerShell 7.4; this machine has 5.1)",
+    "installer upload and download verification",
+    "issue #15 closure"
+  ]
+}

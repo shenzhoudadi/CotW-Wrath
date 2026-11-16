@@ -3,9 +3,12 @@
   "stage": "B first vertical slice (Abjuration), development only",
   "contract": "C-0099-20261115-r1",
   "checkType": "isolated numeric state model over production sources",
+  "acceptanceScope": "model_supplement_only",
   "nativeWrathEntriesExercised": false,
+  "nativeEntryPointsExercised": false,
   "gameOrUmmLaunched": false,
-  "assertions": 279,
+  "releaseEligible": false,
+  "assertions": 364,
   "failures": [],
   "cases": {
     "MF01": "model_assertions",
@@ -24,11 +27,12 @@
     "SP05": "partial_model_full_143_rows_not_run",
     "SP06": "partial_model_fireshield_variants_not_run",
     "SP07": "model_assertions",
-    "SP08": "model_assertions",
+    "SP08": "model_gate_only_native_cache_not_run",
     "MF07": "not_run",
-    "MF11": "not_run"
+    "MF11": "partial_model_dedup_only_reentry_stickytouch_not_run"
   },
-  "assertionSeconds": 0.03,
+  "assertionSeconds": 0.042,
   "timingNote": "Host assertion time only. The full dotnet run command including its build is recorded separately in B-abjuration-slice.md.",
-  "result": "PASS"
+  "result": "MODEL_ONLY_PASS",
+  "resultMeaning": "Numeric state-model assertions over linked production sources. NOT native-entry acceptance; native Wrath payment/learning entry points were not exercised by this host. See the native host report for entry-point evidence."
 }

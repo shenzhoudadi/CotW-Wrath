@@ -24,10 +24,20 @@ namespace CallOfTheWild.Wrath.Prototype
         public bool IsVariant;
         public string CanonicalGuid;     // variants point at the canonical root
         public bool IsKnack;
+        // D-0099-06 fix: variant identity is a real, writable concept. The
+        // Abjuration catalog legitimately carries no variants (Fire Shield
+        // warm/cold belongs to the later Evocation package), so variant rows
+        // are registered explicitly via Occultist0099Spells.AddVariantRoot
+        // when a school package brings them; Candidates/Learn resolve them
+        // to the canonical root and never give them a second quota.
+        public string[] VariantGuids = new string[0];
     }
 
-    // A-occultist-assets.json, spellRoots rows with school == Abjuration.
-    // 18 rows: 6 knacks-wide catalog is separate; circles 0..6 here.
+    // A-occultist-assets.json, spellRoots rows with school == Abjuration:
+    // 18 roots (13 Wrath + 4 CotW + 1 External), PLUS a separate fixed grant of
+    // six level-0 Knacks. Only Resistance is Abjuration; the other five Knacks
+    // belong to other schools, so they are NOT part of the 18 Abjuration roots
+    // (D-0099-09 wording fix; A JSON spellRoots.level == 0 has exactly 6 rows).
     public static class Occultist0099AbjurationCatalog
     {
         public const string WardingWeapon = "1ce11d27e8d07955d1012a6abaabfbe0";
@@ -133,6 +143,10 @@ namespace CallOfTheWild.Wrath.Prototype
     public sealed class Occultist0099SpellState
     {
         public int ClassLevel;
+        // D-0099-03 fix (C:31): learning AND casting gate Int >= 10 + circle.
+        // Temporary Int changes gate new learning/casting but never delete an
+        // established quota or a saved source.
+        public int Intelligence = 10;
         public int NextSequence = 1;
         public List<Occultist0099Slot> Slots = new List<Occultist0099Slot>();
         public Dictionary<string, string> Quotas = new Dictionary<string, string>();
@@ -143,12 +157,27 @@ namespace CallOfTheWild.Wrath.Prototype
         public HashSet<string> CotWRootsPublished = new HashSet<string>();
         public HashSet<string> ForeignBookRoots = new HashSet<string>();
         public HashSet<string> SameBookGrantSources = new HashSet<string>();
-        public bool CotWRegistrationComplete = true;
-        public HashSet<string> KnownRootsOverride = new HashSet<string>();
+        // D-0099-06 fix: no longer a hardcoded facade. Create() sets this true
+        // only because the development fixture assumes the slice's own CotW
+        // roots published; the registration package will drive it from the
+        // real atomic publish result, and SetCotWRegistrationComplete is the
+        // single write point. While false, no CotW root enters candidates.
+        public bool CotWRegistrationComplete;
+        // D-0099-06 fix: variant rows registered by later school packages
+        // (Fire Shield warm/cold, sticky touch delivery). Each maps a variant
+        // GUID to its canonical root GUID; a variant never owns a quota.
+        public Dictionary<string, string> VariantRoots = new Dictionary<string, string>();
 
+        // D-0099-05 fix: the fingerprint covers EVERY mutable field so that
+        // preview-cancel byte-for-byte assertions cannot silently miss a leak.
         public string Fingerprint()
         {
-            var parts = new List<string> { ClassLevel.ToString(), NextSequence.ToString() };
+            var parts = new List<string>
+            {
+                ClassLevel.ToString(), Intelligence.ToString(),
+                NextSequence.ToString(),
+                CotWRegistrationComplete ? "1" : "0"
+            };
             foreach (var s in Slots)
                 parts.Add("slot:" + s.Key + ":" + (s.School ?? s.Panoply) + ":" +
                           (s.ExtraSpells ? 1 : 0) + ":" + s.Sequence);
@@ -157,7 +186,16 @@ namespace CallOfTheWild.Wrath.Prototype
             foreach (var s in Sources.OrderBy(k => k.Id))
                 parts.Add("src:" + s.Id + ":" + s.SlotKey + ":" + s.Circle + ":" +
                           s.RootGuid + ":" + s.Origin);
+            foreach (var p in Providers.OrderBy(k => k.Key))
+                parts.Add("provider:" + p.Key + ":" + (p.Value ? 1 : 0));
+            foreach (var p in PublishedLists.OrderBy(k => k.Key))
+                parts.Add("published:" + p.Key + ":" + (p.Value ? 1 : 0));
+            parts.Add("dlc=" + string.Join(",", DlcAllowed.OrderBy(x => x)));
+            parts.Add("cotwpub=" + string.Join(",", CotWRootsPublished.OrderBy(x => x)));
             parts.Add("foreign=" + string.Join(",", ForeignBookRoots.OrderBy(x => x)));
+            parts.Add("grants=" + string.Join(",", SameBookGrantSources.OrderBy(x => x)));
+            foreach (var v in VariantRoots.OrderBy(k => k.Key))
+                parts.Add("variant:" + v.Key + ":" + v.Value);
             return string.Join("|", parts);
         }
 
@@ -165,7 +203,8 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var copy = new Occultist0099SpellState
             {
-                ClassLevel = ClassLevel, NextSequence = NextSequence,
+                ClassLevel = ClassLevel, Intelligence = Intelligence,
+                NextSequence = NextSequence,
                 CotWRegistrationComplete = CotWRegistrationComplete
             };
             foreach (var s in Slots)
@@ -187,16 +226,23 @@ namespace CallOfTheWild.Wrath.Prototype
             foreach (string x in CotWRootsPublished) copy.CotWRootsPublished.Add(x);
             foreach (string x in ForeignBookRoots) copy.ForeignBookRoots.Add(x);
             foreach (string x in SameBookGrantSources) copy.SameBookGrantSources.Add(x);
-            foreach (string x in KnownRootsOverride) copy.KnownRootsOverride.Add(x);
+            foreach (var v in VariantRoots) copy.VariantRoots[v.Key] = v.Value;
             return copy;
         }
     }
 
     public static class Occultist0099Spells
     {
-        public static Occultist0099SpellState Create(int classLevel = 1)
+        // Development fixture: Int defaults to 16 so every circle 1..6 of the
+        // six-circle table is reachable; the native adapter passes the real
+        // Owner.Stats.Intelligence value instead.
+        public static Occultist0099SpellState Create(int classLevel = 1,
+            int intelligence = 16)
         {
-            var s = new Occultist0099SpellState { ClassLevel = classLevel };
+            var s = new Occultist0099SpellState
+            {
+                ClassLevel = classLevel, Intelligence = intelligence
+            };
             foreach (string root in Occultist0099AbjurationCatalog.Roots
                          .Where(r => r.Source == "CotW").Select(r => r.Guid))
                 s.CotWRootsPublished.Add(root);
@@ -205,6 +251,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 s.DlcAllowed.Add(root);
             s.Providers["TabletopTweaks-Base"] = false;
             s.PublishedLists["TabletopTweaks-Base"] = false;
+            // The slice's own CotW roots are published in the dev fixture;
+            // the registration package replaces this with the atomic result.
+            s.CotWRegistrationComplete = true;
             OpenCircles(s);
             return s;
         }
@@ -212,8 +261,28 @@ namespace CallOfTheWild.Wrath.Prototype
         public static string QuotaKey(string slotKey, int circle)
             => slotKey + ":" + circle;
 
+        // D-0099-03: the effective open circle is min(level table, Int gate).
+        // Int >= 10 + circle is required to learn or cast that circle.
         public static int MaxCircle(Occultist0099SpellState s)
-            => Occultist0099AbjurationCatalog.MaxCircleForLevel(s.ClassLevel);
+        {
+            int byLevel = Occultist0099AbjurationCatalog.MaxCircleForLevel(s.ClassLevel);
+            int byInt = Math.Max(0, s.Intelligence - 10);
+            return Math.Min(byLevel, byInt);
+        }
+
+        public static bool IntAllowsCircle(Occultist0099SpellState s, int circle)
+            => s != null && circle >= 0 && s.Intelligence >= 10 + circle;
+
+        // Casting gate: the root must be known in THIS book and the current
+        // Int must still satisfy 10 + the root's private circle. A temporary
+        // Int drop blocks casting but never deletes the quota or the source.
+        public static bool CanCast(Occultist0099SpellState s, string rootGuid)
+        {
+            if (s == null || !IsKnown(s, rootGuid)) return false;
+            string canonical = CanonicalOf(s, rootGuid);
+            var root = Occultist0099AbjurationCatalog.Find(canonical);
+            return root != null && IntAllowsCircle(s, root.Circle);
+        }
 
         private static void OpenCircles(Occultist0099SpellState s)
         {
@@ -233,6 +302,58 @@ namespace CallOfTheWild.Wrath.Prototype
             s.ClassLevel = level;
             OpenCircles(s);   // new circle gives every existing slot one choice
             return Occultist0099Outcome.Ok;
+        }
+
+        // Temporary or permanent Int change. Raising Int opens newly eligible
+        // circles; lowering Int never removes an established quota or source
+        // (C:31-32), it only gates further learning and casting.
+        public static Occultist0099Outcome SetIntelligence(Occultist0099SpellState s,
+            int intelligence)
+        {
+            if (s == null || intelligence < 0)
+                return Occultist0099Outcome.RejectedInvalidArgument;
+            s.Intelligence = intelligence;
+            OpenCircles(s);
+            return Occultist0099Outcome.Ok;
+        }
+
+        // Single write point for the CotW atomic registration result.
+        public static void SetCotWRegistrationComplete(Occultist0099SpellState s,
+            bool complete)
+        {
+            if (s != null) s.CotWRegistrationComplete = complete;
+        }
+
+        // D-0099-06: later school packages register variant rows here. A
+        // variant resolves to its canonical root for candidates, learning and
+        // known-spell identity; it never consumes a second quota.
+        public static Occultist0099Outcome AddVariantRoot(Occultist0099SpellState s,
+            string variantGuid, string canonicalGuid)
+        {
+            if (s == null || !IsHex32(variantGuid) || !IsHex32(canonicalGuid) ||
+                variantGuid == canonicalGuid)
+                return Occultist0099Outcome.RejectedInvalidArgument;
+            if (Occultist0099AbjurationCatalog.Find(canonicalGuid) == null)
+                return Occultist0099Outcome.RejectedInvalidArgument;
+            // A catalog root can never be demoted to a variant of another root.
+            if (Occultist0099AbjurationCatalog.Find(variantGuid) != null)
+                return Occultist0099Outcome.RejectedInvalidArgument;
+            if (s.VariantRoots.ContainsKey(variantGuid) &&
+                s.VariantRoots[variantGuid] != canonicalGuid)
+                return Occultist0099Outcome.RejectedDuplicate;
+            s.VariantRoots[variantGuid] = canonicalGuid;
+            return Occultist0099Outcome.Ok;
+        }
+
+        public static bool IsHex32(string g)
+            => g != null && g.Length == 32 &&
+               g.All(c => (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f'));
+
+        public static string CanonicalOf(Occultist0099SpellState s, string rootGuid)
+        {
+            if (s == null || rootGuid == null) return rootGuid;
+            string mapped;
+            return s.VariantRoots.TryGetValue(rootGuid, out mapped) ? mapped : rootGuid;
         }
 
         public static int QuotaCount(Occultist0099SpellState s, int circle)
@@ -321,11 +442,14 @@ namespace CallOfTheWild.Wrath.Prototype
             string key = QuotaKey(slotKey, circle);
             if (!s.Quotas.ContainsKey(key) || s.Quotas[key] != null)
                 return new Occultist0099SpellRoot[0];
+            // D-0099-03: Int >= 10 + circle gates learning as well as casting.
+            if (!IntAllowsCircle(s, circle)) return new Occultist0099SpellRoot[0];
             string[] schools = SchoolsOf(s, slotKey);
             var known = new HashSet<string>(s.Sources.Select(x => x.RootGuid));
             return Occultist0099AbjurationCatalog.Roots
-                .Where(r => r.Circle == circle && !r.IsKnack &&
+                .Where(r => r.Circle == circle && !r.IsKnack && !r.IsVariant &&
                             r.Guid == r.CanonicalGuid &&
+                            !s.VariantRoots.ContainsKey(r.Guid) &&
                             schools.Contains(r.School) &&
                             !known.Contains(r.Guid) && IsRootAvailable(s, r))
                 .ToArray();
@@ -338,10 +462,16 @@ namespace CallOfTheWild.Wrath.Prototype
             string key = QuotaKey(slotKey, circle);
             if (!s.Quotas.ContainsKey(key))
                 return Occultist0099Outcome.RejectedInsufficient; // circle not open
+            if (!IntAllowsCircle(s, circle))
+                return Occultist0099Outcome.RejectedIntTooLow;   // D-0099-03
             if (s.Quotas[key] != null)
                 return Occultist0099Outcome.RejectedDuplicate;
-            var root = Occultist0099AbjurationCatalog.Find(rootGuid);
-            if (!Candidates(s, slotKey, circle).Any(r => r.Guid == rootGuid))
+            // A variant GUID resolves to its canonical root before candidacy;
+            // the quota and the source always record the canonical identity.
+            string canonicalGuid = CanonicalOf(s, rootGuid);
+            var root = Occultist0099AbjurationCatalog.Find(canonicalGuid);
+            if (root == null || root.IsVariant ||
+                !Candidates(s, slotKey, circle).Any(r => r.Guid == canonicalGuid))
                 return Occultist0099Outcome.RejectedInvalidArgument;
             // A quota holds exactly one canonical root. Variants and sticky
             // touch delivery never consume another quota.
@@ -369,13 +499,19 @@ namespace CallOfTheWild.Wrath.Prototype
             s.Sources.Add(new Occultist0099Source
             {
                 Id = sourceId, SlotKey = "same-book-grant", Circle = circle,
-                RootGuid = rootGuid, Origin = "same-book-grant"
+                RootGuid = CanonicalOf(s, rootGuid), Origin = "same-book-grant"
             });
             return Occultist0099Outcome.Ok;
         }
 
+        // Known identity is canonical: a variant GUID counts as known exactly
+        // when its canonical root is held by a source in THIS book.
         public static bool IsKnown(Occultist0099SpellState s, string rootGuid)
-            => s.Sources.Any(x => x.RootGuid == rootGuid);
+        {
+            if (s == null) return false;
+            string canonical = CanonicalOf(s, rootGuid);
+            return s.Sources.Any(x => x.RootGuid == canonical);
+        }
 
         public static string[] KnownRoots(Occultist0099SpellState s)
             => s.Sources.Select(x => x.RootGuid).Distinct().OrderBy(x => x).ToArray();
@@ -442,8 +578,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (s == null || snapshot == null)
                 return Occultist0099Outcome.RejectedInvalidState;
             // Restore byte-for-byte equivalent live state (SP03 / MF09).
+            // Every mutable field is assigned; Fingerprint() covers them all.
             var restore = snapshot.Clone();
             s.ClassLevel = restore.ClassLevel;
+            s.Intelligence = restore.Intelligence;
             s.NextSequence = restore.NextSequence;
             s.CotWRegistrationComplete = restore.CotWRegistrationComplete;
             s.Slots = restore.Slots;
@@ -455,7 +593,7 @@ namespace CallOfTheWild.Wrath.Prototype
             s.CotWRootsPublished = restore.CotWRootsPublished;
             s.ForeignBookRoots = restore.ForeignBookRoots;
             s.SameBookGrantSources = restore.SameBookGrantSources;
-            s.KnownRootsOverride = restore.KnownRootsOverride;
+            s.VariantRoots = restore.VariantRoots;
             return Occultist0099Outcome.Ok;
         }
 
@@ -499,41 +637,87 @@ namespace CallOfTheWild.Wrath.Prototype
         }
     }
 
-    // O-S02 registration atomicity (SP08). Missing core donor or a foreign
-    // GUID collision leaves 0099 unpublished and foreign data intact. A
-    // complete map publishes exactly one class, one spellbook and the whole
-    // choice set; repeated completion never duplicates anything.
+    // O-S02 registration atomicity (SP08). D-0099-06 fix: the gate now works
+    // over real 32-hex blueprint GUIDs and an explicit cache dictionary with
+    // owner tokens, and ForeignDataTouched is a genuine before/after diff of
+    // every non-0099 entry instead of a hardcoded false. The native wiring
+    // (task #11) feeds it the real BlueprintsCache snapshot; until that runs,
+    // SP08 stays not_run for acceptance purposes.
     public sealed class Occultist0099Registration
     {
+        public const string OwnerToken = "0099";
+
         public int ClassEntries;
         public int SpellbookEntries;
         public int ChoiceEntries;
         public bool PreviewLedgerPresent;
         public bool ForeignDataTouched;
 
+        // The only identities this gate may write. Everything else in the
+        // cache is foreign data and must remain byte-identical.
+        public static readonly string[] PrivateGuids =
+        {
+            Occultist0099Ids.ClassGuid, Occultist0099Ids.BookGuid,
+            Occultist0099Ids.SpellListGuid, Occultist0099Ids.FocusFactGuid,
+            Occultist0099Ids.FocusResourceGuid, Occultist0099Ids.LockFocusAbilityGuid,
+            Occultist0099Ids.ResetFocusAbilityGuid, Occultist0099Ids.InvestAbilityGuid,
+            Occultist0099Ids.ReplenishAbilityGuid, Occultist0099Ids.WardingTalismanBuffGuid,
+            Occultist0099Ids.MindBarrierAbilityGuid, Occultist0099Ids.ImplementSelectionGuid,
+            Occultist0099Ids.ProgressionGuid
+        };
+
         public bool Published => ClassEntries == 1 && SpellbookEntries == 1 &&
                                  ChoiceEntries > 0 && !PreviewLedgerPresent;
 
+        private static bool IsPrivate(string guid)
+            => Array.IndexOf(PrivateGuids, guid) >= 0;
+
+        private static Dictionary<string, string> ForeignSubset(
+            Dictionary<string, string> cache)
+            => cache.Where(kv => !IsPrivate(kv.Key))
+                    .ToDictionary(kv => kv.Key, kv => kv.Value);
+
+        // cache: guid -> owner token, shared with foreign packages. A foreign
+        // owner already holding one of our private GUIDs is a collision; the
+        // attempt must fail without writing anything, foreign or private.
+        // afterForeignWrite (optional) is invoked between the foreign snapshot
+        // and the private write, so a concurrent foreign mutation during
+        // publication is caught by the genuine before/after diff.
         public bool TryPublish(string[] mandatoryRoots, string[] availableRoots,
-            bool foreignGuidCollision, int choiceCount)
+            Dictionary<string, string> cache, int choiceCount,
+            Action afterForeignWrite = null)
         {
             PreviewLedgerPresent = true;
-            if (foreignGuidCollision || choiceCount <= 0 ||
+            ForeignDataTouched = false;
+            var foreignBefore = ForeignSubset(cache);
+
+            bool validGuids = mandatoryRoots != null && availableRoots != null &&
+                mandatoryRoots.All(Occultist0099Spells.IsHex32) &&
+                availableRoots.All(Occultist0099Spells.IsHex32);
+            bool collision = PrivateGuids.Any(g =>
+                cache.ContainsKey(g) && cache[g] != OwnerToken);
+            if (!validGuids || collision || choiceCount <= 0 ||
                 mandatoryRoots.Any(m => !availableRoots.Contains(m)))
             {
                 ClassEntries = 0; SpellbookEntries = 0; ChoiceEntries = 0;
-                ForeignDataTouched = false;
+                ForeignDataTouched = !SameSubset(foreignBefore, ForeignSubset(cache));
                 PreviewLedgerPresent = false;
                 return false;
             }
-            if (ClassEntries == 0)
-            {
-                ClassEntries = 1;
-                SpellbookEntries = 1;
-                ChoiceEntries = choiceCount;
-            }
+            if (afterForeignWrite != null) afterForeignWrite();
+            // Write only private identities; repeated completion is a no-op.
+            foreach (string g in PrivateGuids) cache[g] = OwnerToken;
+            ClassEntries = 1;
+            SpellbookEntries = 1;
+            ChoiceEntries = choiceCount;
+            ForeignDataTouched = !SameSubset(foreignBefore, ForeignSubset(cache));
             PreviewLedgerPresent = false;
             return true;
         }
+
+        private static bool SameSubset(Dictionary<string, string> a,
+            Dictionary<string, string> b)
+            => a.Count == b.Count && a.All(kv => b.ContainsKey(kv.Key) &&
+                                               b[kv.Key] == kv.Value);
     }
 }
