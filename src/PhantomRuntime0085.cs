@@ -149,7 +149,7 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         public string Emotion;
 
-        protected override void OnActivate()
+        protected override void OnTurnOn()
         {
             var master = Owner;
             if (master == null || master.IsPet || !master.PreviewOf.IsEmpty) return;
@@ -685,7 +685,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintBuffReference SaveBuff;
         public bool Permanent;
 
-        protected override void OnActivate() => RefreshAll(Owner);
+        protected override void OnTurnOn() => RefreshAll(Owner);
         protected override void OnDeactivate() => RefreshAll(Owner);
 
         private bool Eligible(UnitEntityData master, UnitPartPhantom0085 part)
@@ -957,17 +957,20 @@ namespace CallOfTheWild.Wrath.Prototype
             [JsonProperty] public List<EntityFactRef<Feature>> Features = new List<EntityFactRef<Feature>>();
         }
 
-        protected override void OnActivate() => Refresh(Owner?.Get<UnitPartPhantom0085>()?.BoundPet(Owner));
+        protected override void OnTurnOn() => RefreshForOwner();
         protected override void OnDeactivate()
         {
             if (!IsReapplying) Clear();
         }
 
-        protected override void OnApplyPostLoadFixes() => OnActivate();
+        protected override void OnApplyPostLoadFixes()
+        {
+            if (Fact.IsTurnedOn) RefreshForOwner();
+        }
 
         public void HandleAddPet(UnitEntityData master, UnitEntityData pet)
         {
-            if (master == Owner) OnActivate();
+            if (master == Owner) RefreshForOwner();
         }
 
         public void HandleRemovePet(UnitEntityData master, UnitEntityData pet)
@@ -984,6 +987,12 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         protected abstract IEnumerable<BlueprintFeature> FeaturesToGrant();
+
+        private void RefreshForOwner()
+        {
+            var master = Owner;
+            Refresh(master?.Get<UnitPartPhantom0085>()?.BoundPet(master));
+        }
 
         private void Refresh(UnitEntityData pet)
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using HarmonyLib;
+using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
@@ -19,6 +20,7 @@ using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Alignments;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
@@ -34,17 +36,17 @@ using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Parts;
+using Kingmaker.Utility;
+using Kingmaker.View;
 
 // COTW-0085 B-stage directed checks, contract C-0085-20261115-r1.
 // The host enters with COTW_0085_CASE=spiritualist0085 and routes straight
 // here after the shared Psychic fixture; no historical behaviour suite runs.
 //
-// Scope: real game Managed blueprint types, the real production Spiritualist
-// registration, the private 137-row catalog, six emotion graphs, the reserved
-// PetType and the pure resource/progression shapes. The native companion chain
-// (AddPet -> SetMaster -> UnitPartPetMaster -> AddClassLevels), scene placement,
-// rest UI, save/load and the respec screen are NOT entered here; they are D /
-// player-TEST boundaries and are reported as not run.
+// Scope: production blueprint registration, emotion and resource graphs,
+// and native companion methods with pre-created managed entity fixtures.
+// Unity spawning, actual level-up application, placement, save/load, rest UI
+// and the respec screen remain outside this host.
 internal static class Spiritualist0085Tests
 {
     private static int assertions;
@@ -247,6 +249,176 @@ internal static class Spiritualist0085Tests
         phantom.Get<UnitPartPet>().Clear();
         Check(Retired(phantom) && !Retired(dog) && dog.Master == master,
             "C09: an already detached and destroy-marked private pet skips repeated cleanup, leaving Dog's binding untouched");
+    }
+
+    private static readonly List<(AddClassLevels Source, UnitEntityData Pet, int Levels)> FixtureLevelRequests =
+        new List<(AddClassLevels, UnitEntityData, int)>();
+
+    private static bool ObserveFixtureLevelUp(AddClassLevels __0, UnitDescriptor __1, int __2)
+    {
+        FixtureLevelRequests.Add((__0, __1.Unit, __2));
+        return false;
+    }
+
+    private static void CheckNativePetBinding(BlueprintCharacterClass spiritualist, BlueprintCharacterClass unrelated, BlueprintFeature anger,
+        BlueprintFeature dogFeature, BlueprintFaction neutral)
+    {
+        var scene = (SceneEntitiesState)FormatterServices.GetUninitializedObject(typeof(SceneEntitiesState));
+        var masterBlueprint = new BlueprintUnit { name = "0085-managed-owner", ComponentsArray = Array.Empty<BlueprintComponent>() };
+        UnitEntityData Actor(string id, BlueprintUnit blueprint, bool owner = false)
+        {
+            var unit = ManagedFixtureUnit(id);
+            Set(unit.Descriptor, "Blueprint", blueprint);
+            Set(unit.Descriptor, "OriginalBlueprint", blueprint);
+            Set(unit.Descriptor, "m_Faction", neutral);
+            Set(unit.Descriptor, "m_IsPlayerFactionCached", false);
+            Set(unit.Descriptor, "AttackFactions", new UnitAttackFactions(unit.Descriptor));
+            var alignment = new UnitAlignment(unit.Descriptor);
+            Set(alignment, "m_Value", Alignment.TrueNeutral);
+            Set(unit.Descriptor, "Alignment", alignment);
+            Set(unit, "Passive", new ObservableCountFlag());
+            var facts = new EntityFactsManager(unit);
+            Set(unit, "Facts", facts);
+            Set(unit, "Buffs", facts.EnsureFactProcessor<BuffCollection>());
+            var progression = new UnitProgressionData();
+            Set(unit.Descriptor, "Progression", progression);
+            var classes = new List<ClassData>();
+            Set(progression, "Classes", classes);
+            Set(progression, "Features", facts.EnsureFactProcessor<FeatureCollection>());
+            if (owner)
+            {
+                Set(unit, "HoldingState", scene);
+                classes.Add(new ClassData(spiritualist) { Level = 1 });
+            }
+            return unit;
+        }
+
+        var a = Actor("0085-binding-a", masterBlueprint, owner: true);
+        var b = Actor("0085-binding-b", masterBlueprint, owner: true);
+        var petA = Actor("0085-binding-phantom-a", anger.GetComponent<AddPet>().Pet);
+        var petB = Actor("0085-binding-phantom-b", anger.GetComponent<AddPet>().Pet);
+        var dog = Actor("0085-binding-dog", dogFeature.GetComponent<AddPet>().Pet);
+        var phantomLevels = petA.Blueprint.GetComponent<AddClassLevels>();
+        foreach (var pet in new[] { petA, petB })
+        {
+            var unitFact = new UnitFact(pet.Blueprint);
+            unitFact.RestoreOwnerLink(pet.Facts);
+            pet.Facts.List.Add(unitFact);
+        }
+        BlueprintComponentAndRuntime<AddPet> Record(UnitEntityData owner, BlueprintFeature blueprint, UnitEntityData pet)
+        {
+            var fact = new Feature(blueprint, owner.Descriptor);
+            fact.RestoreOwnerLink(owner.Facts);
+            owner.Facts.List.Add(fact);
+            var grant = fact.GetComponentWithRuntime<AddPet>();
+            grant.GetData<AddPetData>().SpawnedPetRef = pet;
+            return grant;
+        }
+        var sourceA = Record(a, anger, petA);
+        var sourceB = Record(b, anger, petB);
+        var dogSource = Record(a, dogFeature, dog);
+        var getPart = AccessTools.Method(typeof(EntityPartsManager), "Get").MakeGenericMethod(T("UnitPartPhantom0085"));
+        UnitEntityData Bound(UnitEntityData owner, object part)
+            => part == null ? null : (UnitEntityData)AccessTools.Method(part.GetType(), "BoundPet").Invoke(part, new object[] { owner });
+        void Update(BlueprintComponentAndRuntime<AddPet> grant)
+        {
+            using (grant.Runtime.RequestEventContext()) ((IUpdatePet)grant.Component).TryUpdatePet();
+        }
+
+        // Seed the recorded references because spawning a Unity view is outside this host.
+        // The native binding, re-entry, ownership checks and detach below are executed.
+        var native = new Harmony("CotWSpiritualist0085.PetFixture");
+        var gameField = AccessTools.Field(typeof(Game), "s_Instance");
+        var previousGame = gameField.GetValue(null);
+        var game = (Game)FormatterServices.GetUninitializedObject(typeof(Game));
+        var stateField = AccessTools.Field(typeof(Game), "State");
+        var state = FormatterServices.GetUninitializedObject(stateField.FieldType);
+        var player = (Player)FormatterServices.GetUninitializedObject(typeof(Player));
+        Set(player, "PartyCharacters", new List<UnitReference>());
+        Set(state, "PlayerState", player);
+        stateField.SetValue(game, state);
+        gameField.SetValue(null, game);
+        try
+        {
+            var omitScene = new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(SkipRecoveryFixtureView));
+            native.Patch(AccessTools.Method(typeof(UnitEntityData), "UpdateGroup"), prefix: omitScene);
+            native.Patch(AccessTools.Method(typeof(UnitPartPetMaster), "UpdateMountAbility"), prefix: omitScene);
+            native.Patch(AccessTools.Method(typeof(UnitEntityData), nameof(UnitEntityData.SetMaster)),
+                transpiler: new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(BoundFixtureScale)));
+            native.CreateClassProcessor(T("Phantom0085Patches+ExistingPetReference")).Patch();
+            native.CreateClassProcessor(T("Phantom0085Patches+PetLevelOverride")).Patch();
+            native.Patch(AccessTools.Method(typeof(AddClassLevels), nameof(AddClassLevels.LevelUp),
+                new[] { typeof(AddClassLevels), typeof(UnitDescriptor), typeof(int), typeof(UnitFact) }),
+                prefix: new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(ObserveFixtureLevelUp)));
+            a.Facts.TurnOn();
+            b.Facts.TurnOn();
+            foreach (var grant in new[] { sourceA, dogSource, sourceB })
+                grant.Runtime.Fact.Activate();
+            var partA = getPart.Invoke(a.Parts, null);
+            var partB = getPart.Invoke(b.Parts, null);
+            Check(partA != null && partB != null && (string)Get(partA, "PetId") == petA.UniqueId &&
+                (string)Get(partB, "PetId") == petB.UniqueId,
+                "C02: the initial native fact activation tracks both phantoms before any area or user action");
+            Check(FixtureLevelRequests.Count == 2 && FixtureLevelRequests.All(request =>
+                    request.Source == phantomLevels && request.Levels == 1) &&
+                FixtureLevelRequests.Select(request => request.Pet).SequenceEqual(new[] { petA, petB }),
+                "C02: the native AddPet path requests exactly one initial level from each phantom's own donor");
+            var petClass = new ClassData(phantomLevels.CharacterClass) { Level = 1 };
+            petA.Progression.Classes.Add(petClass);
+            Set(petA.Progression, "m_CharacterLevel", 1);
+            FixtureLevelRequests.Clear();
+            Update(sourceA);
+            Check(a.Pets.Count == 2 && b.Pets.Count == 1 && petA.Master == a && petB.Master == b && dog.Master == a &&
+                Bound(a, partA) == petA && Bound(b, partB) == petB && FixtureLevelRequests.Count == 0,
+                "C02/C17: native AddPet update and SetMaster retain separate Anger bindings and the same-owner Dog on replay");
+            var ownerClass = a.Progression.Classes.Single();
+            ownerClass.Level = 2;
+            sourceA.Runtime.Fact.Reapply();
+            Check(FixtureLevelRequests.SequenceEqual(new[] { (phantomLevels, petA, 1) }) &&
+                sourceA.Runtime.Fact.IsTurnedOn && Bound(a, partA) == petA,
+                "C03: native reapplication asks for one Phantom level on the same entity when its owner reaches Spiritualist 2");
+            petClass.Level = 2;
+            Set(petA.Progression, "m_CharacterLevel", 2);
+            FixtureLevelRequests.Clear();
+            a.Progression.Classes.Add(new ClassData(unrelated) { Level = 4 });
+            sourceA.Runtime.Fact.Reapply();
+            Check(FixtureLevelRequests.Count == 0 && Bound(a, partA) == petA,
+                "C03: four unrelated class levels leave the native Phantom request unchanged");
+            ownerClass.Level = 20;
+            sourceA.Runtime.Fact.Reapply();
+            Check(FixtureLevelRequests.SequenceEqual(new[] { (phantomLevels, petA, 18) }) && Bound(a, partA) == petA,
+                "C03: native reapplication requests the remaining 18 levels at Spiritualist 20 on the same entity");
+            FixtureLevelRequests.Clear();
+            sourceA.GetData<AddPetData>().SpawnedPetRef = petB;
+            Update(sourceA);
+            Check(Bound(a, partA) == null && Bound(b, partB) == petB && a.Pets.Count == 2 && petB.Master == b,
+                "C17: a cross-owner recorded phantom is rejected without touching either native pet list");
+            sourceA.GetData<AddPetData>().SpawnedPetRef = petA;
+            petA.RemoveMaster();
+            petA.MarkForDestroy();
+            Update(sourceA);
+            Check(Bound(a, partA) == null && Bound(b, partB) == petB && a.Pets.Single().Entity == dog &&
+                dog.Master == a && petA.Master == null && petA.DestroyMark,
+                "C09/C17: native detach followed by a stale update cannot reattach the retired Phantom or remove Dog");
+        }
+        finally
+        {
+            FixtureLevelRequests.Clear();
+            foreach (var grant in new[] { sourceA, dogSource, sourceB })
+                if (grant.Runtime.Fact.IsTurnedOn) grant.Runtime.Fact.TurnOff();
+            native.UnpatchAll(native.Id);
+            gameField.SetValue(null, previousGame);
+        }
+    }
+
+    private static IEnumerable<CodeInstruction> BoundFixtureScale(IEnumerable<CodeInstruction> source)
+    {
+        var instructions = source.ToList();
+        var scale = AccessTools.Method(typeof(UnitEntityView), "UpdateScaleImmediately");
+        var call = instructions.Single(i => i.Calls(scale));
+        call.opcode = System.Reflection.Emit.OpCodes.Pop;
+        call.operand = null;
+        return instructions;
     }
 
     private static void FailPrivateInsert(SimpleBlueprint __1)
@@ -793,6 +965,8 @@ internal static class Spiritualist0085Tests
         Check(!(bool)Call("Phantom0085Patches+ExactDamageTransfer", "CanReceivePayment", incoming, petEntity),
             "C14: native untargetable recipient is rejected before deducting redirected damage from the original hit");
         CheckNativeMountAndRetirement(harmony, angersGrant.Pet, dogGrant.Pet, petType);
+        CheckNativePetBinding(cls, inquisitor, (BlueprintFeature)angersGrant.OwnerBlueprint, (BlueprintFeature)dogGrant.OwnerBlueprint,
+            Load<BlueprintFaction>(cache, BlueprintGuid.Parse("d8de50cc80eb4dc409a983991e0b77ad")));
         var restPatch = T("Phantom0085Patches+RestResurrectionQueue");
         var restMethod = AccessTools.Method(typeof(Kingmaker.Controllers.Rest.RestController), "ResurrectDeadUnits");
         var nativeRest = AccessTools.Method(typeof(Kingmaker.Controllers.Rest.State.CampingState), "GetPartyUnitsForRest");
@@ -869,7 +1043,7 @@ internal static class Spiritualist0085Tests
         Check(ReferenceEquals(cache.Load(inqBook.AssetGuid), inqBook), "Inquisitor spellbook identity preserved");
 
         // ---- Boundaries not entered by this offline host ----
-        Console.WriteLine("0085 NOT RUN: native AddPet->SetMaster->UnitPartPetMaster->AddClassLevels chain, SetHidden/TeleportToMaster/RemoveMaster on a live instance, rest UI, save/load, respec screen, mount button, scene placement (D / player TEST).");
+        Console.WriteLine("0085 NOT RUN: Unity AddPet spawning, level-up application beyond the AddClassLevels call boundary, live scene placement and navigation, rest UI, save/load, respec screen and mount button.");
         Console.WriteLine("0085 RESULT: " + assertions + " assertions passed, " + Failures.Count + " failed.");
         if (Failures.Count > 0)
             throw new Exception("0085 directed failures: " + string.Join(" | ", Failures));
