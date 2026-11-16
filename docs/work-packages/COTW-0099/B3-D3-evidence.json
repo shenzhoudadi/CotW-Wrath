@@ -1,0 +1,164 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "bdbda521935bf7b923ad97b035c0bd0463f3bb02",
+  "stage": "B3 implement learning scope only",
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "scope": "B3 production adapter and native-b3-4.json, 137 assertions",
+    "lastFixtureChange": "B re-ran the same production sources with the spontaneous book and zero-known table"
+  },
+  "builds": [
+    {
+      "wallSeconds": 1.997,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "wallSeconds": 1.175,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "wallSeconds": 1.969,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "wallSeconds": 2.027,
+      "warnings": 0,
+      "errors": 0
+    },
+    {
+      "wallSeconds": 1.153,
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "nativeRuns": [
+    {
+      "wallSeconds": 3.358,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 124
+    },
+    {
+      "wallSeconds": 3.37,
+      "result": "fixture_aborted",
+      "cause": "Unity profiling ECall during native ApplySpellbook"
+    },
+    {
+      "wallSeconds": 3.402,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 129
+    },
+    {
+      "wallSeconds": 3.448,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 137
+    },
+    {
+      "wallSeconds": 3.497,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 137
+    }
+  ],
+  "native": {
+    "workPackage": "COTW-0099",
+    "contract": "C-0099-20261115-r1",
+    "stage": "B3 directed native recheck (stable implement learning offers)",
+    "acceptanceScope": "native_entry_points_directed",
+    "playerGameAcceptance": false,
+    "gameLaunched": false,
+    "ummLaunched": false,
+    "slicePublished": false,
+    "releaseEligible": false,
+    "productionBridgesInstalled": 12,
+    "nativeRootsLoaded": 13,
+    "hostStagedRoots": 5,
+    "hostStagedRootNames": [
+      "CotWWrathPsychicWardingWeapon(CotW)",
+      "CotWWrathPsychicAlliedCloak(CotW)",
+      "CloakOfWindsAbility(External)",
+      "CotWWrathPsychicGlobeOfInvulnerabilityLesser(CotW)",
+      "CotWWrathPsychicGlobeOfInvulnerability(CotW)"
+    ],
+    "skippedArchiveComponents": 0,
+    "rootFixtureBoundary": "13 of the 18 audited Abjuration roots come from the reviewed Wrath archive fixture. The 4 CotW roots are built by this project's own production builders (PsychicWardingSpells / PsychicGlobeSpells / PsychicSupportSpells.Cloak) against real archived native donors; only PsychicOriginalIcons.Load is substituted because ImageConversion is a Unity native call. The 1 External root (CloakOfWindsAbility, TabletopTweaks-Base) is host-staged at its frozen A identity with a real Abjuration SpellComponent and a real executable effect path; the real provider assembly is NOT loaded, so its provider gate is exercised only through the authoritative state, never through a real third-party blueprint.",
+    "checks": 137,
+    "failures": [],
+    "hostLoggedExceptions": 0,
+    "caseStatus": {
+      "MF01": "native_pre_effect_payment_and_command_identity",
+      "MF09": "native_fact_reattach_only",
+      "MF11": "native_dedup_and_late_refusal_sticky_touch_not_run",
+      "SP01": "native_level_up_offers_select_apply_isolated_book_and_exact_sources",
+      "SP03": "native_copy_provenance_and_preview_isolation_only",
+      "SP02": "native_live_int_learning_plus_model_cast_gate",
+      "MF04": "native_rest_identity_and_batch_only",
+      "SP08": "native_gate_only_registration_not_run",
+      "MF02": "not_run_native",
+      "MF03": "not_run_native",
+      "MF05": "not_run_native",
+      "MF06": "not_run_native",
+      "MF07": "not_run_native",
+      "MF08": "not_run_native",
+      "MF10": "not_run_native",
+      "SP04": "not_run_native",
+      "SP05": "not_run_native",
+      "SP06": "not_run_native",
+      "SP07": "not_run_native"
+    },
+    "result": "NATIVE_DIRECTED_PASS",
+    "resultMeaning": "Native RuleCastSpell prior to the mocked dispatch, ApplySpellbook/OnApplyAction, private SelectSpell/AddKnown, offer refresh, native fact replacement and ApplyRest ran in a managed fixture.",
+    "boundary": "Real managed Rulebook/RuleApplySpell.Before, RuleCastSpell.OnTrigger, AbilityResourceLogic, EntityFactsManager and per-unit part, native ApplySpellbook/LevelUpState.OnApplyAction/SelectSpell, CharGen phase reuse rejection, Spellbook and ApplyRest. Source acquisition is staged on the preview ledger. Host substitutions: Unity profiling, target scene, minimal execution context, executor dispatch counter, command binding invoked directly, batch heal boundary delegates to the real per-unit ApplyRest, no UnitDescriptor.Replenish. No rendered UI, full level-up controller traversal, plan serialization, full command OnAction scene, real effect delivery, full rest coroutine or immediate scripted rest scene.",
+    "notRun": [
+      "game/UMM startup",
+      "player gameplay acceptance",
+      "full historical suites",
+      "shared class/spellbook/progression registration",
+      "level-up UI and respec controller",
+      "save/load transport",
+      "real TabletopTweaks / other provider assembly load",
+      "packaging, version bump, upload and issue closure"
+    ],
+    "commandSeconds": 3.497,
+    "command": [
+      "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099NativeTests\\bin\\Release\\net472\\Occultist0099NativeTests.exe",
+      "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+      "C:\\Users\\xuenc\\agent-tools\\occultist-next\\B-D2-fix\\native-b3-5.json",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+    ],
+    "environment": {
+      "COTW_HARMONY_MATRIX_PATH": "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed\\0Harmony.dll"
+    }
+  },
+  "sourceSHA256": {
+    "src/ModEntry.cs": "81A1C69AF0B48D39FA2C3AC2BA0105EB0ED29064DDA740F36184569CC00DA622",
+    "src/Occultist0099Ids.cs": "15AEFE5F4001E0C00A5D997B4232A5074141A3A8F63159EEE6DB94C4B0C8407D",
+    "src/Occultist0099Native.cs": "5BA4F16F7B8B70A97F0BCF51327E448054C6DC09BDECFAAD197BEE94429ACE4A",
+    "src/Occultist0099NativeWiring.cs": "0F0EE485A6E16D565052B23BFFCD4474904ED2A21FB362E53814BB6E4ED9554D",
+    "src/Occultist0099Rules.cs": "E39E8BB422D704AEFEB30834FA6A86468023F51AD21002889FFC434E224D9EFF",
+    "src/Occultist0099Spells.cs": "DC644CA5A7A127F4BC96F9A1A0E4159CC9F5C5DA91D565C5CDECF45CE165EED8",
+    "tests/Occultist0099NativeProgram.cs": "83396BF2ED25999933A8F10ACF59381220D035A45DD0A596EFE9C437AB60E457"
+  },
+  "artifactSHA256": {
+    "candidateDll": "602E96852125607647FEA7306D48880F0A2BC9FE084ECB050C06F003E553314F",
+    "hostExe": "BD811854DF42679CD6F2564934300BD501EB96348493B4100E0BADC1A61A613C",
+    "isolatedEngineAssembly": "3A85EDDC5D21CE98779C54F549BDD471D3DEF061948AEE2E85988E9782B82E80",
+    "installedGameAssembly": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+    "harmony": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5"
+  },
+  "fixtureSHA256": {
+    "A-occultist-assets.json": "247C988FDD28E365E419F90D834D5C389A21CC70DF070C5FFB9A88FCB3DA6C59",
+    "spirit-guide-0060-native-ext.json": "0CE753666FAE00A56359C17375169652195EDBBF5D54DA77C565D04B0165C06D"
+  },
+  "rawLogSHA256": "31B1EE216E29AC07FCAE5795B20607EFC40C13EA270DCAD92FD699B47AE05128",
+  "model": "not_run",
+  "packaging": "not_run",
+  "installerUpload": "not_run"
+}

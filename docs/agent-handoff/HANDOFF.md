@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成，B 在分支 `feat/cotw-0099-occultist` 修复 Abjuration 开发切片的 D2-01～06。独立 D 完成源码与 119 条定向证据复核，指出未发布补丁的自动安装，B 补上门禁并复验。主工程和原生宿主编译 0 警告 / 0 错误（1.80 秒），最终隔离原生 120/120（3.198 秒），模型 364/364（2.241 秒）。13 个 Wrath 根、4 个 CotW 构建器及 1 个 TTT 供体均沿用已有来源。升级 UI、重训、存读档、实际提供方、SP08 真实注册、实机、打包和上传未运行。切片为开发态，认领保持开放。[D2 修复与复用复查](../work-packages/COTW-0099/B-D2-fix.md) · [复跑证据](../work-packages/COTW-0099/B-D2-fix-evidence.json)。
+- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成，B3 完成 Abjuration 首切片的稳定学习来源、原生 DLC 和候选刷新。独立 D3 在该定向范围复查通过。最终编译 0 警告 / 0 错误（1.153 秒），隔离原生 137/137（3.497 秒）。继续 B/D 修复 Mind Barrier 和 Warding Talisman 原生生效、SP08 与既有供体接线；八学派、四 Panoply 和完整成长仍在施工。完整升级界面、真实提供方、重训、存读档、实机、打包和安装包上传未运行。保持开发态和认领开放。[B3 / D3 与后续发现](../work-packages/COTW-0099/B3-D3-implement-learning.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 

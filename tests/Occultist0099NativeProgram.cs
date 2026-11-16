@@ -15,6 +15,7 @@ using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.Controllers.Rest.State;
 using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.DLC;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
@@ -22,6 +23,7 @@ using Kingmaker.Inspect;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.UI.MVVM._VM.CharGen.Phases.Spells;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -133,6 +135,7 @@ internal static class Occultist0099NativeTests
     { __result = "0099N-" + (++serial).ToString("X"); return false; }
     private static bool TimeGetter(ref TimeSpan __result) { __result = currentTime; return false; }
     private static bool NoReplenish() => false;
+    private static bool NoUnityProfile(ref IDisposable __result) { __result = null; return false; }
 
     private static bool CastContextBoundary(ref AbilityExecutionContext __result)
     {
@@ -177,6 +180,9 @@ internal static class Occultist0099NativeTests
 
     private static void InstallBoundaries()
     {
+        harmony.Patch(AccessTools.Method(typeof(Kingmaker.Utility.ProfileScope), "New",
+                new[] { typeof(string), typeof(UnityEngine.Object) }),
+            prefix: new HarmonyMethod(AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NoUnityProfile))));
         harmony.Patch(AccessTools.PropertyGetter(typeof(UnitDescriptor), "IsPlayerFaction"),
             prefix: new HarmonyMethod(AccessTools.Method(
                 typeof(Occultist0099NativeTests), nameof(NotPlayerFaction))));
@@ -592,6 +598,8 @@ internal static class Occultist0099NativeTests
     private static BlueprintCharacterClass occultistClass;
     private static BlueprintSpellbook occultistBook;
     private static BlueprintSpellList occultistList;
+    private static BlueprintSpellList firstImplementList;
+    private static BlueprintSpellList extraImplementList;
     private static BlueprintFeature focusFact;
     private static BlueprintFeature spellbookFact;
     private static BlueprintAbilityResource focusResource;
@@ -634,19 +642,42 @@ internal static class Occultist0099NativeTests
         }
         occultistList.SpellsByLevel = rows.ToArray();
         Stage(occultistList, Occultist0099Ids.SpellListGuid, "0099N.OccultistSpellList");
+        firstImplementList = Stage(new BlueprintSpellList { SpellsByLevel = rows.ToArray() },
+            Occultist0099Ids.Id("slot-1-Abjuration-LearnList"), "0099N.AbjurationFirstList");
+        extraImplementList = Stage(new BlueprintSpellList { SpellsByLevel = rows.ToArray() },
+            Occultist0099Ids.Id("slot-2-Abjuration-ExtraLearnList"), "0099N.AbjurationExtraList");
 
         // The private book uses the audited Alchemist six-circle donor table for
         // its per-day counts (A dailySpellSlots.tableDonor) but its OWN identity,
         // list and class. The donor book itself is never modified.
         var donorTable = Native<BlueprintSpellsTable>("bf4a0a03a45275d438b8c59cd5388259");
+        var zeroKnown = Stage(new BlueprintSpellsTable
+        {
+            Levels = Enumerable.Range(0, 21).Select(_ => new SpellsLevelEntry { Count = new int[11] }).ToArray()
+        }, Occultist0099Ids.Id("ZeroSpellsKnown"), "0099N.OccultistZeroKnown");
         occultistBook = new BlueprintSpellbook
         {
-            Spontaneous = false,
+            Spontaneous = true,
             AllSpellsKnown = false,
             CastingAttribute = StatType.Intelligence,
             ComponentsArray = new BlueprintComponent[]
             {
-                new Occultist0099SpellbookMarker0099 { name = "$0099N$Marker" }
+                new Occultist0099SpellbookMarker0099
+                {
+                    name = "$0099N$Marker",
+                    ImplementLists = new[]
+                    {
+                        new Occultist0099ImplementSpellList
+                        {
+                            SlotKey = "slot-1", School = "Abjuration", List = Ref<BlueprintSpellListReference>(firstImplementList)
+                        },
+                        new Occultist0099ImplementSpellList
+                        {
+                            SlotKey = "slot-2", School = "Abjuration", ExtraSpells = true,
+                            List = Ref<BlueprintSpellListReference>(extraImplementList)
+                        }
+                    }
+                }
             }
         };
         Set(occultistBook, "m_CharacterClass",
@@ -654,7 +685,9 @@ internal static class Occultist0099NativeTests
         Set(occultistBook, "m_SpellList", Ref<BlueprintSpellListReference>(occultistList));
         Set(occultistBook, "m_SpellsPerDay",
             Ref<BlueprintSpellsTableReference>(donorTable));
+        Set(occultistBook, "m_SpellsKnown", Ref<BlueprintSpellsTableReference>(zeroKnown));
         Stage(occultistBook, Occultist0099Ids.BookGuid, "0099N.OccultistSpellbook");
+        Set(occultistClass, "m_Spellbook", Ref<BlueprintSpellbookReference>(occultistBook));
 
         focusResource = Stage(new BlueprintAbilityResource
         {
@@ -881,15 +914,14 @@ internal static class Occultist0099NativeTests
     // ------------------------------------------------------------------
     // SP01 / SP02 native: SelectSpell.Check / Apply and Spellbook.AddKnown.
     // ------------------------------------------------------------------
-    private static LevelUpState ChoiceState(Spellbook book, int circle, int slots)
+    private static LevelUpState LevelState(Spellbook book)
     {
         var state = Empty<LevelUpState>();
         Set(state, "m_Unit", book.Owner.Unit);
         Set(state, "Selections", new List<FeatureSelectionState>());
         Set(state, "SpellSelections", new List<SpellSelectionData>());
         Set(state, "SelectedClass", occultistClass);
-        var selection = state.DemandSpellSelection(book.Blueprint, book.Blueprint.SpellList);
-        for (int i = 0; i < 11; i++) selection.SetLevelSpells(i, i == circle ? slots : 0);
+        state.OnApplyAction();
         return state;
     }
 
@@ -902,6 +934,15 @@ internal static class Occultist0099NativeTests
         var u = Unit("sp01", occultistClass, 1, 16);
         u.Facts.Add(new Feature(spellbookFact, u.Descriptor));
         var book = Book(u);
+        Set(book, "m_BaseLevelInternal", 0);
+        var state = LevelState(book);
+        new ApplySpellbook().Apply(state, u.Descriptor);
+        state.OnApplyAction();
+        var baseline = state.GetSpellSelection(occultistBook, occultistList);
+        Check(book.BaseLevel == 1 && occultistBook.Spontaneous && baseline != null && !baseline.HasEmpty(),
+            "SP01N native ApplySpellbook advances the spontaneous private book without granting a generic known slot");
+        Check(state.GetSpellSelection(occultistBook, firstImplementList) == null,
+            "SP01N the baseline action does not offer an implement before it is acquired");
         Check(BookFact(u) != null,
             "SP01N the real fact manager attaches the 0099 spellbook component");
 
@@ -925,14 +966,14 @@ internal static class Occultist0099NativeTests
 
         // POSITIVE: the native SelectSpell.Check permits the eligible choice and
         // Apply really spends the slot and really adds the known spell.
-        var state = ChoiceState(book, 1, 1);
-        var choice = new SelectSpell(occultistBook, occultistList, 1, mageShield, 0);
+        state.OnApplyAction();
+        var choice = new SelectSpell(occultistBook, firstImplementList, 1, mageShield, 0);
         Check(NativeCheck(choice, state, u.Descriptor),
             "SP01N native SelectSpell.Check permits an eligible private choice");
         choice.Apply(state, u.Descriptor);
         Check(book.IsKnown(mageShield),
             "SP01N native SelectSpell.Apply really adds the root to the private book");
-        Check(!state.GetSpellSelection(occultistBook, occultistList).CanSpendSlot(1, 0),
+        Check(!state.GetSpellSelection(occultistBook, firstImplementList).CanSpendSlot(1, 0),
             "SP01N the native selection slot is really consumed");
         InBook(u, f =>
         {
@@ -945,15 +986,15 @@ internal static class Occultist0099NativeTests
         });
 
         // NEGATIVE: the same root cannot occupy a second slot in the same book.
-        var second = ChoiceState(book, 1, 1);
-        Check(!NativeCheck(new SelectSpell(occultistBook, occultistList, 1, mageShield, 0),
+        var second = LevelState(book);
+        Check(!NativeCheck(new SelectSpell(occultistBook, firstImplementList, 1, mageShield, 0),
                 second, u.Descriptor),
             "SP01N native Check refuses an already known root in a fresh slot");
 
         // NEGATIVE: a circle the class level has not opened yet.
         var resist = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.ResistEnergy);
-        var early = ChoiceState(book, 2, 1);
-        Check(!NativeCheck(new SelectSpell(occultistBook, occultistList, 2, resist, 0),
+        var early = LevelState(book);
+        Check(!NativeCheck(new SelectSpell(occultistBook, firstImplementList, 2, resist, 0),
                 early, u.Descriptor),
             "SP01N native Check refuses circle 2 at class level 1");
 
@@ -988,7 +1029,8 @@ internal static class Occultist0099NativeTests
         string beforeForeign = null;
         InBook(u, f => beforeForeign = f.StateFingerprint());
         var foreignChoice = new SelectSpell(foreignBook, occultistList, 1, mageShield, 0);
-        var foreignState = ChoiceState(foreign, 1, 1);
+        var foreignState = LevelState(foreign);
+        foreignState.DemandSpellSelection(foreignBook, occultistList).SetLevelSpells(1, 1);
         // The gate only governs the PRIVATE book; a foreign book keeps native
         // behaviour, and the 0099 ledger must not move either way.
         Check(NativeCheck(foreignChoice, foreignState, u.Descriptor),
@@ -1003,28 +1045,35 @@ internal static class Occultist0099NativeTests
             Type = AbilityType.Spell,
             ComponentsArray = new BlueprintComponent[] { new SpellComponent { School = SpellSchool.Evocation } }
         }, Guid.NewGuid().ToString("N"), "0099N.OffList");
-        var wrongChoice = new SelectSpell(occultistBook, occultistList, 1, wrongRoot, 0);
-        var wrongState = ChoiceState(book, 1, 1);
+        var wrongChoice = new SelectSpell(occultistBook, firstImplementList, 1, wrongRoot, 0);
+        var wrongState = LevelState(book);
         Check(!NativeCheck(wrongChoice, wrongState, u.Descriptor), "D2-04 private Check refuses an off-list root");
         Check(book.AddKnown(1, wrongRoot) == null && !book.IsKnown(wrongRoot),
             "D2-04 unapproved private AddKnown refuses the off-list root");
-        new SelectSpell(occultistBook, occultistList, 2, mageShield, 0).Apply(early, u.Descriptor);
-        Check(early.GetSpellSelection(occultistBook, occultistList).CanSpendSlot(2, 0),
-            "D2-04 a directly applied wrong-circle choice leaves the native slot unused");
-
-        InBook(u, f => Occultist0099Spells.AddSlot(SpellStateOf(f), "slot-2", "Abjuration"));
-        var secondSlot = ChoiceState(book, 1, 2);
+        InBook(u, f => Occultist0099Spells.AddSlot(SpellStateOf(f), "slot-2", "Abjuration", extraSpells: true));
+        second.OnApplyAction();
+        var choiceForExtra = second.GetSpellSelection(occultistBook, extraImplementList);
+        Check(second.GetSpellSelection(occultistBook, firstImplementList) == null && choiceForExtra.CanSpendSlot(1, 0),
+            "SP01N the previously filled quota is absent and the newly acquired implement has native index zero");
         var warding = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.Roots
             .Single(r => r.Name == "CotWWrathPsychicWardingWeapon").Guid);
-        var occupied = new SelectSpell(occultistBook, occultistList, 1, warding, 0);
-        Check(!NativeCheck(occupied, secondSlot, u.Descriptor),
-            "D2-04 native index 0 cannot borrow the open quota of a different implement slot");
-        var newSource = new SelectSpell(occultistBook, occultistList, 1, warding, 1);
-        Check(NativeCheck(newSource, secondSlot, u.Descriptor), "D2-04 native index 1 selects its exact quota");
-        newSource.Apply(secondSlot, u.Descriptor);
+        new SelectSpell(occultistBook, extraImplementList, 1, resist, 0).Apply(second, u.Descriptor);
+        Check(choiceForExtra.CanSpendSlot(1, 0) && !book.IsKnown(resist),
+            "D2-04 a directly applied wrong-circle choice leaves an actual native slot unused");
+        var occupied = new SelectSpell(occultistBook, firstImplementList, 1, warding, 0);
+        Check(!NativeCheck(occupied, second, u.Descriptor),
+            "D2-04 an action for the first source cannot borrow the new source's native index zero");
+        Check(!NativeCheck(new SelectSpell(occultistBook, occultistList, 1, warding, 0), second, u.Descriptor),
+            "SP01N the private union list is not a stable source");
+        var newSource = new SelectSpell(occultistBook, extraImplementList, 1, warding, 0);
+        Check(NativeCheck(newSource, second, u.Descriptor), "SP01N the native extra implement offer selects its own quota");
+        newSource.Apply(second, u.Descriptor);
+        second.OnApplyAction();
+        Check(second.GetSpellSelection(occultistBook, extraImplementList).LevelCount[1].SpellSelections[0] == warding,
+            "SP01N refreshing native offers preserves the pending native selection for undo");
         InBook(u, f => Eq(warding.AssetGuid.ToString(),
             SpellStateOf(f).Quotas[Occultist0099Spells.QuotaKey("slot-2", 1)],
-            "D2-04 the ledger records the source of the index selected in the native action"));
+            "D2-04 the ledger records the stable source carried by the native action"));
         var preview = Unit("sp01-preview", occultistClass, 1, 16);
         preview.Facts.Add(new Feature(spellbookFact, preview.Descriptor));
         var previewBook = Book(preview);
@@ -1041,7 +1090,7 @@ internal static class Occultist0099NativeTests
         });
         InBook(u, f => Stable(sourceBefore, f.StateFingerprint(),
             "D2-04 preview ledger mutations never affect the live book"));
-        caseStatus["SP01"] = "native_select_apply_isolated_book_and_exact_sources";
+        caseStatus["SP01"] = "native_level_up_offers_select_apply_isolated_book_and_exact_sources";
         caseStatus["SP03"] = "native_copy_provenance_and_preview_isolation_only";
     }
 
@@ -1059,28 +1108,28 @@ internal static class Occultist0099NativeTests
                 "SP02N Int 11 caps the open circle at 1 even at class level 4");
         });
         var resist = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.ResistEnergy);
-        Check(!NativeCheck(new SelectSpell(occultistBook, occultistList, 2, resist, 0),
-                ChoiceState(book, 2, 1), u.Descriptor),
+        Check(!NativeCheck(new SelectSpell(occultistBook, firstImplementList, 2, resist, 0),
+                LevelState(book), u.Descriptor),
             "SP02N native Check refuses circle 2 while the real Int stat is 11");
         Check(book.AddKnown(2, resist) == null,
             "SP02N native AddKnown refuses circle 2 while Int is 11");
 
         // A live attribute change is seen without requiring a rest.
         SetInt(u, 16);
-        Check(NativeCheck(new SelectSpell(occultistBook, occultistList, 2, resist, 0),
-                ChoiceState(book, 2, 1), u.Descriptor),
+        Check(NativeCheck(new SelectSpell(occultistBook, firstImplementList, 2, resist, 0),
+                LevelState(book), u.Descriptor),
             "SP02N native Check permits circle 2 after the real Int raise");
 
         // Lower Int again: an established quota survives, new learning does not.
-        var state = ChoiceState(book, 2, 1);
-        new SelectSpell(occultistBook, occultistList, 2, resist, 0).Apply(state, u.Descriptor);
+        var state = LevelState(book);
+        new SelectSpell(occultistBook, firstImplementList, 2, resist, 0).Apply(state, u.Descriptor);
         Check(book.IsKnown(resist), "SP02N circle 2 root really learned at Int 16");
-        SetInt(u, 11);
-        var lowInt = ChoiceState(book, 2, 2);
+        InBook(u, f => Occultist0099Spells.AddSlot(SpellStateOf(f), "slot-2", "Abjuration", extraSpells: true));
+        var lowInt = LevelState(book);
         var alliedCloak = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.Roots
             .Single(r => r.Name == "CotWWrathPsychicAlliedCloak").Guid);
-        InBook(u, f => Occultist0099Spells.AddSlot(SpellStateOf(f), "slot-2", "Abjuration"));
-        Check(!NativeCheck(new SelectSpell(occultistBook, occultistList, 2, alliedCloak, 1),
+        SetInt(u, 11);
+        Check(!NativeCheck(new SelectSpell(occultistBook, extraImplementList, 2, alliedCloak, 0),
                 lowInt, u.Descriptor), "D2-04 a temporary Int drop blocks new learning without rest");
         Rest(u);
         InBook(u, f =>
@@ -1096,6 +1145,102 @@ internal static class Occultist0099NativeTests
             "SP02N a second circle-2 root cannot be learned while Int is 11");
 
         caseStatus["SP02"] = "native_live_int_learning_plus_model_cast_gate";
+    }
+
+    private static void ExhaustedImplementQuotaNative()
+    {
+        var u = Unit("sp01-exhausted", occultistClass, 16, 16);
+        u.Facts.Add(new Feature(spellbookFact, u.Descriptor));
+        var book = Book(u);
+        InBook(u, f =>
+        {
+            var ledger = SpellStateOf(f);
+            Occultist0099Spells.AddSlot(ledger, "slot-1", "Abjuration");
+            Occultist0099Spells.AddSlot(ledger, "slot-2", "Abjuration", extraSpells: true);
+        });
+        var state = LevelState(book);
+        var globe = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.GlobeOfInvulnerability);
+        var first = new SelectSpell(occultistBook, firstImplementList, 6, globe, 0);
+        var extra = new SelectSpell(occultistBook, extraImplementList, 6, globe, 0);
+        Check(NativeCheck(first, state, u.Descriptor) && NativeCheck(extra, state, u.Descriptor),
+            "SP01N a newly open circle offers one native slot for each implement");
+        var reward = Stage(new BlueprintDlcReward(), Guid.NewGuid().ToString("N"), "0099N.UnavailableReward");
+        Set(reward, "m_IsAvailable", false);
+        var restriction = new DlcCondition { name = "$0099N$GlobeRestriction" };
+        Set(restriction, "m_DlcReward", Ref<BlueprintDlcRewardReference>(reward));
+        var components = globe.ComponentsArray;
+        var row = extraImplementList.SpellsByLevel[6];
+        try
+        {
+            globe.ComponentsArray = components.Concat(new BlueprintComponent[] { restriction }).ToArray();
+            Set(row, "m_SpellsFiltered", null);
+            Check(row.SpellsRefs.Count == 1 && extraImplementList.GetSpells(6).Count == 0,
+                "SP01N native DLC filtering hides the sole raw root");
+            var restricted = LevelState(book);
+            Check(restricted.GetSpellSelection(occultistBook, extraImplementList).LevelCount[6] == null,
+                "SP01N no native slot is allocated for the DLC-hidden root");
+            extra.Apply(state, u.Descriptor);
+            Check(!book.IsKnown(globe) && state.GetSpellSelection(occultistBook, extraImplementList).CanSpendSlot(6, 0),
+                "SP01N directly replaying the stale DLC-hidden choice still cannot spend the native slot");
+        }
+        finally
+        {
+            globe.ComponentsArray = components;
+            Set(row, "m_SpellsFiltered", null);
+        }
+        extra.Apply(state, u.Descriptor);
+        state.OnApplyAction();
+        Check(state.GetSpellSelection(occultistBook, firstImplementList).LevelCount[6] == null &&
+              state.GetSpellSelection(occultistBook, extraImplementList).LevelCount[6].SpellSelections[0] == globe,
+            "SP01N native offers remove the exhausted page and preserve the pending selection");
+        InBook(u, f => Check(SpellStateOf(f).Quotas[Occultist0099Spells.QuotaKey("slot-1", 6)] == null,
+            "SP01N the exhausted quota remains open in the source ledger for a later upgrade"));
+    }
+
+    private static void ImplementReplayNative()
+    {
+        var live = Unit("sp01-replay-live", occultistClass, 4, 16);
+        live.Facts.Add(new Feature(spellbookFact, live.Descriptor));
+        var liveBook = Book(live);
+        InBook(live, f =>
+        {
+            var ledger = SpellStateOf(f);
+            Occultist0099Spells.AddSlot(ledger, "slot-1", "Abjuration");
+            Occultist0099Spells.AddSlot(ledger, "slot-2", "Abjuration", extraSpells: true);
+        });
+        var warding = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.WardingWeapon);
+        var first = new SelectSpell(occultistBook, firstImplementList, 1, warding, 0);
+        var extra = new SelectSpell(occultistBook, extraImplementList, 1, warding, 0);
+        var copyBook = AccessTools.Method(typeof(UnitHelper), "CopySpellbook");
+        var preview = Unit("sp01-replay-preview", occultistClass, 4, 16);
+        preview.Facts.Add(new Feature(spellbookFact, preview.Descriptor));
+        var previewBook = Book(preview);
+        copyBook.Invoke(null, new object[] { live, preview });
+        var state = LevelState(previewBook);
+        var before = state.GetSpellSelection(occultistBook, firstImplementList);
+        Check(NativeCheck(extra, state, preview.Descriptor), "SP01N a rebuilt preview accepts the same stored source action");
+        extra.Apply(state, preview.Descriptor);
+        state.OnApplyAction();
+        var after = state.GetSpellSelection(occultistBook, firstImplementList);
+        Check(before.CanSpendSlot(1, 0) && after.CanSpendSlot(1, 0) && !ReferenceEquals(before, after),
+            "SP01N candidate loss replaces the whole source offer while the native slot count is unchanged");
+        var phase = Empty<CharGenSpellsPhaseVM>();
+        Set(phase, "m_SelectionData", before);
+        Check(!phase.TryUpdateSamePhase(after), "SP01N native source phases refuse reuse after a candidate is learned elsewhere");
+        Check(previewBook.IsKnown(warding) && !liveBook.IsKnown(warding),
+            "SP01N discarding the preview would leave the live book unmodified");
+
+        var changed = Unit("sp01-replay-source-removed", occultistClass, 4, 16);
+        changed.Facts.Add(new Feature(spellbookFact, changed.Descriptor));
+        var changedBook = Book(changed);
+        copyBook.Invoke(null, new object[] { live, changed });
+        InBook(changed, f => Occultist0099Spells.RemoveSlot(SpellStateOf(f), "slot-2"));
+        state = LevelState(changedBook);
+        Check(NativeCheck(first, state, changed.Descriptor) && !NativeCheck(extra, state, changed.Descriptor),
+            "SP01N the same unknown root is still offered but replay cannot move it to the surviving source");
+        extra.Apply(state, changed.Descriptor);
+        Check(!changedBook.IsKnown(warding) && state.GetSpellSelection(occultistBook, firstImplementList).CanSpendSlot(1, 0),
+            "SP01N the stale action leaves the surviving source and its native choice slot untouched");
     }
 
     // ------------------------------------------------------------------
@@ -1254,6 +1399,8 @@ internal static class Occultist0099NativeTests
         MF01Native();
         SP01Native();
         SP02Native();
+        ExhaustedImplementQuotaNative();
+        ImplementReplayNative();
         RestNative();
         GateNative();
 
@@ -1269,7 +1416,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B directed native recheck (D2 fixes)",
+            ["stage"] = "B3 directed native recheck (stable implement learning offers)",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -1288,9 +1435,9 @@ internal static class Occultist0099NativeTests
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Native RuleCastSpell prior to the mocked dispatch, private SelectSpell and AddKnown, native fact replacement and ApplyRest ran in a managed fixture."
+                ? "Native RuleCastSpell prior to the mocked dispatch, ApplySpellbook/OnApplyAction, private SelectSpell/AddKnown, offer refresh, native fact replacement and ApplyRest ran in a managed fixture."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Real managed Rulebook/RuleApplySpell.Before, RuleCastSpell.OnTrigger, AbilityResourceLogic, EntityFactsManager and per-unit part, SelectSpell, Spellbook and ApplyRest. Host substitutions: no native target scene, minimal execution context, executor dispatch counter, native UnitUseAbility constructed with metamagic profiling disabled, command binding invoked directly, batch heal boundary delegates to the real per-unit ApplyRest, no UnitDescriptor.Replenish. No full command OnAction scene, real effect delivery, full rest coroutine or immediate scripted rest scene.",
+            ["boundary"] = "Real managed Rulebook/RuleApplySpell.Before, RuleCastSpell.OnTrigger, AbilityResourceLogic, EntityFactsManager and per-unit part, native ApplySpellbook/LevelUpState.OnApplyAction/SelectSpell, CharGen phase reuse rejection, Spellbook and ApplyRest. Source acquisition is staged on the preview ledger. Host substitutions: Unity profiling, target scene, minimal execution context, executor dispatch counter, command binding invoked directly, batch heal boundary delegates to the real per-unit ApplyRest, no UnitDescriptor.Replenish. No rendered UI, full level-up controller traversal, plan serialization, full command OnAction scene, real effect delivery, full rest coroutine or immediate scripted rest scene.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

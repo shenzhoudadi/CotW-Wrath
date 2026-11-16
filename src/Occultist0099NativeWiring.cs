@@ -14,6 +14,7 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.UI.MVVM._VM.CharGen.Phases.Spells;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -352,11 +353,11 @@ namespace CallOfTheWild.Wrath.Prototype
 
         public void HandleUnitGainLevel() => Sync();
 
-        internal string EligibleSlot(Spellbook book, int index, int circle, BlueprintAbility spell)
+        internal bool CanLearn(Spellbook book, Occultist0099ImplementSpellList source, int circle,
+            BlueprintAbility spell)
         {
-            if (book?.Owner?.Unit != Owner || !Occultist0099NativeScope.IsPrivateBook(book) ||
-                index < 0 || spell == null || book.IsKnown(spell))
-                return null;
+            if (book?.Owner?.Unit != Owner || spell == null || book.IsKnown(spell))
+                return false;
 
             var root = Occultist0099NativeScope.RootOf(spell);
             int intelligence = IntelligenceScore();
@@ -364,7 +365,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (root == null || circle != root.Circle || root.IsKnack || spell.Type != AbilityType.Spell ||
                 spell.Parent != null || spell.GetComponent<SpellComponent>()?.School.ToString() != root.School ||
                 intelligence < 10 + circle || circle > Occultist0099AbjurationCatalog.MaxCircleForLevel(level))
-                return null;
+                return false;
 
             var state = State;
             if (state.Intelligence != intelligence || state.ClassLevel != level)
@@ -373,13 +374,47 @@ namespace CallOfTheWild.Wrath.Prototype
                 Occultist0099Spells.SetLevel(state, level);
                 Occultist0099Spells.SetIntelligence(state, intelligence);
             }
-            // One private list for the Abjuration slice. Native indices map
-            // to every source quota of the circle, including filled slots.
-            var slot = state.Slots
-                .Where(s => state.Quotas.ContainsKey(Occultist0099Spells.QuotaKey(s.Key, circle)))
-                .ElementAtOrDefault(index);
-            return slot != null && Occultist0099Spells.Candidates(state, slot.Key, circle)
-                .Any(r => r.Guid == root.Guid) ? slot.Key : null;
+            return state.Slots.Any(source.Matches) &&
+                Occultist0099Spells.Candidates(state, source.SlotKey, circle).Any(r => r.Guid == root.Guid);
+        }
+
+        internal void RefreshOffers(LevelUpState levelUp, Spellbook book)
+        {
+            Sync();
+            var state = State;
+            foreach (var source in book.Blueprint.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists)
+            {
+                var list = source.List?.Get();
+                if (list == null || list == book.Blueprint.SpellList) continue;
+                var previous = levelUp.GetSpellSelection(book.Blueprint, list);
+                var next = new Occultist0099NativeSpellOffer(book.Blueprint, list);
+                bool changed = false;
+                bool ownsSource = state.Slots.Any(source.Matches);
+                for (int circle = 1; circle <= 6; circle++)
+                {
+                    var old = previous?.LevelCount[circle]?.SpellSelections;
+                    var selected = old?.FirstOrDefault();
+                    if (selected != null && (!state.Quotas.TryGetValue(
+                            Occultist0099Spells.QuotaKey(source.SlotKey, circle), out var guid) ||
+                            guid != selected.AssetGuid.ToString() || !ownsSource)) selected = null;
+                    var visible = next.Visible[circle];
+                    if (selected != null) visible.Add(selected);
+                    else if (ownsSource && Occultist0099Spells.IntAllowsCircle(state, circle))
+                        foreach (var spell in list.GetSpells(circle))
+                            if (CanLearn(book, source, circle, spell)) visible.Add(spell);
+                    if (visible.Count > 0)
+                    {
+                        next.SetLevelSpells(circle, 1);
+                        next.LevelCount[circle].SpellSelections[0] = selected;
+                    }
+                    var priorVisible = (previous as Occultist0099NativeSpellOffer)?.Visible[circle];
+                    changed |= (visible.Count > 0) != (old?.Length == 1) || selected != old?.FirstOrDefault() ||
+                        (priorVisible != null && !visible.SetEquals(priorVisible));
+                }
+                if (!changed) continue;
+                if (previous != null) levelUp.SpellSelections.Remove(previous);
+                if (next.LevelCount.Any(row => row != null)) levelUp.SpellSelections.Add(next);
+            }
         }
 
         internal bool RecordLearn(string slot, int circle, BlueprintAbility spell)
@@ -399,14 +434,51 @@ namespace CallOfTheWild.Wrath.Prototype
             => Occultist0099Spells.QuotaCount(State, circle);
     }
 
+    internal sealed class Occultist0099NativeSpellOffer : SpellSelectionData
+    {
+        internal readonly HashSet<BlueprintAbility>[] Visible = Enumerable.Range(0, 7)
+            .Select(_ => new HashSet<BlueprintAbility>()).ToArray();
+
+        internal Occultist0099NativeSpellOffer(BlueprintSpellbook book, BlueprintSpellList list) : base(book, list) { }
+    }
+
+    // Native level-up replays ApplySpellbook before feature selections and
+    // invokes OnApplyAction after each action on both the preview and commit.
+    [HarmonyPatch(typeof(LevelUpState), nameof(LevelUpState.OnApplyAction))]
+    internal static class Occultist0099NativeLearnOffers
+    {
+        private static void Postfix(LevelUpState __instance)
+        {
+            if (__instance.SelectedClass == null) return;
+            var owner = __instance.Unit;
+            var blueprint = owner.Progression.GetClassData(__instance.SelectedClass)?.Spellbook;
+            if (!Occultist0099NativeScope.IsPrivateBook(blueprint)) return;
+            var book = owner.GetSpellbook(blueprint);
+            if (book == null) return;
+            Occultist0099NativeScope.InFactContext(owner.Unit, Occultist0099Ids.SpellbookFactGuid,
+                typeof(Occultist0099SpellbookFact0099),
+                component => ((Occultist0099SpellbookFact0099)component).RefreshOffers(__instance, book));
+        }
+    }
+
     internal static class Occultist0099NativeSelection
     {
+        private static Occultist0099ImplementSpellList SourceFor(BlueprintSpellbook book, BlueprintSpellList list)
+            => list == null || !Occultist0099NativeScope.IsPrivateBook(book) || list == book.SpellList ? null :
+                book.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists
+                    .FirstOrDefault(s => s.List?.Get() == list);
+
         internal static bool Select(SelectSpell action, LevelUpState levelUp, UnitDescriptor owner, bool commit)
         {
             if (levelUp == null || owner == null || action.SpellLevel < 1 || action.SpellLevel > 6 ||
-                action.SpellList == null || action.SpellList != action.Spellbook.SpellList ||
-                action.SpellList.AssetGuid.ToString() != Occultist0099Ids.SpellListGuid)
+                action.SlotIndex != 0 || action.SpellList == null || action.SpellList == action.Spellbook.SpellList ||
+                action.Spell == null)
                 return false;
+            // The native SelectSpell action serializes the list reference. A
+            // replay can only fill this source even if other slots were added,
+            // filled, removed, or assigned a different implement in between.
+            var source = SourceFor(action.Spellbook, action.SpellList);
+            if (source == null || !action.SpellList.GetSpells(action.SpellLevel).Contains(action.Spell)) return false;
             var choice = levelUp.GetSpellSelection(action.Spellbook, action.SpellList);
             if (choice == null || (commit && !choice.CanSpendSlot(action.SpellLevel, action.SlotIndex)))
                 return false;
@@ -417,9 +489,8 @@ namespace CallOfTheWild.Wrath.Prototype
             return Occultist0099NativeScope.InRuntimeContext(runtime, component =>
             {
                 var facts = (Occultist0099SpellbookFact0099)component;
-                string slot = facts.EligibleSlot(book, action.SlotIndex, action.SpellLevel, action.Spell);
-                if (slot == null) return false;
-                return !commit || Learn(facts, book, choice, action, slot);
+                if (!facts.CanLearn(book, source, action.SpellLevel, action.Spell)) return false;
+                return !commit || Learn(facts, book, choice, action, source.SlotKey);
             }, false);
         }
 
@@ -467,6 +538,36 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             EventBus.RaiseEvent<ILearnSpellHandler>(h => h.HandleLearnSpell());
             return true;
+        }
+    }
+
+    // Use the same native selector and collection hook as the Bard
+    // masterpiece choices. Only a private 0099 source needs this filtering.
+    [HarmonyPatch(typeof(CharGenSpellsPhaseVM), "CreateSpellVMsCollection")]
+    internal static class Occultist0099NativeChoiceList
+    {
+        private static void Postfix(SpellSelectionData ___m_SelectionData, List<CharGenSpellSelectorItemVM> __result)
+        {
+            if (!(___m_SelectionData is Occultist0099NativeSpellOffer offer)) return;
+            __result.RemoveAll(item =>
+            {
+                if (item.Level >= 1 && item.Level <= 6 && offer.Visible[item.Level].Contains(item.Spell)) return false;
+                item.Dispose();
+                return true;
+            });
+        }
+    }
+
+    [HarmonyPatch(typeof(CharGenSpellsPhaseVM), nameof(CharGenSpellsPhaseVM.TryUpdateSamePhase))]
+    internal static class Occultist0099NativeChoiceRefresh
+    {
+        private static bool Prefix(SpellSelectionData __0, SpellSelectionData ___m_SelectionData, ref bool __result)
+        {
+            if (!(__0 is Occultist0099NativeSpellOffer) || ReferenceEquals(__0, ___m_SelectionData)) return true;
+            // CharGen recreates phases by selection object, so all circles of
+            // a changed source must refuse reuse together.
+            __result = false;
+            return false;
         }
     }
 

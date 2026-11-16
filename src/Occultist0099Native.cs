@@ -13,6 +13,7 @@ using System.Linq;
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.EntitySystem.Entities;
@@ -236,6 +237,20 @@ namespace CallOfTheWild.Wrath.Prototype
         }
     }
 
+    [Serializable]
+    public sealed class Occultist0099ImplementSpellList
+    {
+        public string SlotKey;
+        public string School;
+        public string Panoply;
+        public bool ExtraSpells;
+        public BlueprintSpellListReference List;
+
+        public bool Matches(Occultist0099Slot slot)
+            => slot.Key == SlotKey && slot.School == School && slot.Panoply == Panoply &&
+               slot.ExtraSpells == ExtraSpells;
+    }
+
     // Private spellbook marker. Only this book may use the private circle
     // table; backlink/global spell-list data of other books stays untouched.
     [TypeId(Occultist0099Ids.SpellbookMarkerTypeId)]
@@ -243,6 +258,7 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         public int MaximumSpellLevel = 6;
         public bool ZeroQuotaSpellsKnownTable = true;
+        public Occultist0099ImplementSpellList[] ImplementLists = Array.Empty<Occultist0099ImplementSpellList>();
 
         public int PrivateCircle(string rootGuid, int nativeCircle)
             => Occultist0099BookScope.CircleOf(Occultist0099Ids.BookGuid,
