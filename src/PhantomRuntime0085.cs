@@ -30,6 +30,7 @@ using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
@@ -281,6 +282,15 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool SameLocalArea(UnitEntityData master, UnitEntityData pet)
             => pet != null && CanPlace(master) && pet.HoldingState == master.HoldingState;
 
+        internal static UnitEntityData ManifestedPet(UnitEntityData master)
+        {
+            var part = master?.Get<UnitPartPhantom0085>();
+            if (part == null || part.Confined) return null;
+            var pet = part.BoundPet(master);
+            return Alive(pet) && pet.IsInGame && !pet.Get<UnitPartPet>().ShouldBeHidden &&
+                SameLocalArea(master, pet) ? pet : null;
+        }
+
         internal static bool TryMoveNearMaster(UnitEntityData master, UnitEntityData pet, bool requireMovement = true)
         {
             var path = AstarPath.active;
@@ -471,7 +481,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 evt.Reason.Context?.AssociatedBlueprint?.GetComponent<Phantom0085HatefulAura>() != null) return;
             var phantom = Buff.Context.MaybeCaster;
             var master = phantom?.Get<UnitPartPet>()?.Master;
-            if (!ReferenceEquals(Phantom0085DamageTransfer.ActivePet(master), phantom) || phantom == null ||
+            if (!ReferenceEquals(Phantom0085Link.ManifestedPet(master), phantom) || phantom == null ||
                 !Owner.IsEnemy(phantom) || (evt.Target != phantom && evt.Target != master) ||
                 Owner.DistanceTo(phantom) > 20.Feet().Meters) return;
             int bonus = Math.Max(0, phantom.Stats.Charisma.Bonus);
@@ -788,15 +798,6 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool ExpectedVictim(bool spiritualBond, UnitEntityData victim, UnitEntityData master, UnitEntityData pet)
             => !ReferenceEquals(victim, null) && ReferenceEquals(victim, spiritualBond ? master : pet);
 
-        internal static UnitEntityData ActivePet(UnitEntityData master)
-        {
-            var part = master?.Get<UnitPartPhantom0085>();
-            if (part == null || part.Confined) return null;
-            var pet = part.BoundPet(master);
-            return Phantom0085Link.Alive(pet) && pet.IsInGame && !pet.Get<UnitPartPet>().ShouldBeHidden &&
-                Phantom0085Link.SameLocalArea(master, pet) ? pet : null;
-        }
-
         internal static UnitEntityData ResolveRecipient(RuleDealDamage deal, out int amount)
         {
             amount = 0;
@@ -807,7 +808,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var victimPart = victim.Get<UnitPartPet>();
             bool spiritualBond = victimPart?.Type != Spiritualist0085Ids.PhantomPetType;
             var master = spiritualBond ? victim : victimPart.Master;
-            var pet = ActivePet(master);
+            var pet = Phantom0085Link.ManifestedPet(master);
             if (pet == null || !ExpectedVictim(spiritualBond, victim, master, pet)) return null;
             if (!master.Buffs.Enumerable.Any(b => b.IsTurnedOn && !b.IsSuppressed &&
                 b.Blueprint.GetComponent<Phantom0085DamageTransfer>()?.SpiritualBond == spiritualBond))
@@ -841,7 +842,7 @@ namespace CallOfTheWild.Wrath.Prototype
     [TypeId("b7e10085a10045008500850085008522")]
     public sealed class Phantom0085DamageLinkRestriction : ActivatableAbilityRestriction
     {
-        protected override bool IsAvailable() => Phantom0085DamageTransfer.ActivePet(Owner) != null;
+        protected override bool IsAvailable() => Phantom0085Link.ManifestedPet(Owner) != null;
     }
 
     [TypeId("b7e10085a1004500850085008500851e")]
@@ -921,25 +922,33 @@ namespace CallOfTheWild.Wrath.Prototype
     }
 
     // ---- Phantom Recall: move only the bound manifested phantom ----
+    [TypeId("b7e10085a10045008500850085008526")]
+    public sealed class Phantom0085RecallCost : AbilityResourceLogic, IAbilityCasterRestriction
+    {
+        public bool IsCasterRestrictionPassed(UnitEntityData caster) => Phantom0085Link.ManifestedPet(caster) != null;
+        public string GetAbilityCasterRestrictionUIText() => "Requires a living, manifested phantom in this area.";
+
+        // Keep native count and availability, but commit the cost at the successful landing.
+        public override void Spend(AbilityData ability) { }
+        internal void SpendForMovement(AbilityData ability) => base.Spend(ability);
+    }
+
     [TypeId("b7e10085a10045008500850085008513")]
     public sealed class Phantom0085Recall : ContextAction
     {
         public override string GetCaption() => "Phantom Recall";
         public override void RunAction()
         {
-            var master = Context?.MaybeCaster;
-            var part = master?.Get<UnitPartPhantom0085>();
-            var pet = part?.BoundPet(master);
-            if (pet == null || part.Confined || !Phantom0085Link.Alive(pet)) return;
-            if (!pet.IsInGame || !Phantom0085Link.SameLocalArea(master, pet)) return;
-            var petPart = pet.Get<UnitPartPet>();
-            if (petPart == null || petPart.ShouldBeHidden) return;
-            var resource = ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(Spiritualist0085Ids.Id("PhantomRecallResource"));
-            if (resource == null || master.Resources.GetResourceAmount(resource) < 1) return;
+            var ability = Context?.SourceAbilityContext?.Ability;
+            var master = ability?.Caster?.Unit;
+            var pet = Phantom0085Link.ManifestedPet(master);
+            if (pet == null || ability.AbilityResourceLogic is not Phantom0085RecallCost cost ||
+                !cost.IsAbilityRestrictionPassed(ability)) return;
+            var part = master.Get<UnitPartPhantom0085>();
             if (part.AtLastRecallLanding(pet.UniqueId, master.Position, pet.Position) ||
                 !Phantom0085Link.TryMoveNearMaster(master, pet)) return;
-            master.Resources.Spend(resource, 1);
             part.RememberRecall(pet.UniqueId, master.Position, pet.Position);
+            cost.SpendForMovement(ability);
         }
     }
 

@@ -22,9 +22,11 @@ using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Alignments;
+using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
+using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.FactLogic;
@@ -268,6 +270,88 @@ internal static class Spiritualist0085Tests
             Set(__instance, "UniqueId", Guid.NewGuid().ToString("N"));
     }
 
+    private static int recallFixtureAttempts;
+    private static bool recallFixtureHasLanding;
+
+    private static bool MoveRecallFixture(UnitEntityData __0, UnitEntityData __1, ref bool __result)
+    {
+        recallFixtureAttempts++;
+        __result = recallFixtureHasLanding;
+        if (__result)
+            Set(__1, "m_Position", __0.Position + new UnityEngine.Vector3(1f, 0f, 0f));
+        return false;
+    }
+
+    private static void CheckRecallExecution(Harmony harmony, UnitEntityData master, UnitEntityData pet, UnitEntityData dog, UnitEntityData otherPet)
+    {
+        var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>(Id("PhantomRecallAbility"));
+        var logic = blueprint.GetComponent<AbilityResourceLogic>();
+        var resource = logic.RequiredResource;
+        var pool = new UnitAbilityResource(resource);
+        Set(pool, "Amount", 2);
+        var collection = new UnitAbilityResourceCollection(master.Descriptor);
+        Set(collection, "m_Resources", new Dictionary<BlueprintScriptableObject, UnitAbilityResource> { { resource, pool } });
+        Set(master.Descriptor, "Resources", collection);
+        var scene = master.HoldingState;
+        Set(master, "m_IsInGame", true);
+        Set(pet, "m_IsInGame", true);
+        Set(pet, "HoldingState", scene);
+        Set(pet, "m_Position", new UnityEngine.Vector3(5f, 0f, 0f));
+        var casterPosition = master.Position;
+        var dogPosition = dog.Position;
+        var otherPosition = otherPet.Position;
+        var ability = new AbilityData(blueprint, master.Descriptor);
+        var context = new AbilityExecutionContext(ability, AbilityParams.Empty, new TargetWrapper(master));
+        void Recall()
+        {
+            using (context.GetDataScope(master))
+                blueprint.GetComponent<AbilityEffectRunAction>().Actions.Run();
+        }
+
+        var link = T("Phantom0085Link");
+        var sceneCheck = AccessTools.Method(link, "CanPlace");
+        var move = AccessTools.Method(link, "TryMoveNearMaster");
+        var allowScene = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(AllowRecoveryFixturePlacement));
+        var moveFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(MoveRecallFixture));
+        harmony.Patch(sceneCheck, prefix: new HarmonyMethod(allowScene));
+        harmony.Patch(move, prefix: new HarmonyMethod(moveFixture));
+        try
+        {
+            recallFixtureAttempts = 0;
+            recallFixtureHasLanding = true;
+            Check(ability.GetAvailableForCastCount() == 2 && logic.IsAbilityRestrictionPassed(ability) &&
+                ((IAbilityCasterRestriction)logic).IsCasterRestrictionPassed(master),
+                "C05: native cast availability reports the Recall pool and a local manifested phantom");
+            AbilityCastRateUtils.SpendResources(ability);
+            Check(ability.GetAvailableForCastCount() == 2, "C05: native pre-spend leaves the Recall pool intact");
+            Recall();
+            Recall();
+            Check(ability.GetAvailableForCastCount() == 1 && recallFixtureAttempts == 1 &&
+                pet.Position == casterPosition + new UnityEngine.Vector3(1f, 0f, 0f) &&
+                master.Position == casterPosition && dog.Position == dogPosition && otherPet.Position == otherPosition,
+                "C05/C17: a successful Recall spends once, immediate replay is free, and only the owned phantom moves");
+            Set(pet, "m_Position", new UnityEngine.Vector3(5f, 0f, 0f));
+            recallFixtureHasLanding = false;
+            Recall();
+            Check(ability.GetAvailableForCastCount() == 1 && recallFixtureAttempts == 2,
+                "C05: a rejected landing preserves the native Recall pool");
+            Set(pet, "HoldingState", null);
+            Recall();
+            Check(!((IAbilityCasterRestriction)logic).IsCasterRestrictionPassed(master) && recallFixtureAttempts == 2 &&
+                ability.GetAvailableForCastCount() == 1, "C05: cross-scene Recall is rejected before attempting a move or spending");
+            Set(pet, "HoldingState", scene);
+            Set(pool, "Amount", 0);
+            Recall();
+            Check(ability.GetAvailableForCastCount() == 0 && !logic.IsAbilityRestrictionPassed(ability) &&
+                recallFixtureAttempts == 2, "C05: native availability blocks an empty Recall pool before movement");
+        }
+        finally
+        {
+            harmony.Unpatch(move, moveFixture);
+            harmony.Unpatch(sceneCheck, allowScene);
+        }
+    }
+
     private static void CheckNativePetBinding(BlueprintCharacterClass spiritualist, BlueprintCharacterClass unrelated, BlueprintFeature anger,
         BlueprintFeature dogFeature, BlueprintFaction neutral)
     {
@@ -423,6 +507,7 @@ internal static class Spiritualist0085Tests
             sourceA.Runtime.Fact.Reapply();
             Check(FixtureLevelRequests.Count == 0 && Bound(a, partA) == petA,
                 "C03: four unrelated class levels leave the native Phantom request unchanged");
+            CheckRecallExecution(native, a, petA, dog, petB);
             var saveSettings = new JsonSerializerSettings { ContractResolver = new OptInContractResolver() };
             Set(partA, "Confined", true);
             petA.Get<UnitPartPet>().SetHidden(true);
@@ -946,7 +1031,9 @@ internal static class Spiritualist0085Tests
 
         // ---- Self-review fixes (2026-11-16) ----
         var recallAbility = Load<BlueprintAbility>(cache, Id("PhantomRecallAbility"));
-        Check(recallAbility.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityResourceLogic>() == null, "recall spends inside the action only on a successful move, not via pre-cost");
+        var recallCost = recallAbility.GetComponent<AbilityResourceLogic>();
+        Check(recallCost?.GetType() == T("Phantom0085RecallCost") && recallCost.IsSpendResource && recallCost.RequiredResource == recall,
+            "C05: recall uses the native resource display and a deferred-spend component for the same pool");
         Check(recallAbility.ComponentsArray.Any(c => c.GetType().Name == "AbilityEffectRunAction"), "recall action present");
         var tether = Load<BlueprintFeature>(cache, Id("EthericTetherFeature"));
         var bond = Load<BlueprintFeature>(cache, Id("SpiritualBondFeature"));

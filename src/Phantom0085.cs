@@ -1263,10 +1263,13 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(amount, "m_Archetypes", Array.Empty<BlueprintArchetypeReference>());
             Set(amount, "m_ArchetypesDiv", Array.Empty<BlueprintArchetypeReference>());
             Set(resource, "m_MaxAmount", amount);
+            var cost = new Phantom0085RecallCost { name = "Phantom0085RecallCost" };
+            Set(cost, "m_RequiredResource", Ref<BlueprintAbilityResourceReference>(resource));
+            Set(cost, "m_IsSpendResource", true);
             var ability = f.Ability("PhantomRecallAbility", "Phantom Recall",
                 "At 6th level, as a swift action, a spiritualist can call her manifested phantom to her side. This functions as dimension door, using the spiritualist's caster level. The phantom appears adjacent to the spiritualist (or as close as possible). Once per day at 6th level, plus one additional time per day for every four levels beyond 6th.",
                 AbilityType.Supernatural, UnitCommand.CommandType.Swift, AbilityRange.Personal,
-                PsychicAssets.Run(new Phantom0085Recall { name = "Phantom0085Recall" }));
+                PsychicAssets.Run(new Phantom0085Recall { name = "Phantom0085Recall" }), cost);
             ability.CanTargetSelf = true;
             return f.Feature("PhantomRecall", "Phantom Recall", NameOf(ability), Facts(ability), Grant(resource));
         }

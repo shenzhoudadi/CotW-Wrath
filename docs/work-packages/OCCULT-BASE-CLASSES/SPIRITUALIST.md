@@ -1,6 +1,6 @@
 # COTW-0085 Spiritualist · 基础职业
 
-状态为 **D12 已修，继续复查**。分支 `feat/cotw-0085-spiritualist`。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。范围是 Wisdom 六环自发念力施法、Phantom、六种原作基础情绪，以及主人完整职业进度。COTW-0086–0091 变体沿用原状态。原作 `createPhantoms` 实际接通 Anger、Despair、Hatred、Fear、Zeal、Kindness，Whimsy 沿用原作未接通状态。 [施工认领 #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)
+状态为 **D13 已修，继续复查**。分支 `feat/cotw-0085-spiritualist`。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。范围是 Wisdom 六环自发念力施法、Phantom、六种原作基础情绪，以及主人完整职业进度。COTW-0086–0091 变体沿用原状态。原作 `createPhantoms` 实际接通 Anger、Despair、Hatred、Fear、Zeal、Kindness，Whimsy 沿用原作未接通状态。 [施工认领 #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)
 
 - A 已交接。[原作与 Wrath 入口](../COTW-0085/A-spiritualist-map.md) · [蓝图、情绪与私人法表](../COTW-0085/A-spiritualist-assets.json)
 - C 已冻结 `C-0085-20261115-r1`。[生命周期合同](../COTW-0085/C-spiritualist-contract.md) · [18 项待执行用例](../COTW-0085/C-spiritualist-cases.json)
@@ -16,6 +16,7 @@
 - D10 实走原生伙伴绑定与清退并修复首绑时机，365 条定向通过，等级验证到原生请求入口。[D10/B10 记录](../COTW-0085/D10-B10-spiritualist.md)
 - D11 排除重复情绪技能加点，复用原生升级事件，实走 Anger 1 至 2 级，375 条定向通过。[D11/B11 记录](../COTW-0085/D11-B11-spiritualist.md)
 - D12 修复原生重连覆盖收回状态，沿用区域加载完成阶段，380 条定向通过。[D12/B12 记录](../COTW-0085/D12-B12-spiritualist.md)
+- D13 接回召回的原生次数检查，共用显现门控并验证单次扣除，386 条定向通过。[D13/B13 记录](../COTW-0085/D13-B13-spiritualist.md)
 
 每个角色开始先读本页与 `AGENTS.md`。阶段原件写入本机 `C:/Users/xuenc/agent-tools/spiritualist-next/`，保留来源路径、GUID 与失败原件。A 和 C 可读原作、当前仓库及本机合法游戏元数据，不提交第三方程序集或原生蓝图。B 不启动游戏或 UMM，不跑整套测试。D 以新增编译、离线注册和本职业定向检查为准，实机存读档／重训界面等未测边界如实列明。
 
