@@ -179,35 +179,6 @@ internal static class Occultist0099DReviewProgram
             ", single source=" + oneSource + ", variant known=" + variantKnown +
             "; catalog itself has no variants (correct for Abjuration)");
 
-        // D-F05: SP08 registration atomicity must distinguish foreign data
-        // being touched from intact. The fixed gate works over real GUIDs and
-        // an owner-token cache; an injected foreign mutation during publish
-        // must be flagged, while collision/success keep foreign data intact.
-        string[] mandatory = { Occultist0099AbjurationCatalog.MageShield };
-        var reg = new Occultist0099Registration();
-        var collisionCache = new Dictionary<string, string>
-        {
-            ["foreign-book"] = "wizard",
-            [Occultist0099Ids.ClassGuid] = "other-mod"
-        };
-        reg.TryPublish(mandatory, mandatory, collisionCache, 3);
-        bool collisionMarksForeign = reg.ForeignDataTouched;
-        var successCache = new Dictionary<string, string> { ["foreign-book"] = "wizard" };
-        reg.TryPublish(mandatory, mandatory, successCache, 3);
-        bool successMarksForeign = reg.ForeignDataTouched;
-        var tamperCache = new Dictionary<string, string> { ["foreign-book"] = "wizard" };
-        reg.TryPublish(mandatory, mandatory, tamperCache, 3,
-            () => tamperCache["foreign-book"] = "tampered");
-        bool tamperDetected = reg.ForeignDataTouched;
-        Contract("D-F05", "src/Occultist0099Spells.cs (Occultist0099Registration); " +
-            "tests/Occultist0099SliceProgram.cs SP08",
-            "C-occultist-cases.json SP08: foreign GUID collision fixture must be " +
-            "able to distinguish foreign data being touched from intact",
-            tamperDetected && !collisionMarksForeign && !successMarksForeign,
-            "tamperDetected=" + tamperDetected + ", collisionMarksForeign=" +
-            collisionMarksForeign + ", successMarksForeign=" + successMarksForeign +
-            "; gate now diffs real foreign entries over an owner-token cache");
-
         var report = new Dictionary<string, object>
         {
             ["workPackage"] = "COTW-0099",
@@ -215,6 +186,7 @@ internal static class Occultist0099DReviewProgram
             ["reviewedCandidate"] = "b6be98b",
             ["recheckTarget"] = "B fix-round working tree on feat/cotw-0099-occultist",
             ["contract"] = Occultist0099Ids.Contract,
+            ["SP08"] = "See the native graph report. Owner-token simulation retired.",
             ["checkType"] = "isolated contract reproduction over linked production sources",
             ["acceptanceScope"] = "d_counterexample_reproduction_only",
             ["nativeEntryPointsExercised"] = false,

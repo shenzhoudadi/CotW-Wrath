@@ -9,6 +9,7 @@ using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.Localization;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
@@ -28,7 +29,8 @@ namespace CallOfTheWild.Wrath.Prototype
     // the class and the school feature to the first Abjuration implement.
     internal static class Occultist0099Abjuration
     {
-        internal static BlueprintScriptableObject[] Build(BlueprintAbility shield, BlueprintAbility resistance)
+        internal static BlueprintScriptableObject[] Build(BlueprintAbility shield, BlueprintAbility resistance,
+            Func<string, string, string, LocalizedString> text)
         {
             const string mind = "As a swift action, spend 1 point of mental focus invested in Abjuration to gain 2 temporary hit points per effective occultist level. The barrier lasts for one round or until exhausted.";
             const string ward = "Gain a resistance bonus on all saving throws for every 2 points of mental focus invested in your Abjuration implement, up to 1 + 1 for every 4 occultist levels. The bonus lasts while your focus is locked and the implement remains available.";
@@ -48,7 +50,7 @@ namespace CallOfTheWild.Wrath.Prototype
                         RemoveWhenHitPointsEnd = true
                     }
                 }
-            }, "MindBarrierBuff", "Mind Barrier", mind, shield);
+            }, "MindBarrierBuff", "Mind Barrier", mind, shield, text);
             var effects = new BlueprintComponent[]
             {
                 Run(Apply(mindBuff, 1, toCaster: true)),
@@ -58,7 +60,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var visual = shield.GetComponent<AbilitySpawnFx>();
             var mindAbility = Identify(SelfAbility(AbilityType.SpellLike, UnitCommand.CommandType.Swift,
                 visual == null ? effects : effects.Concat(new[] { CopyData(visual) }).ToArray()),
-                "MindBarrierAbility", "Mind Barrier", mind, shield);
+                "MindBarrierAbility", "Mind Barrier", mind, shield, text);
             var wardBuff = Identify(new BlueprintBuff
             {
                 Stacking = StackingType.Replace,
@@ -69,7 +71,7 @@ namespace CallOfTheWild.Wrath.Prototype
                         name = "OccultistWardingTalisman" + stat, Stat = stat,
                         Descriptor = ModifierDescriptor.Resistance, Value = PropertyValue(wardBonus)
                     }).ToArray()
-            }, "WardingTalismanBuff", "Warding Talisman", ward, resistance);
+            }, "WardingTalismanBuff", "Warding Talisman", ward, resistance, text);
 
             var invest = Operation("InvestFocusAbility", "Invest Mental Focus: Abjuration",
                 "Invest 1 point of unallocated mental focus in Abjuration before locking your focus.",
@@ -92,16 +94,16 @@ namespace CallOfTheWild.Wrath.Prototype
                     new Occultist0099ImplementSchool { name = "OccultistAbjurationSchool", School = Occultist0099Ids.SliceSchool },
                     Facts(mindAbility, invest, replenish)
                 }
-            }, "AbjurationImplementFocus", "Abjuration Implement", "Gain Mind Barrier and Warding Talisman.", shield);
+            }, "AbjurationImplementFocus", "Abjuration Implement", "Gain Mind Barrier and Warding Talisman.", shield, text);
             return new BlueprintScriptableObject[] { absorption, wardBonus, mindBuff, mindAbility, wardBuff,
                 invest, replenish, reset, locked, implement };
-        }
 
-        private static BlueprintAbility Operation(string token, string label, string description,
-            Occultist0099FocusAction action, UnitCommand.CommandType command, BlueprintAbility icon)
-            => Identify(SelfAbility(AbilityType.Special, command, new BlueprintComponent[]
-                { new Occultist0099FocusOperation { name = "OccultistFocus" + action, Action = action } }),
-                token, label, description, icon);
+            BlueprintAbility Operation(string token, string label, string description,
+                Occultist0099FocusAction action, UnitCommand.CommandType command, BlueprintAbility icon)
+                => Identify(SelfAbility(AbilityType.Special, command, new BlueprintComponent[]
+                    { new Occultist0099FocusOperation { name = "OccultistFocus" + action, Action = action } }),
+                    token, label, description, icon, text);
+        }
 
         private static BlueprintAbility SelfAbility(AbilityType type, UnitCommand.CommandType command,
             BlueprintComponent[] components) => new BlueprintAbility
@@ -127,16 +129,16 @@ namespace CallOfTheWild.Wrath.Prototype
             return value;
         }
 
-        private static T Identify<T>(T blueprint, string token, string label, string description,
-            BlueprintAbility icon) where T : BlueprintScriptableObject
+        internal static T Identify<T>(T blueprint, string token, string label, string description,
+            BlueprintAbility icon, Func<string, string, string, LocalizedString> text = null) where T : BlueprintScriptableObject
         {
             blueprint.AssetGuid = BlueprintGuid.Parse(Occultist0099Ids.Id(token));
             blueprint.name = "CotWWrathOccultist0099" + token;
             if (blueprint is BlueprintUnitFact)
             {
-                Set(blueprint, "m_DisplayName", Text(blueprint.name, "name", label));
-                Set(blueprint, "m_Description", Text(blueprint.name, "description", description));
-                Set(blueprint, "m_Icon", Get(icon, "m_Icon"));
+                Set(blueprint, "m_DisplayName", text?.Invoke(blueprint.name, "name", label) ?? Text(blueprint.name, "name", label));
+                Set(blueprint, "m_Description", text?.Invoke(blueprint.name, "description", description) ?? Text(blueprint.name, "description", description));
+                if (icon != null) Set(blueprint, "m_Icon", Get(icon, "m_Icon"));
             }
             return blueprint;
         }

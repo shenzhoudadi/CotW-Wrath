@@ -12,8 +12,10 @@ using Newtonsoft.Json.Linq;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.Blueprints.Root;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.Controllers.Rest.State;
 using Kingmaker.Designers.Mechanics.Buffs;
@@ -455,7 +457,7 @@ internal static class Occultist0099NativeTests
         }
     }
 
-    private static SimpleBlueprint Materialise(JObject row)
+    private static SimpleBlueprint Materialise(JObject row, string blueprintName)
     {
         var data = (JObject)row["Data"];
         string typeName = ((string)data["$type"]).Split(',').Last().Trim();
@@ -465,7 +467,7 @@ internal static class Occultist0099NativeTests
         if (type == null) return null;
         var bp = (BlueprintScriptableObject)Activator.CreateInstance(type);
         bp.AssetGuid = P((string)row["AssetId"]);
-        bp.name = "$0099N$" + Guid.NewGuid().ToString("N");
+        bp.name = blueprintName;
         // The archived component graph is deserialised by the real native
         // polymorphic serializer, so the shipped SpellComponent / SpellListComponent
         // identities and school data are genuine.
@@ -507,7 +509,7 @@ internal static class Occultist0099NativeTests
         bp.ComponentsArray = loaded.ToArray();
         foreach (var field in new[] { "Type", "ActionType", "Range", "Spontaneous",
                                       "AllSpellsKnown", "CastingAttribute", "IsArcane",
-                                      "SpellsPerLevel", "CantripsType", "IsMythic" })
+                                      "SpellsPerLevel", "CantripsType", "IsMythic", "HitDie", "SkillPoints" })
         {
             var info = AccessTools.Field(type, field);
             var value = data[field];
@@ -515,12 +517,12 @@ internal static class Occultist0099NativeTests
             try { info.SetValue(bp, value.ToObject(info.FieldType)); } catch { }
         }
         foreach (var field in new[] { "m_SpellList", "m_CharacterClass", "m_SpellsPerDay",
-                                      "m_SpellsKnown", "m_SpellSlots" })
+                                      "m_SpellsKnown", "m_SpellSlots", "m_BaseAttackBonus", "m_FortitudeSave", "m_WillSave" })
         {
             var info = AccessTools.Field(type, field);
             var value = data[field];
             if (info == null || value == null || value.Type == JTokenType.Null) continue;
-            try { info.SetValue(bp, value.ToObject(info.FieldType)); } catch { }
+            info.SetValue(bp, value.ToObject(info.FieldType, Json.Serializer));
         }
         if (bp is Kingmaker.Blueprints.Facts.BlueprintUnitFact)
             Set(bp, "m_Icon", Empty<UnityEngine.Sprite>());
@@ -666,7 +668,7 @@ internal static class Occultist0099NativeTests
             var bp = (JObject)row["blueprint"];
             string id = (string)bp["AssetId"];
             if (!wanted.Contains(id) || cache.Load(P(id)) != null) continue;
-            Materialise(bp);
+            Materialise(bp, (string)row["name"]);
         }
     }
 
@@ -776,7 +778,7 @@ internal static class Occultist0099NativeTests
 
         var effects = (BlueprintScriptableObject[])AccessTools.Method(Production("Occultist0099Abjuration"), "Build")
             .Invoke(null, new object[] { Native<BlueprintAbility>(Occultist0099AbjurationCatalog.MageShield),
-                Native<BlueprintAbility>("0a5ddfbcfb3989543ac7c936fc256889") });
+                Native<BlueprintAbility>("0a5ddfbcfb3989543ac7c936fc256889"), null });
         foreach (var effect in effects) Stage(effect, effect.AssetGuid.ToString(), effect.name);
         mindBarrier = Native<BlueprintAbility>(Occultist0099Ids.MindBarrierAbilityGuid);
         mindBarrierBuff = Native<BlueprintBuff>(Occultist0099Ids.MindBarrierBuffGuid);
@@ -1362,7 +1364,7 @@ internal static class Occultist0099NativeTests
         Set(state, "m_Unit", book.Owner.Unit);
         Set(state, "Selections", new List<FeatureSelectionState>());
         Set(state, "SpellSelections", new List<SpellSelectionData>());
-        Set(state, "SelectedClass", occultistClass);
+        Set(state, "SelectedClass", book.Blueprint.CharacterClass);
         state.OnApplyAction();
         return state;
     }
@@ -1764,11 +1766,260 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.FocusFactTypeId, Occultist0099Ids.SpellbookMarkerTypeId,
             Occultist0099Ids.FocusResourceLogicTypeId, Occultist0099Ids.FocusPartTypeId,
             Occultist0099Ids.SpellbookFactTypeId, Occultist0099Ids.FocusPropertyTypeId,
-            Occultist0099Ids.FocusOperationTypeId, Occultist0099Ids.ImplementSchoolTypeId
+            Occultist0099Ids.FocusOperationTypeId, Occultist0099Ids.ImplementSchoolTypeId,
+            Occultist0099Ids.ImplementSlotTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
                 "GATE private TypeId " + id + " has no native collision");
-        caseStatus["SP08"] = "native_gate_only_registration_not_run";
+    }
+
+    private static BlueprintsCache faultedRegistration;
+
+    private static void InterruptRegistration(BlueprintsCache __instance, BlueprintGuid __0)
+    {
+        if (__instance == faultedRegistration && __0 == P(Occultist0099Ids.BookGuid))
+            throw new InvalidOperationException("0099 fixture write interrupted");
+    }
+
+    private static BlueprintAbility ProviderSpell(string guid, string name, SpellSchool school, BlueprintBuff effect)
+    {
+        var apply = new Kingmaker.UnitLogic.Mechanics.Actions.ContextActionApplyBuff
+            { name = "0099N.ProviderApply", Permanent = true };
+        Set(apply, "m_Buff", Ref<BlueprintBuffReference>(effect));
+        var spell = new BlueprintAbility
+        {
+            AssetGuid = P(guid), name = name, Type = AbilityType.Spell, Range = AbilityRange.Personal,
+            ComponentsArray = new BlueprintComponent[]
+            {
+                new SpellComponent { name = "0099N.ProviderSchool", School = school },
+                new AbilityEffectRunAction { name = "0099N.ProviderEffect", Actions = new Kingmaker.ElementsSystem.ActionList
+                    { Actions = new Kingmaker.ElementsSystem.GameAction[] { apply } } }
+            }
+        };
+        spell.OnEnable();
+        return spell;
+    }
+
+    private static void ProviderBacklink(BlueprintAbility spell, BlueprintSpellList list, int circle)
+    {
+        var link = new SpellListComponent { name = "0099N.ProviderList", SpellLevel = circle };
+        Set(link, "m_SpellList", Ref<BlueprintSpellListReference>(list));
+        spell.ComponentsArray = spell.ComponentsArray.Concat(new BlueprintComponent[] { link }).ToArray();
+    }
+
+    private static void AddDanglingProviderVariant(BlueprintAbility spell)
+    {
+        var missing = new BlueprintAbilityReference();
+        missing.ReadGuidFromGuid(P(Occultist0099Ids.Id("HostMissingVariant")));
+        var variants = new AbilityVariants { name = "0099N.DanglingProviderVariant" };
+        Set(variants, "m_Variants", new[] { missing });
+        spell.ComponentsArray = spell.ComponentsArray.Concat(new BlueprintComponent[] { variants }).ToArray();
+    }
+
+    private static void FireShieldVariantsNative(BlueprintsCache detached, Occultist0099SpellRoot row, BlueprintSpellList wizardList, BlueprintBuff effect)
+    {
+        var root = ProviderSpell(row.Guid, row.Name, SpellSchool.Evocation, effect);
+        var warm = ProviderSpell("54ab6ea1a66d45e3adb5a9afaa723b43", "FireShieldWarm", SpellSchool.Evocation, effect);
+        var cold = ProviderSpell("b3578d622d7c42539f783c48b4d723a4", "FireShieldCold", SpellSchool.Evocation, effect);
+        foreach (var child in new[] { warm, cold })
+            Set(child, "m_Parent", BlueprintReferenceBase.CreateTyped<BlueprintAbilityReference>(root));
+        var variants = new AbilityVariants { name = "0099N.FireShieldVariants" };
+        Set(variants, "m_Variants", new[] { Ref<BlueprintAbilityReference>(warm), Ref<BlueprintAbilityReference>(cold) });
+        root.ComponentsArray = new BlueprintComponent[] { root.GetComponent<SpellComponent>(), variants };
+        ProviderBacklink(root, wizardList, 4);
+        wizardList.SpellsByLevel[4].SpellsRefs.Add(Ref<BlueprintAbilityReference>(root));
+        detached.AddCachedBlueprint(root.AssetGuid, root);
+        detached.AddCachedBlueprint(warm.AssetGuid, warm);
+        var resolver = AccessTools.Method(Production("Occultist0099Donors"), "TryExternal");
+        bool Registered() => (bool)resolver.Invoke(null, new object[] { detached, row, null });
+        Check(!Registered(), "SP08 a reciprocal Fire Shield root with a missing signed Cold variant is not accepted");
+        detached.AddCachedBlueprint(cold.AssetGuid, cold);
+        Check(Registered(), "SP08 the exact executable Warm and Cold children authorize the existing Fire Shield root");
+        cold.GetComponent<AbilityEffectRunAction>().Actions = new Kingmaker.ElementsSystem.ActionList
+            { Actions = Array.Empty<Kingmaker.ElementsSystem.GameAction>() };
+        AddDanglingProviderVariant(cold);
+        Check(!Registered(), "SP08 a Fire Shield child with only a dangling variant rejects the whole optional root");
+    }
+
+    private static void RegistrationNative(JArray auditedRows, string donorTable)
+    {
+        var catalogue = (Occultist0099SpellRoot[])AccessTools.Field(Production("Occultist0099SpellCatalog"), "Roots").GetValue(null);
+        Eq(auditedRows.Count, catalogue.Length, "SP08 the production data contains all frozen 143 root identities");
+        var byId = catalogue.ToDictionary(row => row.Guid);
+        Check(auditedRows.All(audit => byId.TryGetValue((string)audit["root"]["guid"], out var row) &&
+              row.Name == (string)audit["root"]["name"] && row.School == (string)audit["school"] &&
+              row.Circle == (int)audit["level"] && row.Source == (string)audit["source"] &&
+              row.Provider == (string)audit["root"]["provider"] && row.RequiresPublishedList == ((bool?)audit["root"]["publishedListRequired"] ?? false)),
+            "SP08 the 143 production mappings agree with the frozen source, schools, circles and provider identities");
+
+        var detached = new BlueprintsCache();
+        var register = AccessTools.Method(Production("Occultist0099NativeRegistration"), "RegisterAbjurationInDetachedCache");
+        bool TryRegister(BlueprintsCache target) => (bool)register.Invoke(null, new object[] { target });
+        Check(!TryRegister(cache), "SP08 the production development entry refuses the ordinary process cache");
+        const string alchemistClassId = "0937bec61c0dabc468428f496580c721";
+        const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
+        LoadRows(new[] { alchemistClassId, proficienciesId }.Concat(Occultist0099AbjurationCatalog.Knacks).ToArray());
+        foreach (var id in catalogue.Where(row => (row.School == "Abjuration" || row.IsKnack) && row.Source != "External")
+                     .Select(row => row.Guid).Concat(new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc" }))
+        {
+            var donor = cache.Load(P(id));
+            if (donor != null) detached.AddCachedBlueprint(donor.AssetGuid, donor);
+        }
+        var alchemist = Native<BlueprintCharacterClass>(alchemistClassId);
+        var root = Empty<BlueprintRoot>();
+        root.AssetGuid = P("2d77316c72b9ed44f888ceefc2a131f6");
+        root.name = "BlueprintRoot";
+        Set(root, "Progression", new ProgressionRoot());
+        var original = new[] { Ref<BlueprintCharacterClassReference>(alchemist) };
+        Set(root.Progression, "m_CharacterClasses", original);
+        detached.AddCachedBlueprint(root.AssetGuid, root);
+        var privateIds = Occultist0099Ids.SliceTokens.Select(token => P(Occultist0099Ids.Id(token))).ToArray();
+        bool Vacant() => privateIds.All(id => detached.Load(id) == null) && ReferenceEquals(Get(root.Progression, "m_CharacterClasses"), original);
+        Check(!TryRegister(detached) && Vacant(), "SP08 missing mandatory Alchemist table leaves the real class list and all private cache entries untouched");
+        detached.AddCachedBlueprint(P(donorTable), Native<BlueprintSpellsTable>(donorTable));
+        var processRoot = (BlueprintRoot)cache.Load(root.AssetGuid);
+        bool temporaryProcessRoot = processRoot == null;
+        if (temporaryProcessRoot)
+        {
+            processRoot = Empty<BlueprintRoot>();
+            processRoot.AssetGuid = root.AssetGuid;
+            Set(processRoot, "Progression", new ProgressionRoot());
+            cache.AddCachedBlueprint(processRoot.AssetGuid, processRoot);
+        }
+        var independentProgression = root.Progression;
+        Set(root, "Progression", processRoot.Progression);
+        var processClasses = Get(processRoot.Progression, "m_CharacterClasses");
+        Check(!TryRegister(detached) && ReferenceEquals(Get(processRoot.Progression, "m_CharacterClasses"), processClasses) &&
+              privateIds.All(id => detached.Load(id) == null), "SP08 a detached cache sharing the process progression root is rejected");
+        Set(root, "Progression", independentProgression);
+        if (temporaryProcessRoot) cache.RemoveCachedBlueprint(processRoot.AssetGuid);
+        var sharedStrings = (Dictionary<string, string>)AccessTools.Field(Production("PsychicAssets"), "Strings").GetValue(null);
+        var stringsBefore = new Dictionary<string, string>(sharedStrings);
+        var previousPack = Kingmaker.Localization.LocalizationManager.CurrentPack;
+        var testPack = new Kingmaker.Localization.LocalizationPack();
+        testPack.PutString("0099N.ForeignText", "Unchanged");
+        Kingmaker.Localization.LocalizationManager.CurrentPack = testPack;
+        bool LocalizationUnchanged() => sharedStrings.Count == stringsBefore.Count &&
+            stringsBefore.All(pair => sharedStrings.TryGetValue(pair.Key, out string value) && value == pair.Value) &&
+            ((System.Collections.IDictionary)Get(testPack, "m_Strings")).Count == 1;
+        var originalShield = Native<BlueprintAbility>(Occultist0099AbjurationCatalog.MageShield);
+        var aliasedShield = ProviderSpell(Occultist0099Ids.Id("HostWrongShieldGuid"), originalShield.name, SpellSchool.Abjuration, null);
+        detached.AddCachedBlueprint(originalShield.AssetGuid, aliasedShield);
+        Check(!TryRegister(detached) && Vacant(), "SP08 a same-name donor stored under the signed key cannot substitute a different payload GUID");
+        detached.AddCachedBlueprint(originalShield.AssetGuid, originalShield);
+        var occupied = new BlueprintSpellList { AssetGuid = P(Occultist0099Ids.Id("slot-2-Abjuration-ExtraLearnList")),
+            name = "CotWWrathOccultist0099slot-2-Abjuration-ExtraLearnList", ComponentsArray = Array.Empty<BlueprintComponent>() };
+        detached.AddCachedBlueprint(occupied.AssetGuid, null);
+        var detachedEntries = (System.Collections.IDictionary)Get(detached, "m_LoadedBlueprints");
+        Check(!TryRegister(detached) && detachedEntries.Contains(occupied.AssetGuid) && Vacant(),
+            "SP08 an existing native cache reservation is preserved even when Load has no payload");
+        detached.AddCachedBlueprint(occupied.AssetGuid, occupied);
+        Check(!TryRegister(detached) && ReferenceEquals(detached.Load(occupied.AssetGuid), occupied) &&
+              privateIds.Where(id => id != occupied.AssetGuid).All(id => detached.Load(id) == null) &&
+              ReferenceEquals(Get(root.Progression, "m_CharacterClasses"), original),
+            "SP08 a signed-looking source-list collision preserves the foreign object and publishes nothing else");
+        detached.RemoveCachedBlueprint(occupied.AssetGuid);
+        Check(LocalizationUnchanged(), "SP08 rejected donor aliases and collisions leave both global localization stores unchanged");
+
+        var add = AccessTools.Method(typeof(BlueprintsCache), nameof(BlueprintsCache.AddCachedBlueprint));
+        var fault = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(InterruptRegistration));
+        harmony.Patch(add, postfix: new HarmonyMethod(fault));
+        bool interrupted = false;
+        faultedRegistration = detached;
+        try { TryRegister(detached); }
+        catch (TargetInvocationException error) when (error.InnerException?.Message == "0099 fixture write interrupted") { interrupted = true; }
+        finally { faultedRegistration = null; harmony.Unpatch(add, fault); }
+        Check(interrupted && Vacant(), "SP08 interruption after real cache insertion rolls back every owned object and the class list");
+        Check(LocalizationUnchanged(), "SP08 rollback preserves both global localization stores");
+
+        Check(TryRegister(detached), "SP08 restored mandatory donor and vacant identities publish the complete detached Abjuration graph");
+        Check(LocalizationUnchanged(), "SP08 a successful detached graph does not publish process localization");
+        Kingmaker.Localization.LocalizationManager.CurrentPack = previousPack;
+        var entries = privateIds.Select(detached.Load).ToArray();
+        Check(entries.All(entry => entry != null) && root.Progression.CharacterClasses.Count() == 2 &&
+              root.Progression.CharacterClasses.First() == alchemist,
+            "SP08 each signed asset is present and only one class was appended to the unchanged native entry");
+        var publishedClass = (BlueprintCharacterClass)detached.Load(P(Occultist0099Ids.ClassGuid));
+        var publishedBook = publishedClass.Spellbook;
+        var baseList = publishedBook.SpellList;
+        var sourceList = publishedBook.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists[0].List.Get();
+        var listsBefore = baseList.SpellsByLevel;
+        Check(publishedBook.CharacterClass == publishedClass && publishedBook.Spontaneous &&
+              publishedBook.SpellsPerDay == Native<BlueprintSpellsTable>(donorTable) &&
+              publishedClass.Progression.LevelEntries.Single().Features.OfType<BlueprintFeatureSelection>().Count() == 2 &&
+              baseList.GetSpells(0).Count == 6 && baseList.SpellsByLevel.Length == 11,
+            "SP08 the real graph links its spontaneous Alchemist-table book, both implement choices and six fixed knacks");
+        Check(TryRegister(detached) && entries.SequenceEqual(privateIds.Select(detached.Load)) &&
+              ReferenceEquals(listsBefore, baseList.SpellsByLevel) && root.Progression.CharacterClasses.Count() == 2,
+            "SP08 retry preserves object identities, class entry count and unchanged row arrays");
+        var firstLevel = Unit("registered-0099-knacks", publishedClass, 1, 16);
+        firstLevel.Facts.Add(new Feature((BlueprintFeature)detached.Load(P(Occultist0099Ids.SpellbookFactGuid)), firstLevel.Descriptor));
+        var knackBook = firstLevel.Descriptor.DemandSpellbook(publishedBook);
+        new ApplySpellbook().Apply(LevelState(knackBook), firstLevel.Descriptor);
+        Check(knackBook.BaseLevel == 1 &&
+              new HashSet<BlueprintGuid>(knackBook.GetKnownSpells(0).Select(ability => ability.Blueprint.AssetGuid))
+                  .SetEquals(Occultist0099AbjurationCatalog.Knacks.Select(P)) &&
+              publishedBook.SpellsPerDay.GetCount(1, 0) == 0,
+            "SP01 the native first-level book learns the exact six knacks from its list and grants no paid level-zero slot");
+        InBook(firstLevel, fact => Eq(0, Occultist0099Spells.QuotaCount(SpellStateOf(fact), 0),
+            "SP01 native knacks consume no private implement quota"));
+
+        var effect = new BlueprintBuff { AssetGuid = P(Occultist0099Ids.Id("HostProviderEffect")), name = "0099N.ProviderEffect",
+            ComponentsArray = Array.Empty<BlueprintComponent>() };
+        var cloak = ProviderSpell(Occultist0099AbjurationCatalog.CloakOfWinds, "CloakOfWindsAbility", SpellSchool.Abjuration, effect);
+        detached.AddCachedBlueprint(cloak.AssetGuid, cloak);
+        Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak),
+            "SP08 TTT root without provider publication does not enter any private circle");
+        var wizardList = new BlueprintSpellList { AssetGuid = P("ba0401fdeb4062f40a7aa95b6f07fe89"), name = "WizardSpellList",
+            SpellsByLevel = Enumerable.Range(0, 11).Select(circle => new SpellLevelList(circle)).ToArray() };
+        detached.AddCachedBlueprint(wizardList.AssetGuid, wizardList);
+        ProviderBacklink(cloak, wizardList, 3);
+        Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak), "SP08 a lone backlink is not proof that the provider enabled Cloak");
+        wizardList.SpellsByLevel[3].SpellsRefs.Add(Ref<BlueprintAbilityReference>(cloak));
+        var danglingParent = new BlueprintAbilityReference();
+        danglingParent.ReadGuidFromGuid(P(Occultist0099Ids.Id("HostMissingParent")));
+        Set(cloak, "m_Parent", danglingParent);
+        Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak),
+            "SP08 a provider variant with an unresolved signed parent cannot qualify as a root");
+        Set(cloak, "m_Parent", null);
+        var run = cloak.GetComponent<AbilityEffectRunAction>();
+        var actions = run.Actions;
+        run.Actions = new Kingmaker.ElementsSystem.ActionList { Actions = Array.Empty<Kingmaker.ElementsSystem.GameAction>() };
+        var cloakComponents = cloak.ComponentsArray;
+        AddDanglingProviderVariant(cloak);
+        Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak),
+            "SP08 a reciprocal Cloak placeholder with only a dangling variant remains unavailable");
+        cloak.ComponentsArray = cloakComponents;
+        run.Actions = actions;
+        detached.RemoveCachedBlueprint(wizardList.AssetGuid);
+        Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak),
+            "SP08 a cached blueprint held by a removed provider list reference cannot authorize a detached graph");
+        detached.AddCachedBlueprint(wizardList.AssetGuid, wizardList);
+        var nativeRows = wizardList.SpellsByLevel;
+        Check(TryRegister(detached) && sourceList.GetSpells(3).Contains(cloak) && baseList.GetSpells(3).Contains(cloak) &&
+              entries.SequenceEqual(privateIds.Select(detached.Load)) && root.Progression.CharacterClasses.Count() == 2 &&
+              wizardList.SpellsByLevel == nativeRows && wizardList.SpellsByLevel[3].SpellsRefs.Count == 1,
+            "SP08 late reciprocal TTT publication refreshes both private rows without replacing the class, book or source-list identity");
+
+        var unit = Unit("registered-0099-source", publishedClass, 7, 16);
+        unit.Facts.Add(new Feature((BlueprintFeature)detached.Load(P(Occultist0099Ids.SpellbookFactGuid)), unit.Descriptor));
+        var implement = new Feature((BlueprintFeature)detached.Load(P(Occultist0099Ids.Id("AbjurationImplementFocus"))), unit.Descriptor);
+        unit.Facts.Add(implement);
+        var functioning = unit.Descriptor.DemandSpellbook(publishedBook);
+        Set(functioning, "m_BaseLevelInternal", 7);
+        var levelUp = LevelState(functioning);
+        var learnCloak = new SelectSpell(publishedBook, sourceList, 3, cloak, 0);
+        Check(NativeCheck(learnCloak, levelUp, unit.Descriptor), "SP08 a real registered implement and the validated donor table expose Cloak to native selection");
+        learnCloak.Apply(levelUp, unit.Descriptor);
+        Check(functioning.IsKnown(cloak), "SP08 the private book learns the validated root without enabling a per-provider model flag");
+        unit.RemoveFact(implement);
+        Check(!functioning.IsKnown(cloak), "SP03 removal of the registered last implement source retires its actual native known spell");
+        wizardList.SpellsByLevel[3].SpellsRefs.Clear();
+        Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak) && !sourceList.GetSpells(3).Contains(cloak),
+            "SP08 withdrawn provider publication removes only the optional private row on retry");
+        FireShieldVariantsNative(detached, byId["017970c386634351bfdea34d6a4d4c74"], wizardList, effect);
+        caseStatus["SP08"] = "native_atomic_detached_abjuration_graph_only_full_class_not_run";
+        caseStatus["SP03"] = "native_copy_serialization_and_last_registered_implement_revoke_only";
     }
 
     // ------------------------------------------------------------------
@@ -1782,7 +2033,8 @@ internal static class Occultist0099NativeTests
         // The frozen A evidence is the authority for the donor identities and
         // the circle-opening levels; the host proves the shipped catalogue
         // agrees with it instead of restating the numbers.
-        var slots = JObject.Parse(File.ReadAllText(assetsPath))["dailySpellSlots"];
+        var assetEvidence = JObject.Parse(File.ReadAllText(assetsPath));
+        var slots = assetEvidence["dailySpellSlots"];
         string donorBook = (string)slots["spellbookDonor"];
         string donorTable = (string)slots["tableDonor"];
         Check(donorBook == "027d37761f3804042afa96fe3e9086cc" &&
@@ -1849,6 +2101,7 @@ internal static class Occultist0099NativeTests
         ImplementReplayNative();
         RestNative();
         GateNative();
+        RegistrationNative((JArray)assetEvidence["spellRoots"], donorTable);
         Check(hostLogs == 0, "HOST native rules report no fixture exceptions");
 
         // Everything else in the frozen contract is honestly NOT run here.
@@ -1863,7 +2116,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B5 directed native recheck (focus preview, respec transfer and archive fields)",
+            ["stage"] = "B6 detached native Abjuration registration and provider validation",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -1875,16 +2128,16 @@ internal static class Occultist0099NativeTests
             ["hostStagedRoots"] = hostStaged,
             ["hostStagedRootNames"] = new JArray(stagedRoots),
             ["skippedArchiveComponents"] = skippedComponents,
-            ["rootFixtureBoundary"] = "13 of the 18 audited Abjuration roots come from the reviewed Wrath archive fixture. The 4 CotW roots are built by this project's own production builders (PsychicWardingSpells / PsychicGlobeSpells / PsychicSupportSpells.Cloak) against real archived native donors; only PsychicOriginalIcons.Load is substituted because ImageConversion is a Unity native call. The 1 External root (CloakOfWindsAbility, TabletopTweaks-Base) is host-staged at its frozen A identity with a real Abjuration SpellComponent and a real executable effect path; the real provider assembly is NOT loaded, so its provider gate is exercised only through the authoritative state, never through a real third-party blueprint.",
+            ["rootFixtureBoundary"] = "18 Abjuration roots comprise 13 native archive blueprints, 4 roots built by the existing CotW psychic builders, and a host-staged TTT Cloak of Winds root. Only the CotW icon import is substituted. The detached cache provider fixtures stage reciprocal Cloak and Fire Shield publications with signed identities. Actual provider assemblies were not loaded.",
             ["checks"] = checks,
             ["failures"] = new JArray(failures),
             ["hostLoggedExceptions"] = hostLogs,
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Native focus and spell learning, CopyFacts, respec survivor transfer, window completion, archived fields and rest passed in the managed fixture."
+                ? "Native Abjuration graph publication, rollback, provider-list refresh and existing focus and spell paths passed in the managed fixture."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Managed native CopyFacts, IUnitPartSurviveRespec enumeration and callback, RespecContractResolver population of the parts collection, RestoreOwnerLink, after-respec notification, real window Complete and close, and opt-in archive resolver. XP table and changed class/stats are fixture inputs. Prior managed casting, buff/damage, learning and ApplyRest checks also run. Full RespecOnCommit scene, player UI, disk save/load, full command OnAction and scripted rest scenes are outside scope.",
+            ["boundary"] = "Uses a real detached BlueprintsCache and an independent class list. Registration publishes the Abjuration development graph and level-one progression only. Existing managed focus, rest, preview, archive and respec-step checks are retained. The ordinary startup path, full class, player UI and disk saves are outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

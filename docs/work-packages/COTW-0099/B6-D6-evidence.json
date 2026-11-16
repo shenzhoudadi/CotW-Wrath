@@ -1,0 +1,122 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "97ecfcd9ced454ce222f02c88292f47ea054a2f7",
+  "stage": "B6 detached native Abjuration registration and donor validation",
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "nativeEvidence": "native-4.json",
+    "closedFindings": [
+      "Same-cache and shared ProgressionRoot isolation",
+      "Detached writes to process localization",
+      "A reserved private GUID and mismatched payload identity",
+      "Native parent GUID rather than a live process-cache object",
+      "Duplicate native and AddKnownSpell knack grants",
+      "Provider candidates with dangling-only variant execution"
+    ]
+  },
+  "reuse": {
+    "daysTable": "Wrath Alchemist",
+    "proficiencies": "Wrath RangerProficiencies",
+    "knacks": "Wrath ApplySpellbook and private circle-zero spell list",
+    "abjuration": {
+      "Wrath": 13,
+      "CotW": 4,
+      "external": 1
+    },
+    "allAuditedRows": 143,
+    "optional": "Existing Psychic spell catalog and availability probe, with strict native publication verification for 0099"
+  },
+  "builds": [
+    {
+      "wallSeconds": 1.931,
+      "result": "FAIL",
+      "cause": "Missing native AddKnownSpell namespace during initial graph wiring"
+    },
+    {
+      "wallSeconds": 2.282,
+      "result": "PASS"
+    },
+    {
+      "wallSeconds": 1.189,
+      "result": "FAIL",
+      "cause": "Missing native feature selection namespace in test"
+    },
+    {
+      "wallSeconds": 1.096,
+      "result": "PASS"
+    },
+    {
+      "wallSeconds": 2.175,
+      "result": "PASS"
+    },
+    {
+      "wallSeconds": 2.046,
+      "result": "PASS"
+    },
+    {
+      "wallSeconds": 1.949,
+      "result": "PASS",
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "nativeRuns": [
+    {
+      "wallSeconds": 3.7,
+      "result": "ABORTED",
+      "cause": "Magus list GUID initially copied without two digits"
+    },
+    {
+      "wallSeconds": 3.788,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 227,
+      "failures": 0
+    },
+    {
+      "wallSeconds": 3.732,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 241,
+      "failures": 0
+    },
+    {
+      "wallSeconds": 3.703,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 241,
+      "failures": 0,
+      "hostExceptions": 0,
+      "registeredIdentities": 24,
+      "scope": "detached cache and level-one Abjuration graph"
+    }
+  ],
+  "model": {
+    "wallSeconds": 2.342,
+    "result": "MODEL_ONLY_PASS",
+    "assertions": 344,
+    "failures": 0
+  },
+  "rawLogs": "C:/Users/xuenc/agent-tools/occultist-next/B6-registration",
+  "sourceSha256": {
+    "src/Occultist0099Abjuration.cs": "8730433000AF1CF8F4825221B5178A1F3D3E85C66B32BF5462C490EBB6387CA1",
+    "src/Occultist0099Donors.cs": "CD19661FA29C208E3290541ED99557DD1BB334CFD8B03D4545F9F946D022CAD2",
+    "src/Occultist0099Ids.cs": "40D960AD429E709924D68910CFB1540DB0FBFCD52BB51DEE29E8AFAD4E042D88",
+    "src/Occultist0099NativeRegistration.cs": "C82DC951B5561F9AA1CF6C59EA9864DBEB02B90F7186DDD6804914CC5203EFE2",
+    "src/Occultist0099NativeWiring.cs": "839DBE0E1957F8B8D8E68307F0692B8935C3C5230606053ED73A2A13905C4D3A",
+    "src/Occultist0099SpellCatalog.cs": "2819800D494319A0E2B249908D4CAC99A27F8F06A3B9BC78D6FB8624D6621B12",
+    "src/Occultist0099Spells.cs": "18668CC6E8D6CF65B548A1313E77CA98AF6B51130FBFB49C98D8249875FEFE79",
+    "src/PsychicSpellIntegration.cs": "D8C2E6658A873F47449840A5196094289C7E6521EEF6690BA7DC856188D94473",
+    "tests/Occultist0099NativeProgram.cs": "954EAD271F8D02197E12B6A2105BC8C9715DC8FB0EDDEDD41DEE3D63C229A185"
+  },
+  "slicePublished": false,
+  "releaseEligible": false,
+  "unverified": [
+    "Full SP08 and ordinary startup, registration retry and shared PR #14 integration",
+    "Seven further schools, four Panoplies, and later career progression",
+    "Real providers, availability and restoration of already known roots",
+    "Player level-up UI, complete respec, disk saves, game and UMM"
+  ],
+  "packaging": "not_run",
+  "upload": "not_run",
+  "historicalSuites": "not_run"
+}

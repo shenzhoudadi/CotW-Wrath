@@ -55,6 +55,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public const string FocusPropertyTypeId = "0099c0e1a1b24c0d8e5f600000000007";
         public const string FocusOperationTypeId = "0099c0e1a1b24c0d8e5f600000000008";
         public const string ImplementSchoolTypeId = "0099c0e1a1b24c0d8e5f600000000009";
+        public const string ImplementSlotTypeId = "0099c0e1a1b24c0d8e5f60000000000a";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.
@@ -70,7 +71,9 @@ namespace CallOfTheWild.Wrath.Prototype
             "ResetFocusAbility", "InvestFocusAbility", "ReplenishFocusAbility",
             "WardingTalismanBuff", "MindBarrierAbility", "MindBarrierBuff", "ImplementSelection",
             "OccultistProgression", "OccultistSpellbookFact", "MindBarrierAbsorption",
-            "WardingTalismanResistance", "AbjurationImplementFocus"
+            "WardingTalismanResistance", "AbjurationImplementFocus", "AbjurationExtraSpells",
+            "slot-1-Abjuration-LearnList", "slot-2-Abjuration-ExtraLearnList", "ZeroSpellsKnown",
+            "ExtraImplementSelection", "OccultistKnacksFeature"
         };
     }
 
@@ -86,13 +89,8 @@ namespace CallOfTheWild.Wrath.Prototype
         public static bool IsRuntimePatch(Type type)
             => type.Name.StartsWith("Occultist0099Native", StringComparison.Ordinal);
 
-        // D-0099-08 fix: SlicePublished is now an ENFORCED registration gate,
-        // not an unused flag. The native registration entry point (task #11)
-        // calls CanRegister() before touching the shared registration chain;
-        // while the slice is unpublished it returns false and no class,
-        // spellbook or progression is registered. Flipping SlicePublished to
-        // true is necessary but not sufficient: the full map must also be
-        // complete (eight schools, four Panoplies, progression, 143 rows).
+        // Startup suppresses all private runtime patches until the full graph
+        // is ready. The development transaction only accepts a detached cache.
         public static bool CanRegister(bool fullMapComplete)
             => Occultist0099Ids.SlicePublished && fullMapComplete;
 

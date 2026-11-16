@@ -27,27 +27,55 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         internal const string ModuleName = "Psychic optional spell integration";
         internal static string LastSummary = "Not scanned";
-        internal static bool Available(BlueprintsCache cache, PsychicSpellLink link, out BlueprintAbility ability)
+        internal static bool Available(BlueprintsCache cache, PsychicSpellLink link, out BlueprintAbility ability,
+            Func<BlueprintGuid, int, bool> requiredPublication = null)
         {
-            ability=cache.Load(BlueprintGuid.Parse(link.Guid)) as BlueprintAbility;
+            var guid = BlueprintGuid.Parse(link.Guid);
+            ability=cache.Load(guid) as BlueprintAbility;
             if(ability==null || ability.name!=link.Name || ability.Type!=AbilityType.Spell ||
-                ability.Parent!=null || ability.GetComponent<SpellComponent>()?.School!=link.School) return false;
+                ability.GetComponent<SpellComponent>()?.School!=link.School) return false;
+            if (requiredPublication == null ? ability.Parent != null :
+                ability.AssetGuid != guid || ParentGuid(ability) != BlueprintGuid.Empty) return false;
             // Empty disabled placeholders and stale identity-only stubs are not spells.
             bool executable=ability.GetComponent<AbilityEffectRunAction>()!=null || ability.GetComponent<AbilityVariants>()!=null ||
                 ability.GetComponent<AbilityEffectStickyTouch>()!=null || ability.GetComponent<AbilityShadowSpell>()!=null ||
                 ability.GetComponent<AdditionalAbilityEffectRunActionOnClickedTarget>()!=null;
-            if(!executable) return false;
+            if(!executable || (requiredPublication != null && !HasExecutableContents(ability))) return false;
             if(!link.PublishedListRequired) return true;
             // TTT/Tome can create a full blueprint even when the user disables the
             // spell. Require a live, reciprocal provider/native list publication.
             // Never count our own link as proof that a provider enabled a spell.
             var id=ability.AssetGuid;
             return ability.GetComponents<SpellListComponent>().Any(c => {
+                if (requiredPublication != null)
+                {
+                    var reference = Get(c, "m_SpellList") as BlueprintSpellListReference;
+                    if (reference == null || !requiredPublication(reference.Guid, c.SpellLevel)) return false;
+                    var published = cache.Load(reference.Guid) as BlueprintSpellList;
+                    return published?.AssetGuid == reference.Guid && published.name != null &&
+                        !published.name.StartsWith("CotWWrath", StringComparison.Ordinal) &&
+                        published.AssetGuid != BlueprintGuid.Parse(PsychicClass.ListId) &&
+                        published.SpellsByLevel?.Any(row => row != null && row.SpellLevel == c.SpellLevel &&
+                            row.SpellsRefs?.Any(spell => spell != null && spell.Guid == id) == true) == true;
+                }
                 var list=c.SpellList;
                 return list!=null && list.AssetGuid!=BlueprintGuid.Parse(PsychicClass.ListId) && list.SpellsByLevel!=null &&
                     list.SpellsByLevel.Any(l=>l!=null && l.SpellLevel==c.SpellLevel && l.Spells.Any(s=>s!=null && s.AssetGuid==id));
             });
         }
+
+        internal static BlueprintGuid ParentGuid(BlueprintAbility ability)
+            => (Get(ability, "m_Parent") as BlueprintAbilityReference)?.Guid ?? BlueprintGuid.Empty;
+
+        internal static bool HasRunActions(BlueprintAbility ability)
+            => ability.GetComponents<AbilityEffectRunAction>().Any(run => run.Actions?.Actions?.Any(action => action != null) == true);
+
+        internal static bool HasExecutableContents(BlueprintAbility ability)
+            => HasRunActions(ability) ||
+               ability.GetComponents<AdditionalAbilityEffectRunActionOnClickedTarget>().Any(run => run.Action?.Actions?.Any(action => action != null) == true) ||
+               ability.GetComponents<AbilityVariants>().Any(variants => (Get(variants, "m_Variants") as BlueprintAbilityReference[])?.Any(v => v != null && v.Guid != BlueprintGuid.Empty) == true) ||
+               ability.GetComponents<AbilityEffectStickyTouch>().Any(touch => Get(touch, "m_TouchDeliveryAbility") is BlueprintAbilityReference reference && reference.Guid != BlueprintGuid.Empty) ||
+               ability.GetComponents<AbilityShadowSpell>().Any(shadow => Get(shadow, "SpellList") is BlueprintSpellListReference reference && reference.Guid != BlueprintGuid.Empty);
         internal static void Register(BlueprintsCache cache)
         {
             PsychicEidolonHealing.Integrate(cache);

@@ -362,6 +362,26 @@ namespace CallOfTheWild.Wrath.Prototype
 
         public void HandleUnitGainLevel() => Sync();
 
+        internal void ApplyImplement(Occultist0099ImplementSlot implement, bool present)
+        {
+            Sync();
+            var state = State;
+            if (present)
+            {
+                Occultist0099Spells.AddSlot(state, implement.SlotKey, implement.School, implement.ExtraSpells, implement.Panoply);
+                return;
+            }
+            var previous = Occultist0099Spells.KnownRoots(state);
+            if (Occultist0099Spells.RemoveSlot(state, implement.SlotKey) != Occultist0099Outcome.Ok) return;
+            var removed = new HashSet<string>(previous.Except(Occultist0099Spells.KnownRoots(state)));
+            if (removed.Count == 0) return;
+            var book = Owner.Descriptor.GetSpellbook(CharacterClass?.Get()?.Spellbook);
+            if (!Occultist0099NativeScope.IsPrivateBook(book)) return;
+            foreach (var spell in book.GetAllKnownSpells().Where(ability => removed.Contains(ability.Blueprint.AssetGuid.ToString()))
+                         .Select(ability => ability.Blueprint).Distinct().ToArray())
+                book.RemoveSpell(spell);
+        }
+
         internal bool CanLearn(Spellbook book, Occultist0099ImplementSpellList source, int circle,
             BlueprintAbility spell)
         {
@@ -373,7 +393,8 @@ namespace CallOfTheWild.Wrath.Prototype
             int level = ClassLevel();
             if (root == null || circle != root.Circle || root.IsKnack || spell.Type != AbilityType.Spell ||
                 spell.Parent != null || spell.GetComponent<SpellComponent>()?.School.ToString() != root.School ||
-                intelligence < 10 + circle || circle > Occultist0099AbjurationCatalog.MaxCircleForLevel(level))
+                intelligence < 10 + circle || circle > Occultist0099AbjurationCatalog.MaxCircleForLevel(level) ||
+                !book.Blueprint.SpellList.GetSpells(circle).Contains(spell))
                 return false;
 
             var state = State;
@@ -384,7 +405,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 Occultist0099Spells.SetIntelligence(state, intelligence);
             }
             return state.Slots.Any(source.Matches) &&
-                Occultist0099Spells.Candidates(state, source.SlotKey, circle).Any(r => r.Guid == root.Guid);
+                Occultist0099Spells.Candidates(state, source.SlotKey, circle, r => r.Guid == root.Guid).Any();
         }
 
         internal void RefreshOffers(LevelUpState levelUp, Spellbook book)
@@ -426,10 +447,12 @@ namespace CallOfTheWild.Wrath.Prototype
             }
         }
 
-        internal bool RecordLearn(string slot, int circle, BlueprintAbility spell)
+        internal bool RecordLearn(Spellbook book, string slot, int circle, BlueprintAbility spell)
         {
+            if (!book.Blueprint.SpellList.GetSpells(circle).Contains(spell)) return false;
             Sync();
-            return Occultist0099Spells.Learn(State, slot, circle, spell.AssetGuid.ToString())
+            string id = spell.AssetGuid.ToString();
+            return Occultist0099Spells.Learn(State, slot, circle, id, root => root.Guid == id)
                 == Occultist0099Outcome.Ok;
         }
 
@@ -441,6 +464,22 @@ namespace CallOfTheWild.Wrath.Prototype
         public string StateFingerprint() => State.Fingerprint();
         public int OpenQuotaCount(int circle)
             => Occultist0099Spells.QuotaCount(State, circle);
+    }
+
+    [TypeId(Occultist0099Ids.ImplementSlotTypeId)]
+    public sealed class Occultist0099ImplementSlot : UnitFactComponentDelegate
+    {
+        public string SlotKey;
+        public string School = Occultist0099Ids.SliceSchool;
+        public bool ExtraSpells;
+        public string Panoply;
+
+        protected override void OnActivate() => UpdateSlot(true);
+        protected override void OnDeactivate() => UpdateSlot(false);
+
+        private void UpdateSlot(bool present)
+            => Occultist0099NativeScope.InFactContext(Owner, Occultist0099Ids.SpellbookFactGuid,
+                typeof(Occultist0099SpellbookFact0099), component => ((Occultist0099SpellbookFact0099)component).ApplyImplement(this, present));
     }
 
     internal sealed class Occultist0099NativeSpellOffer : SpellSelectionData
@@ -534,7 +573,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (book.AddKnown(action.SpellLevel, action.Spell, false) == null ||
                     !book.IsKnownOnLevel(action.Spell, action.SpellLevel) ||
                     !choice.CanSpendSlot(action.SpellLevel, action.SlotIndex) ||
-                    !facts.RecordLearn(slot, action.SpellLevel, action.Spell))
+                    !facts.RecordLearn(book, slot, action.SpellLevel, action.Spell))
                     return false;
                 choice.SpendSlot(action.SpellLevel, action.Spell, action.SlotIndex);
                 committed = true;

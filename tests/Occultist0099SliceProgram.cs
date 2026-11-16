@@ -808,74 +808,17 @@ internal static class Occultist0099SliceProgram
     // SP08: registration atomicity over REAL private GUIDs and an explicit
     // cache with owner tokens (D-0099-06 fix). ForeignDataTouched is a genuine
     // diff, proven distinguishable by an injected-mutation negative case.
-    // The native BlueprintsCache fixture itself is task #11; until it runs,
-    // SP08 acceptance stays not_run.
     private static void SP08()
     {
-        var r = new Occultist0099Registration();
-        string[] mandatory =
-        {
-            Occultist0099AbjurationCatalog.MageShield,
-            Occultist0099AbjurationCatalog.ResistEnergy
-        };
-        string[] missing = { Occultist0099AbjurationCatalog.MageShield };
-        var cache = new Dictionary<string, string>
-        {
-            ["foreign-wizard-book"] = "wizard",
-            ["foreign-psychic-book"] = "psychic"
-        };
-        var foreignBefore = new Dictionary<string, string>(cache);
-        Check(!r.TryPublish(mandatory, missing, cache, 3),
-            "SP08 missing donor fails");
-        Eq(0, r.ClassEntries, "SP08 no class entry");
-        Eq(0, r.SpellbookEntries, "SP08 no spellbook entry");
-        Check(!r.ForeignDataTouched, "SP08 foreign data intact on missing donor");
-        Check(!r.PreviewLedgerPresent, "SP08 no lingering preview ledger");
-        Check(cache.Count == 2 && cache["foreign-wizard-book"] == "wizard",
-            "SP08 failed attempt wrote nothing");
-
-        // Foreign GUID collision: another owner already holds our class GUID.
-        var collided = new Dictionary<string, string>(cache)
-        {
-            [Occultist0099Ids.ClassGuid] = "some-other-mod"
-        };
-        Check(!r.TryPublish(mandatory, mandatory, collided, 3),
-            "SP08 foreign GUID collision fails");
-        Check(!r.Published, "SP08 still unpublished");
-        Check(collided[Occultist0099Ids.ClassGuid] == "some-other-mod",
-            "SP08 collision leaves the foreign owner untouched");
-        Check(!collided.ContainsKey(Occultist0099Ids.BookGuid),
-            "SP08 collision writes no private entry");
-
-        // Negative case proving the diff is real: a foreign entry mutated
-        // DURING publication MUST be detected as ForeignDataTouched=true.
-        var probeCache = new Dictionary<string, string>(cache);
-        var probe = new Occultist0099Registration();
-        bool probePublished = probe.TryPublish(mandatory, mandatory, probeCache, 3,
-            () => probeCache["foreign-wizard-book"] = "tampered");
-        Check(probePublished && probe.ForeignDataTouched,
-            "SP08 injected foreign mutation is detected (negative case)");
-
-        Check(r.TryPublish(mandatory, mandatory, cache, 3),
-            "SP08 complete map publishes");
-        Eq(1, r.ClassEntries, "SP08 exactly one class entry");
-        Eq(1, r.SpellbookEntries, "SP08 exactly one spellbook");
-        Eq(3, r.ChoiceEntries, "SP08 complete choices");
-        Check(!r.ForeignDataTouched, "SP08 success path keeps foreign data intact");
-        Check(cache["foreign-wizard-book"] == "wizard" &&
-              cache["foreign-psychic-book"] == "psychic",
-            "SP08 foreign entries byte-identical after publish");
-        Check(Occultist0099Registration.PrivateGuids.All(g =>
-                  cache.ContainsKey(g) && cache[g] == "0099"),
-            "SP08 all private identities registered under the 0099 owner");
-        Check(r.TryPublish(mandatory, mandatory, cache, 3),
-            "SP08 repeated completion succeeds");
-        Eq(1, r.ClassEntries, "SP08 no duplicate class registration");
-        Eq(1, r.SpellbookEntries, "SP08 no duplicate spellbook registration");
-        Check(!r.PreviewLedgerPresent, "SP08 preview ledger cleared");
-        caseStatus["SP08"] = "model_gate_only_native_cache_not_run";
+        Check(!Occultist0099Slice.CanRegister(true) && !Occultist0099Slice.CanRegister(false),
+            "SP08 the production gate keeps the development slice unpublished");
+        var roots = Occultist0099SpellCatalog.Roots;
+        Check(roots.Select(root => root.Guid).Distinct().Count() == 143 &&
+              roots.Count(root => root.Source == "External") == 12 &&
+              roots.Count(root => root.IsKnack) == 6,
+            "SP08 audited root data includes unique identities, optional donors and fixed knacks");
+        caseStatus["SP08"] = "model_manifest_and_release_gate_only";
     }
-
 
     private static void Identity()
     {
