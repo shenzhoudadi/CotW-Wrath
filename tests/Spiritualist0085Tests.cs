@@ -10,8 +10,10 @@ using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.EntitySystem.Stats;
+using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.ActivatableAbilities;
@@ -61,6 +63,13 @@ internal static class Spiritualist0085Tests
         => bp?.ComponentsArray?.FirstOrDefault(c => c != null && c.GetType().Name == typeName);
     private static IEnumerable<BlueprintComponent> Components(BlueprintScriptableObject bp, string typeName)
         => bp?.ComponentsArray?.Where(c => c != null && c.GetType().Name == typeName) ?? Enumerable.Empty<BlueprintComponent>();
+    private static int Rank(ContextRankConfig config, int level)
+        => (int)AccessTools.Method(typeof(ContextRankConfig), "ApplyProgression").Invoke(config, new object[] { level });
+
+    private static void FailPrivateInsert(SimpleBlueprint __1)
+    {
+        if (__1.AssetGuid == Id("PhantomClass")) throw new InvalidOperationException("0085 test: late insertion fault");
+    }
 
     internal static int Run(BlueprintsCache cache, Harmony harmony)
     {
@@ -120,12 +129,25 @@ internal static class Spiritualist0085Tests
         }
 
         // ---- Registration gate and idempotency (C01) ----
+        var faultPoint = AccessTools.Method(typeof(BlueprintsCache), "AddCachedBlueprint");
+        var fault = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(FailPrivateInsert));
+        harmony.Patch(faultPoint, postfix: new HarmonyMethod(fault));
+        try
+        {
+            Check(!(bool)Call("Spiritualist0085", "Register", cache), "C01: injected late insertion failure rejects registration");
+            Check(cache.Load(Id("Spiritualist0085Class")) == null && cache.Load(Id("PhantomClass")) == null,
+                "C01: failure rolls back both inserted class blueprints");
+        }
+        finally
+        {
+            harmony.Unpatch(faultPoint, fault);
+        }
         bool first = (bool)Call("Spiritualist0085", "Register", cache);
         Check(first, "registration publishes with all native donors present");
         if (!first)
         {
             Console.WriteLine("0085 NOT RUN: registration rejected: " + AccessTools.Field(T("Spiritualist0085"), "LastSummary").GetValue(null));
-            return assertions;
+            throw new InvalidOperationException("0085 retry failed to publish the class.");
         }
         var cls = Load<BlueprintCharacterClass>(cache, Id("Spiritualist0085Class"));
         Check(cls != null, "private class published");
@@ -192,6 +214,10 @@ internal static class Spiritualist0085Tests
             var pet = pets[0];
             Check(pet.Type == petType, n + " AddPet uses reserved type 850085");
             Check((bool)Get(pet, "m_UseContextValueLevel") && (bool)Get(pet, "m_ForceAutoLevelup") && (bool)Get(pet, "m_DestroyPetOnDeactivate"), n + " AddPet context-level, force-auto, destroy-on-remove");
+            var rank = prog.GetComponent<ContextRankConfig>();
+            Check(new[] { 1, 2, 20 }.All(l => Rank(rank, l) == l) &&
+                ((BlueprintCharacterClassReference[])Get(rank, "m_Class")).Single().Guid == cls.AssetGuid,
+                n + " native rank formula follows only committed Spiritualist levels");
             Check(Get(pet, "m_LevelRank") == null && Get(pet, "m_UpgradeFeature") == null && pet.UpgradeLevel == 0, n + " AddPet has no rank/upgrade donor");
             var unit = pet.Pet;
             Check(unit != null && units.Add(unit.AssetGuid), n + " unit blueprint is distinct");
@@ -215,7 +241,7 @@ internal static class Spiritualist0085Tests
             foreach (var lvl in new[] { 1, 7, 12, 17 })
             {
                 var entry = prog.LevelEntries.Single(e => e.Level == lvl);
-                Check(entry.Features.Any(f => f.GetComponents<AddFeatureToPet>().Any()), n + " pet feature grant at level " + lvl);
+                Check(entry.Features.OfType<BlueprintFeature>().Any(f => Component(f, "Phantom0085BoundGrant") != null), n + " scoped pet feature grant at level " + lvl);
             }
         }
 
@@ -253,6 +279,10 @@ internal static class Spiritualist0085Tests
         Check((int)Get(ba, "BaseValue") == 3 && (bool)Get(ba, "IncreasedByLevel") && (int)Get(ba, "LevelIncrease") == 1, "bonded manifestation budget is 3 + level");
         var dual = Load<BlueprintFeature>(cache, Id("DualBond"));
         Check(Component(dual, "IncreaseResourceAmountBySharedValue") != null, "Dual Bond adds a second level-scaled budget");
+        Check(((BlueprintCharacterClassReference[])Get(ba, "m_Class")).Single().Guid == cls.AssetGuid &&
+            ((BlueprintCharacterClassReference[])Get(ba, "m_ClassDiv")).Length == 0 &&
+            new[] { 17, 20 }.Select(l => 3 + l + Rank(dual.GetComponent<ContextRankConfig>(), l)).SequenceEqual(new[] { 37, 43 }),
+            "C12: native linear resource source and Dual Bond totals are correct");
 
         // ---- Consciousness grants (C11) ----
         var shared = Load<BlueprintFeature>(cache, Id("SharedConsciousness"));
@@ -264,6 +294,9 @@ internal static class Spiritualist0085Tests
         Check(sharedGrants.All(g => Get(g, "SaveBuff") != null) && fusedGrants.All(g => Get(g, "SaveBuff") != null), "consciousness save buffs wired");
         var fusedSave = ((BlueprintBuffReference)Get(fusedGrants[0], "SaveBuff")).Get();
         Check(fusedSave.GetComponent<ContextRankConfig>() != null, "fused save bonus scales by class rank");
+        Check(Component(fused, "SavingThrowBonusAgainstDescriptor") == null &&
+            new[] { 10, 12 }.Select(l => Rank(fusedSave.GetComponent<ContextRankConfig>(), l)).SequenceEqual(new[] { 4, 8 }),
+            "C11: one Fused source, +4 and +8");
 
         // ---- Potent Phantom (C16) ----
         var potent = Load<BlueprintFeatureSelection>(cache, Id("PotentPhantom"));
@@ -311,9 +344,44 @@ internal static class Spiritualist0085Tests
         Check(transfer(true, 20, 1, 5, 13) == 13, "C14: 20 damage transfers exactly 13 (phantom 1 -> -12, owner 5 -> -2)");
         Check(transfer(true, 20, 0, 5, 13) == 0, "C14: phantom below 1 HP transfers zero");
         Check(transfer(true, 3, 10, 5, 13) == 0, "C14: non-lethal-to-owner packet transfers zero");
+        var effective = AccessTools.Method(transferType, "EffectiveHpDamage");
+        int HpDamage(int damage, int temporary) => (int)effective.Invoke(null, new object[] { damage, temporary });
+        Check(transfer(false, 200, 185, 10, 13) == 3, "C13: 200-point packet can transfer exactly 3");
+        Check(transfer(false, HpDamage(16, 16), 1, 10, 13) == 0 &&
+            transfer(false, HpDamage(20, 4), 1, 10, 13) == 3, "C13: only effective normal HP damage is transferred");
+        var ownerEntity = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
+        var petEntity = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
+        var otherEntity = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
+        bool Victim(bool bondMode, UnitEntityData unit)
+            => (bool)Call("Phantom0085DamageTransfer", "ExpectedVictim", bondMode, unit, ownerEntity, petEntity);
+        Check(Victim(false, petEntity) && !Victim(false, ownerEntity) && !Victim(false, otherEntity) &&
+            Victim(true, ownerEntity) && !Victim(true, petEntity) && !Victim(true, otherEntity),
+            "C13/C14/C17: only the actual owner or own phantom can be the expected damage target");
+        var patch = T("Phantom0085Patches+ExactDamageTransfer");
+        var nativeDamage = AccessTools.Method(typeof(RuleDealDamage), nameof(RuleDealDamage.OnTrigger));
+        var originalIl = PatchProcessor.GetOriginalInstructions(nativeDamage);
+        var rewrittenIl = ((IEnumerable<CodeInstruction>)AccessTools.Method(patch, "Transpiler")
+            .Invoke(null, new object[] { originalIl })).ToList();
+        var boundary = AccessTools.PropertySetter(typeof(UnitEntityData), "LastHandledDamage");
+        int insert = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Apply")));
+        int deliver = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Deliver")));
+        Check(insert > 0 && rewrittenIl[insert + 1].Calls(boundary) && deliver > insert,
+            "C13/C14: native damage IL provides the exact HP boundary and guarded delivery call");
         var bondedShield = Load<BlueprintBuff>(cache, Id("BondedManifestationEffect"));
         Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085ShieldToIncorporealTouch"), "bonded shield transfers to incorporeal touch AC");
         Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085TendrilDice") == false, "tendril dice live on the temporary attack buff, not the shield");
+        Check(new[] { 3, 13 }.Select(l => Rank(bondedShield.GetComponent<ContextRankConfig>(), l)).SequenceEqual(new[] { 4, 6 }),
+            "C12: Bonded's own shield rank is +4/+6");
+        var inference = Load<BlueprintFeature>(cache, Id("SpiritualInference"));
+        Check(inference.GetComponent<AddFeatureOnClassLevel>() is AddFeatureOnClassLevel gate && gate.BeforeThisLevel && gate.Level == 12 &&
+            Component(inferenceAlly, "Phantom0085InferenceBonus") != null, "C15: basic aura retires at 12 and the ally bonus rechecks its source");
+        var curse = Load<BlueprintAbility>(cache, Id("HatredSla2"));
+        var children = curse.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityVariants>()?.Variants.ToArray();
+        Check(children != null && children.Length > 0 && children.All(child => child.Parent == curse &&
+            child.Type == AbilityType.SpellLike &&
+            child.GetComponent<ContextCalculateAbilityParamsBasedOnClass>()?.CharacterClass == cls &&
+            child.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityResourceLogic>() != null),
+            "C16: native Bestow Curse variants are private, use the master class and spend the matching SLA resource");
 
         // ---- Shared roots untouched ----
         Check(ReferenceEquals(cache.Load(inqBook.AssetGuid), inqBook), "Inquisitor spellbook identity preserved");

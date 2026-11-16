@@ -580,7 +580,8 @@ namespace CallOfTheWild.Wrath.Prototype
             string token, BlueprintCharacterClass casterClass, BlueprintCharacterClass dcClass, StatType dcStat,
             BlueprintAbilityResource resource, bool supernatural = false, bool noScaling = false)
         {
-            var ability = (BlueprintAbility)CopyData(root);
+            if (root == null) throw new InvalidOperationException("Missing spell-like ability variant for " + token);
+            var ability = CopyBlueprint(root);
             ability.AssetGuid = Id(token);
             ability.name = Spiritualist0085Ids.AssetPrefix + token;
             ability.Type = supernatural ? AbilityType.Supernatural : AbilityType.SpellLike;
@@ -590,7 +591,17 @@ namespace CallOfTheWild.Wrath.Prototype
             var components = new List<BlueprintComponent>();
             foreach (var c in ability.ComponentsArray ?? Array.Empty<BlueprintComponent>())
             {
-                if (c is SpellComponent || c is SpellListComponent) continue;
+                if (c is SpellComponent || c is SpellListComponent || c is AbilityResourceLogic) continue;
+                if (c is AbilityVariants variants)
+                {
+                    var children = variants.Variants.Select((variant, i) =>
+                        ConvertToSpellLike(f, cache, variant, token + "Option" + i, casterClass, dcClass, dcStat, resource, supernatural, noScaling)).ToArray();
+                    var menu = new AbilityVariants { name = variants.name };
+                    Set(menu, "m_Variants", children.Select(Ref<BlueprintAbilityReference>).ToArray());
+                    foreach (var child in children) child.Parent = ability;
+                    components.Add(menu);
+                    continue;
+                }
                 if (c is ContextRankConfig rank)
                 {
                     var clone = (ContextRankConfig)CopyData(rank);
@@ -610,7 +621,7 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             if (!components.Any(c => c is ContextCalculateAbilityParamsBasedOnClass))
                 components.Add(Params(dcClass, dcStat, "Phantom0085SlaParams" + token));
-            components.Add(Cost(resource));
+            if (!components.Any(c => c is AbilityVariants)) components.Add(Cost(resource));
             ability.ComponentsArray = components.ToArray();
             f.Register(ability, token);
             return ability;
@@ -672,7 +683,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 AbilityType.Supernatural, UnitCommand.CommandType.Move, AbilityRange.Medium,
                 PsychicAssets.Run(Apply(hatedBuff, new ContextDurationValue(), "Phantom0085HatedApply")));
             hatedMove.CanTargetEnemies = true;
-            var hatedSwift = (BlueprintAbility)CopyData(hatedMove);
+            var hatedSwift = CopyBlueprint(hatedMove);
             hatedSwift.AssetGuid = Id("HatredHatedTargetSwiftAbility");
             hatedSwift.name = Spiritualist0085Ids.AssetPrefix + "HatredHatedTargetSwiftAbility";
             hatedSwift.ActionType = UnitCommand.CommandType.Swift;
@@ -742,7 +753,7 @@ namespace CallOfTheWild.Wrath.Prototype
             // successful saves grant 24h immunity; allies gain fear shelter at 17.
             var immuneBuff = f.Buff("FearIncreaseFearImmune", "", "", new Phantom0085NoOp { name = "Phantom0085FearImmuneMarker" });
             SetEnum(immuneBuff, "m_Flags", "RemoveOnRest, HiddenInUi");
-            var frightenedAura = (BlueprintBuff)CopyData(frightened);
+            var frightenedAura = CopyBlueprint(frightened);
             frightenedAura.AssetGuid = Id("FearIncreaseFearAuraBuff");
             frightenedAura.name = Spiritualist0085Ids.AssetPrefix + "FearIncreaseFearAuraBuff";
             f.Register(frightenedAura, "FearIncreaseFearAuraBuff");
@@ -838,7 +849,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 Facts(haste), Grant(hasteResource));
 
             var resolveResource = FixedResource(f, "ZealZealsResolveResource", 3);
-            var resolveAttackBuff = (BlueprintBuff)CopyData(f.Native<BlueprintBuff>(LuckDomainBuffId));
+            var resolveAttackBuff = CopyBlueprint(f.Native<BlueprintBuff>(LuckDomainBuffId));
             resolveAttackBuff.AssetGuid = Id("ZealZealsResolveAttackBuff");
             resolveAttackBuff.name = Spiritualist0085Ids.AssetPrefix + "ZealZealsResolveAttackBuff";
             resolveAttackBuff.ComponentsArray = new BlueprintComponent[]
@@ -847,7 +858,7 @@ namespace CallOfTheWild.Wrath.Prototype
             };
             Set(resolveAttackBuff, "m_DisplayName", Text("ZealZealsResolveAttackBuff", "name", "Zeal's Resolve: Attack Roll"));
             f.Register(resolveAttackBuff, "ZealZealsResolveAttackBuff");
-            var resolveSaveBuff = (BlueprintBuff)CopyData(resolveAttackBuff);
+            var resolveSaveBuff = CopyBlueprint(resolveAttackBuff);
             resolveSaveBuff.AssetGuid = Id("ZealZealsResolveSaveBuff");
             resolveSaveBuff.name = Spiritualist0085Ids.AssetPrefix + "ZealZealsResolveSaveBuff";
             resolveSaveBuff.ComponentsArray = new BlueprintComponent[]
@@ -902,7 +913,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(amount, "m_Archetypes", Array.Empty<BlueprintArchetypeReference>());
             Set(amount, "m_ArchetypesDiv", Array.Empty<BlueprintArchetypeReference>());
             Set(healingResource, "m_MaxAmount", amount);
-            var laySelf = (BlueprintAbility)CopyData(f.Native<BlueprintAbility>(LayOnHandsSelfId));
+            var laySelf = CopyBlueprint(f.Native<BlueprintAbility>(LayOnHandsSelfId));
             laySelf.AssetGuid = Id("KindnessEthericHealingSelf");
             laySelf.name = Spiritualist0085Ids.AssetPrefix + "KindnessEthericHealingSelf";
             laySelf.Range = AbilityRange.Touch;
@@ -912,7 +923,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 .Concat(new BlueprintComponent[] { new Phantom0085TargetSelfOrMaster { name = "Phantom0085HealSelfOrMaster" } }).ToArray();
             Set(laySelf, "m_DisplayName", Text("KindnessEthericHealingSelf", "name", "Etheric Healing: Self or Master"));
             f.Register(laySelf, "KindnessEthericHealingSelf");
-            var layOthers = (BlueprintAbility)CopyData(f.Native<BlueprintAbility>(LayOnHandsOthersId));
+            var layOthers = CopyBlueprint(f.Native<BlueprintAbility>(LayOnHandsOthersId));
             layOthers.AssetGuid = Id("KindnessEthericHealing");
             layOthers.name = Spiritualist0085Ids.AssetPrefix + "KindnessEthericHealing";
             layOthers.ComponentsArray = layOthers.ComponentsArray
@@ -936,7 +947,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (mercy == null) continue;
                 var prereq = mercy.GetComponent<PrerequisiteClassLevel>();
                 if (prereq != null && prereq.Level > 12) continue;
-                var clone = (BlueprintFeature)CopyData(mercy);
+                var clone = CopyBlueprint(mercy);
                 clone.AssetGuid = Id("KindnessPhantomMercy" + mercy.name);
                 clone.name = Spiritualist0085Ids.AssetPrefix + "KindnessPhantomMercy" + mercy.name;
                 clone.ComponentsArray = (clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
@@ -970,10 +981,9 @@ namespace CallOfTheWild.Wrath.Prototype
             return clone;
         }
 
-        internal static BlueprintFeature GrantToPet(FactoryShim f, string token, BlueprintFeature feature, PetType petType)
+        internal static BlueprintFeature GrantToPet(FactoryShim f, string token, BlueprintFeature feature)
         {
-            var grant = new AddFeatureToPet { name = "Phantom0085Grant" + token }; Set(grant, "m_PetType", petType);
-            Set(grant, "m_Feature", Ref<BlueprintFeatureReference>(feature));
+            var grant = new Phantom0085BoundGrant { name = "Phantom0085Grant" + token, Feature = Ref<BlueprintFeatureReference>(feature) };
             return f.Feature(token, NameOf(feature), DescOf(feature), grant);
         }
 
@@ -1035,8 +1045,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var amount = Get(resource, "m_MaxAmount");
             Set(amount, "BaseValue", 3);
             Set(amount, "IncreasedByLevel", true); Set(amount, "LevelIncrease", 1);
-            Set(amount, "m_ClassDiv", new[] { Ref<BlueprintCharacterClassReference>(character) });
-            Set(amount, "m_Class", Array.Empty<BlueprintCharacterClassReference>());
+            Set(amount, "m_ClassDiv", Array.Empty<BlueprintCharacterClassReference>());
+            Set(amount, "m_Class", new[] { Ref<BlueprintCharacterClassReference>(character) });
             Set(amount, "m_Archetypes", Array.Empty<BlueprintArchetypeReference>());
             Set(amount, "m_ArchetypesDiv", Array.Empty<BlueprintArchetypeReference>());
             Set(resource, "m_MaxAmount", amount);
@@ -1067,7 +1077,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(dualResource, "m_Resource", Ref<BlueprintAbilityResourceReference>(resource));
             dualBond = f.Feature("DualBond", "Dual Bond",
                 "At 17th level, the spiritualist can use her bonded manifestation ability a number of rounds per day equal to 3 + twice her spiritualist level.",
-                dualResource, Rank(character, "OnePlusDivStep"));
+                dualResource, Rank(character, "AsIs"));
             dualBond.ReapplyOnLevelUp = true;
             return bonded;
         }
@@ -1107,15 +1117,9 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var token = greater ? "GreaterSpiritualInference" : "SpiritualInference";
             var ownerBuff = f.Buff(token + "Owner", "", "",
-                new AddStatBonus { name = "Phantom0085InferenceOwnerAC", Stat = StatType.AC, Value = greater ? 4 : 2, Descriptor = ModifierDescriptor.Shield },
-                new AddStatBonus { name = "Phantom0085InferenceOwnerFort", Stat = StatType.SaveFortitude, Value = greater ? 4 : 2, Descriptor = ModifierDescriptor.Circumstance },
-                new AddStatBonus { name = "Phantom0085InferenceOwnerRef", Stat = StatType.SaveReflex, Value = greater ? 4 : 2, Descriptor = ModifierDescriptor.Circumstance },
-                new AddStatBonus { name = "Phantom0085InferenceOwnerWill", Stat = StatType.SaveWill, Value = greater ? 4 : 2, Descriptor = ModifierDescriptor.Circumstance });
+                new Phantom0085InferenceBonus { name = "Phantom0085InferenceOwnerBonus", Greater = greater, ForMaster = true, Bonus = greater ? 4 : 2 });
             var allyBuff = f.Buff(token + "Ally", "", "",
-                new AddStatBonus { name = "Phantom0085InferenceAllyAC", Stat = StatType.AC, Value = 2, Descriptor = ModifierDescriptor.Shield },
-                new AddStatBonus { name = "Phantom0085InferenceAllyFort", Stat = StatType.SaveFortitude, Value = 2, Descriptor = ModifierDescriptor.Circumstance },
-                new AddStatBonus { name = "Phantom0085InferenceAllyRef", Stat = StatType.SaveReflex, Value = 2, Descriptor = ModifierDescriptor.Circumstance },
-                new AddStatBonus { name = "Phantom0085InferenceAllyWill", Stat = StatType.SaveWill, Value = 2, Descriptor = ModifierDescriptor.Circumstance });
+                new Phantom0085InferenceBonus { name = "Phantom0085InferenceAllyBonus", Greater = greater, Bonus = 2 });
             ownerBuff.Stacking = StackingType.Stack;
             allyBuff.Stacking = StackingType.Stack;
             var aura = f.Add(new BlueprintAbilityAreaEffect
@@ -1137,9 +1141,11 @@ namespace CallOfTheWild.Wrath.Prototype
                     ? "At 12th level, whenever allies are within the phantom's reach, each ally gains a +2 shield bonus to AC and a +2 circumstance bonus on saving throws. For the spiritualist, these bonuses increase to +4. The phantom itself does not benefit."
                     : "At 4th level, whenever the spiritualist is within the reach of her manifested phantom, she gains a +2 shield bonus to AC and a +2 circumstance bonus on saving throws. She doesn't gain these bonuses when the phantom is grappled, helpless or unconscious.",
                 AreaLink(aura, token));
-            var grant = new AddFeatureToPet { name = "Phantom0085InferenceGrant" + token }; Set(grant, "m_PetType", PhantomPetType);
-            Set(grant, "m_Feature", Ref<BlueprintFeatureReference>(petFeature));
-            return f.Feature(token, greater ? "Greater Spiritual Inference" : "Spiritual Inference", DescOf(petFeature), grant);
+            if (greater) return GrantToPet(f, token, petFeature);
+            var carrier = GrantToPet(f, token + "Grant", petFeature);
+            var gate = ClassLevelGrant(character, 12, carrier, "Phantom0085InferenceBeforeGreater");
+            gate.BeforeThisLevel = true;
+            return f.Feature(token, "Spiritual Inference", DescOf(petFeature), gate);
         }
 
         internal static BlueprintFeature BuildRecall(FactoryShim f, BlueprintCharacterClass character)

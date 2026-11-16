@@ -13,6 +13,7 @@ out = pathlib.Path(sys.argv[2])
 assets = json.loads((repo / 'docs/work-packages/COTW-0085/A-spiritualist-assets.json').read_text(encoding='utf-8-sig'))
 
 wanted = {}
+sla_roots = set()
 for guid, row in assets.get('observedAssets', {}).items():
     wanted[guid] = row.get('recordSha256')
 for group in ('sourceDonors', 'wrathComparisonDonors'):
@@ -28,9 +29,11 @@ for emotion in assets.get('emotions', []):
     for sla in emotion.get('ownerSpellLike', []):
         if sla.get('originalGuid'):
             wanted.setdefault(sla['originalGuid'], None)
+            sla_roots.add(sla['originalGuid'])
         cand = sla.get('candidate') or {}
         if cand.get('provider') == 'Wrath' and cand.get('guid'):
             wanted.setdefault(cand['guid'], None)
+            sla_roots.add(cand['guid'])
 for row in assets.get('privateSpellList', []):
     if row.get('originalGuid') and row.get('wrathStatus') in ('native', 'nativeCandidateRequiresBehaviorComparison'):
         wanted.setdefault(row['originalGuid'], None)
@@ -54,28 +57,44 @@ def parse(raw):
 rows = []
 found = {}
 with zipfile.ZipFile(game / 'blueprints.zip') as archive:
+    index = {}
     for name in archive.namelist():
         if not name.endswith('.jbp'):
             continue
-        raw = archive.read(name)
-        head = raw[:200].decode('utf-8-sig', errors='replace')
+        with archive.open(name) as stream:
+            head = stream.read(200).decode('utf-8-sig', errors='replace')
         match = re.search(r'"AssetId":\s*"([0-9a-f]{32})"', head)
-        if not match or match.group(1) not in wanted:
-            continue
-        guid = match.group(1)
-        if guid in found:
-            continue
+        if match:
+            index.setdefault(match.group(1), name)
+
+    def load(guid):
+        name = index.get(guid)
+        if name is None:
+            raise SystemExit('Missing native blueprint: %s' % guid)
+        raw = archive.read(name)
         sha = hashlib.sha256(raw).hexdigest()
-        expected = wanted[guid]
+        expected = wanted.get(guid)
         if expected is not None and sha.lower() != expected.lower():
             raise SystemExit('Fingerprint mismatch for %s: archive %s != A-assets %s' % (guid, sha, expected))
         blueprint = parse(raw)
         rows.append({'name': name.rsplit('/', 1)[-1][:-4], 'sha256': sha.upper(), 'blueprint': blueprint})
         found[guid] = sha
+        return blueprint
 
-missing = set(wanted) - set(found)
-if missing:
-    raise SystemExit('Missing native rows in the installed archive: %s' % sorted(missing))
+    variants = set(sla_roots)
+    blueprints = {guid: load(guid) for guid in wanted}
+    visited = set()
+    while variants:
+        guid = min(variants)
+        variants.remove(guid)
+        visited.add(guid)
+        blueprint = blueprints.get(guid)
+        if blueprint is None:
+            blueprint = blueprints[guid] = load(guid)
+        for component in blueprint['Data'].get('Components', []):
+            if (component or {}).get('$type', '').endswith(', AbilityVariants'):
+                variants.update(child.removeprefix('!bp_') for child in component['m_Variants']
+                                if child and child.removeprefix('!bp_') not in visited)
 out.parent.mkdir(parents=True, exist_ok=True)
 out.write_text(json.dumps({'requiredNative': rows}, ensure_ascii=False), encoding='utf-8')
 print('Spiritualist 0085: %d native rows extracted, all recorded fingerprints verified.' % len(rows))

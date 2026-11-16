@@ -88,9 +88,13 @@ namespace CallOfTheWild.Wrath.Prototype
             Assets.Add(token, obj); return obj;
         }
         internal T Clone<T>(T original, string token, string name, string description) where T : BlueprintScriptableObject {
+            return Add(CopyBlueprint(original), token, name, description);
+        }
+        internal static T CopyBlueprint<T>(T original) where T : BlueprintScriptableObject {
             var cloned = (T)AccessTools.Method(typeof(object), "MemberwiseClone").Invoke(original, null);
-            cloned.ComponentsArray = original.ComponentsArray.Select(c => (BlueprintComponent)DeepCopy(c, new Dictionary<object, object>(ObjectIdentity.Instance))).ToArray();
-            return Add(cloned, token, name, description);
+            cloned.ComponentsArray = (original.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .Select(c => (BlueprintComponent)DeepCopy(c, new Dictionary<object, object>(ObjectIdentity.Instance))).ToArray();
+            return cloned;
         }
         // A copy graph is keyed by object identity, never resource/value equality.
         // WeakResourceLink.Equals compares only AssetId, even across UnitViewLink

@@ -6,6 +6,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Kingmaker;
 using Kingmaker.Blueprints;
@@ -42,8 +44,11 @@ using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.ActivatableAbilities.Restrictions;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.Controllers.Rest;
+using Kingmaker.Controllers.Rest.State;
 using Kingmaker.Utility;
+using Kingmaker.View;
 using Newtonsoft.Json;
+using Pathfinding;
 using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 
 namespace CallOfTheWild.Wrath.Prototype
@@ -59,24 +64,27 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal UnitEntityData BoundPet(UnitEntityData master)
         {
-            if (master == null || string.IsNullOrEmpty(Emotion)) return null;
-            // Only the committed primary emotion authorizes companion access.
+            if (master == null || master.IsPet || !master.PreviewOf.IsEmpty || string.IsNullOrEmpty(Emotion)) return null;
+            var cls = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(Spiritualist0085Ids.Id(Spiritualist0085.RootToken));
+            if (cls == null || master.Progression.GetClassLevel(cls) < 1) return null;
             var emotionFact = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(Spiritualist0085Ids.Id(Emotion + "Emotion"));
-            if (emotionFact == null || !master.HasFact(emotionFact)) return null;
+            var fact = emotionFact == null ? null : master.GetFact(emotionFact);
+            if (fact == null || !fact.IsTurnedOn) return null;
+            var grant = fact.GetComponentWithRuntime<AddPet>();
+            var authorized = grant.Runtime == null ? null : grant.GetData<AddPetData>()?.SpawnedPetRef.Value;
+            if (authorized == null || grant.Component?.Pet != authorized.Blueprint ||
+                Phantom0085Marker.EmotionOf(authorized) != Emotion) return null;
             var list = master.Get<UnitPartPetMaster>();
             if (list == null) return null;
             UnitEntityData found = null;
             foreach (var reference in list.Pets)
             {
-                var pet = reference.Entity;
                 var petPart = reference.EntityPart;
-                if (pet == null || petPart == null || petPart.Type != Spiritualist0085Ids.PhantomPetType || petPart.Master != master) continue;
-                if (!Phantom0085Marker.IsPhantom(pet)) continue;
-                if (!string.IsNullOrEmpty(PetId) && pet.UniqueId != PetId) continue;
-                if (found != null) return null; // reserved-type collision: keep foreign units, disable this operation
-                found = pet;
+                if (petPart == null || petPart.Type != Spiritualist0085Ids.PhantomPetType) continue;
+                if (found != null || reference.Entity != authorized || petPart.Master != master) return null;
+                found = authorized;
             }
-            if (found != null && string.IsNullOrEmpty(PetId)) PetId = found.UniqueId;
+            if (found != null) PetId = found.UniqueId;
             return found;
         }
     }
@@ -94,7 +102,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // ---- Emotion link: owns the master state and the lifecycle events ----
     [TypeId("b7e10085a10045008500850085008502")]
-    public sealed class Phantom0085Link : UnitFactComponentDelegate, IAreaHandler, IUnitRestHandler, IUnitHandler, IGlobalSubscriber
+    public sealed class Phantom0085Link : UnitFactComponentDelegate, IAreaHandler, IUnitRestHandler, IUnitHandler, IPetHandler, IGlobalSubscriber
     {
         public string Emotion;
 
@@ -104,39 +112,28 @@ namespace CallOfTheWild.Wrath.Prototype
             if (master == null || master.IsPet || !master.PreviewOf.IsEmpty) return;
             var part = master.Ensure<UnitPartPhantom0085>();
             part.Emotion = Emotion;
-            EventBus.Subscribe(this);
             Reproject(master, part);
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
 
         protected override void OnDeactivate()
         {
-            if (IsReapplying) return;
             var master = Owner;
-            EventBus.Unsubscribe(this);
+            if (IsReapplying) return;
             var part = master?.Get<UnitPartPhantom0085>();
             if (part == null || part.Emotion != Emotion) return;
-            // Release only this emotion's owned focus grants and effects.
-            foreach (var guid in part.GrantedFocus.ToArray())
-            {
-                var focus = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(BlueprintGuid.Parse(guid));
-                if (focus != null && master.HasFact(focus)) master.RemoveFact(focus);
-                part.GrantedFocus.Remove(guid);
-            }
-            // Deterministic cleanup: the emotion is gone, so every focus this
-            // master state tracks must be released regardless of fact-list
-            // ordering during native deactivation.
             foreach (var key in part.GrantedFocus.ToArray())
             {
                 var focus = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(BlueprintGuid.Parse(key));
                 if (focus != null && master.HasFact(focus)) master.RemoveFact(focus);
                 part.GrantedFocus.Remove(key);
             }
-            Phantom0085ConsciousnessGrant.RefreshAll(master);
+            ClearBonded(master);
             part.Confined = false;
             part.PendingManifest = false;
             part.PetId = null;
             part.Emotion = null;
+            Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
 
         public void OnAreaBeginUnloading() { }
@@ -155,21 +152,33 @@ namespace CallOfTheWild.Wrath.Prototype
             // Completed rest releases living confinement (original RemoveOnRest).
             var pet = part.BoundPet(unit);
             ClearBonded(unit);
-            if (pet != null && !pet.Descriptor.State.IsFinallyDead && part.Confined)
+            if (Alive(pet) && part.Confined)
             {
-                part.Confined = false;
-                part.PendingManifest = !CanPlace(unit);
-                if (!part.PendingManifest) ManifestNow(unit, pet, part);
+                part.PendingManifest = true;
             }
             Reproject(unit, part);
             Phantom0085ConsciousnessGrant.RefreshAll(unit);
         }
 
         public void HandleUnitSpawned(UnitEntityData unit) { }
+        public void HandleAddPet(UnitEntityData master, UnitEntityData pet)
+        {
+            if (master == Owner && Phantom0085Marker.EmotionOf(pet) == Emotion)
+            {
+                var part = master.Get<UnitPartPhantom0085>();
+                if (part?.Emotion == Emotion) Reproject(master, part);
+            }
+        }
+        public void HandleRemovePet(UnitEntityData master, UnitEntityData pet) { }
         public void HandleUnitDestroyed(UnitEntityData unit)
         {
             var part = Owner?.Get<UnitPartPhantom0085>();
-            if (part != null && unit.UniqueId == part.PetId) part.PetId = null;
+            if (part == null || unit.UniqueId != part.PetId) return;
+            part.PetId = null;
+            part.Confined = false;
+            part.PendingManifest = false;
+            ClearBonded(Owner);
+            Phantom0085ConsciousnessGrant.RefreshAll(Owner);
         }
         public void HandleUnitDeath(UnitEntityData unit)
         {
@@ -183,8 +192,32 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         internal static bool CanPlace(UnitEntityData master)
-            => master != null && master.IsInGame && master.HoldingState != null &&
+            => Alive(master) && master.IsInGame && master.HoldingState != null &&
                Game.Instance?.CurrentlyLoadedArea != null && !Game.Instance.IsModeActive(GameModeType.GlobalMap);
+
+        internal static bool SameLocalArea(UnitEntityData master, UnitEntityData pet)
+            => pet != null && CanPlace(master) && pet.HoldingState == master.HoldingState;
+
+        internal static bool TryMoveNearMaster(UnitEntityData master, UnitEntityData pet, bool requireMovement = true)
+        {
+            var path = AstarPath.active;
+            if (!SameLocalArea(master, pet) || !path) return false;
+            FreePlaceSelector.PlaceSpawnPlaces(1, 0.5f, master.Position);
+            var destination = FreePlaceSelector.GetRelaxedPosition(0, projectOnGround: true);
+            var nearest = path.GetNearest(destination);
+            if (nearest.node?.Walkable != true || VectorDistanceHorizontal(nearest.position, destination) > 0.5f ||
+                VectorDistanceHorizontal(master.Position, destination) > 10.Feet().Meters)
+                return false;
+            if (VectorDistanceHorizontal(pet.Position, destination) <= 0.1f) return !requireMovement;
+            pet.Position = destination;
+            return true;
+        }
+
+        private static float VectorDistanceHorizontal(UnityEngine.Vector3 from, UnityEngine.Vector3 to)
+        {
+            from.y = to.y;
+            return UnityEngine.Vector3.Distance(from, to);
+        }
 
         internal static void Reproject(UnitEntityData master, UnitPartPhantom0085 part)
         {
@@ -192,44 +225,44 @@ namespace CallOfTheWild.Wrath.Prototype
             if (pet == null) return;
             var petPart = pet.Get<UnitPartPet>();
             if (petPart == null) return;
+            Phantom0085Patches.MountSuppression.SuppressIfOnlyPhantom(master, pet);
+            Phantom0085PetGrant.RefreshAll(master, pet);
             if (pet.Descriptor.Alignment.ValueRaw != master.Descriptor.Alignment.ValueRaw)
                 pet.Descriptor.Alignment.Set(master.Descriptor.Alignment.ValueRaw);
             if (pet.Descriptor.State.IsFinallyDead) return;
-            if (part.Confined)
+            if (part.PendingManifest && Alive(pet))
+            {
+                ManifestNow(master, pet, part);
+            }
+            else if (part.Confined)
             {
                 if (!petPart.ShouldBeHidden) petPart.SetHidden(true);
             }
-            else if (part.PendingManifest)
+            else if (petPart.ShouldBeHidden && Alive(pet))
             {
-                if (CanPlace(master))
-                {
-                    part.PendingManifest = false;
-                    ManifestNow(master, pet, part);
-                }
-            }
-            else if (petPart.ShouldBeHidden)
-            {
-                ClearBonded(master);
-                petPart.SetHidden(false);
+                ManifestNow(master, pet, part);
             }
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
 
-        internal static void ManifestNow(UnitEntityData master, UnitEntityData pet, UnitPartPhantom0085 part)
+        internal static bool ManifestNow(UnitEntityData master, UnitEntityData pet, UnitPartPhantom0085 part)
         {
             var petPart = pet.Get<UnitPartPet>();
-            if (petPart == null) return;
-            ClearBonded(master);
+            if (petPart == null || !TryMoveNearMaster(master, pet, requireMovement: false)) return false;
             petPart.SetHidden(false);
-            petPart.TeleportToMaster();
             part.Confined = false;
+            part.PendingManifest = false;
+            return true;
         }
+
+        internal static Buff BondedEffect(UnitEntityData master)
+            => master?.Buffs.Enumerable.FirstOrDefault(b => b.Blueprint.AssetGuid == Spiritualist0085Ids.Id("BondedManifestationEffect"));
 
         internal static void ClearBonded(UnitEntityData master)
         {
-            if (master == null) return;
-            var bonded = master.Buffs.Enumerable.FirstOrDefault(b => b.Blueprint.AssetGuid == Spiritualist0085Ids.Id("BondedManifestationEffect"));
-            if (bonded != null) bonded.Remove();
+            var ability = ResourcesLibrary.TryGetBlueprint<BlueprintActivatableAbility>(Spiritualist0085Ids.Id("BondedManifestation"));
+            if (ability != null) master?.ActivatableAbilities.GetFact(ability)?.TurnOff();
+            BondedEffect(master)?.Remove();
         }
 
         internal static bool Alive(UnitEntityData pet)
@@ -238,14 +271,9 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // ---- Alignment sync: phantom mirrors the master ----
     [TypeId("b7e10085a10045008500850085008503")]
-    public sealed class Phantom0085AlignmentSync : UnitFactComponentDelegate, IUnitHandler
+    public sealed class Phantom0085AlignmentSync : UnitFactComponentDelegate, IAlignmentChangeHandler
     {
-        protected override void OnActivate()
-        {
-            Sync();
-            EventBus.Subscribe(this);
-        }
-        protected override void OnDeactivate() => EventBus.Unsubscribe(this);
+        protected override void OnActivate() => Sync();
         private void Sync()
         {
             var master = Owner;
@@ -254,9 +282,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (pet != null && pet.Descriptor.Alignment.ValueRaw != master.Descriptor.Alignment.ValueRaw)
                 pet.Descriptor.Alignment.Set(master.Descriptor.Alignment.ValueRaw);
         }
-        public void HandleUnitSpawned(UnitEntityData unit) => Sync();
-        public void HandleUnitDestroyed(UnitEntityData unit) { }
-        public void HandleUnitDeath(UnitEntityData unit) { }
+        public void HandleAlignmentChange(UnitEntityData unit, Alignment newAlignment, Alignment prevAlignment)
+        {
+            if (unit == Owner) Sync();
+        }
     }
 
     // ---- Slam dice replacement (native rulebook, bounded to natural slams) ----
@@ -469,11 +498,12 @@ namespace CallOfTheWild.Wrath.Prototype
         private bool Eligible(UnitEntityData master, UnitPartPhantom0085 part)
         {
             var emotion = Emotion?.Get();
-            if (emotion == null || !master.HasFact(emotion)) return false;
+            if (emotion == null || part.Emotion == null || emotion.AssetGuid != Spiritualist0085Ids.Id(part.Emotion + "Emotion") ||
+                !master.HasFact(emotion)) return false;
             if (Permanent) return true;
             var fused = Fused?.Get();
             var pet = part.BoundPet(master);
-            return part.Confined && pet != null && !pet.Descriptor.State.IsFinallyDead &&
+            return part.Confined && Phantom0085Link.Alive(pet) &&
                 (fused == null || !master.HasFact(fused));
         }
 
@@ -521,44 +551,54 @@ namespace CallOfTheWild.Wrath.Prototype
                 part.GrantedFocus.Remove(key);
             }
             // Reconcile the mode save buffs.
-            foreach (var grant in grants)
-            {
-                var buff = grant.SaveBuff?.Get();
-                if (buff == null) continue;
-                bool active = grant.Permanent ? fusedActive : sharedActive;
-                var present = master.Buffs.GetBuff(buff) != null;
-                if (active && !present) master.Buffs.AddBuff(buff, master, TimeSpan.MaxValue, AbilityParams.Empty);
-                else if (!active && present) master.Buffs.GetBuff(buff).Remove();
-            }
+            ReconcileSave(master, "SharedConsciousnessSave", sharedActive && !fusedActive);
+            ReconcileSave(master, "FusedConsciousnessSave", fusedActive);
+        }
+
+        private static void ReconcileSave(UnitEntityData master, string token, bool active)
+        {
+            var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(Spiritualist0085Ids.Id(token));
+            if (blueprint == null) return;
+            var existing = master.Buffs.GetBuff(blueprint);
+            if (active && existing == null) master.Buffs.AddBuff(blueprint, master, TimeSpan.MaxValue, AbilityParams.Empty);
+            if (!active) existing?.Remove();
         }
     }
 
     // ---- Etheric Tether / Spiritual Bond damage transfer ----
     [TypeId("b7e10085a1004500850085008500850f")]
-    public sealed class Phantom0085DamageTransfer : UnitFactComponentDelegate, IGlobalRulebookHandler<RuleCalculateDamage>, IGlobalSubscriber
+    public sealed class Phantom0085DamageTransfer : UnitFactComponentDelegate
     {
         public bool SpiritualBond;
-        public void OnEventAboutToTrigger(RuleCalculateDamage evt) { }
-        public void OnEventDidTrigger(RuleCalculateDamage evt)
+
+        internal static int EffectiveHpDamage(int damage, int temporaryHp)
+            => damage <= 0 ? 0 : Math.Max(0, damage - Math.Max(0, temporaryHp));
+
+        internal static bool ExpectedVictim(bool spiritualBond, UnitEntityData victim, UnitEntityData master, UnitEntityData pet)
+            => !ReferenceEquals(victim, null) && ReferenceEquals(victim, spiritualBond ? master : pet);
+
+        internal static UnitEntityData ResolveRecipient(RuleDealDamage deal, out int amount)
         {
-            var deal = evt.ParentRule as RuleDealDamage;
-            if (deal == null || deal.IsFake || deal.IsDot) return;
-            var master = Owner;
+            amount = 0;
+            if (deal == null || deal.IsFake || deal.RedirectionTarget.Value != null || deal.RedirectedPercent != 0 || deal.RedirectedDamage != 0)
+                return null;
+            var victim = deal.Target;
+            if (victim == null) return null;
+            var victimPart = victim.Get<UnitPartPet>();
+            bool spiritualBond = victimPart?.Type != Spiritualist0085Ids.PhantomPetType;
+            var master = spiritualBond ? victim : victimPart.Master;
             var part = master?.Get<UnitPartPhantom0085>();
+            if (part == null || part.Confined || !Phantom0085Link.Alive(master)) return null;
             var pet = part?.BoundPet(master);
-            if (pet == null || !Phantom0085Link.Alive(pet)) return;
-            var petPart = pet.Get<UnitPartPet>();
-            if (petPart == null || petPart.ShouldBeHidden || pet.HoldingState != master.HoldingState) return;
-            int result = 0;
-            foreach (var value in evt.CalculatedDamage) result += value.FinalValue;
-            if (result <= 0) return;
-            int amount = TransferAmount(SpiritualBond, result, pet.HPLeft, master.HPLeft, pet.Stats.Constitution.ModifiedValue);
-            UnitEntityData target = SpiritualBond ? pet : master;
-            if (amount <= 0) return;
-            // Native redirection is an integer percent of the final Result;
-            // round up so the transferred amount is exact below 100 damage.
-            deal.RedirectedPercent = (amount * 100 + result - 1) / result;
-            deal.RedirectionTarget = target;
+            if (!ExpectedVictim(spiritualBond, victim, master, pet) || !Phantom0085Link.Alive(pet) ||
+                !pet.IsInGame || pet.Get<UnitPartPet>().ShouldBeHidden || !Phantom0085Link.SameLocalArea(master, pet)) return null;
+            if (!master.Buffs.Enumerable.Any(b => b.IsTurnedOn && !b.IsSuppressed &&
+                b.Blueprint.GetComponent<Phantom0085DamageTransfer>()?.SpiritualBond == spiritualBond))
+                return null;
+
+            int hpDamage = EffectiveHpDamage(deal.Result, (int)victim.Stats.TemporaryHitPoints);
+            amount = TransferAmount(spiritualBond, hpDamage, pet.HPLeft, master.HPLeft, pet.Stats.Constitution.ModifiedValue);
+            return amount > 0 ? (spiritualBond ? pet : master) : null;
         }
 
         // Pure contract arithmetic (C13/C14), offline-testable. HP semantics:
@@ -573,11 +613,11 @@ namespace CallOfTheWild.Wrath.Prototype
                 int excess = 1 - (masterHp - result);
                 if (excess <= 0) return 0;
                 int capacity = petHp - floor;
-                return Math.Min(excess, Math.Max(0, capacity));
+                return Math.Min(result, Math.Min(excess, Math.Max(0, capacity)));
             }
             int overflow = floor - (petHp - result);
             if (overflow <= 0) return 0;
-            return Math.Min(overflow, Math.Max(0, masterHp - 1));
+            return Math.Min(result, Math.Min(overflow, Math.Max(0, masterHp - 1)));
         }
     }
 
@@ -613,15 +653,56 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var phantom = Context?.MaybeCaster;
             var unit = Target?.Unit;
-            var master = phantom?.Get<UnitPartPet>()?.Master;
-            if (master == null || unit == null || unit == phantom || !Phantom0085Link.Alive(phantom)) return;
-            if (phantom.Descriptor.State.HasCondition(UnitCondition.Helpless) ||
-                phantom.Descriptor.State.HasCondition(UnitCondition.Unconscious) ||
-                phantom.Get<UnitPartGrappleInitiator>() != null ||
-                phantom.Get<UnitPartGrappleTarget>() != null) return;
+            if (phantom == null || unit == null || unit == phantom) return;
+            var master = phantom.Get<UnitPartPet>()?.Master;
             var buff = (unit == master ? OwnerBuff : (Greater ? AllyBuff : null))?.Get();
-            if (buff != null && unit.Buffs.GetBuff(buff) == null) unit.Buffs.AddBuff(buff, phantom, TimeSpan.MaxValue, AbilityParams.Empty);
+            if (buff == null) return;
+            if (!Phantom0085InferenceBonus.Eligible(phantom, unit, Greater, unit == master))
+            {
+                Phantom0085InferenceExit.Remove(unit, phantom, buff);
+                return;
+            }
+            if (!unit.Buffs.Enumerable.Any(b => b.Blueprint == buff && b.Context?.MaybeCaster == phantom))
+                unit.Buffs.AddBuff(buff, phantom, TimeSpan.MaxValue, AbilityParams.Empty);
         }
+    }
+
+    [TypeId("b7e10085a1004500850085008500851c")]
+    public sealed class Phantom0085InferenceBonus : UnitBuffComponentDelegate,
+        ITargetRulebookHandler<RuleCalculateAC>, IInitiatorRulebookHandler<RuleSavingThrow>, IUnitSubscriber
+    {
+        public bool Greater;
+        public bool ForMaster;
+        public int Bonus;
+
+        internal static bool Eligible(UnitEntityData phantom, UnitEntityData unit, bool greater, bool forMaster)
+        {
+            if (!Phantom0085Link.Alive(phantom) || unit == null || unit == phantom || !phantom.IsInGame ||
+                phantom.HoldingState == null || phantom.HoldingState != unit.HoldingState ||
+                phantom.DistanceTo(unit) > 10.Feet().Meters ||
+                phantom.State.HasCondition(UnitCondition.Helpless) || phantom.State.HasCondition(UnitCondition.Unconscious) ||
+                phantom.Get<UnitPartGrappleInitiator>() != null || phantom.Get<UnitPartGrappleTarget>() != null)
+                return false;
+            var master = phantom.Get<UnitPartPet>()?.Master;
+            var part = master?.Get<UnitPartPhantom0085>();
+            if (part == null || part.Confined || part.BoundPet(master) != phantom) return false;
+            var upgraded = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(Spiritualist0085Ids.Id("GreaterSpiritualInference"));
+            if (greater != (upgraded != null && master.HasFact(upgraded))) return false;
+            return forMaster ? unit == master : greater && unit != master && unit.IsAlly(phantom);
+        }
+
+        public void OnEventAboutToTrigger(RuleCalculateAC evt)
+        {
+            if (Eligible(Buff.Context?.MaybeCaster, Owner, Greater, ForMaster))
+                evt.AddModifier(Bonus, Fact, ModifierDescriptor.Shield);
+        }
+        public void OnEventAboutToTrigger(RuleSavingThrow evt)
+        {
+            if (Eligible(Buff.Context?.MaybeCaster, Owner, Greater, ForMaster))
+                evt.AddModifier(Bonus, Fact, ModifierDescriptor.Circumstance);
+        }
+        public void OnEventDidTrigger(RuleCalculateAC evt) { }
+        public void OnEventDidTrigger(RuleSavingThrow evt) { }
     }
 
     [TypeId("b7e10085a10045008500850085008518")]
@@ -633,12 +714,17 @@ namespace CallOfTheWild.Wrath.Prototype
         public override void RunAction()
         {
             var unit = Target?.Unit;
-            if (unit == null) return;
-            foreach (var reference in new[] { OwnerBuff, AllyBuff })
-            {
-                var buff = reference?.Get();
-                if (buff != null && unit.Buffs.GetBuff(buff) != null) unit.Buffs.GetBuff(buff)?.Remove();
-            }
+            var phantom = Context?.MaybeCaster;
+            if (unit == null || phantom == null) return;
+            Remove(unit, phantom, OwnerBuff?.Get());
+            Remove(unit, phantom, AllyBuff?.Get());
+        }
+
+        internal static void Remove(UnitEntityData unit, UnitEntityData phantom, BlueprintBuff blueprint)
+        {
+            if (blueprint == null) return;
+            foreach (var fact in unit.Buffs.Enumerable.Where(b => b.Blueprint == blueprint && b.Context?.MaybeCaster == phantom).ToArray())
+                fact.Remove();
         }
     }
 
@@ -653,45 +739,99 @@ namespace CallOfTheWild.Wrath.Prototype
             var part = master?.Get<UnitPartPhantom0085>();
             var pet = part?.BoundPet(master);
             if (pet == null || part.Confined || !Phantom0085Link.Alive(pet)) return;
-            if (pet.HoldingState != master.HoldingState) return;
+            if (!pet.IsInGame || !Phantom0085Link.SameLocalArea(master, pet)) return;
             var petPart = pet.Get<UnitPartPet>();
             if (petPart == null || petPart.ShouldBeHidden) return;
-            // Already at the landing point: redundant call spends nothing.
-            if (pet.DistanceTo(master) <= 5.Feet().Meters) return;
             var resource = ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(Spiritualist0085Ids.Id("PhantomRecallResource"));
             if (resource == null || master.Resources.GetResourceAmount(resource) < 1) return;
-            master.Resources.Spend(resource, 1);
-            petPart.TeleportToMaster();
+            if (pet.DistanceTo(master) <= 5.Feet().Meters) return;
+            if (Phantom0085Link.TryMoveNearMaster(master, pet)) master.Resources.Spend(resource, 1);
         }
     }
 
-    // ---- Potent Phantom: secondary emotion's four capabilities ----
-    [TypeId("b7e10085a10045008500850085008514")]
-    public sealed class Phantom0085PotentGrant : UnitFactComponentDelegate
+    // Native AddPet owns the entity. These grants record only their own facts
+    // so even a reserved-type collision cannot modify another mod's companion.
+    public abstract class Phantom0085PetGrant : UnitFactComponentDelegate<Phantom0085PetGrant.State>, IPetHandler
     {
-        public BlueprintProgressionReference Emotion;
-        protected override void OnActivate()
+        public sealed class State
         {
-            var master = Owner;
-            var part = master?.Get<UnitPartPhantom0085>();
-            var pet = part?.BoundPet(master);
-            var emotion = Emotion?.Get();
-            if (pet == null || emotion == null) return;
-            // Only the secondary emotion's 1/7/12/17 pet capabilities apply to
-            // the same phantom; no second AddPet, no master SLA side effects.
-            foreach (var entry in emotion.LevelEntries)
+            [JsonProperty] public string PetId;
+            [JsonProperty] public List<EntityFactRef<Feature>> Features = new List<EntityFactRef<Feature>>();
+        }
+
+        protected override void OnActivate() => Refresh(Owner?.Get<UnitPartPhantom0085>()?.BoundPet(Owner));
+        protected override void OnDeactivate()
+        {
+            if (!IsReapplying) Clear();
+        }
+
+        protected override void OnApplyPostLoadFixes() => OnActivate();
+
+        public void HandleAddPet(UnitEntityData master, UnitEntityData pet)
+        {
+            if (master == Owner) OnActivate();
+        }
+
+        public void HandleRemovePet(UnitEntityData master, UnitEntityData pet)
+        {
+            if (master == Owner && pet?.UniqueId == Data.PetId) Clear();
+        }
+
+        private void Clear()
+        {
+            foreach (var reference in Data.Features)
+                if (reference.Fact is Feature fact && fact.Manager != null) fact.Owner.RemoveFact(fact);
+            Data.Features.Clear();
+            Data.PetId = null;
+        }
+
+        protected abstract IEnumerable<BlueprintFeature> FeaturesToGrant();
+
+        private void Refresh(UnitEntityData pet)
+        {
+            if (pet == null) return;
+            if (Data.PetId != pet.UniqueId)
             {
-                if (entry.Level != 1 && entry.Level != 7 && entry.Level != 12 && entry.Level != 17) continue;
-                foreach (var reference in entry.Features)
+                Clear();
+                Data.PetId = pet.UniqueId;
+            }
+            foreach (var feature in FeaturesToGrant())
+            {
+                if (feature != null && !pet.HasFact(feature))
                 {
-                    var grantFeature = reference as BlueprintFeature;
-                    var toPet = grantFeature?.GetComponent<AddFeatureToPet>();
-                    if (toPet == null) continue;
-                    var inner = (AccessTools.Field(toPet.GetType(), "m_Feature").GetValue(toPet) as BlueprintFeatureReference)?.Get();
-                    if (inner != null && !pet.HasFact(inner)) pet.Progression.Features.AddFeature(inner);
+                    var added = pet.Progression.Features.AddFeature(feature);
+                    if (added != null) Data.Features.Add(added);
                 }
             }
         }
+
+        internal static void RefreshAll(UnitEntityData master, UnitEntityData pet)
+        {
+            foreach (var runtime in master.Facts.List.Where(f => f.IsTurnedOn).SelectMany(f => f.Components).ToArray())
+            {
+                if (!(runtime.SourceBlueprintComponent is Phantom0085PetGrant grant) || !(runtime is ISubscriptionProxy subscriber))
+                    continue;
+                using (subscriber.RequestEventContext()) grant.Refresh(pet);
+            }
+        }
+    }
+
+    [TypeId("b7e10085a1004500850085008500851d")]
+    public sealed class Phantom0085BoundGrant : Phantom0085PetGrant
+    {
+        public BlueprintFeatureReference Feature;
+        protected override IEnumerable<BlueprintFeature> FeaturesToGrant() { yield return Feature?.Get(); }
+    }
+
+    [TypeId("b7e10085a10045008500850085008514")]
+    public sealed class Phantom0085PotentGrant : Phantom0085PetGrant
+    {
+        public BlueprintProgressionReference Emotion;
+        protected override IEnumerable<BlueprintFeature> FeaturesToGrant()
+            => (Emotion?.Get()?.LevelEntries ?? Array.Empty<LevelEntry>())
+                .Where(entry => entry.Level == 1 || entry.Level == 7 || entry.Level == 12 || entry.Level == 17)
+                .SelectMany(entry => entry.Features).OfType<BlueprintFeature>()
+                .Select(feature => feature.GetComponent<Phantom0085BoundGrant>()?.Feature?.Get()).Where(feature => feature != null);
     }
 
     // ---- Bonded Manifestation tendrils ----
@@ -767,7 +907,7 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (!evt.AttackType.IsTouch()) return;
             if (evt.Initiator == null || !evt.Initiator.HasFact(ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(Incorporeal))) return;
-            int shield = Owner.Stats.AC.GetDescriptorBonus(ModifierDescriptor.Shield);
+            int shield = Context?[AbilityRankType.Default] ?? 0;
             if (shield > 0) evt.AddModifier(shield, Fact, ModifierDescriptor.UntypedStackable);
         }
         public void OnEventDidTrigger(RuleCalculateAC evt) { }
@@ -784,12 +924,13 @@ namespace CallOfTheWild.Wrath.Prototype
             var part = master?.Get<UnitPartPhantom0085>();
             var pet = part?.BoundPet(master);
             if (pet == null || part.Confined) return;
-            if (!Phantom0085Link.Alive(pet) || pet.Damage < 1) return;
-            if (pet.HoldingState != master.HoldingState) return;
+            if (!Phantom0085Link.Alive(pet) || pet.HPLeft < 1 || !pet.IsInGame ||
+                !Phantom0085Link.SameLocalArea(master, pet)) return;
             var petPart = pet.Get<UnitPartPet>();
             if (petPart == null || petPart.ShouldBeHidden) return;
             petPart.SetHidden(true);
             part.Confined = true;
+            part.PendingManifest = false;
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
     }
@@ -804,12 +945,9 @@ namespace CallOfTheWild.Wrath.Prototype
             var part = master?.Get<UnitPartPhantom0085>();
             var pet = part?.BoundPet(master);
             if (pet == null || !part.Confined || !Phantom0085Link.Alive(pet)) return;
-            if (!Phantom0085Link.CanPlace(master)) { part.PendingManifest = true; return; }
-            // Bonded Manifestation must end before the phantom manifests.
-            var bonded = master.Buffs.Enumerable.FirstOrDefault(b => b.Blueprint.AssetGuid == Spiritualist0085Ids.Id("BondedManifestationEffect"));
-            if (bonded != null) bonded.Remove();
-            Phantom0085Link.ManifestNow(master, pet, part);
-            Phantom0085ConsciousnessGrant.RefreshAll(master);
+            if (Phantom0085Link.BondedEffect(master) != null) return;
+            if (Phantom0085Link.ManifestNow(master, pet, part))
+                Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
     }
 
@@ -819,6 +957,76 @@ namespace CallOfTheWild.Wrath.Prototype
     // ---- Bounded Harmony patches: mount, rest fallback, aid another ----
     internal static class Phantom0085Patches
     {
+        [HarmonyPatch(typeof(RuleDealDamage), nameof(RuleDealDamage.OnTrigger))]
+        internal static class ExactDamageTransfer
+        {
+            private static readonly ConditionalWeakTable<RuleDealDamage, object> Exact = new ConditionalWeakTable<RuleDealDamage, object>();
+            private static readonly object Marker = new object();
+            [ThreadStatic] private static bool applyingDerivedDamage;
+            private static readonly System.Reflection.MethodInfo SetResult = AccessTools.PropertySetter(typeof(RuleDealDamage), "Result");
+            private static readonly System.Reflection.MethodInfo SetRedirected = AccessTools.PropertySetter(typeof(RuleDealDamage), "RedirectedDamage");
+
+            [HarmonyTranspiler]
+            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source)
+            {
+                var instructions = source.ToList();
+                var lastDamage = AccessTools.PropertySetter(typeof(UnitEntityData), "LastHandledDamage");
+                var directDamage = AccessTools.Method(typeof(Kingmaker.Designers.GameHelper), nameof(Kingmaker.Designers.GameHelper.DealDirectDamage),
+                    new[] { typeof(UnitEntityData), typeof(UnitEntityData), typeof(int) });
+                var points = instructions.Where(i => i.Calls(lastDamage)).ToArray();
+                var directCalls = instructions.Where(i => i.Calls(directDamage)).ToArray();
+                if (points.Length != 1 || directCalls.Length != 1 || SetResult == null || SetRedirected == null)
+                {
+                    ModEntry.LogSpellDiagnostic("0085 exact damage transfer disabled: native damage application boundary was not found.");
+                    return instructions;
+                }
+
+                // The native rule has already applied MinHP, difficulty and other
+                // redirection. It has not touched temporary HP or normal HP yet.
+                var point = points[0];
+                var load = new CodeInstruction(OpCodes.Ldarg_0);
+                load.labels.AddRange(point.labels);
+                point.labels.Clear();
+                instructions.InsertRange(instructions.IndexOf(point), new[]
+                {
+                    load, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ExactDamageTransfer), nameof(Apply)))
+                });
+
+                var call = directCalls[0];
+                var rule = new CodeInstruction(OpCodes.Ldarg_0);
+                rule.labels.AddRange(call.labels);
+                call.labels.Clear();
+                call.operand = AccessTools.Method(typeof(ExactDamageTransfer), nameof(Deliver));
+                instructions.Insert(instructions.IndexOf(call), rule);
+                return instructions;
+            }
+
+            private static void Apply(RuleDealDamage deal)
+            {
+                if (applyingDerivedDamage) return;
+                var recipient = Phantom0085DamageTransfer.ResolveRecipient(deal, out int amount);
+                if (recipient == null) return;
+                Exact.Add(deal, Marker);
+                SetResult.Invoke(deal, new object[] { deal.Result - amount });
+                SetRedirected.Invoke(deal, new object[] { amount });
+                deal.RedirectionTarget = recipient;
+            }
+
+            private static void Deliver(UnitEntityData initiator, UnitEntityData recipient, int amount, RuleDealDamage original)
+            {
+                bool previous = applyingDerivedDamage;
+                applyingDerivedDamage |= Exact.Remove(original);
+                try
+                {
+                    Kingmaker.Designers.GameHelper.DealDirectDamage(initiator, recipient, amount);
+                }
+                finally
+                {
+                    applyingDerivedDamage = previous;
+                }
+            }
+        }
+
         private static readonly Dictionary<UnitEntityData, List<Phantom0085AidAnotherActionType>> AidAnother =
             new Dictionary<UnitEntityData, List<Phantom0085AidAnotherActionType>>();
         private static readonly HashSet<UnitEntityData> Benevolent = new HashSet<UnitEntityData>();
@@ -890,13 +1098,14 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 var owner = __instance.Owner;
                 if (owner == null) return;
-                bool onlyPhantom = __instance.Pets.Count > 0;
-                foreach (var reference in __instance.Pets)
-                {
-                    var part = reference.EntityPart;
-                    if (part == null || part.Type != Spiritualist0085Ids.PhantomPetType) { onlyPhantom = false; break; }
-                }
-                if (!onlyPhantom) return;
+                var phantom = owner.Get<UnitPartPhantom0085>()?.BoundPet(owner);
+                if (phantom != null) SuppressIfOnlyPhantom(owner, phantom);
+            }
+
+            internal static void SuppressIfOnlyPhantom(UnitEntityData owner, UnitEntityData phantom)
+            {
+                var pets = owner.Get<UnitPartPetMaster>()?.Pets;
+                if (pets?.Count != 1 || pets[0].Entity != phantom) return;
                 var mount = Kingmaker.Blueprints.Root.BlueprintRoot.Instance?.SystemMechanics?.MountAbility;
                 if (mount == null) return;
                 var fact = owner.ActivatableAbilities.GetFact(mount);
@@ -912,9 +1121,8 @@ namespace CallOfTheWild.Wrath.Prototype
             [HarmonyPostfix]
             private static void Postfix()
             {
-                var player = Game.Instance?.Player;
-                if (player == null) return;
-                foreach (var master in player.AllCharacters)
+                if (Game.Instance?.Player == null) return;
+                foreach (var master in CampingState.GetPartyUnitsForRest(removePets: true, includeDeadAndParalyzed: true))
                 {
                     var part = master.Get<UnitPartPhantom0085>();
                     var pet = part?.BoundPet(master);

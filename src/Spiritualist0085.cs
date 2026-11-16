@@ -507,6 +507,10 @@ namespace CallOfTheWild.Wrath.Prototype
             var f = new Phantom0085.FactoryShim(cache);
             var unavailable = new List<string>();
             BlueprintCharacterClass root = null;
+            Kingmaker.Blueprints.Root.ProgressionRoot rootProgression = null;
+            BlueprintCharacterClassReference[] previousClasses = null;
+            BlueprintCharacterClassReference[] publishedClasses = null;
+            var inserted = new List<BlueprintScriptableObject>();
             try
             {
                 root = Build(f, cache, inquisitor, inquisitorBook, unavailable);
@@ -516,20 +520,27 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (cache.Load(a.AssetGuid) != null)
                         throw new InvalidOperationException("0085 private GUID occupied: " + a.name);
 
+                var bpRoot = cache.Load(BlueprintGuid.Parse(Spiritualist0085Ids.RootId)) as Kingmaker.Blueprints.Root.BlueprintRoot;
+                var progression = bpRoot.Progression;
+                rootProgression = progression;
+                previousClasses = (BlueprintCharacterClassReference[])Get(progression, "m_CharacterClasses");
+                var previous = previousClasses ?? Array.Empty<BlueprintCharacterClassReference>();
+                if (previous.Any(r => r?.Guid == root.AssetGuid))
+                    throw new InvalidOperationException("0085 class already listed in root progression.");
+
                 foreach (var a in assets) Prepare(a);
                 f.Enable();
-                foreach (var a in assets) cache.AddCachedBlueprint(a.AssetGuid, a);
+                foreach (var a in assets)
+                {
+                    inserted.Add(a);
+                    cache.AddCachedBlueprint(a.AssetGuid, a);
+                }
                 foreach (var a in assets)
                     if (!ReferenceEquals(cache.Load(a.AssetGuid), a))
                         throw new InvalidOperationException("0085 private blueprint not published: " + a.name);
 
-                // BlueprintRoot.Progression carries the playable class list.
-                var bpRoot = cache.Load(BlueprintGuid.Parse(Spiritualist0085Ids.RootId)) as Kingmaker.Blueprints.Root.BlueprintRoot;
-                var progression = bpRoot.Progression;
-                var previous = (BlueprintCharacterClassReference[])Get(progression, "m_CharacterClasses") ?? Array.Empty<BlueprintCharacterClassReference>();
-                if (previous.Any(r => r?.Guid == root.AssetGuid))
-                    throw new InvalidOperationException("0085 class already listed in root progression.");
-                Set(progression, "m_CharacterClasses", previous.Concat(new[] { Ref<BlueprintCharacterClassReference>(root) }).ToArray());
+                publishedClasses = previous.Concat(new[] { Ref<BlueprintCharacterClassReference>(root) }).ToArray();
+                Set(progression, "m_CharacterClasses", publishedClasses);
 
                 Published.Add(cache, new State
                 {
@@ -547,6 +558,12 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             catch (Exception error)
             {
+                if (publishedClasses != null && ReferenceEquals(Get(rootProgression, "m_CharacterClasses"), publishedClasses))
+                    Set(rootProgression, "m_CharacterClasses", previousClasses);
+                for (int i = inserted.Count - 1; i >= 0; i--)
+                    if (ReferenceEquals(cache.Load(inserted[i].AssetGuid), inserted[i]))
+                        cache.RemoveCachedBlueprint(inserted[i].AssetGuid);
+                Published.Remove(cache);
                 LastSummary = "reject: 0085 " + error.GetType().Name + ": " + error.Message;
                 Log(LastSummary + "\n" + error.StackTrace);
                 return false;
@@ -789,15 +806,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 "While a phantom is confined in a spiritualist's consciousness (but not while it's fully manifested or banished), it grants the spiritualist Skill Focus in two skills determined by the phantom's emotional focus, unless she already has Skill Focus in those skills. It also grants a +4 bonus on saving throws against all mind-affecting effects; at 12th level, this bonus increases to +8.");
             // Fused Consciousness: persistent grant from level 10.
             result.FusedConsciousness = f.Feature("FusedConsciousness", "Fused Consciousness",
-                "At 10th level, a spiritualist always gains the benefits of Shared Consciousness, even when her phantom is manifested.",
-                new SavingThrowBonusAgainstDescriptor
-                {
-                    name = "Spiritualist0085FusedSave",
-                    SpellDescriptor = SpellDescriptor.MindAffecting,
-                    Bonus = new ContextValue { ValueType = ContextValueType.Rank },
-                    ModifierDescriptor = ModifierDescriptor.UntypedStackable
-                },
-                Rank(character, "Custom", 11, 4, 20, 8));
+                "At 10th level, a spiritualist always gains the benefits of Shared Consciousness, even when her phantom is manifested.");
             Phantom0085.BuildConsciousnessGrants(f, character, phantomClass, selection, emotions, result.SharedConsciousness, result.FusedConsciousness);
 
             // Etheric Tether / Spiritual Bond: mutually exclusive free toggles.
@@ -851,7 +860,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var resource = Resource(f, row.Name + "Sla" + i + "Resource", character, 0, start, 4);
                 BlueprintAbility sla = null;
                 if (root != null)
-                    sla = Phantom0085.ConvertToSpellLike(f, cache, root, row.Name + "Sla" + i, character, phantomClass, StatType.Wisdom, resource);
+                    sla = Phantom0085.ConvertToSpellLike(f, cache, root, row.Name + "Sla" + i, character, character, StatType.Wisdom, resource);
                 var feature = f.Feature(row.Name + "Sla" + i + "Feature", "Emotional Power: " + (root != null ? Phantom0085.NameOf(root) : row.Name),
                     "A spiritualist gains spell-like abilities tied to her phantom's emotional focus: one at 5th level, a second at 7th, a third at 9th and a fourth at 16th. Each can be used once per day, plus one additional time per day for every 4 spiritualist levels beyond the level at which it was gained. The save DC equals 10 + 1/2 spiritualist class level + Wisdom modifier.",
                     sla != null ? Facts(sla) : new AddFacts { name = "Spiritualist0085EmptySla" },
@@ -859,10 +868,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 slaFeatures[i] = feature;
             }
 
-            // Phantom-side features at 1/7/12/17, granted through the native
-            // AddFeatureToPet chain so they follow the actual companion.
+            // The private grant follows the companion owned by native AddPet.
             var petFeatures = Phantom0085.BuildEmotionFeatures(f, cache, character, phantomClass, row);
-            var grants = petFeatures.Select(p => (BlueprintFeature)Phantom0085.GrantToPet(f, row.Name + "Grant" + p.name, p, Spiritualist0085Ids.PhantomPetType)).ToArray();
+            var grants = petFeatures.Select(p => Phantom0085.GrantToPet(f, row.Name + "Grant" + p.name, p)).ToArray();
 
             var progression = f.Progression(row.Name + "Emotion", "Emotion Focus: " + row.Name, row.Description,
                 new[]
@@ -889,8 +897,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var link = new Phantom0085Link { name = "Spiritualist0085Link" + row.Name, Emotion = row.Name };
             var levelRank = new ContextRankConfig { name = "Spiritualist0085PetLevel" + row.Name };
             SetEnum(levelRank, "m_BaseValueType", "ClassLevel");
-            SetEnum(levelRank, "m_Progression", "OnePlusDivStep");
-            Set(levelRank, "m_StepLevel", 1);
+            SetEnum(levelRank, "m_Progression", "AsIs");
             Set(levelRank, "m_Class", new[] { Ref<BlueprintCharacterClassReference>(character) });
             progression.ComponentsArray = progression.ComponentsArray.Concat(new BlueprintComponent[]
             {
