@@ -23,6 +23,7 @@ using Kingmaker.Blueprints.Root;
 using Kingmaker.Controllers;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.Controllers.Rest.State;
+using Kingmaker.Designers.EventConditionActionSystem.Actions;
 using Kingmaker.Designers.Mechanics.Buffs;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.DLC;
@@ -50,6 +51,7 @@ using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
+using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
 using Kingmaker.UnitLogic.Class.LevelUp.Actions;
@@ -67,9 +69,10 @@ internal static class Occultist0099NativeLauncher
     {
         if (args.Length != 5 || string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_AEGIS_FIXTURE")) ||
             string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_DIVINATION_FIXTURE")) ||
-            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_ILLUSION_FIXTURE")))
+            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_ILLUSION_FIXTURE")) ||
+            string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COTW_0099_TRANSMUTATION_FIXTURE")))
         {
-            Console.Error.WriteLine("Set the Aegis, Divination and Illusion fixtures using ReadOccultist0099Archive.ps1.");
+            Console.Error.WriteLine("Set the Aegis, Divination, Illusion and Transmutation fixtures using ReadOccultist0099Archive.ps1.");
             return 2;
         }
         var runtimePath = Environment.GetEnvironmentVariable("COTW_HARMONY_MATRIX_PATH");
@@ -546,7 +549,7 @@ internal static class Occultist0099NativeTests
             try { info.SetValue(bp, value.ToObject(info.FieldType)); } catch { }
         }
         foreach (var field in new[] { "m_Parent", "m_SpellList", "m_CharacterClass", "m_SpellsPerDay",
-                                      "m_Type", "m_Enchantments",
+                                      "m_Type", "m_Enchantments", "m_DamageType", "m_AttackType",
                                       "m_SpellsKnown", "m_SpellSlots", "m_BaseAttackBonus", "m_FortitudeSave", "m_WillSave" })
         {
             var info = AccessTools.Field(type, field);
@@ -604,6 +607,29 @@ internal static class Occultist0099NativeTests
     private static Type Production(string typeName)
         => typeof(Occultist0099Ids).Assembly
             .GetType("CallOfTheWild.Wrath.Prototype." + typeName, true);
+
+    private static void StageTransmutationRoots(IEnumerable<Occultist0099SpellRoot> published)
+    {
+        LoadRows("c4a7f98d743bc784c9d4cf2105852c39", "c927a8b0cd3f5174f8c0b67cdbfde539", "f3c0b267dd17a2a45a40805e31fe3cd1",
+            "c0f4e1c24c9cd334ca988ed1bd9d201f", "6cbb732b9d638724a960d784634dcdcf", "e252b26686ab66241afdf33f2adaead6",
+            "e84fc922ccf952943b5240293669b171");
+        var factory = Activator.CreateInstance(Production("PsychicAssets"), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+            null, new object[] { cache }, null);
+        foreach (var (type, method) in new[] {
+            ("PsychicGhostbaneDirge", "Build"), ("PsychicUtilitySpells", "CountlessEyes"), ("PsychicBattleSpells", "Arrows"),
+            ("PsychicTravelSpells", "BuildAirTravel"), ("PsychicWeaponSpells", "BuildAnchor"), ("PsychicBoundWeapons", "Blade"),
+            ("PsychicCataclysmSpells", "Control") })
+            AccessTools.Method(Production(type), method).Invoke(null, new[] { factory });
+        var assets = (System.Collections.IDictionary)Get(factory, "Assets");
+        foreach (var asset in assets.Values.Cast<BlueprintScriptableObject>())
+        {
+            asset.OnEnable();
+            cache.AddCachedBlueprint(asset.AssetGuid, asset);
+        }
+        foreach (var row in published)
+            Check(Native<BlueprintAbility>(row.Guid)?.GetComponent<SpellComponent>()?.School.ToString() == row.School,
+                "HOST the existing CotW builder publishes the Transmutation root " + row.Name);
+    }
 
     private static void StageAbsentRoot(Occultist0099SpellRoot root)
     {
@@ -1853,6 +1879,9 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.AegisOptionTypeId, Occultist0099Ids.AegisTargetTypeId, Occultist0099Ids.AegisArmorTypeId,
             Occultist0099Ids.AegisStorageTypeId, Occultist0099Ids.AegisStoreSpellTypeId, Occultist0099Ids.AegisReleaseTypeId,
             Occultist0099Ids.AegisReleaseActionTypeId, Occultist0099Ids.AegisApplyTypeId, Occultist0099Ids.AegisGrantsTypeId,
+            Occultist0099Ids.TransmutationLevelTypeId, Occultist0099Ids.LegacyWeaponOptionTypeId,
+            Occultist0099Ids.LegacyWeaponTargetTypeId, Occultist0099Ids.LegacyWeaponBuffTypeId, Occultist0099Ids.PhilosophersTouchBuffTypeId,
+            Occultist0099Ids.QuicknessCounterTypeId,
             Occultist0099Ids.ProphecyReadyTypeId, Occultist0099Ids.ShadowTierTypeId, Occultist0099Ids.ShadowHealthTypeId,
             Occultist0099Ids.ShadowHealthActionTypeId
         })
@@ -1957,7 +1986,7 @@ internal static class Occultist0099NativeTests
               progression.LevelEntries.SelectMany(entry => entry.Features.OfType<BlueprintFeatureSelection>()
                   .Where(selection => selection != powers).Select(_ => entry.Level)).SequenceEqual(new[] { 1, 1, 2, 6, 10, 14, 18 }),
             "ENCH native progression schedules the seven distinct implement choices and ten focus-power choices at the audited levels");
-        Check(slots.Length == 52 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length &&
+        Check(slots.Length == 65 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length &&
               slots.GroupBy(slot => slot.School).All(school => school.Count() == 13),
             "HOST all four school and slot alternatives have distinct stable native learning lists");
         var command = Native<BlueprintAbility>("feb70aab86cc17f4bb64432c83737ac2");
@@ -2555,6 +2584,222 @@ internal static class Occultist0099NativeTests
         caseStatus["Illusion"] = "native_learning_private_miss_roll_paid_variants_and_shadow_context";
     }
 
+    private static void TransmutationNative(BlueprintsCache detached, BlueprintCharacterClass character)
+    {
+        T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
+        var unit = Unit("transmutation-occultist", character, 12, 16);
+        var body = Empty<UnitBody>();
+        Set(body, "Owner", unit.Descriptor);
+        Set(body, "m_HandsEquipmentSets", new[] { new HandsEquipmentSet(unit.Descriptor) });
+        Set(unit.Descriptor, "Body", body);
+        Set(unit, "IsTurnedOn", true);
+        Set(unit.Descriptor, "UISettings", new Kingmaker.UI.UnitSettings.UnitUISettings(unit.Descriptor));
+        var speed = new ModifiableValueSpeed(unit.Stats);
+        Set(speed, "m_BaseValue", 30);
+        Set(speed, "ModifiedValue", 30);
+        Set(unit.Stats, "Speed", speed);
+        var attack = new ModifiableValue(unit.Stats, StatType.AdditionalAttackBonus);
+        Set(unit.Stats, "AdditionalAttackBonus", attack);
+        var ac = new ModifiableValueArmorClass(unit.Stats);
+        Set(unit.Stats, "AC", ac);
+        unit.Stats.AllStats.AddRange(new ModifiableValue[] { speed, attack, ac });
+        Set(unit.Progression, "m_Selections", new Dictionary<BlueprintFeatureSelection, FeatureSelectionData>());
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MentalFocusFact"), unit.Descriptor));
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("OccultistSpellbookFact"), unit.Descriptor));
+        var implement = new Feature(Asset<BlueprintFeature>("slot-1-Transmutation-Implement"), unit.Descriptor);
+        unit.Facts.Add(implement);
+        var book = unit.Descriptor.DemandSpellbook(character.Spellbook);
+        Set(book, "m_BaseLevelInternal", 12);
+        var leveling = LevelState(book);
+        foreach (string token in new[] { "SuddenSpeed", "SizeAlteration", "PhilosophersTouch", "Quickness", "MindOverGravity" })
+        {
+            var selection = leveling.AddSelection(null, character.Progression, Asset<BlueprintFeatureSelection>("FocusPowerSelection"), 1);
+            var pick = new SelectFeature(selection, Asset<BlueprintFeature>(token + "Power"));
+            Check(pick.Check(leveling, unit.Descriptor), "TRAN native selection admits " + token);
+            pick.Apply(leveling, unit.Descriptor);
+        }
+        var list = character.Spellbook.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists
+            .Single(slot => slot.SlotKey == "slot-1" && slot.School == "Transmutation").List.Get();
+        const string keenEdgeId = "64923c9c808143c7ab7adba5a27f0ca4";
+        var rows = ((Occultist0099SpellRoot[])AccessTools.Field(Production("Occultist0099SpellCatalog"), "Roots").GetValue(null))
+            .Where(row => row.School == "Transmutation" && !row.IsKnack && row.Source != "External").ToArray();
+        bool Listed(Occultist0099SpellRoot row) => list.GetSpells(row.Circle).Any(spell => spell.AssetGuid == P(row.Guid));
+        Check(rows.Where(row => row.Guid != keenEdgeId).All(Listed) && list.SpellsByLevel.Sum(row => row.Spells.Count()) == rows.Length - 1,
+            "TRAN native and existing CotW learning entries keep their signed school and circles, with unowned DLC and absent external spells excluded");
+        var reward = Native<BlueprintDlcReward>("b94f823171a84e30ad7a1b892433ab5d");
+        var register = AccessTools.Method(Production("Occultist0099NativeRegistration"), "RegisterInDetachedCache");
+        Set(reward, "m_IsAvailable", (bool?)true);
+        Check((bool)register.Invoke(null, new object[] { detached }) && rows.All(Listed), "TRAN native DLC ownership restores Keen Edge at its signed circle");
+        Set(reward, "m_IsAvailable", (bool?)false);
+        Check((bool)register.Invoke(null, new object[] { detached }) && !Listed(rows.Single(row => row.Guid == keenEdgeId)),
+            "TRAN removing DLC ownership withdraws only the gated candidate");
+        var enlargeSpell = Native<BlueprintAbility>("c60969e7f264e6d4b84a1499fdcf9039");
+        var learn = new SelectSpell(character.Spellbook, list, 1, enlargeSpell, 0);
+        Check(NativeCheck(learn, leveling, unit.Descriptor), "TRAN native implement offers Enlarge Person");
+        learn.Apply(leveling, unit.Descriptor);
+        Check(book.IsKnown(enlargeSpell), "TRAN reused Enlarge Person enters the private spellbook");
+
+        AbilityData Granted(string token) => unit.Abilities.Enumerable.Single(grant => grant.Blueprint == Asset<BlueprintAbility>(token)).Data;
+        AbilityData Variant(string root, string token) => new AbilityData(Granted(root), Asset<BlueprintAbility>(token));
+        var focus = unit.Get<Occultist0099FocusPart>().State;
+        var pool = focus.Schools["Transmutation"];
+        var dexterity = Variant("PhysicalEnhancementAbility", "PhysicalEnhancementDexterityAbility");
+        var strength = Variant("PhysicalEnhancementAbility", "PhysicalEnhancementStrengthAbility");
+        var standard = Variant("LegacyWeaponAbility", "LegacyWeaponStandardAbility");
+        var swift = Variant("LegacyWeaponAbility", "LegacyWeaponSwiftAbility");
+        var philo = Granted("PhilosophersTouchAbility");
+        var touch = Variant("PhilosophersTouchAbility", "PhilosophersTouchColdIronTouch");
+        var silver = Variant("PhilosophersTouchAbility", "PhilosophersTouchSilverBurst");
+        var adamantine = Variant("PhilosophersTouchAbility", "PhilosophersTouchAdamantineBurst");
+        var ward = Asset<BlueprintBuff>("LegacyWeaponBuff");
+        var level = unit.Progression.GetClassData(character);
+        int Reflex() => unit.Stats.SaveReflex.ModifiedValue;
+        int Movement() => unit.Stats.Speed.ModifiedValue;
+
+        var service = AccessTools.PropertyGetter(typeof(EntityService), nameof(EntityService.Instance));
+        var serviceBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ArmorEntityServiceBoundary));
+        var dollRoom = AccessTools.PropertyGetter(typeof(ItemEnchantment), "WielderVisibleInInventory");
+        var skipDollRoom = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ArmorDollRoomBoundary));
+        armorFixtureEntities = new EntityService();
+        harmony.Patch(service, prefix: new HarmonyMethod(serviceBoundary));
+        harmony.Patch(dollRoom, prefix: new HarmonyMethod(skipDollRoom));
+        applyNativeEffects = true;
+        try
+        {
+            var club = Native<BlueprintItemWeapon>("07863393521453a4da9e98626531eb5f").CreateEntity<ItemEntityWeapon>();
+            var sword = Native<BlueprintItemWeapon>("6fd0a849531617844b195f452661b2cd").CreateEntity<ItemEntityWeapon>();
+            Equip(club);
+            for (int i = 0; i < 12; i++) CastRule(Granted("TransmutationInvestFocusAbility"));
+            Check(CastRule(dexterity).Success && unit.Stats.Dexterity.ModifiedValue == 10, "TRAN physical choice applies only after lock");
+            Check(CastRule(Granted("LockFocusAbility")).Success && unit.Stats.Dexterity.ModifiedValue == 16,
+                "TRAN locked level 12 physical enhancement adds six points to the chosen stat");
+            Check(CastRule(strength).ForceFail && unit.Stats.Strength.ModifiedValue == 10 && pool.Remaining == 12,
+                "TRAN the native physical selector cannot rewrite a locked snapshot");
+
+            int baseSpeed = Movement();
+            var sudden = Granted("SuddenSpeedAbility");
+            Check(CastRule(sudden).Success && sudden.Blueprint.ActionType == UnitCommand.CommandType.Swift &&
+                Movement() == baseSpeed + 30 && unit.Buffs.GetBuff(Native<BlueprintBuff>("9ea4ec3dc30cd7940a372a4d699032e7"))?.TimeLeft == TimeSpan.FromMinutes(1),
+                "TRAN Sudden Speed uses the native movement buff as a one-minute swift power");
+            unit.Buffs.GetBuff(Native<BlueprintBuff>("9ea4ec3dc30cd7940a372a4d699032e7"))?.Remove();
+            var flight = Granted("MindOverGravityAbility");
+            Check(CastRule(flight).Success && Movement() == baseSpeed + 10 &&
+                unit.Buffs.GetBuff(Asset<BlueprintBuff>("MindOverGravityBuff"))?.TimeLeft == TimeSpan.FromMinutes(12),
+                "TRAN Mind Over Gravity uses the released flight mechanics for one minute per class level");
+            unit.Buffs.GetBuff(Asset<BlueprintBuff>("MindOverGravityBuff"))?.Remove();
+
+            int baseReflex = Reflex(), baseAttack = attack.ModifiedValue, baseAc = ac.ModifiedValue;
+            var haste = Native<BlueprintBuff>("17113651fa8b40c2a7bbf9721462e646");
+            var stockHaste = unit.Buffs.AddBuff(haste, unit, TimeSpan.FromMinutes(1));
+            var quickness = Granted("QuicknessAbility");
+            Check(CastRule(quickness).Success && unit.Buffs.GetBuff(Asset<BlueprintBuff>("QuicknessBuff"))?.TimeLeft == TimeSpan.FromSeconds(72) &&
+                Reflex() == baseReflex + 3 && attack.ModifiedValue == baseAttack + 3 && ac.ModifiedValue == baseAc + 3 && Movement() == baseSpeed + 30,
+                "TRAN Quickness combines the native haste benefit and two extra bonuses without duplicating the base modifiers");
+            stockHaste.Remove();
+            Check(Reflex() == baseReflex + 3 && attack.ModifiedValue == baseAttack + 3 && ac.ModifiedValue == baseAc + 3,
+                "TRAN Quickness retains its own full effect when overlapping Haste expires");
+            var slowSpell = Native<BlueprintAbility>("f492622e473d34747806bdb39356eb89");
+            var slowBuff = Native<BlueprintBuff>("0bc608c3f2b548b44b7146b7530613ac");
+            var slowContext = new AbilityExecutionContext(GrantAbility(unit, slowSpell), AbilityParams.Empty, new TargetWrapper(unit));
+            var counter = Rulebook.Trigger(new RuleCanApplyBuff(unit, slowBuff, slowContext, TimeSpan.FromMinutes(1)));
+            Check(!counter.CanApply && unit.Buffs.GetBuff(Asset<BlueprintBuff>("QuicknessBuff")) == null && Reflex() == baseReflex,
+                "TRAN the failed-save native Slow application consumes Quickness and no Slow is applied");
+
+            var enlarge = Variant("SizeAlterationAbility", "EnlargeAlterationAbility");
+            var reduce = Variant("SizeAlterationAbility", "ReduceAlterationAbility");
+            Check(enlarge.Blueprint.Range == AbilityRange.Touch && reduce.Blueprint.Range == AbilityRange.Touch &&
+                enlarge.Blueprint.CanTargetFriends && reduce.Blueprint.CanTargetFriends &&
+                enlarge.Blueprint.GetComponent<Kingmaker.UnitLogic.Abilities.Components.TargetCheckers.AbilityTargetHasFact>() == null &&
+                reduce.Blueprint.GetComponent<AbilityEffectRunAction>().Actions.Actions.Single() is Conditional normalReduce &&
+                normalReduce.IfTrue.Actions.Single() is Kingmaker.UnitLogic.Mechanics.Actions.ContextActionRemoveBuff,
+                "TRAN Size Alteration drops only the creature-type restriction while retaining the stock counter-buff action");
+
+            level.Level = 7;
+            Check(philo.GetConversions().Any(option => option.Blueprint == touch.Blueprint && option.IsVisible()) &&
+                  !philo.GetConversions().Any(option => option.Blueprint == silver.Blueprint && option.IsVisible()) && CastRule(touch).Success &&
+                  club.Enchantments.Any(e => e.Blueprint == Native<BlueprintWeaponEnchantment>("e5990dc76d2a613409916071c898eee8")),
+                "TRAN low-level Philosopher's Touch applies the stock cold iron property to the selected main hand");
+            Equip(sword);
+            Check(!club.Enchantments.Any() && sword.Enchantments.Any(e => e.Blueprint == Native<BlueprintWeaponEnchantment>("e5990dc76d2a613409916071c898eee8")),
+                "TRAN Philosopher's Touch moves only its own enchantment when the weapon changes");
+            level.Level = 8;
+            int prior = pool.Remaining;
+            Check(CastRule(touch).ForceFail && CastRule(adamantine).ForceFail && pool.Remaining == prior &&
+                  silver.Blueprint.GetComponent<AbilityTargetsAround>() != null,
+                "TRAN level 8 switches to the native burst shape and rejects the old touch and early adamantine variants before payment");
+            level.Level = 12;
+            Check(CastRule(silver).Success && sword.Enchantments.Any(e => e.Blueprint == Native<BlueprintWeaponEnchantment>("0ae8fc9f2e255584faf4d14835224875")) &&
+                  !sword.Enchantments.Any(e => e.Blueprint == Native<BlueprintWeaponEnchantment>("e5990dc76d2a613409916071c898eee8")),
+                "TRAN Philosopher's Touch replaces its previous material with the native silver property");
+
+            var disruption = unit.ActivatableAbilities.Enumerable.Single(item => item.Blueprint == Asset<BlueprintActivatableAbility>("LegacyWeaponDisruptionChoice"));
+            Check(!disruption.IsAvailable, "TRAN Disruption rejects a slashing weapon");
+            Equip(club);
+            Check(disruption.IsAvailable, "TRAN Disruption admits a bludgeoning melee weapon");
+            disruption.IsOn = true;
+            prior = pool.Remaining;
+            var numericOne = Native<BlueprintWeaponEnchantment>("d704f90f54f813043a525f304f6c0050");
+            var otherEnhancement = club.AddEnchantment(numericOne, null);
+            Check(CastRule(standard).Success && pool.Remaining == prior - 1 && Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(club) == 2 &&
+                  club.Enchantments.Any(e => e.Blueprint == Native<BlueprintWeaponEnchantment>("0f20d79b7049c0f4ca54ca3d1ea44baa")) &&
+                  unit.Buffs.GetBuff(ward)?.TimeLeft == TimeSpan.FromMinutes(1) && body.PrimaryHand.Lock.Count == 1,
+                "TRAN Legacy Weapon buys native Disruption and +1 alongside another source's identical +1 temporary enchantment");
+            Check(CastRule(swift).Success && pool.Remaining == prior - 3 && body.PrimaryHand.Lock.Count == 1 &&
+                club.Enchantments.Count(e => e.Blueprint == Native<BlueprintWeaponEnchantment>("0f20d79b7049c0f4ca54ca3d1ea44baa")) == 1 &&
+                club.Enchantments.Count(e => e.Blueprint == numericOne) == 2 && club.Enchantments.Contains(otherEnhancement),
+                "TRAN the two-point swift recast retains one lock and one copy of each of its own properties alongside the other source");
+            club.RemoveEnchantment(otherEnhancement);
+            level.Level = 6;
+            Check(CastRule(standard).ForceFail && pool.Remaining == prior - 3 && unit.Buffs.GetBuff(ward) != null,
+                "TRAN the older instance cannot supply the +1 baseline for a special-only replacement");
+            level.Level = 12;
+            disruption.IsOn = false;
+            Equip(null);
+            Set(body, "m_EmptyHandWeapon", club);
+            Check(CastRule(standard).Success && body.PrimaryHand.Lock.Count == 1 &&
+                  Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(club) == 3,
+                "TRAN Legacy Weapon can snapshot the current empty-hand weapon");
+            Set(body, "m_EmptyHandWeapon", sword);
+            EventBus.RaiseEvent(unit, (IUnitEmptyHandWeaponHandler handler) => handler.HandleUnitEmptyHandWeaponUpdated());
+            Check(unit.Buffs.GetBuff(ward) == null && body.PrimaryHand.Lock.Count == 0 &&
+                  Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(club) == 0,
+                "TRAN the native empty-hand change event releases the exact old weapon and lock");
+            Equip(club);
+            Check(CastRule(standard).Success, "TRAN Legacy Weapon can be applied again after a weapon swap");
+            unit.RemoveFact(implement);
+            Check(unit.Buffs.GetBuff(ward) == null && body.PrimaryHand.Lock.Count == 0 && unit.Stats.Dexterity.ModifiedValue == 10 &&
+                  Kingmaker.Designers.GameHelper.GetItemEnhancementBonus(club) == 0,
+                "TRAN removing the implement retracts physical enhancement and its exact Legacy Weapon effects");
+        }
+        finally
+        {
+            applyNativeEffects = false;
+            harmony.Unpatch(dollRoom, skipDollRoom);
+            harmony.Unpatch(service, serviceBoundary);
+        }
+        caseStatus["Transmutation"] = "native_private_learning_lock_haste_flight_material_and_weapon_enchants";
+
+        void Equip(ItemEntityWeapon item)
+        {
+            var hand = body.PrimaryHand;
+            var previous = hand.MaybeWeapon;
+            if (previous != null)
+            {
+                previous.Facts.TurnOff();
+                previous.HoldingSlot = null;
+                Set(previous, "m_WielderRef", default(EntityRef<UnitEntityData>));
+            }
+            hand.SetFakeItem(item);
+            if (item != null)
+            {
+                item.HoldingSlot = hand;
+                Set(item, "m_WielderRef", (EntityRef<UnitEntityData>)unit);
+                item.Facts.TurnOn();
+            }
+            EventBus.RaiseEvent((IUnitEquipmentHandler handler) => handler.HandleEquipmentSlotUpdated(hand, previous));
+        }
+    }
+
     private static void AegisNative(BlueprintsCache detached, BlueprintCharacterClass character)
     {
         T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
@@ -3096,19 +3341,25 @@ internal static class Occultist0099NativeTests
         Check(!TryRegister(cache), "SP08 the production development entry refuses the ordinary process cache");
         const string alchemistClassId = "0937bec61c0dabc468428f496580c721";
         const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
-        var implementedSchools = new HashSet<string> { "Abjuration", "Enchantment", "Divination", "Illusion" };
+        var implementedSchools = new HashSet<string> { "Abjuration", "Enchantment", "Divination", "Illusion", "Transmutation" };
         var rows = catalogue.Where(row => (implementedSchools.Contains(row.School) || row.IsKnack) && row.Source != "External").ToArray();
         var coreDonors = (string[])AccessTools.Field(Production("Occultist0099Enchantment"), "DonorIds").GetValue(null);
         var armorDonors = (string[])AccessTools.Field(Production("Occultist0099Aegis"), "Donors").GetValue(null);
         var divinationDonors = (string[])AccessTools.Field(Production("Occultist0099Divination"), "DonorIds").GetValue(null);
         var illusionDonors = (string[])AccessTools.Field(Production("Occultist0099Illusion"), "DonorIds").GetValue(null);
         var shadowDonors = (string[])AccessTools.Field(Production("Occultist0099ShadowBeasts"), "DonorIds").GetValue(null);
+        var transmutationDonors = (string[])AccessTools.Field(Production("Occultist0099Transmutation"), "DonorIds").GetValue(null);
+        var weaponDonors = (IEnumerable<string>)AccessTools.Property(Production("Occultist0099TransmutationWeapons"), "Donors").GetValue(null);
         var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a",
             "143775c49ae6b7446b805d3b2e702298" }
             .Concat(coreDonors).Concat(armorDonors).Concat(divinationDonors).Concat(illusionDonors).Concat(shadowDonors)
+            .Concat(transmutationDonors).Concat(weaponDonors)
             .Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
         LoadRows(expectedDonors);
-        foreach (var row in rows.Where(row => row.Source == "CotW" && cache.Load(P(row.Guid)) == null)) StageAbsentRoot(row);
+        var transmutationRoots = rows.Where(row => row.Source == "CotW" && row.School == "Transmutation").ToArray();
+        if (transmutationRoots.Any(row => cache.Load(P(row.Guid)) == null)) StageTransmutationRoots(transmutationRoots);
+        foreach (var row in rows.Where(row => row.Source == "CotW" && row.School != "Transmutation" && cache.Load(P(row.Guid)) == null))
+            StageAbsentRoot(row);
         foreach (var id in expectedDonors)
         {
             var donor = cache.Load(P(id));
@@ -3303,6 +3554,7 @@ internal static class Occultist0099NativeTests
             AegisNative(detached, publishedClass);
             DivinationNative(detached, publishedClass);
             IllusionNative(detached, publishedClass);
+            TransmutationNative(detached, publishedClass);
         }
         finally
         {
@@ -3311,7 +3563,7 @@ internal static class Occultist0099NativeTests
             harmony.Unpatch(visual, noVisual);
             EnchantmentFixtureRoot = null;
         }
-        caseStatus["SP08"] = "native_atomic_detached_four_school_graph_only_full_class_not_run";
+        caseStatus["SP08"] = "native_atomic_detached_five_school_graph_only_full_class_not_run";
         caseStatus["SP03"] = "native_copy_serialization_and_last_registered_implement_revoke_only";
     }
 
@@ -3354,6 +3606,12 @@ internal static class Occultist0099NativeTests
         Eq(10, divinationArchiveRows, "HOST loads the signed Divination ability, resonance and native spell rows");
         int illusionArchiveRows = LoadArchiveDonors(Environment.GetEnvironmentVariable("COTW_0099_ILLUSION_FIXTURE"));
         Eq(78, illusionArchiveRows, "HOST loads the signed Illusion effects, spell roots, summon families and Wizard list");
+        int transmutationArchiveRows = LoadArchiveDonors(Environment.GetEnvironmentVariable("COTW_0099_TRANSMUTATION_FIXTURE"));
+        Eq(51, transmutationArchiveRows, "HOST loads the audited Transmutation spell and weapon donors");
+        var keenEdgeReward = Native<Kingmaker.DLC.BlueprintDlcReward>("b94f823171a84e30ad7a1b892433ab5d");
+        Set(keenEdgeReward, "m_IsAvailable", (bool?)false);
+        var keenEdge = Native<BlueprintAbility>("64923c9c808143c7ab7adba5a27f0ca4");
+        Check(Kingmaker.DLC.DlcConditionExtension.IsDlcRestricted(keenEdge), "TRAN Keen Edge keeps the native DLC gate");
 
         // Load only the audited rows this directed check needs.
         var roots = Occultist0099AbjurationCatalog.Roots.Select(r => r.Guid)
@@ -3415,7 +3673,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B11 Illusion focus powers, resonance and native shadow summons",
+            ["stage"] = "B12 Transmutation implement, resonance and focus powers",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -3427,20 +3685,21 @@ internal static class Occultist0099NativeTests
             ["armorArchiveRows"] = armorArchiveRows,
             ["divinationArchiveRows"] = divinationArchiveRows,
             ["illusionArchiveRows"] = illusionArchiveRows,
+            ["transmutationArchiveRows"] = transmutationArchiveRows,
             ["nativeRootsLoaded"] = loadedRoots,
             ["hostStagedRoots"] = hostStaged,
             ["hostStagedRootNames"] = new JArray(stagedRoots),
             ["skippedArchiveComponents"] = skippedComponents,
-            ["rootFixtureBoundary"] = "Illusion uses eight native learning roots, plus fifteen signed summon families with 48 leaves. Other registered schools retain their existing managed donors and staged publications. Actual external provider assemblies were not loaded.",
+            ["rootFixtureBoundary"] = "Transmutation uses 14 Wrath roots and 9 roots produced by the existing CotW builders. The native DLC reward availability is supplied to exercise the Keen Edge gate; the four external provider roots are absent.",
             ["checks"] = checks,
             ["failures"] = new JArray(failures),
             ["hostLoggedExceptions"] = hostLogs,
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Detached native Illusion learn, Distortion, paid variants, overlapping aura facts and shadow cast context passed alongside the current Occultist checks."
+                ? "Detached Transmutation learning, focus lock, haste and Slow, movement, material swaps and owned weapon enhancement passed alongside the current Occultist checks."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Detached BlueprintsCache, native choice, spellbook and cast payment. Illusion injects the Distortion roll and calls native roll entry; Color Beam applies the reused actions after supplied delivery; native overlap is checked at the buff collection. Shadow Beasts uses native cast, context and HP modifier with a scene spawn boundary. Terror graph is checked without combat engagement. Unity scenes, UI, ordinary startup, full career and disk saves remain outside scope.",
+            ["boundary"] = "Detached BlueprintsCache, native choice, spellbook and cast payment. Size Alteration checks the native action graph. Philosopher's Touch checks the supplied recipient and burst definition. Slow enters the native buff-application rule after the save branch. Weapon and empty-hand changes use supplied items and the native events. Unity scenes, UI, ordinary startup, full career and disk saves remain outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

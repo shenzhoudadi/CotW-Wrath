@@ -173,6 +173,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintBuffReference[] AbjurationEffects = Array.Empty<BlueprintBuffReference>();
         public BlueprintBuffReference[] DivinationEffects = Array.Empty<BlueprintBuffReference>();
         public BlueprintBuffReference IllusionAura;
+        public BlueprintBuffReference LegacyWeapon;
         public Occultist0099SchoolResonance[] SchoolResonances = Array.Empty<Occultist0099SchoolResonance>();
 
         private Occultist0099FocusPart Ledger
@@ -197,6 +198,8 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private Occultist0099FocusState State => Ledger.State;
+
+        internal int ActualLevel => ClassLevel();
 
         private int ClassLevel()
         {
@@ -258,6 +261,7 @@ namespace CallOfTheWild.Wrath.Prototype
             RemoveAbjurationEffects();
             RemoveDivinationEffects();
             RemoveIllusionEffects();
+            RemoveLegacyWeapon();
             SyncResonance();
         }
 
@@ -285,6 +289,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 RemoveAbjurationEffects();
                 RemoveDivinationEffects();
                 RemoveIllusionEffects();
+                RemoveLegacyWeapon();
             }
             SyncResonance();
         }
@@ -299,6 +304,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!present && school == Occultist0099Ids.SliceSchool) RemoveAbjurationEffects();
             if (!present && school == "Divination") RemoveDivinationEffects();
             if (!present && school == Occultist0099Illusion.School) RemoveIllusionEffects();
+            if (!present && school == Occultist0099Transmutation.School) RemoveLegacyWeapon();
             SyncResonance();
         }
 
@@ -310,6 +316,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 RemoveAbjurationEffects();
                 RemoveDivinationEffects();
                 RemoveIllusionEffects();
+                RemoveLegacyWeapon();
                 return;
             }
             var active = new HashSet<string>(Owner.Progression.Features.Enumerable.Where(f => f.Active)
@@ -324,9 +331,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!CanRetainMindBarrier()) RemoveAbjurationEffects();
             if (!state.Locked || !state.Schools["Divination"].Present) RemoveDivinationEffects();
             if (!state.Locked || !state.Schools[Occultist0099Illusion.School].Present) RemoveIllusionEffects();
+            if (!state.Locked || !state.Schools[Occultist0099Transmutation.School].Present) RemoveLegacyWeapon();
         }
 
-        internal bool Operate(Occultist0099FocusAction action, string school, string executionId, bool commit)
+        internal bool Operate(Occultist0099FocusAction action, string school, string physicalAttribute, string executionId, bool commit)
         {
             if (!IsOwnedBy(Owner) || (commit && executionId == null)) return false;
             var current = State;
@@ -339,6 +347,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 case Occultist0099FocusAction.Reset: outcome = Occultist0099Focus.Reset(state); break;
                 case Occultist0099FocusAction.Lock: outcome = Occultist0099Focus.Lock(state, ClassLevel()); break;
                 case Occultist0099FocusAction.Replenish: outcome = Occultist0099Focus.Replenish(state, school); break;
+                case Occultist0099FocusAction.ChoosePhysical: outcome = Occultist0099Focus.ChoosePhysicalAttribute(state, physicalAttribute); break;
                 default: return false;
             }
             if (outcome != Occultist0099Outcome.Ok) return false;
@@ -380,23 +389,30 @@ namespace CallOfTheWild.Wrath.Prototype
             if (aura != null) Owner.Buffs.GetBuff(aura)?.Remove();
         }
 
+        private void RemoveLegacyWeapon()
+        {
+            var ward = LegacyWeapon?.Get();
+            if (ward != null) Owner.Buffs.GetBuff(ward)?.Remove();
+        }
+
         private void SyncResonance()
         {
             SyncResonanceBuff(Occultist0099Ids.SliceSchool, WardingTalisman?.Get());
             foreach (var resonance in SchoolResonances)
-                SyncResonanceBuff(resonance.School, resonance.Buff?.Get(), resonance.Tier);
+                SyncResonanceBuff(resonance.School, resonance.Buff?.Get(), resonance.Tier, resonance.PhysicalAttribute);
         }
 
-        private void SyncResonanceBuff(string school, BlueprintBuff blueprint, int tier = 0)
+        private void SyncResonanceBuff(string school, BlueprintBuff blueprint, int tier = 0, string physicalAttribute = null)
         {
             if (blueprint == null) return;
             var current = Owner.Buffs.GetBuff(blueprint);
             int amount = WardingTalismanResonance(school);
-            if (amount <= 0 || (tier > 0 && Occultist0099Focus.ResonanceTier(State, school) != tier))
+            if (amount <= 0 || (tier > 0 && Occultist0099Focus.ResonanceTier(State, school) != tier) ||
+                (physicalAttribute != null && physicalAttribute != State.PhysicalAttribute))
                 current?.Remove();
             else if (current == null)
                 Owner.Buffs.AddBuff(blueprint, Owner, (TimeSpan?)null);
-            else if (school == "Divination" && tier == 0 &&
+            else if (((school == "Divination" && tier == 0) || physicalAttribute != null) &&
                 current.Context[Kingmaker.Enums.AbilityRankType.Default] != amount)
             {
                 current.Remove();
@@ -489,12 +505,12 @@ namespace CallOfTheWild.Wrath.Prototype
         public Occultist0099FocusPower MindBarrier(string school)
             => Occultist0099Focus.MindBarrier(State, school, ClassLevel(), IntModifier());
 
-        internal int AegisBudget()
+        internal int EquipmentBudget(string school)
         {
-            if (!IsOwnedBy(Owner) || !State.Enabled || !State.Schools[Occultist0099Ids.SliceSchool].Present) return 0;
+            if (!IsOwnedBy(Owner) || !State.Enabled || !State.Schools[school].Present) return 0;
             int level = ClassLevel();
             return 1 + Math.Min(3, level / 6) +
-                (level >= 20 && State.MasterySchool == Occultist0099Ids.SliceSchool ? 1 : 0);
+                (level >= 20 && State.MasterySchool == school ? 1 : 0);
         }
 
         internal bool CanRetainMindBarrier()
@@ -510,6 +526,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public string School;
         public BlueprintBuffReference Buff;
         public int Tier;
+        public string PhysicalAttribute;
     }
 
     // One identity for a batch of applied rests, including paired units.

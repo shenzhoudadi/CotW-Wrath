@@ -42,7 +42,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         private static readonly ConditionalWeakTable<BlueprintsCache, Graph> Published = new ConditionalWeakTable<BlueprintsCache, Graph>();
         private static readonly string[] Schools = { Occultist0099Ids.SliceSchool, Occultist0099Enchantment.School,
-            Occultist0099Divination.School, Occultist0099Illusion.School };
+            Occultist0099Divination.School, Occultist0099Illusion.School, Occultist0099Transmutation.School };
         private static readonly int[] ImplementLevels = { 1, 1, 2, 6, 10, 14, 18 };
         private static readonly Occultist0099SpellRoot[] Rows = Occultist0099SpellCatalog.Roots
             .Where(row => row.IsKnack || Schools.Contains(row.School)).ToArray();
@@ -71,6 +71,8 @@ namespace CallOfTheWild.Wrath.Prototype
             ids.UnionWith(Occultist0099Divination.Tokens);
             ids.UnionWith(Occultist0099Illusion.Tokens);
             ids.UnionWith(Occultist0099ShadowBeasts.Tokens());
+            ids.UnionWith(Occultist0099Transmutation.Tokens());
+            ids.UnionWith(Occultist0099TransmutationWeapons.Tokens());
             foreach (var school in Schools) ids.Add(school + "ExtraSpellSource");
             for (int index = 0; index < ImplementLevels.Length; index++)
             {
@@ -135,13 +137,24 @@ namespace CallOfTheWild.Wrath.Prototype
                 var aegis = Occultist0099Aegis.Build(cache, DetachedText);
                 var divination = Occultist0099Divination.Build(cache, DetachedText);
                 var illusion = Occultist0099Illusion.Build(cache, DetachedText);
-                if (enchantment == null || abjuration == null || aegis == null || divination == null || illusion == null) return false;
+                var transmutation = Occultist0099Transmutation.Build(cache, DetachedText);
+                if (enchantment == null || abjuration == null || aegis == null || divination == null || illusion == null ||
+                    transmutation == null) return false;
                 BlueprintUnitProperty IllusionProperty(string token)
                     => illusion.OfType<BlueprintUnitProperty>().Single(property => property.AssetGuid == BlueprintGuid.Parse(Occultist0099Ids.Id(token)));
                 var shadows = Occultist0099ShadowBeasts.Build(cache, IllusionProperty("IllusionEffectiveLevel"), IllusionProperty("IllusionDCLevel"), DetachedText);
-                if (shadows == null) return false;
+                T TransmutationAsset<T>(string token) where T : BlueprintScriptableObject
+                    => transmutation.OfType<T>().Single(asset => asset.AssetGuid == BlueprintGuid.Parse(Occultist0099Ids.Id(token)));
+                var weapons = Occultist0099TransmutationWeapons.Build(cache, TransmutationAsset<BlueprintUnitProperty>("TransmutationEffectiveLevel"),
+                    Occultist0099Transmutation.Load<BlueprintAbility>(cache, Occultist0099Transmutation.Enlarge), DetachedText);
+                if (shadows == null || weapons == null) return false;
+                var transmutationImplement = Feature("TransmutationImplementFocus", "Transmutation Implement", new Occultist0099ImplementSchool
+                    { name = "OccultistTransmutationImplement", School = Occultist0099Transmutation.School },
+                    Facts(weapons.OfType<BlueprintFeature>().Single(), TransmutationAsset<BlueprintAbility>("PhysicalEnhancementAbility"),
+                        TransmutationAsset<BlueprintAbility>("TransmutationInvestFocusAbility"), TransmutationAsset<BlueprintAbility>("TransmutationReplenishFocusAbility")));
                 var graph = BuildGraph(root, alchemist, day, proficiencies, spells,
-                    enchantment.Concat(abjuration).Concat(aegis).Concat(divination).Concat(illusion).Concat(shadows).ToArray());
+                    enchantment.Concat(abjuration).Concat(aegis).Concat(divination).Concat(illusion).Concat(shadows)
+                        .Concat(transmutation).Concat(weapons).Append(transmutationImplement).ToArray());
                 var ids = new HashSet<BlueprintGuid>(graph.Assets.Select(asset => asset.AssetGuid));
                 if (ids.Count != graph.Assets.Length || !ids.SetEquals(manifest))
                     throw new InvalidOperationException("Occultist development graph differs from its private identity manifest.");
@@ -288,6 +301,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 DivinationEffects = new[] { "SuddenInsightBuff", "DangerSightBuff", "ProphecyBuff" }
                     .Select(token => Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token))).ToArray(),
                 IllusionAura = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("BedevelingAuraBuff")),
+                LegacyWeapon = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("LegacyWeaponBuff")),
                 WardingTalisman = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("WardingTalismanBuff")),
                 SchoolResonances = new[] {
                     new Occultist0099SchoolResonance { School = Occultist0099Enchantment.School,
@@ -297,7 +311,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 }.Concat(
                     new[] { "ThirdEyeBuff", "ThirdEyeSeeInvisibility", "ThirdEyeBlindsense", "ThirdEyeBlindsight" }
                         .Select((token, tier) => new Occultist0099SchoolResonance { School = Occultist0099Divination.School,
-                            Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token)), Tier = tier })).ToArray()
+                            Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>(token)), Tier = tier }))
+                    .Concat(Occultist0099Transmutation.Attributes.Select(stat => new Occultist0099SchoolResonance {
+                        School = Occultist0099Transmutation.School, PhysicalAttribute = stat.ToString(),
+                        Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("PhysicalEnhancement" + stat + "Buff")) })).ToArray()
             }, Facts(Mechanic<BlueprintAbility>("ResetFocusAbility"), Mechanic<BlueprintAbility>("LockFocusAbility")));
             var learning = Feature("OccultistSpellbookFact", "Implement Spells", new Occultist0099SpellbookFact0099
                 { name = "OccultistSpellSourceAuthority", CharacterClass = Ref<BlueprintCharacterClassReference>(character) });
@@ -305,6 +322,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var abjurationImplement = Mechanic<BlueprintFeature>("AbjurationImplementFocus");
             var divinationImplement = Mechanic<BlueprintFeature>("DivinationImplementFocus");
             var illusionImplement = Mechanic<BlueprintFeature>("IllusionImplementFocus");
+            var transmutationImplement = Mechanic<BlueprintFeature>("TransmutationImplementFocus");
             var powers = new[]
             {
                 Power("BindingPattern", "Binding Pattern", enchantmentImplement, 7),
@@ -322,7 +340,12 @@ namespace CallOfTheWild.Wrath.Prototype
                 Power("Terror", "Terror", illusionImplement),
                 Power("Unseen", "Unseen", illusionImplement, 7),
                 Power("BedevelingAura", "Bedeveling Aura", illusionImplement, 9),
-                Power("ShadowBeasts", "Shadow Beasts", illusionImplement, 9)
+                Power("ShadowBeasts", "Shadow Beasts", illusionImplement, 9),
+                Power("SuddenSpeed", "Sudden Speed", transmutationImplement),
+                Power("SizeAlteration", "Size Alteration", transmutationImplement),
+                Power("PhilosophersTouch", "Philosopher's Touch", transmutationImplement),
+                Power("Quickness", "Quickness", transmutationImplement, 5),
+                Power("MindOverGravity", "Mind Over Gravity", transmutationImplement, 7)
             };
             BlueprintFeature Power(string token, string label, BlueprintFeature implement, int minimum = 0)
             {

@@ -366,6 +366,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (attribute != "Strength" && attribute != "Dexterity" &&
                 attribute != "Constitution")
                 return Occultist0099Outcome.RejectedInvalidArgument;
+            if (!s.Schools["Transmutation"].Present) return Occultist0099Outcome.RejectedNotOwned;
             s.PhysicalAttribute = attribute;
             return Occultist0099Outcome.Ok;
         }
@@ -419,6 +420,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static void CaptureSchoolResonance(Occultist0099FocusState state)
         {
             CaptureThirdEye(state);
+            CapturePhysicalEnhancement(state);
             const string school = "Illusion";
             var source = state.Schools[school];
             if (!source.Present || source.LockedLevel <= 0) return;
@@ -426,6 +428,17 @@ namespace CallOfTheWild.Wrath.Prototype
             int invested = source.LockedInvestment + mastery;
             source.ResonanceValid = invested > 0;
             source.Resonance = Math.Min(source.LockedLevel + mastery, invested);
+        }
+
+        private static void CapturePhysicalEnhancement(Occultist0099FocusState state)
+        {
+            const string school = "Transmutation";
+            var source = state.Schools[school];
+            if (!source.Present || source.LockedLevel <= 0) return;
+            int mastery = state.MasterySchool == school ? 4 : 0;
+            int invested = source.LockedInvestment + mastery;
+            source.ResonanceValid = state.PhysicalAttribute != null && invested >= 3;
+            source.Resonance = source.ResonanceValid ? 2 * (Math.Min(3 + (source.LockedLevel + mastery) / 2, invested) / 3) : 0;
         }
 
         private static void CaptureThirdEye(Occultist0099FocusState state)
@@ -719,6 +732,7 @@ namespace CallOfTheWild.Wrath.Prototype
             st.Remaining = 0;
             InvalidateSchool(s, school);
             if (s.MasterySchool == school) s.MasterySchool = null;
+            if (school == "Transmutation") s.PhysicalAttribute = null;
             return Occultist0099Outcome.Ok;
         }
 

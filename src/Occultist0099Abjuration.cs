@@ -162,13 +162,14 @@ namespace CallOfTheWild.Wrath.Prototype
                 }, 0);
     }
 
-    public enum Occultist0099FocusAction { Invest, Reset, Lock, Replenish }
+    public enum Occultist0099FocusAction { Invest, Reset, Lock, Replenish, ChoosePhysical }
 
     [TypeId(Occultist0099Ids.FocusOperationTypeId)]
     public sealed class Occultist0099FocusOperation : AbilityApplyEffect, IAbilityRestriction
     {
         public Occultist0099FocusAction Action;
         public string School = Occultist0099Ids.SliceSchool;
+        public string PhysicalAttribute;
 
         public bool IsAbilityRestrictionPassed(AbilityData ability) => CanExecute(ability, null);
 
@@ -185,7 +186,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         private bool Operate(AbilityData ability, string executionId, bool commit)
             => Occultist0099NativeScope.InRuntimeContext(Occultist0099NativeScope.FocusRuntime(ability),
-                component => ((Occultist0099FocusFact0099)component).Operate(Action, School, executionId, commit), false);
+                component => ((Occultist0099FocusFact0099)component).Operate(Action, School, PhysicalAttribute, executionId, commit), false);
     }
 
     [TypeId(Occultist0099Ids.ImplementSchoolTypeId)]

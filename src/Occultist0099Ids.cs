@@ -74,6 +74,12 @@ namespace CallOfTheWild.Wrath.Prototype
         public const string ShadowTierTypeId = "0099c0e1a1b24c0d8e5f60000000001a";
         public const string ShadowHealthTypeId = "0099c0e1a1b24c0d8e5f60000000001b";
         public const string ShadowHealthActionTypeId = "0099c0e1a1b24c0d8e5f60000000001c";
+        public const string TransmutationLevelTypeId = "0099c0e1a1b24c0d8e5f60000000001d";
+        public const string LegacyWeaponOptionTypeId = "0099c0e1a1b24c0d8e5f60000000001e";
+        public const string LegacyWeaponTargetTypeId = "0099c0e1a1b24c0d8e5f60000000001f";
+        public const string LegacyWeaponBuffTypeId = "0099c0e1a1b24c0d8e5f600000000020";
+        public const string PhilosophersTouchBuffTypeId = "0099c0e1a1b24c0d8e5f600000000021";
+        public const string QuicknessCounterTypeId = "0099c0e1a1b24c0d8e5f600000000022";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.

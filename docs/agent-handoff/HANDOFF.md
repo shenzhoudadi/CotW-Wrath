@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。防护、惑控、预言、幻术四校通过独立定向复查。B11/D11 沿用原版射线、隐形和影术，以及 CotW 的 Phantasm 和未命中机制。编译零警告、零错误（1.250 秒），隔离原生 425/425（4.68 秒），模型 344/344（2.542 秒）。其余四校、四 Panoply、剩余职业特性及普通启动登记继续施工。场景、存读档、实机及出包未运行。 [B11 / D11 与证据](../work-packages/COTW-0099/B11-D11-illusion.md)。
+- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。防护、惑控、预言、幻术、变化五校通过独立定向复查。B12/D12 复用原生加速、体型和附魔，以及 CotW 的飞行与已有法术。编译零警告、零错误（1.239 秒），隔离原生 474/474（4.97 秒），模型 344/344（2.137 秒）。其余三校、四 Panoply、剩余职业特性及普通启动登记继续施工。实机、存读档及出包未运行。 [B12 / D12 与证据](../work-packages/COTW-0099/B12-D12-transmutation.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 

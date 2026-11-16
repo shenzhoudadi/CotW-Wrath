@@ -1,0 +1,196 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "stage": "B12 / D12 Transmutation",
+  "baseline": "e778ed614d543de81be24ac6a250f4d5b2f3b63f",
+  "releaseEligible": false,
+  "slicePublished": false,
+  "build": {
+    "seconds": 1.239,
+    "warnings": 0,
+    "errors": 0,
+    "attempts": [
+      {
+        "seconds": 3.45,
+        "exitCode": 0
+      },
+      {
+        "seconds": 3.289,
+        "exitCode": 0
+      },
+      {
+        "seconds": 2.282,
+        "exitCode": 0
+      },
+      {
+        "seconds": 2.133,
+        "exitCode": 0
+      },
+      {
+        "seconds": 2.181,
+        "exitCode": 0
+      },
+      {
+        "seconds": 1.238,
+        "exitCode": 0
+      },
+      {
+        "seconds": 2.214,
+        "exitCode": 1
+      },
+      {
+        "seconds": 1.22,
+        "exitCode": 0
+      },
+      {
+        "seconds": 1.269,
+        "exitCode": 0
+      },
+      {
+        "seconds": 1.374,
+        "exitCode": 1
+      },
+      {
+        "seconds": 2.289,
+        "exitCode": 0
+      },
+      {
+        "seconds": 1.252,
+        "exitCode": 0
+      },
+      {
+        "seconds": 2.136,
+        "exitCode": 0
+      },
+      {
+        "seconds": 2.053,
+        "exitCode": 0
+      },
+      {
+        "seconds": 1.254,
+        "exitCode": 0
+      },
+      {
+        "seconds": 1.239,
+        "exitCode": 0
+      }
+    ]
+  },
+  "nativeAttempts": [
+    {
+      "seconds": 4.36,
+      "result": "Missing Keen Edge DLC reward fixture"
+    },
+    {
+      "seconds": 4.82,
+      "result": "Registration and donor checks passed, before the added Transmutation behavior cases"
+    },
+    {
+      "seconds": 4.91,
+      "result": "Host AC stat used the wrong runtime type"
+    },
+    {
+      "seconds": 4.97,
+      "result": "Host did not filter variant visibility or deserialize weapon damage types"
+    },
+    {
+      "seconds": 5.02,
+      "result": "Host gear swap unsubscribed after clearing the previous wielder"
+    },
+    {
+      "seconds": 4.93,
+      "result": "468 checks passed before D12 repairs"
+    },
+    {
+      "seconds": 5.01,
+      "result": "470 checks passed with native Slow counter"
+    },
+    {
+      "seconds": 4.98,
+      "result": "474 checks passed with exact numeric stacking and empty-hand cleanup, inspected by D12"
+    },
+    {
+      "seconds": 4.97,
+      "result": "474 checks passed with amended evidence metadata"
+    }
+  ],
+  "model": {
+    "result": "MODEL_ONLY_PASS",
+    "seconds": 2.137,
+    "checks": 344,
+    "failures": 0,
+    "attempts": [
+      {
+        "seconds": 0.727,
+        "result": "Installed game path missing from command"
+      },
+      {
+        "seconds": 2.137,
+        "result": "MODEL_ONLY_PASS"
+      }
+    ]
+  },
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "reviewedNativeSeconds": 4.98,
+    "reviewedNativeChecks": 474,
+    "rerunByReviewer": false,
+    "findings": [
+      {
+        "finding": "Native Slow did not consume Quickness",
+        "resolution": "Observe successful native Slow buff application after the stock save and stock Haste branches."
+      },
+      {
+        "finding": "Legacy Weapon missed empty-hand replacement",
+        "resolution": "Subscribe to the native empty-hand event and reuse the existing item-identity cleanup."
+      }
+    ]
+  },
+  "notRun": [
+    "game and UMM",
+    "real area target selection",
+    "level-up and respec UI",
+    "disk save/load",
+    "real external provider assemblies",
+    "historical suites",
+    "packaging and upload"
+  ],
+  "native": {
+    "result": "NATIVE_DIRECTED_PASS",
+    "seconds": 4.97,
+    "checks": 474,
+    "failures": [],
+    "hostLoggedExceptions": 0,
+    "skippedArchiveComponents": 0,
+    "registeredPrivateIdentities": 401,
+    "transmutationArchiveRows": 51,
+    "boundary": "Detached BlueprintsCache, native choice, spellbook and cast payment. Size Alteration checks the native action graph. Philosopher's Touch checks the supplied recipient and burst definition. Slow enters the native buff-application rule after the save branch. Weapon and empty-hand changes use supplied items and the native events. Unity scenes, UI, ordinary startup, full career and disk saves remain outside scope.",
+    "sourceSHA256": {
+      "ModEntry.cs": "81A1C69AF0B48D39FA2C3AC2BA0105EB0ED29064DDA740F36184569CC00DA622",
+      "PsychicTravelSpells.cs": "860FA29FAA20DFB26DE38C79C3BB96796ED57F8282FD270B27073D7FFF6E6557",
+      "PsychicVigorHasteStats.cs": "F61BCFC319D3A2F1B8F6384426720772106B7F7D63B09AD0AF2E2D542F91C871",
+      "PsychicWeaponSpells.cs": "F18C369AD4E423F48B964334B12013AB87A3CB60BDF3827A55972633F8949084",
+      "Occultist0099Abjuration.cs": "6BCA012707892FBF93B20B68A85249F53753C6D95B85BCCF30E4814DF9805D18",
+      "Occultist0099AbjurationPowers.cs": "2A502E91841EEE35C53ADE56789FBA20F642F35D1FE7989113841B87FB2B0202",
+      "Occultist0099Aegis.cs": "81E0A1EC80C48BD89AA06C43C1DD6ECC26E6C5184E1606EB308DF8F6C548B7BE",
+      "Occultist0099AegisStorage.cs": "05D04E2365544D6D2D6BC9C18ADEEBDD86C6D7E9A6F7F94B38BD8AC69A9B8479",
+      "Occultist0099Divination.cs": "FF36D6F1E3BDB43C2A18DC35383BC49D07315EB67024FABC6D15DF7B7F7F6211",
+      "Occultist0099Donors.cs": "CD19661FA29C208E3290541ED99557DD1BB334CFD8B03D4545F9F946D022CAD2",
+      "Occultist0099Enchantment.cs": "C0EBAEDF372D65B23D236BFB94307C8654878A3DAE1898E49EF2A79352EB866E",
+      "Occultist0099Ids.cs": "AF20AAF27BCED9D3A45F77AF5BBA6BA937520ADAA172206AFF0DB86A8D8194C3",
+      "Occultist0099Illusion.cs": "7B9B45D9C9E654DABB992BAFED6868784F4E2B17CE5199E74A413A355DFF872F",
+      "Occultist0099Native.cs": "6BE66FD6621C07A62D9130121C9E4CB28F3FEB655275FC626FCA82BF7CD92B75",
+      "Occultist0099NativeRegistration.cs": "68E7151BC15BA962D464015949C9E5B42AF8EF9CA0EA33B9A963FC43D0C49C40",
+      "Occultist0099NativeWiring.cs": "5E877BB60A99EE3E2074823210F02E47749C24D58A6F9736161CCA7CB0EAA113",
+      "Occultist0099Rules.cs": "19FC215CFECAAA87AE5AFEAE035F7B0B6F3A92FDF02E09E540A643442375AE3B",
+      "Occultist0099ShadowBeasts.cs": "8C6B83A102226B55D46EEE7921532CAAE8E3369C631F4A343C48AA5300C6AE2B",
+      "Occultist0099SpellCatalog.cs": "2819800D494319A0E2B249908D4CAC99A27F8F06A3B9BC78D6FB8624D6621B12",
+      "Occultist0099Spells.cs": "18668CC6E8D6CF65B548A1313E77CA98AF6B51130FBFB49C98D8249875FEFE79",
+      "Occultist0099Transmutation.cs": "F42E48707AC5B59239B50CF1721EF24D95A9A3F882EC167592DE1BA79ED96CF5",
+      "Occultist0099TransmutationWeapons.cs": "D6E3C3CAED53F930301FD97AC5F05AA1EC2EE8BD8AB8CA02F81E1851B7B83234"
+    },
+    "hostSourceSHA256": "3CD5D8308FAF6A4DEB89E2F82462CD8184C570DDEED5CC0E425E7BBCB8AFFA80",
+    "logSHA256": "928CAD7955F3E38FEAD3E2A53E01AF3CC642DB96F1AC2916721AD91919BD68EB"
+  }
+}

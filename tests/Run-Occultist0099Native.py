@@ -45,7 +45,7 @@ cmd = [str(launcher), str(engine), str(host), str(managed), str(candidate),
        str(report), str(evidence), str(native)]
 archive_fixtures = {}
 with tempfile.TemporaryDirectory(prefix='cotw-0099-') as fixture_dir:
-    for group in ('Aegis', 'Divination', 'Illusion'):
+    for group in ('Aegis', 'Divination', 'Illusion', 'Transmutation'):
         file = Path(fixture_dir) / f'{group}.json'
         started = time.perf_counter()
         subprocess.run(['pwsh', '-NoProfile', '-File', str(archive_reader),
@@ -67,7 +67,8 @@ if report.is_file():
 # Source fingerprints are the authoritative code identity for this stage; the
 # DLL hashes below are build artefacts only (D-0099-07).
 source_dir = test_dir.parent / 'src'
-sources = [source_dir / 'ModEntry.cs', *sorted(source_dir.glob('Occultist0099*.cs'))]
+sources = [source_dir / name for name in ('ModEntry.cs', 'PsychicTravelSpells.cs', 'PsychicVigorHasteStats.cs', 'PsychicWeaponSpells.cs')]
+sources += sorted(source_dir.glob('Occultist0099*.cs'))
 result = {
     'workPackage': 'COTW-0099',
     'case': 'occultist0099-native',

@@ -2,7 +2,7 @@
 param(
     [Parameter(Mandatory)][string] $WrathPath,
     [Parameter(Mandatory)][string] $OutputPath,
-    [ValidateSet('Aegis', 'Divination', 'Illusion')][string] $Group = 'Aegis'
+    [ValidateSet('Aegis', 'Divination', 'Illusion', 'Transmutation')][string] $Group = 'Aegis'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -33,6 +33,28 @@ elseif ($Group -eq 'Divination') {
         'Spells/Level8/PredictionOfFailure.jbp',
         'Units/Monsters/Will-o-Wisp/CR6_WillOWispStandart.jbp'
     )
+}
+elseif ($Group -eq 'Transmutation') {
+    $members = @(
+        'Spells/Level1/EnlargePerson.jbp', 'Spells/Level1/EnlargePersonBuff.jbp',
+        'Spells/Level1/ReducePerson.jbp', 'Spells/Level1/ReducePersonBuff.jbp',
+        'Spells/Level1/ExpeditiousRetreat.jbp', 'Spells/Level1/ExpeditiousRetreatBuff.jbp',
+        'Spells/Level1/HurricaneBow.jbp', 'Spells/Level1/LeadBlades.jbp', 'Spells/Level1/MagicWeapon/MagicWeapon.jbp',
+        'Spells/Level2/EffortlessArmor.jbp', 'Spells/DLC6NewSpells/KeenEdge.jbp',
+        'Spells/Level3/Haste.jbp', 'Spells/Level3/HasteBuff.jbp', 'Spells/Level3/HasteBuffEffect.jbp', 'Spells/Level3/Slow.jbp',
+        'Spells/Level3/SlowBuff.jbp',
+        'Spells/Level3/MagicalVestment.jbp', 'Spells/Level3/MagicWeaponGreater/MagicWeaponGreater.jbp',
+        'Spells/Level4/Echolocation.jbp', 'Spells/Level6/Disintegrate.jbp', 'Spells/Level6/Transformation.jbp',
+        'DLC/DLC6/Dlc6Reward.jbp',
+        'CreatureAbilities/Subtypes/SubtypeElemental.jbp',
+        'Weapons/Items/Standard/SimpleOneHanded/StandardClub.jbp', 'Weapons/Types/SimpleOneHanded/Club.jbp',
+        'Weapons/Items/Standard/MartialOneHanded/StandardLongsword.jbp', 'Weapons/Types/MartialOneHanded/Longsword.jbp'
+    )
+    $enchantments = @('Flaming', 'Frost', 'Shock', 'GhostTouch', 'Keen', 'CruelEnchantment', 'ViciousEnchantment',
+        'Disruption', 'Holy', 'Unholy', 'Axiomatic', 'Anarchic', 'Speed', 'BrilliantEnergy', 'BaneEverything', 'Vorpal',
+        'ColdIronWeaponEnchantment', 'MithralWeaponEnchantment', 'AdamantineWeaponEnchantment')
+    $enchantments += @(1..5 | ForEach-Object { "TemporaryEnhancement$_" })
+    $members += @($enchantments | ForEach-Object { "Weapons/Enchantments/$_.jbp" })
 }
 else {
     $members = @(

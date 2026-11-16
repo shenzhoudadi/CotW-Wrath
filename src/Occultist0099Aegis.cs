@@ -6,6 +6,7 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Items.Ecnchantments;
+using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Items;
 using Kingmaker.Items.Slots;
@@ -148,7 +149,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static int Budget(UnitEntityData unit)
             => Occultist0099NativeScope.InRuntimeContext(
                 Occultist0099NativeScope.RuntimeOf(unit, Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099)),
-                component => ((Occultist0099FocusFact0099)component).AegisBudget(), 0);
+                component => ((Occultist0099FocusFact0099)component).EquipmentBudget(Occultist0099Ids.SliceSchool), 0);
 
         internal static IEnumerable<Occultist0099AegisOption> Selected(UnitEntityData unit, ActivatableAbility excluded = null)
             => unit.ActivatableAbilities.Enumerable.Where(ability => ability != excluded && ability.Active && ability.IsOn && ability.IsStarted)
@@ -198,31 +199,88 @@ namespace CallOfTheWild.Wrath.Prototype
                 !(context.Ability.ResourceLogic is Occultist0099FocusResourceLogic logic) ||
                 !Occultist0099NativeCast.TryGetPaymentIdentity(context, out var identity) || !logic.CanPay(context.Ability, identity)) return;
 
-            var previous = unit.Buffs.Enumerable.FirstOrDefault(buff => buff.Blueprint.AssetGuid == Occultist0099Aegis.WardId);
-            var previousData = previous?.Components.First(component => component.SourceBlueprintComponent is Occultist0099AegisArmor)
-                .GetData<Occultist0099AegisArmorData>();
+            var blueprint = ApplyWard.Buff;
+            var previous = unit.Buffs.GetBuff(blueprint);
+            var previousRuntime = previous?.Components.First(component => component.SourceBlueprintComponent is IOccultist0099EquipmentWard);
             using (context.GetDataScope(target)) ApplyWard.RunAction();
-            var ward = unit.Buffs.Enumerable.FirstOrDefault(buff => buff.Blueprint.AssetGuid == Occultist0099Aegis.WardId &&
+            var ward = unit.Buffs.Enumerable.FirstOrDefault(buff => buff.Blueprint == blueprint &&
                 buff != previous && buff.Context?.SourceAbilityContext == context);
             if (ward == null) return;
 
-            var runtime = ward.Components.First(component => component.SourceBlueprintComponent is Occultist0099AegisArmor);
+            var runtime = ward.Components.First(component => component.SourceBlueprintComponent is IOccultist0099EquipmentWard);
             bool paid = false;
             try
             {
                 using (runtime.RequestEventContext())
                 {
-                    var equipment = (Occultist0099AegisArmor)runtime.SourceBlueprintComponent;
-                    if (ward.IsTurnedOn && !ward.IsSuppressed && equipment.TrySetup(previousData) &&
+                    var equipment = (IOccultist0099EquipmentWard)runtime.SourceBlueprintComponent;
+                    if (ward.IsTurnedOn && !ward.IsSuppressed && equipment.TryStage(previousRuntime) &&
                         logic.TryPay(context.Ability, identity))
                     {
                         paid = true;
-                        equipment.KeepSharedEnchantments(previousData);
+                        equipment.Adopt(previousRuntime);
                     }
                 }
             }
             finally { if (!paid) ward.Remove(); }
             if (paid) previous?.Remove();
+        }
+    }
+
+    internal interface IOccultist0099EquipmentWard
+    {
+        bool TryStage(EntityFactComponent previous);
+        void Adopt(EntityFactComponent previous);
+    }
+
+    internal static class Occultist0099EquipmentEnchantments
+    {
+        internal static bool Refresh(ItemEntity item, BlueprintItemEnchantment[] desired, List<ItemEnchantment> applied,
+            MechanicsContext context, string effect, BlueprintItemEnchantment stackable = null, ItemEnchantment previousStackable = null)
+        {
+            if (desired.Any(enchantment => enchantment == null)) return false;
+            var items = new[] { item };
+            bool retainPrevious = previousStackable != null && item.Enchantments.Contains(previousStackable);
+            if (MagusEnchantments01454.Current(items, desired, applied) &&
+                (stackable == null || retainPrevious || applied.Any(enchantment => enchantment.Blueprint == stackable))) return true;
+            Clear(applied);
+            try
+            {
+                MagusEnchantments01454.AddMissing(items, desired, applied, context);
+                if (stackable != null && !retainPrevious)
+                    applied.Add(item.AddEnchantment(stackable, context) ??
+                        throw new InvalidOperationException("Native enchantment creation failed: " + stackable.AssetGuid));
+                return true;
+            }
+            catch (Exception failure)
+            {
+                // Native attachment can throw after inserting the enchantment into the item.
+                foreach (var enchantment in item.Enchantments.Where(enchantment => enchantment.ParentContext == context))
+                    if (!applied.Contains(enchantment)) applied.Add(enchantment);
+                Clear(applied);
+                Kingmaker.PFLog.Default.Error("Occultist " + effect + " enchantment failed: " + failure);
+                return false;
+            }
+        }
+
+        internal static void Transfer(ItemEntity item, BlueprintItemEnchantment[] desired, List<ItemEnchantment> previous,
+            List<ItemEnchantment> applied, BlueprintItemEnchantment stackable = null)
+        {
+            foreach (var enchantment in previous.ToArray())
+            {
+                var sameProperty = item.Enchantments.Where(current => current.Blueprint == enchantment.Blueprint);
+                if (!sameProperty.Contains(enchantment)) continue;
+                if (enchantment.Blueprint != stackable &&
+                    (!desired.Contains(enchantment.Blueprint) || sameProperty.Any(current => !previous.Contains(current)))) continue;
+                previous.Remove(enchantment);
+                applied.Add(enchantment);
+            }
+        }
+
+        internal static void Clear(List<ItemEnchantment> applied)
+        {
+            foreach (var enchant in applied.ToArray()) enchant?.Owner?.RemoveEnchantment(enchant);
+            applied.Clear();
         }
     }
 
@@ -235,12 +293,13 @@ namespace CallOfTheWild.Wrath.Prototype
 
     [TypeId(Occultist0099Ids.AegisArmorTypeId)]
     public sealed class Occultist0099AegisArmor : UnitBuffComponentDelegate<Occultist0099AegisArmorData>,
-        IUnitEquipmentHandler, IUnitSubscriber
+        IUnitEquipmentHandler, IUnitSubscriber, IOccultist0099EquipmentWard
     {
         public BlueprintArmorEnchantmentReference[] Numeric;
 
-        internal bool TrySetup(Occultist0099AegisArmorData previous)
+        bool IOccultist0099EquipmentWard.TryStage(EntityFactComponent previousRuntime)
         {
+            var previous = previousRuntime?.GetData<Occultist0099AegisArmorData>();
             var armor = Occultist0099Aegis.Armor(Owner);
             if (armor == null) return false;
             var choices = Occultist0099Aegis.Selected(Owner).ToArray();
@@ -272,17 +331,11 @@ namespace CallOfTheWild.Wrath.Prototype
             return baseline;
         }
 
-        internal void KeepSharedEnchantments(Occultist0099AegisArmorData previous)
+        void IOccultist0099EquipmentWard.Adopt(EntityFactComponent previousRuntime)
         {
-            if (previous?.Armor != Data.Armor) return;
-            foreach (var enchantment in previous.Applied.ToArray())
-            {
-                var sameProperty = Data.Armor.Enchantments.Where(current => current.Blueprint == enchantment.Blueprint);
-                if (!Data.Desired.Any(reference => reference.Get() == enchantment.Blueprint) ||
-                    !sameProperty.Contains(enchantment) || sameProperty.Any(current => !previous.Applied.Contains(current))) continue;
-                previous.Applied.Remove(enchantment);
-                Data.Applied.Add(enchantment);
-            }
+            var previous = previousRuntime?.GetData<Occultist0099AegisArmorData>();
+            if (previous?.Armor == Data.Armor)
+                Occultist0099EquipmentEnchantments.Transfer(Data.Armor, Desired(), previous.Applied, Data.Applied);
         }
 
         protected override void OnTurnOn() { if (Data.Armor != null) Restore(); }
@@ -295,34 +348,13 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!TryAddMissing()) Buff.Remove();
         }
 
-        private bool TryAddMissing()
-        {
-            var items = new ItemEntity[] { Data.Armor };
-            var desired = Data.Desired.Select(reference => reference.Get()).Cast<BlueprintItemEnchantment>().ToArray();
-            if (desired.Any(enchant => enchant == null)) return false;
-            if (MagusEnchantments01454.Current(items, desired, Data.Applied)) return true;
-            Clear();
-            try
-            {
-                MagusEnchantments01454.AddMissing(items, desired, Data.Applied, Context);
-                return true;
-            }
-            catch (Exception failure)
-            {
-                // Native attachment can throw after inserting the enchantment into the item.
-                foreach (var enchantment in Data.Armor.Enchantments.Where(enchantment => enchantment.ParentContext == Context))
-                    if (!Data.Applied.Contains(enchantment)) Data.Applied.Add(enchantment);
-                Clear();
-                Kingmaker.PFLog.Default.Error("Occultist Aegis armor enchantment failed: " + failure);
-                return false;
-            }
-        }
+        private BlueprintItemEnchantment[] Desired()
+            => Data.Desired.Select(reference => reference.Get()).ToArray();
 
-        private void Clear()
-        {
-            foreach (var enchant in Data.Applied.ToArray()) enchant?.Owner?.RemoveEnchantment(enchant);
-            Data.Applied.Clear();
-        }
+        private bool TryAddMissing()
+            => Occultist0099EquipmentEnchantments.Refresh(Data.Armor, Desired(), Data.Applied, Context, "Aegis armor");
+
+        private void Clear() => Occultist0099EquipmentEnchantments.Clear(Data.Applied);
 
         public void HandleEquipmentSlotUpdated(ItemSlot slot, ItemEntity oldItem)
         {

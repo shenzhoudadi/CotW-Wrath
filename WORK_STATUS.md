@@ -4,7 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。防护、惑控、预言、幻术四校通过独立定向复查。B11/D11 沿用原版射线、隐形和影术，以及 CotW 的 Phantasm 和未命中机制。编译零警告、零错误（1.250 秒），隔离原生 425/425（4.68 秒），模型 344/344（2.542 秒）。其余四校、四 Panoply、剩余职业特性及普通启动登记继续施工。场景、存读档、实机及出包未运行。 [B11 / D11 与证据](docs/work-packages/COTW-0099/B11-D11-illusion.md)。
+- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。 A/C 已完成。防护、惑控、预言、幻术、变化五校通过独立定向复查。B12/D12 复用原生加速、体型和附魔，以及 CotW 的飞行与已有法术。编译零警告、零错误（1.239 秒），隔离原生 474/474（4.97 秒），模型 344/344（2.137 秒）。其余三校、四 Panoply、剩余职业特性及普通启动登记继续施工。实机、存读档及出包未运行。 [B12 / D12 与证据](docs/work-packages/COTW-0099/B12-D12-transmutation.md)。
 - **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
 
 ## 本次0.14.69 TEST交付
