@@ -358,7 +358,7 @@ namespace CallOfTheWild.Wrath.Prototype
             return Occultist0099Outcome.Ok;
         }
 
-        public static Occultist0099Outcome Lock(Occultist0099FocusState s)
+        public static Occultist0099Outcome Lock(Occultist0099FocusState s, int? classLevel = null)
         {
             var g = Guard(s);
             if (g != Occultist0099Outcome.Ok) return g;
@@ -367,7 +367,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 var st = s.Schools[school];
                 st.LockedInvestment = st.Present ? st.Invested : 0;
-                st.Resonance = WardingTalismanResonance(s.Level, st.LockedInvestment);
+                st.Resonance = WardingTalismanResonance(classLevel ?? s.Level, st.LockedInvestment);
                 st.ResonanceValid = st.Present && st.LockedInvestment > 0;
             }
             foreach (string panoply in Occultist0099Schools.PanoplyOrder)
@@ -594,12 +594,12 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         public static Occultist0099FocusPower MindBarrier(Occultist0099FocusState s,
-            string school)
+            string school, int? classLevel = null, int? intModifier = null)
         {
             bool mastery = s != null && s.MasterySchool == school;
-            int effective = (s == null ? 0 : s.Level) + (mastery ? 4 : 0);
-            int dc = 10 + (s == null ? 0 : s.Level / 2) +
-                     (s == null ? 0 : s.IntModifier) + (mastery ? 2 : 0);
+            int level = classLevel ?? s?.Level ?? 0;
+            int effective = level + (mastery ? 4 : 0);
+            int dc = 10 + level / 2 + (intModifier ?? s?.IntModifier ?? 0) + (mastery ? 2 : 0);
             return new Occultist0099FocusPower
             {
                 School = school, EffectiveLevel = effective, SaveDC = dc,

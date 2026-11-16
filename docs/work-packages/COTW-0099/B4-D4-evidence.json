@@ -1,0 +1,235 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "28ddb182a14418924cf2e8582e4ded6e32d2c1e0",
+  "stage": "B4 Abjuration effects and focus operations, directed development slice",
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "scope": "B4 production source and native-6.json, 166 assertions",
+    "closedFindings": [
+      "Reconcile active implement sources even when the focus holder was temporarily detached",
+      "Retire locked balances or return pre-lock balances when a source is removed",
+      "Remove an orphaned shield when authority is invalid",
+      "Reject repeat focus-operation rules before native ability-effect dispatch",
+      "Report the headless managed buff and damage evidence with its scene boundaries"
+    ]
+  },
+  "builds": [
+    {
+      "wallSeconds": 1.469,
+      "errors": 1,
+      "warnings": 0,
+      "cause": "read-only full-round ability property"
+    },
+    {
+      "wallSeconds": 1.986,
+      "errors": 1,
+      "warnings": 0,
+      "cause": "fixture used resource interface instead of restriction subtype"
+    },
+    {
+      "wallSeconds": 1.088,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "wallSeconds": 1.097,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "wallSeconds": 1.089,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "wallSeconds": 1.075,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "wallSeconds": 1.968,
+      "errors": 0,
+      "warnings": 0
+    },
+    {
+      "wallSeconds": 1.971,
+      "errors": 0,
+      "warnings": 0
+    }
+  ],
+  "nativeRuns": [
+    {
+      "wallSeconds": 2.971,
+      "result": "fixture_aborted",
+      "cause": "Unity ECall while patching hit visuals"
+    },
+    {
+      "wallSeconds": 3.536,
+      "result": "NATIVE_DIRECTED_FAIL",
+      "checks": 156,
+      "failedChecks": 2,
+      "cause": "unstaged difficulty and NPC scene inputs"
+    },
+    {
+      "wallSeconds": 3.63,
+      "result": "NATIVE_DIRECTED_FAIL",
+      "checks": 157,
+      "failedChecks": 3,
+      "cause": "unstaged native SneakAttack and enemy faction in damage pipeline"
+    },
+    {
+      "wallSeconds": 3.507,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 157
+    },
+    {
+      "wallSeconds": 3.507,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 165
+    },
+    {
+      "wallSeconds": 3.569,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 166
+    }
+  ],
+  "native": {
+    "workPackage": "COTW-0099",
+    "contract": "C-0099-20261115-r1",
+    "stage": "B4 directed native recheck (Abjuration focus operations and effects)",
+    "acceptanceScope": "native_entry_points_directed",
+    "playerGameAcceptance": false,
+    "gameLaunched": false,
+    "ummLaunched": false,
+    "slicePublished": false,
+    "releaseEligible": false,
+    "productionBridgesInstalled": 12,
+    "nativeRootsLoaded": 13,
+    "hostStagedRoots": 5,
+    "hostStagedRootNames": [
+      "CotWWrathPsychicWardingWeapon(CotW)",
+      "CotWWrathPsychicAlliedCloak(CotW)",
+      "CloakOfWindsAbility(External)",
+      "CotWWrathPsychicGlobeOfInvulnerabilityLesser(CotW)",
+      "CotWWrathPsychicGlobeOfInvulnerability(CotW)"
+    ],
+    "skippedArchiveComponents": 0,
+    "rootFixtureBoundary": "13 of the 18 audited Abjuration roots come from the reviewed Wrath archive fixture. The 4 CotW roots are built by this project's own production builders (PsychicWardingSpells / PsychicGlobeSpells / PsychicSupportSpells.Cloak) against real archived native donors; only PsychicOriginalIcons.Load is substituted because ImageConversion is a Unity native call. The 1 External root (CloakOfWindsAbility, TabletopTweaks-Base) is host-staged at its frozen A identity with a real Abjuration SpellComponent and a real executable effect path; the real provider assembly is NOT loaded, so its provider gate is exercised only through the authoritative state, never through a real third-party blueprint.",
+    "checks": 166,
+    "failures": [],
+    "hostLoggedExceptions": 0,
+    "caseStatus": {
+      "MF01": "native_focus_operations_pre_effect_payment_command_identity_buff_damage_and_resonance",
+      "MF09": "native_fact_reattach_school_loss_and_reacquisition_only",
+      "MF11": "native_dedup_and_late_refusal_sticky_touch_not_run",
+      "MF03": "native_invest_reset_replenish_and_locked_refusal",
+      "SP01": "native_level_up_offers_select_apply_isolated_book_and_exact_sources",
+      "SP03": "native_copy_provenance_and_preview_isolation_only",
+      "SP02": "native_live_int_learning_plus_model_cast_gate",
+      "MF04": "native_rest_identity_batch_and_effect_cleanup",
+      "SP08": "native_gate_only_registration_not_run",
+      "MF02": "not_run_native",
+      "MF05": "not_run_native",
+      "MF06": "not_run_native",
+      "MF07": "not_run_native",
+      "MF08": "not_run_native",
+      "MF10": "not_run_native",
+      "SP04": "not_run_native",
+      "SP05": "not_run_native",
+      "SP06": "not_run_native",
+      "SP07": "not_run_native"
+    },
+    "result": "NATIVE_DIRECTED_PASS",
+    "resultMeaning": "Managed native RuleCastSpell payment, Mind Barrier application, RuleDealDamage, Warding Talisman modifiers, ApplySpellbook/OnApplyAction, SelectSpell/AddKnown, fact replacement and ApplyRest passed.",
+    "boundary": "Real managed native Rulebook, RuleCastSpell, AbilityResourceLogic, AbilityEffectRunAction/ContextActionApplyBuff, buff activation and expiry, damage preparation/calculation/delivery, stat modifiers, facts and ApplyRest. The fixture supplies neutral difficulty and faction inputs and skips Unity profiling/hit visuals. For the effects case a headless executor boundary runs native managed ability effects directly. Other cast cases use a dispatch counter. Command binding is invoked directly. Prior native learning cases stage the preview sources and exercise native choices. No full command OnAction, real scene executor, rendered UI, plan serialization, respec controller, full rest coroutine or immediate scripted rest scene.",
+    "notRun": [
+      "game/UMM startup",
+      "player gameplay acceptance",
+      "full historical suites",
+      "shared class/spellbook/progression registration",
+      "level-up UI and respec controller",
+      "save/load transport",
+      "real TabletopTweaks / other provider assembly load",
+      "packaging, version bump, upload and issue closure"
+    ],
+    "commandSeconds": 3.569,
+    "command": [
+      "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine-launcher\\bin\\Release\\net472\\EngineLauncher.exe",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\repair01456\\engine02",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\Occultist0099NativeTests\\bin\\Release\\net472\\Occultist0099NativeTests.exe",
+      "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\CallOfTheWild.Wrath.Prototype\\bin\\Release\\net472\\CallOfTheWild.Wrath.Prototype.dll",
+      "C:\\Users\\xuenc\\agent-tools\\occultist-next\\B-D2-fix\\native-b3-5.json",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\occultist-0099\\docs\\work-packages\\COTW-0099\\A-occultist-assets.json",
+      "D:\\CodexProjects\\CotW-Wrath\\work\\prototype-build\\spirit-guide-0060-native-ext.json"
+    ],
+    "environment": {
+      "COTW_HARMONY_MATRIX_PATH": "D:\\steam\\steamapps\\common\\Pathfinder Second Adventure\\Wrath_Data\\Managed\\0Harmony.dll"
+    }
+  },
+  "model": {
+    "workPackage": "COTW-0099",
+    "stage": "B first vertical slice (Abjuration), development only",
+    "contract": "C-0099-20261115-r1",
+    "checkType": "isolated numeric state model over production sources",
+    "acceptanceScope": "model_supplement_only",
+    "nativeWrathEntriesExercised": false,
+    "nativeEntryPointsExercised": false,
+    "gameOrUmmLaunched": false,
+    "releaseEligible": false,
+    "assertions": 364,
+    "failures": [],
+    "cases": {
+      "MF01": "model_assertions",
+      "MF02": "model_assertions",
+      "MF03": "model_assertions",
+      "MF04": "model_assertions",
+      "MF05": "model_assertions",
+      "MF06": "model_assertions",
+      "MF08": "model_assertions",
+      "MF09": "model_assertions",
+      "MF10": "model_assertions",
+      "SP01": "model_assertions",
+      "SP02": "model_assertions",
+      "SP03": "model_assertions",
+      "SP04": "model_assertions",
+      "SP05": "partial_model_full_143_rows_not_run",
+      "SP06": "partial_model_fireshield_variants_not_run",
+      "SP07": "model_assertions",
+      "SP08": "model_gate_only_native_cache_not_run",
+      "MF07": "not_run",
+      "MF11": "partial_model_dedup_only_reentry_stickytouch_not_run"
+    },
+    "assertionSeconds": 0.042,
+    "timingNote": "Host assertion time only. The full dotnet run command including its build is recorded separately in B-abjuration-slice.md.",
+    "result": "MODEL_ONLY_PASS",
+    "resultMeaning": "Numeric state-model assertions over linked production sources. NOT native-entry acceptance; native Wrath payment/learning entry points were not exercised by this host. See the native host report for entry-point evidence.",
+    "commandSeconds": 1.651
+  },
+  "sourceSHA256": {
+    "src/ModEntry.cs": "81A1C69AF0B48D39FA2C3AC2BA0105EB0ED29064DDA740F36184569CC00DA622",
+    "src/Occultist0099Abjuration.cs": "FD68295DE5CC3EC1F981B74147DB74D8860EF70501503F09DD06748DA9D2FC75",
+    "src/Occultist0099Ids.cs": "BE84C352C33AF4E55B9AC453C5E903BCD8DC2B978ACF6E5A07E3562F7D7E490B",
+    "src/Occultist0099Native.cs": "7D5A7E9ED7849F9D0B0F4D69295AAE9241183EBE6F6FF72C64F4B2FC8551B026",
+    "src/Occultist0099NativeWiring.cs": "41B1D14FB4FB48B24C9B1463502971C592DF5AF9700E462FB3BFD4CEF4F2A933",
+    "src/Occultist0099Rules.cs": "24E8291CD2D8109112CF748EBDF4A5B29D5B2A712B6B1900604CB520E5A1F877",
+    "src/Occultist0099Spells.cs": "858529BD5C339C4581BEA4C2BA98038782F532E37DA3FF3A87994EDADB19D927",
+    "tests/Occultist0099NativeProgram.cs": "9A5DF0E482E3B69BC58956663D44FF83E12674747A40063331D551837ECB7C39"
+  },
+  "artifactSHA256": {
+    "candidateDll": "5DB0B66F26AE8F0F4104E1A3E190854A69C2E182F6E6E4C57C3E5025F7514DAC",
+    "hostExe": "E7AC107F5B05AE61F058A42268A20F790AE611753B09E5B5EA3328103A5C3BF9",
+    "isolatedEngineAssembly": "3A85EDDC5D21CE98779C54F549BDD471D3DEF061948AEE2E85988E9782B82E80",
+    "installedGameAssembly": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953",
+    "harmony": "DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5"
+  },
+  "fixtureSHA256": {
+    "A-occultist-assets.json": "247C988FDD28E365E419F90D834D5C389A21CC70DF070C5FFB9A88FCB3DA6C59",
+    "spirit-guide-0060-native-ext.json": "0CE753666FAE00A56359C17375169652195EDBBF5D54DA77C565D04B0165C06D"
+  },
+  "rawLogSHA256": "EC7F21832F1D7F562DEDAEFC4D7892977461ED39EB6739C503D8E9669F411DDA",
+  "packaging": "not_run",
+  "installerUpload": "not_run"
+}

@@ -18,6 +18,7 @@ using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Parts;
 using Newtonsoft.Json;
 
@@ -43,6 +44,8 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         public BlueprintCharacterClassReference CharacterClass;
         public BlueprintAbilityResourceReference FocusResource;
+        public BlueprintBuffReference WardingTalisman;
+        public BlueprintBuffReference MindBarrierBuff;
 
         private Occultist0099FocusPart Ledger
         {
@@ -65,12 +68,13 @@ namespace CallOfTheWild.Wrath.Prototype
 
         private int IntModifier() => Owner.Stats?.Intelligence?.Bonus ?? 0;
 
-        private void BeginCycle(string identity, bool firstAcquisition)
+        private bool BeginCycle(string identity, bool firstAcquisition)
         {
             var state = State;
             if (Occultist0099Focus.BeginCycle(state, ClassLevel(), IntModifier(),
-                    identity, firstAcquisition) == Occultist0099Outcome.Ok)
-                state.Intelligence = Owner.Stats?.Intelligence?.ModifiedValue ?? 10;
+                    identity, firstAcquisition) != Occultist0099Outcome.Ok) return false;
+            state.Intelligence = Owner.Stats?.Intelligence?.ModifiedValue ?? 10;
+            return true;
         }
 
         protected override void OnActivate()
@@ -87,7 +91,9 @@ namespace CallOfTheWild.Wrath.Prototype
             if (ClassLevel() < part.State.Level)
                 Occultist0099Focus.RespecBudgetDown(part.State, ClassLevel(), IntModifier());
             Occultist0099Focus.Validate(part.State);
+            ReconcileSchools();
             SyncResourceMirror();
+            SyncWardingTalisman();
         }
 
         protected override void OnDeactivate()
@@ -96,8 +102,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (part?.State == null) return;
             if (ClassLevel() <= 0 && part.State.ClassPresent)
                 foreach (string school in Occultist0099Schools.Order)
-                    Occultist0099Focus.SetSchoolPresent(part.State, school, false);
+                    Occultist0099Focus.RespecRemoveSchool(part.State, school);
             Occultist0099Focus.RemoveClass(part.State);
+            RemoveMindBarrier();
+            SyncWardingTalisman();
         }
 
         protected override void OnPostLoad() => Occultist0099Focus.Validate(State);
@@ -105,15 +113,92 @@ namespace CallOfTheWild.Wrath.Prototype
         protected override void OnApplyPostLoadFixes()
         {
             Occultist0099Focus.Validate(State);
+            ReconcileSchools();
             SyncResourceMirror();
+            SyncWardingTalisman();
         }
 
         internal void Rest(string identity)
         {
             if (ClassLevel() <= 0) return;
-            BeginCycle(identity, false);
+            bool reset = BeginCycle(identity, false);
             Occultist0099Focus.Validate(State);
             SyncResourceMirror();
+            if (reset) RemoveMindBarrier();
+            SyncWardingTalisman();
+        }
+
+        internal void SetSchoolPresent(string school, bool present)
+        {
+            var result = present ? Occultist0099Focus.SetSchoolPresent(State, school, true) :
+                Occultist0099Focus.RespecRemoveSchool(State, school);
+            if (result != Occultist0099Outcome.Ok) return;
+            SyncResourceMirror();
+            if (school != Occultist0099Ids.SliceSchool) return;
+            if (!present) RemoveMindBarrier();
+            SyncWardingTalisman();
+        }
+
+        private void ReconcileSchools()
+        {
+            var state = State;
+            if (!state.Enabled)
+            {
+                RemoveMindBarrier();
+                return;
+            }
+            var active = new HashSet<string>(Owner.Progression.Features.Enumerable.Where(f => f.Active)
+                .SelectMany(f => f.Blueprint.GetComponents<Occultist0099ImplementSchool>()).Select(source => source.School));
+            foreach (string school in Occultist0099Schools.Order)
+            {
+                bool present = active.Contains(school);
+                if (present == state.Schools[school].Present) continue;
+                if (present) Occultist0099Focus.SetSchoolPresent(state, school, true);
+                else Occultist0099Focus.RespecRemoveSchool(state, school);
+            }
+            if (!CanRetainMindBarrier()) RemoveMindBarrier();
+        }
+
+        internal bool Operate(Occultist0099FocusAction action, string school, string executionId, bool commit)
+        {
+            if (!IsOwnedBy(Owner) || (commit && executionId == null)) return false;
+            var current = State;
+            if (executionId != null && current.ChargedExecutions.Contains(executionId)) return false;
+            var state = commit ? current : current.Clone();
+            Occultist0099Outcome outcome;
+            switch (action)
+            {
+                case Occultist0099FocusAction.Invest: outcome = Occultist0099Focus.Invest(state, school, 1); break;
+                case Occultist0099FocusAction.Reset: outcome = Occultist0099Focus.Reset(state); break;
+                case Occultist0099FocusAction.Lock: outcome = Occultist0099Focus.Lock(state, ClassLevel()); break;
+                case Occultist0099FocusAction.Replenish: outcome = Occultist0099Focus.Replenish(state, school); break;
+                default: return false;
+            }
+            if (outcome != Occultist0099Outcome.Ok) return false;
+            if (commit)
+            {
+                state.ChargedExecutions.Add(executionId);
+                SyncResourceMirror();
+                if (action == Occultist0099FocusAction.Lock) SyncWardingTalisman();
+            }
+            return true;
+        }
+
+        private void RemoveMindBarrier()
+        {
+            var blueprint = MindBarrierBuff?.Get();
+            if (blueprint != null) Owner.Buffs.GetBuff(blueprint)?.Remove();
+        }
+
+        private void SyncWardingTalisman()
+        {
+            var blueprint = WardingTalisman?.Get();
+            if (blueprint == null) return;
+            var current = Owner.Buffs.GetBuff(blueprint);
+            if (WardingTalismanResonance(Occultist0099Ids.SliceSchool) <= 0)
+                current?.Remove();
+            else if (current == null)
+                Owner.Buffs.AddBuff(blueprint, Owner, (TimeSpan?)null);
         }
 
         public bool IsOwnedBy(UnitEntityData unit) => unit != null && unit == Owner && ClassLevel() > 0;
@@ -195,10 +280,14 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         public int WardingTalismanResonance(string school)
-            => Occultist0099Focus.Resonance(State, school);
+            => ClassLevel() > 0 ? Occultist0099Focus.Resonance(State, school) : 0;
 
         public Occultist0099FocusPower MindBarrier(string school)
-            => Occultist0099Focus.MindBarrier(State, school);
+            => Occultist0099Focus.MindBarrier(State, school, ClassLevel(), IntModifier());
+
+        internal bool CanRetainMindBarrier()
+            => State.Enabled && State.ClassPresent && State.Locked &&
+               State.Schools[Occultist0099Ids.SliceSchool].Present && ClassLevel() > 0;
 
         public string StateFingerprint() => State.Fingerprint();
     }

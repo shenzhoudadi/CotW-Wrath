@@ -4,7 +4,7 @@
 
 ## 🚧 施工中／已认领，请勿重复开发
 
-- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成，B3 完成 Abjuration 首切片的稳定学习来源、原生 DLC 和候选刷新。独立 D3 在该定向范围复查通过。最终编译 0 警告 / 0 错误（1.153 秒），隔离原生 137/137（3.497 秒）。继续 B/D 修复 Mind Barrier 和 Warding Talisman 原生生效、SP08 与既有供体接线；八学派、四 Panoply 和完整成长仍在施工。完整升级界面、真实提供方、重训、存读档、实机、打包和安装包上传未运行。保持开发态和认领开放。[B3 / D3 与后续发现](docs/work-packages/COTW-0099/B3-D3-implement-learning.md)。
+- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成，B4 接通防护系 Mind Barrier、Warding Talisman 和焦点操作，独立 D4 定向复查通过。最终编译 0 警告 / 0 错误（1.971 秒），隔离原生 166/166（3.569 秒），模型 364/364（1.651 秒）。继续 B/D 处理焦点升级预览和重训账本、SP08 原子注册、供体接线及完整八学派、四 Panoply 和成长。完整升级界面、实机、存读档、实际提供方、打包和上传未运行。切片仍为开发态，认领开放。[B4 / D4 与证据](docs/work-packages/COTW-0099/B4-D4-abjuration-effects.md)。
 - **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/SPIRITUALIST.md)。
 
 ## 本次0.14.69 TEST交付

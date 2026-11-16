@@ -38,6 +38,16 @@ namespace CallOfTheWild.Wrath.Prototype
             => RuntimeOf(unit, Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099))
                 ?.SourceBlueprintComponent as Occultist0099FocusFact0099;
 
+        internal static EntityFactComponent FocusRuntime(AbilityData ability)
+        {
+            var unit = ability?.Caster?.Unit;
+            var granted = ability?.Fact;
+            if (unit == null || ability.SourceItem != null || granted == null || !granted.Active || granted.Owner != unit)
+                return null;
+            var runtime = RuntimeOf(unit, Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099));
+            return OwnerOf(runtime) == unit ? runtime : null;
+        }
+
         public static Occultist0099SpellbookFact0099 BookOf(UnitEntityData unit)
             => RuntimeOf(unit, Occultist0099Ids.SpellbookFactGuid, typeof(Occultist0099SpellbookFact0099))
                 ?.SourceBlueprintComponent as Occultist0099SpellbookFact0099;
@@ -142,23 +152,11 @@ namespace CallOfTheWild.Wrath.Prototype
         // runtime's own context before touching Owner / Data. Ownership is
         // proven from the native EntityFactComponent.Owner, which is readable
         // without a context.
-        private static EntityFactComponent Runtime(AbilityData ability)
-        {
-            var unit = ability?.Caster?.Unit;
-            var granted = ability?.Fact;
-            if (unit == null || granted == null || !granted.Active || granted.Owner != unit)
-                return null;
-            var runtime = Occultist0099NativeScope.RuntimeOf(unit,
-                Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099));
-            return Occultist0099NativeScope.OwnerOf(runtime) == unit ? runtime : null;
-        }
-
         public override int CalculateCost(AbilityData ability) => Amount;
 
         public override bool IsAbilityRestrictionPassed(AbilityData ability)
         {
-            if (ability?.SourceItem != null) return false;
-            return Occultist0099NativeScope.InRuntimeContext(Runtime(ability),
+            return Occultist0099NativeScope.InRuntimeContext(Occultist0099NativeScope.FocusRuntime(ability),
                 component =>
                 {
                     var fact = (Occultist0099FocusFact0099)component;
@@ -179,8 +177,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal bool TryPay(AbilityData ability, string identity)
         {
-            if (ability?.SourceItem != null) return false;
-            return Occultist0099NativeScope.InRuntimeContext(Runtime(ability), component =>
+            return Occultist0099NativeScope.InRuntimeContext(Occultist0099NativeScope.FocusRuntime(ability), component =>
             {
                 var fact = (Occultist0099FocusFact0099)component;
                 var unit = ability.Caster.Unit;
@@ -209,13 +206,16 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal static RuleCastSpell BindCommand(RuleCastSpell rule, UnitUseAbility command)
         {
-            if (IsFocusCast(rule.Spell))
+            if (IsFocusCast(rule.Spell) || FocusOperation(rule.Spell) != null)
                 Identities.GetValue(rule, _ => IdentityOf(command));
             return rule;
         }
 
         private static bool IsFocusCast(AbilityData spell)
             => spell?.StickyTouch == null && spell?.ResourceLogic is Occultist0099FocusResourceLogic;
+
+        private static Occultist0099FocusOperation FocusOperation(AbilityData spell)
+            => spell?.Blueprint.GetComponent<Occultist0099FocusOperation>();
 
         private static bool Reject(RuleCastSpell rule)
         {
@@ -225,15 +225,24 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private static bool Prefix(RuleCastSpell __instance)
-            => paymentHookInstalled || !IsFocusCast(__instance.Spell) || Reject(__instance);
+            => paymentHookInstalled || (!IsFocusCast(__instance.Spell) && FocusOperation(__instance.Spell) == null) || Reject(__instance);
 
         private static bool Commit(RuleCastSpell rule)
         {
             var spell = rule.Spell;
-            if (!IsFocusCast(spell)) return true;
+            var operation = FocusOperation(spell);
+            if (operation == null && !IsFocusCast(spell)) return true;
+            bool duplicate = rule.IsDuplicateSpellApplied || rule.Context?.IsDuplicateSpellApplied == true;
+            if (operation != null)
+            {
+                if (duplicate || rule.Context == null) return Reject(rule);
+                string identity = IdentityOf(rule);
+                if (!operation.CanExecute(spell, identity)) return Reject(rule);
+                Identities.GetValue(rule.Context, _ => identity);
+                return true;
+            }
             var logic = (Occultist0099FocusResourceLogic)spell.ResourceLogic;
-            return (!rule.IsDuplicateSpellApplied && rule.Context?.IsDuplicateSpellApplied != true &&
-                    logic.TryPay(spell, IdentityOf(rule))) || Reject(rule);
+            return (!duplicate && logic.TryPay(spell, IdentityOf(rule))) || Reject(rule);
         }
 
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions,

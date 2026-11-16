@@ -35,6 +35,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public static readonly string ReplenishAbilityGuid = Id("ReplenishFocusAbility");
         public static readonly string WardingTalismanBuffGuid = Id("WardingTalismanBuff");
         public static readonly string MindBarrierAbilityGuid = Id("MindBarrierAbility");
+        public static readonly string MindBarrierBuffGuid = Id("MindBarrierBuff");
         public static readonly string ImplementSelectionGuid = Id("ImplementSelection");
         public static readonly string ProgressionGuid = Id("OccultistProgression");
 
@@ -51,6 +52,9 @@ namespace CallOfTheWild.Wrath.Prototype
         public const string LearnGateTypeId = "0099c0e1a1b24c0d8e5f600000000004";
         public const string SpellbookFactTypeId = "0099c0e1a1b24c0d8e5f600000000005";
         public const string FocusPartTypeId = "0099c0e1a1b24c0d8e5f600000000006";
+        public const string FocusPropertyTypeId = "0099c0e1a1b24c0d8e5f600000000007";
+        public const string FocusOperationTypeId = "0099c0e1a1b24c0d8e5f600000000008";
+        public const string ImplementSchoolTypeId = "0099c0e1a1b24c0d8e5f600000000009";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.
@@ -64,8 +68,9 @@ namespace CallOfTheWild.Wrath.Prototype
             "OccultistClass", "OccultistSpellbook", "OccultistSpellList",
             "MentalFocusFact", "MentalFocusResource", "LockFocusAbility",
             "ResetFocusAbility", "InvestFocusAbility", "ReplenishFocusAbility",
-            "WardingTalismanBuff", "MindBarrierAbility", "ImplementSelection",
-            "OccultistProgression", "OccultistSpellbookFact"
+            "WardingTalismanBuff", "MindBarrierAbility", "MindBarrierBuff", "ImplementSelection",
+            "OccultistProgression", "OccultistSpellbookFact", "MindBarrierAbsorption",
+            "WardingTalismanResistance", "AbjurationImplementFocus"
         };
     }
 

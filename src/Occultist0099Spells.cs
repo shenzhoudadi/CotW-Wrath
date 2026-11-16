@@ -655,16 +655,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // The only identities this gate may write. Everything else in the
         // cache is foreign data and must remain byte-identical.
-        public static readonly string[] PrivateGuids =
-        {
-            Occultist0099Ids.ClassGuid, Occultist0099Ids.BookGuid,
-            Occultist0099Ids.SpellListGuid, Occultist0099Ids.FocusFactGuid,
-            Occultist0099Ids.FocusResourceGuid, Occultist0099Ids.LockFocusAbilityGuid,
-            Occultist0099Ids.ResetFocusAbilityGuid, Occultist0099Ids.InvestAbilityGuid,
-            Occultist0099Ids.ReplenishAbilityGuid, Occultist0099Ids.WardingTalismanBuffGuid,
-            Occultist0099Ids.MindBarrierAbilityGuid, Occultist0099Ids.ImplementSelectionGuid,
-            Occultist0099Ids.ProgressionGuid
-        };
+        public static readonly string[] PrivateGuids = Occultist0099Ids.SliceTokens.Select(Occultist0099Ids.Id).ToArray();
 
         public bool Published => ClassEntries == 1 && SpellbookEntries == 1 &&
                                  ChoiceEntries > 0 && !PreviewLedgerPresent;
