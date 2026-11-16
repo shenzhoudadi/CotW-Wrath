@@ -45,7 +45,7 @@ using Kingmaker.View;
 //
 // Scope: production blueprint registration, emotion and resource graphs,
 // and native companion methods with pre-created managed entity fixtures.
-// Unity spawning, actual level-up application, placement, save/load, rest UI
+// Unity spawning, the full AddClassLevels controller, placement, save/load, rest UI
 // and the respec screen remain outside this host.
 internal static class Spiritualist0085Tests
 {
@@ -260,6 +260,12 @@ internal static class Spiritualist0085Tests
         return false;
     }
 
+    private static void EnsureFixtureFactId(EntityFact __instance)
+    {
+        if (string.IsNullOrEmpty(__instance.UniqueId))
+            Set(__instance, "UniqueId", Guid.NewGuid().ToString("N"));
+    }
+
     private static void CheckNativePetBinding(BlueprintCharacterClass spiritualist, BlueprintCharacterClass unrelated, BlueprintFeature anger,
         BlueprintFeature dogFeature, BlueprintFaction neutral)
     {
@@ -282,6 +288,7 @@ internal static class Spiritualist0085Tests
             Set(unit, "Buffs", facts.EnsureFactProcessor<BuffCollection>());
             var progression = new UnitProgressionData();
             Set(unit.Descriptor, "Progression", progression);
+            Set(progression, "Owner", unit.Descriptor);
             var classes = new List<ClassData>();
             Set(progression, "Classes", classes);
             Set(progression, "Features", facts.EnsureFactProcessor<FeatureCollection>());
@@ -335,16 +342,25 @@ internal static class Spiritualist0085Tests
         var state = FormatterServices.GetUninitializedObject(stateField.FieldType);
         var player = (Player)FormatterServices.GetUninitializedObject(typeof(Player));
         Set(player, "PartyCharacters", new List<UnitReference>());
+        Set(player, "m_Party", new List<UnitEntityData>());
+        Set(player, "m_CharacterListsValid", true);
         Set(state, "PlayerState", player);
         stateField.SetValue(game, state);
+        Set(game, "TimeController", new Kingmaker.Controllers.TimeController());
         gameField.SetValue(null, game);
+        var progressionRoot = game.BlueprintRoot.Progression;
+        var oldXP = Get(progressionRoot, "m_XPTable");
+        var nativeXP = ResourcesLibrary.TryGetBlueprint<BlueprintStatProgression>(BlueprintGuid.Parse("87c24ce6bcf1a994296f3c582c1a632b"));
         try
         {
+            Set(progressionRoot, "m_XPTable", BlueprintReferenceBase.CreateTyped<BlueprintStatProgressionReference>(nativeXP));
             var omitScene = new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(SkipRecoveryFixtureView));
             native.Patch(AccessTools.Method(typeof(UnitEntityData), "UpdateGroup"), prefix: omitScene);
             native.Patch(AccessTools.Method(typeof(UnitPartPetMaster), "UpdateMountAbility"), prefix: omitScene);
             native.Patch(AccessTools.Method(typeof(UnitEntityData), nameof(UnitEntityData.SetMaster)),
                 transpiler: new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(BoundFixtureScale)));
+            native.Patch(AccessTools.Method(typeof(EntityFact), nameof(EntityFact.Attach)),
+                prefix: new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(EnsureFixtureFactId)));
             native.CreateClassProcessor(T("Phantom0085Patches+ExistingPetReference")).Patch();
             native.CreateClassProcessor(T("Phantom0085Patches+PetLevelOverride")).Patch();
             native.Patch(AccessTools.Method(typeof(AddClassLevels), nameof(AddClassLevels.LevelUp),
@@ -366,6 +382,18 @@ internal static class Spiritualist0085Tests
             var petClass = new ClassData(phantomLevels.CharacterClass) { Level = 1 };
             petA.Progression.Classes.Add(petClass);
             Set(petA.Progression, "m_CharacterLevel", 1);
+            Set(petA.Descriptor, "Stats", new CharacterStats(petA.Descriptor));
+            Set(petB.Descriptor, "Stats", new CharacterStats(petB.Descriptor));
+            var skillBlueprint = phantomLevels.Archetypes.Single().AddFeatures.Single(entry => entry.Level == 1)
+                .Features.OfType<BlueprintFeature>().Single(feature => Component(feature, "Phantom0085SkillRanks") != null);
+            var skillFact = new Feature(skillBlueprint, petA.Descriptor);
+            skillFact.RestoreOwnerLink(petA.Facts);
+            petA.Facts.List.Add(skillFact);
+            petA.Facts.TurnOn();
+            skillFact.Activate();
+            petA.Stats.SkillAthletics.BaseValue = 1;
+            Check(skillFact.IsTurnedOn && petA.Stats.SkillPersuasion.BaseValue == 1 && petA.Stats.SkillLoreNature.BaseValue == 1,
+                "C03: Anger starts with one rank in each emotion skill through native fact activation");
             FixtureLevelRequests.Clear();
             Update(sourceA);
             Check(a.Pets.Count == 2 && b.Pets.Count == 1 && petA.Master == a && petB.Master == b && dog.Master == a &&
@@ -377,8 +405,15 @@ internal static class Spiritualist0085Tests
             Check(FixtureLevelRequests.SequenceEqual(new[] { (phantomLevels, petA, 1) }) &&
                 sourceA.Runtime.Fact.IsTurnedOn && Bound(a, partA) == petA,
                 "C03: native reapplication asks for one Phantom level on the same entity when its owner reaches Spiritualist 2");
-            petClass.Level = 2;
-            Set(petA.Progression, "m_CharacterLevel", 2);
+            petB.Descriptor.OnGainClassLevel(phantomLevels.CharacterClass);
+            Check(petA.Stats.SkillPersuasion.BaseValue == 1 && petA.Stats.SkillLoreNature.BaseValue == 1,
+                "C03/C17: another phantom's native gain-level event cannot update Anger's skills");
+            petA.Progression.AddClassLevel(phantomLevels.CharacterClass);
+            petA.Descriptor.OnGainClassLevel(phantomLevels.CharacterClass);
+            Check(petA.Progression.GetClassLevel(phantomLevels.CharacterClass) == 2 &&
+                petA.Stats.SkillPersuasion.BaseValue == 2 && petA.Stats.SkillLoreNature.BaseValue == 2 &&
+                petA.Stats.SkillAthletics.BaseValue == 1,
+                "C03: native AddClassLevel advances to level 2, updates only Anger's emotion skills, and gain-level replay does not add ranks");
             FixtureLevelRequests.Clear();
             a.Progression.Classes.Add(new ClassData(unrelated) { Level = 4 });
             sourceA.Runtime.Fact.Reapply();
@@ -403,10 +438,12 @@ internal static class Spiritualist0085Tests
         }
         finally
         {
+            petA.Facts.TurnOff();
             FixtureLevelRequests.Clear();
             foreach (var grant in new[] { sourceA, dogSource, sourceB })
                 if (grant.Runtime.Fact.IsTurnedOn) grant.Runtime.Fact.TurnOff();
             native.UnpatchAll(native.Id);
+            Set(progressionRoot, "m_XPTable", oldXP);
             gameField.SetValue(null, previousGame);
         }
     }
@@ -429,6 +466,10 @@ internal static class Spiritualist0085Tests
     internal static int Run(BlueprintsCache cache, Harmony harmony)
     {
         const string prefix = "CotWWrathSpiritualist0085";
+        const string druidId = "610d836f3a3a9ed42a4349b62f002e96";
+        var druid = Load<BlueprintCharacterClass>(cache, BlueprintGuid.Parse(druidId));
+        var druidRow = PsychicExpansionTests.NativeRows.Single(row => (string)row["blueprint"]["AssetId"] == druidId);
+        druid.SkillPoints = (int)druidRow["blueprint"]["Data"]["SkillPoints"];
         var vampiricId = BlueprintGuid.Parse("8a28a811ca5d20d49a863e832c31cce1");
         var freedomId = BlueprintGuid.Parse("0087fc2d64b6095478bc7b8d7d512caf");
         foreach (var id in new[] { vampiricId, freedomId })
@@ -617,6 +658,11 @@ internal static class Spiritualist0085Tests
             var skill = archetype.AddFeatures.Single(e => e.Level == 1).Features.OfType<BlueprintFeature>()
                 .Single(f => Component(f, "Phantom0085SkillRanks") != null);
             Check(skill.GetComponent<ContextRankConfig>() == null, n + " skill ranks have no redundant native rank formula");
+            var emotionSkills = (StatType[])Get(row, "Skills");
+            Check(levels.Skills.SequenceEqual(new[] { StatType.SkillAthletics, StatType.SkillMobility, StatType.SkillStealth,
+                    StatType.SkillPersuasion, StatType.SkillKnowledgeArcana }.Except(emotionSkills)) &&
+                Component(skill, "Phantom0085SkillRanks") is IOwnerGainLevelHandler,
+                n + " keeps its two automatic emotion skills out of the native discretionary allocation");
             var slaLevels = new[] { 5, 7, 9, 16 };
             for (int i = 0; i < 4; i++)
             {
@@ -702,6 +748,8 @@ internal static class Spiritualist0085Tests
 
         // ---- Phantom class and shared progression ----
         var phantomClass = Load<BlueprintCharacterClass>(cache, Id("PhantomClass"));
+        Check(phantomClass.SkillPoints == druid.SkillPoints - 1 && phantomClass.SkillPoints == 2,
+            "C03: Phantom takes the source skill pool from native Druid minus one");
         var angersGrant = Load<BlueprintProgression>(cache, Id("AngerEmotion")).GetComponent<AddPet>();
         var dogGrant = Load<BlueprintFeature>(cache, BlueprintGuid.Parse("f894e003d31461f48a02f5caec4e3359")).GetComponent<AddPet>();
         var progressionDonor = new BlueprintPet
@@ -1043,7 +1091,7 @@ internal static class Spiritualist0085Tests
         Check(ReferenceEquals(cache.Load(inqBook.AssetGuid), inqBook), "Inquisitor spellbook identity preserved");
 
         // ---- Boundaries not entered by this offline host ----
-        Console.WriteLine("0085 NOT RUN: Unity AddPet spawning, level-up application beyond the AddClassLevels call boundary, live scene placement and navigation, rest UI, save/load, respec screen and mount button.");
+        Console.WriteLine("0085 NOT RUN: Unity AddPet spawning, the full AddClassLevels controller, live scene placement and navigation, rest UI, save/load, respec screen and mount button.");
         Console.WriteLine("0085 RESULT: " + assertions + " assertions passed, " + Failures.Count + " failed.");
         if (Failures.Count > 0)
             throw new Exception("0085 directed failures: " + string.Join(" | ", Failures));

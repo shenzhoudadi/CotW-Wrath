@@ -47,7 +47,8 @@ for guid in ('02b187038a8dce545bb34bbfb346428d', '0c80276018694f24fbaf59ec7b841f
              'c133d22305bab964c88a767cc69b1f9b', '83d3e15962e5d6949b90b5c226a2b487'):
     wanted.setdefault(guid, None)
 for guid in ('dc0c7c1aba755c54f96c089cdf7d14a3', 'a2b05555c704458aaadc34be52a63633',
-             'cea2f6ead41c449191e1acc4ca488bd0'):
+             'cea2f6ead41c449191e1acc4ca488bd0', '610d836f3a3a9ed42a4349b62f002e96',
+             '87c24ce6bcf1a994296f3c582c1a632b'):
     wanted.setdefault(guid, None)
 
 def parse(raw):

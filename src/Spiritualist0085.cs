@@ -53,6 +53,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal const string InquisitorClassId = "f1a70d9e1b0b41e49874e1fa9052a1ce";
         internal const string InquisitorBookId = "57fab75111f377248810ece84193a5a5";
         internal const string FighterClassId = "48ac8db94d5de7645906c7d0ad3bcfbd";
+        internal const string DruidClassId = "610d836f3a3a9ed42a4349b62f002e96";
         internal const string AnimalClassId = "4cd1757a0eea7694ba5c933729a53920";
         internal const string SavesHighId = "ff4662bde9e75f145853417313842751";
         internal const string SavesLowId = "dc0c7c1aba755c54f96c089cdf7d14a3";
@@ -560,6 +561,7 @@ namespace CallOfTheWild.Wrath.Prototype
             yield return Spiritualist0085Ids.InquisitorClassId;
             yield return Spiritualist0085Ids.InquisitorBookId;
             yield return Spiritualist0085Ids.FighterClassId;
+            yield return Spiritualist0085Ids.DruidClassId;
             yield return Spiritualist0085Ids.AnimalClassId;
             yield return Spiritualist0085Ids.SavesHighId;
             yield return Spiritualist0085Ids.SavesLowId;
@@ -633,6 +635,7 @@ namespace CallOfTheWild.Wrath.Prototype
             BlueprintCharacterClass inquisitor, BlueprintSpellbook inquisitorBook, List<string> unavailable)
         {
             var fighter = f.Native<BlueprintCharacterClass>(Spiritualist0085Ids.FighterClassId);
+            var druid = f.Native<BlueprintCharacterClass>(Spiritualist0085Ids.DruidClassId);
             var animal = f.Native<BlueprintCharacterClass>(Spiritualist0085Ids.AnimalClassId);
             var savesLow = f.Native<BlueprintStatProgression>(Spiritualist0085Ids.SavesLowId);
 
@@ -693,7 +696,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(character, "m_Spellbook", Ref<BlueprintSpellbookReference>(book));
 
             // ---- Phantom class and shared progression ----
-            var phantomClass = Phantom0085.BuildPhantomClass(f, fighter, animal, savesLow);
+            var phantomClass = Phantom0085.BuildPhantomClass(f, fighter, animal, druid, savesLow);
             var phantomProgression = Phantom0085.BuildPhantomProgression(f, phantomClass);
             Set(phantomClass, "m_Progression", Ref<BlueprintProgressionReference>(phantomProgression));
 
@@ -834,7 +837,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var bothArray = new[] { phantomClass, character };
             var unit = Phantom0085.BuildUnit(f, cache, phantomClass, row);
             var archetype = Phantom0085.BuildArchetype(f, phantomClass, row);
-            Phantom0085.AttachArchetype(f, unit, archetype);
+            Phantom0085.AttachArchetype(unit, archetype, row.Skills);
 
             // Master-side SLA features at 5/7/9/16 with per-emotion resources.
             var slaFeatures = new BlueprintFeature[4];

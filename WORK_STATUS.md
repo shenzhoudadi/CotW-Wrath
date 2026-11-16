@@ -5,7 +5,7 @@
 ## 🚧 施工中／已认领，请勿重复开发
 
 - **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D10 实走原生绑定与清退，修复首绑授权时机。定向 365/365（17.023 秒），本地 TEST 包三个 DLL 回读一致。Unity 生成、实际等级提交及玩家场景待验，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[最新 B/D 记录](docs/work-packages/COTW-0085/D10-B10-spiritualist.md)。
+- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D11 去掉重复情绪技能加点，复用原生升级事件，并实际推进 Anger 至 2 级。定向 375/375（14.513 秒），本地 TEST 包三个 DLL 回读一致。Unity 生成、完整升级控制器与玩家场景待验，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[最新 B/D 记录](docs/work-packages/COTW-0085/D11-B11-spiritualist.md)。
 
 ## 本次0.14.69 TEST交付
 

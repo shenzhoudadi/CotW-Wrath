@@ -411,18 +411,18 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // ---- Emotion skill ranks equal to phantom class level ----
     [TypeId("b7e10085a10045008500850085008505")]
-    public sealed class Phantom0085SkillRanks : UnitFactComponentDelegate
+    public sealed class Phantom0085SkillRanks : UnitFactComponentDelegate, IOwnerGainLevelHandler
     {
         public StatType[] Skills;
-        protected override void OnActivate() => Apply();
-        protected override void OnDeactivate() { }
-        internal void Apply()
+        protected override void OnTurnOn() => HandleUnitGainLevel();
+
+        public void HandleUnitGainLevel()
         {
             var unit = Owner;
-            if (unit == null || Skills == null) return;
-            int level = unit.Progression.GetClassLevel(unit.Blueprint.GetComponent<Phantom0085Marker>() != null
-                ? ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(Spiritualist0085Ids.Id("PhantomClass")) : null);
-            if (level <= 0) level = unit.Descriptor.Progression.CharacterLevel;
+            if (!Phantom0085Marker.IsPhantom(unit) || Skills == null) return;
+            var phantomClass = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(Spiritualist0085Ids.Id("PhantomClass"));
+            if (phantomClass == null) return;
+            int level = unit.Progression.GetClassLevel(phantomClass);
             foreach (var skill in Skills)
             {
                 var value = unit.Stats.GetStat<ModifiableValueSkill>(skill);
@@ -1440,24 +1440,6 @@ namespace CallOfTheWild.Wrath.Prototype
                 var caster = context.MaybeCaster;
                 if (Phantom0085Marker.IsPhantom(caster) && ActiveFeature(caster, "KindnessPhantomBase") != null)
                     __result -= 2;
-            }
-        }
-
-        // Emotion skill ranks follow the phantom class level. The native
-        // AddClassLevels.LevelUp is the only upgrade point the contract allows
-        // us to touch; the postfix is narrowed to marked 0085 units.
-        [HarmonyPatch(typeof(AddClassLevels), "LevelUp", new[] { typeof(AddClassLevels), typeof(UnitDescriptor), typeof(int), typeof(UnitFact) })]
-        internal static class SkillRankLevelSync
-        {
-            [HarmonyPostfix]
-            private static void Postfix(UnitDescriptor __1)
-            {
-                var unit = __1?.Unit;
-                if (unit == null || !Phantom0085Marker.IsPhantom(unit)) return;
-                foreach (var fact in unit.Facts.List)
-                    foreach (var component in fact.Components)
-                        if (component.SourceBlueprintComponent is Phantom0085SkillRanks ranks)
-                            ranks.Apply();
             }
         }
 

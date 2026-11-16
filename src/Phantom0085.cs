@@ -59,11 +59,11 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // ---- Phantom class (data from Fighter/Animal donors, hidden) ----
         internal static BlueprintCharacterClass BuildPhantomClass(FactoryShim f, BlueprintCharacterClass fighter,
-            BlueprintCharacterClass animal, BlueprintStatProgression savesLow)
+            BlueprintCharacterClass animal, BlueprintCharacterClass druid, BlueprintStatProgression savesLow)
         {
             var cls = f.Add(new BlueprintCharacterClass
             {
-                SkillPoints = 3,
+                SkillPoints = druid.SkillPoints - 1,
                 IsArcaneCaster = false, IsDivineCaster = false, PrestigeClass = false,
                 HideInUI = true,
                 ClassSkills = new[] { StatType.SkillPersuasion, StatType.SkillPerception, StatType.SkillLoreReligion, StatType.SkillStealth },
@@ -314,13 +314,14 @@ namespace CallOfTheWild.Wrath.Prototype
             }
         }
 
-        internal static void AttachArchetype(FactoryShim f, BlueprintUnit unit, BlueprintArchetype archetype)
+        internal static void AttachArchetype(BlueprintUnit unit, BlueprintArchetype archetype, StatType[] emotionSkills)
         {
             var add = new AddClassLevels
             {
                 name = "Phantom0085AddClassLevels",
                 DoNotApplyAutomatically = true, Levels = 0,
-                Skills = new[] { StatType.SkillAthletics, StatType.SkillMobility, StatType.SkillStealth, StatType.SkillPersuasion, StatType.SkillKnowledgeArcana },
+                Skills = new[] { StatType.SkillAthletics, StatType.SkillMobility, StatType.SkillStealth,
+                    StatType.SkillPersuasion, StatType.SkillKnowledgeArcana }.Except(emotionSkills).ToArray(),
                 Selections = Array.Empty<SelectionEntry>()
             };
             Set(add, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(archetype.GetParentClass()));
