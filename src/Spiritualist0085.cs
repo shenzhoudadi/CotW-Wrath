@@ -391,21 +391,6 @@ namespace CallOfTheWild.Wrath.Prototype
             return r;
         }
 
-        private static AddAbilityResources Grant(BlueprintAbilityResource resource)
-        {
-            var c = new AddAbilityResources { RestoreAmount = true, RestoreOnLevelUp = true };
-            Set(c, "m_Resource", Ref<BlueprintAbilityResourceReference>(resource));
-            return c;
-        }
-
-        private static AbilityResourceLogic Cost(BlueprintAbilityResource resource, int amount = 1)
-        {
-            var c = new AbilityResourceLogic { Amount = amount };
-            Set(c, "m_IsSpendResource", true);
-            Set(c, "m_RequiredResource", Ref<BlueprintAbilityResourceReference>(resource));
-            return c;
-        }
-
         private static AddFacts Facts(params BlueprintUnitFact[] facts)
         {
             var result = new AddFacts { name = "Spiritualist0085GrantedFacts" };
@@ -858,13 +843,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 var root = ResolveSla(cache, row.SlaGuids[i], row.SlaProviders[i], unavailable, row.Name);
                 int start = i == 3 ? 16 : 5 + i * 2;
                 var resource = Resource(f, row.Name + "Sla" + i + "Resource", character, 0, start, 4);
-                BlueprintAbility sla = null;
-                if (root != null)
-                    sla = Phantom0085.ConvertToSpellLike(f, cache, root, row.Name + "Sla" + i, character, character, StatType.Wisdom, resource);
-                var feature = f.Feature(row.Name + "Sla" + i + "Feature", "Emotional Power: " + (root != null ? Phantom0085.NameOf(root) : row.Name),
+                var sla = Phantom0085.ConvertToSpellLike(f, root, row.Name + "Sla" + i, character, StatType.Wisdom, resource);
+                var feature = f.Feature(row.Name + "Sla" + i + "Feature", "Emotional Power: " + Phantom0085.NameOf(root),
                     "A spiritualist gains spell-like abilities tied to her phantom's emotional focus: one at 5th level, a second at 7th, a third at 9th and a fourth at 16th. Each can be used once per day, plus one additional time per day for every 4 spiritualist levels beyond the level at which it was gained. The save DC equals 10 + 1/2 spiritualist class level + Wisdom modifier.",
-                    sla != null ? Facts(sla) : new AddFacts { name = "Spiritualist0085EmptySla" },
-                    Grant(resource));
+                    Facts(sla), Phantom0085.Grant(resource));
                 slaFeatures[i] = feature;
             }
 

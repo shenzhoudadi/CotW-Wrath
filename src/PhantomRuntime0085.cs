@@ -1144,6 +1144,45 @@ namespace CallOfTheWild.Wrath.Prototype
     // ---- Native damage, action, mount and rest integration ----
     internal static class Phantom0085Patches
     {
+        [HarmonyPatch(typeof(UnitPartTouch), nameof(UnitPartTouch.HandleObjectLeaveCombat))]
+        internal static class HeldTouchCleanup
+        {
+            private static readonly HashSet<BlueprintGuid> EmotionalPowers = new HashSet<BlueprintGuid>(
+                Spiritualist0085Ids.Emotions.SelectMany(row => Enumerable.Range(0, row.SlaGuids.Length)
+                    .Select(slot => Spiritualist0085Ids.Id(row.Name + "Sla" + slot))));
+
+            internal static bool IsEmotionalPower(BlueprintAbility ability)
+                => ability != null && ability.Type == AbilityType.SpellLike &&
+                    EmotionalPowers.Contains((ability.Parent ?? ability).AssetGuid);
+
+            [HarmonyTranspiler]
+            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source)
+            {
+                var instructions = source.ToList();
+                var restore = AccessTools.Method(typeof(Spellbook), nameof(Spellbook.RestoreSpontaneousSlots), new[] { typeof(int), typeof(int) });
+                var calls = instructions.Where(i => i.Calls(restore)).ToArray();
+                if (calls.Length != 1)
+                {
+                    ModEntry.LogSpellDiagnostic("0085 held touch cleanup: native spontaneous slot recovery was not found.");
+                    return instructions;
+                }
+                var call = calls[0];
+                var argument = new CodeInstruction(OpCodes.Ldarg_0);
+                argument.labels.AddRange(call.labels);
+                call.labels.Clear();
+                call.opcode = OpCodes.Call;
+                call.operand = AccessTools.Method(typeof(HeldTouchCleanup), nameof(RestoreSlot));
+                instructions.Insert(instructions.IndexOf(call), argument);
+                return instructions;
+            }
+
+            private static void RestoreSlot(Spellbook book, int level, int amount, UnitPartTouch touch)
+            {
+                if (!IsEmotionalPower(touch.Ability?.StickyTouch?.Blueprint))
+                    book.RestoreSpontaneousSlots(level, amount);
+            }
+        }
+
         internal static bool IsPrivatePetGrant(AddPet grant)
             => grant.Type == Spiritualist0085Ids.PhantomPetType && grant.Pet?.GetComponent<Phantom0085Marker>() != null;
 

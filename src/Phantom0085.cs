@@ -543,7 +543,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var ferociousMien = f.Feature("AngerFerociousMien", "Ferocious Mien", NameOf(mienAbility), Facts(mienAbility), Grant(mienResource));
 
             var wailResource = FixedResource(f, "AngerFuriousWailResource", 1);
-            var wail = ConvertToSpellLike(f, f.Cache, f.Native<BlueprintAbility>(WailOfBansheeId), "AngerFuriousWail", phantomClass, phantomClass, StatType.Charisma, wailResource, supernatural: true);
+            var wail = ConvertToSpellLike(f, f.Native<BlueprintAbility>(WailOfBansheeId), "AngerFuriousWail", phantomClass, StatType.Charisma, wailResource, supernatural: true);
             var furiousWail = f.Feature("AngerFuriousWailFeature", "Furious Wail",
                 "Once per day, the phantom can emit a furious wail, as wail of the banshee, using its Hit Dice as caster level and Charisma for the save DC.",
                 Facts(wail), Grant(wailResource));
@@ -566,9 +566,9 @@ namespace CallOfTheWild.Wrath.Prototype
             return r;
         }
 
-        private static AddAbilityResources Grant(BlueprintAbilityResource resource)
+        internal static AddAbilityResources Grant(BlueprintAbilityResource resource)
         {
-            var c = new AddAbilityResources { RestoreAmount = true, RestoreOnLevelUp = true };
+            var c = new AddAbilityResources { RestoreAmount = true };
             Set(c, "m_Resource", Ref<BlueprintAbilityResourceReference>(resource));
             return c;
         }
@@ -583,26 +583,33 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // Convert a native spell root into a private spell-like/supernatural
         // ability with its own resource, class-based caster level and DC stat.
-        internal static BlueprintAbility ConvertToSpellLike(FactoryShim f, BlueprintsCache cache, BlueprintAbility root,
-            string token, BlueprintCharacterClass casterClass, BlueprintCharacterClass dcClass, StatType dcStat,
-            BlueprintAbilityResource resource, bool supernatural = false, bool noScaling = false)
+        internal static BlueprintAbility ConvertToSpellLike(FactoryShim f, BlueprintAbility root,
+            string token, BlueprintCharacterClass casterClass, StatType dcStat,
+            BlueprintAbilityResource resource, bool supernatural = false)
         {
             if (root == null) throw new InvalidOperationException("Missing spell-like ability variant for " + token);
             var ability = CopyBlueprint(root);
             ability.AssetGuid = Id(token);
             ability.name = Spiritualist0085Ids.AssetPrefix + token;
             ability.Type = supernatural ? AbilityType.Supernatural : AbilityType.SpellLike;
+            ability.MaterialComponent = new BlueprintAbility.MaterialComponentData();
+            if (supernatural)
+            {
+                ability.SpellResistance = false;
+                ability.AvailableMetamagic = 0;
+            }
             Set(ability, "m_DisplayName", Text(token, "name", NameOf(root)));
             Set(ability, "m_Description", Text(token, "description", DescOf(root)));
             ability.Parent = null;
             var components = new List<BlueprintComponent>();
             foreach (var c in ability.ComponentsArray ?? Array.Empty<BlueprintComponent>())
             {
-                if (c is SpellComponent || c is SpellListComponent || c is AbilityResourceLogic) continue;
+                if (c is SpellListComponent || c is AbilityResourceLogic || c is ContextAbilityParamsCalculator ||
+                    (supernatural && c is SpellComponent)) continue;
                 if (c is AbilityVariants variants)
                 {
                     var children = variants.Variants.Select((variant, i) =>
-                        ConvertToSpellLike(f, cache, variant, token + "Option" + i, casterClass, dcClass, dcStat, resource, supernatural, noScaling)).ToArray();
+                        ConvertToSpellLike(f, variant, token + "Option" + i, casterClass, dcStat, resource, supernatural)).ToArray();
                     var menu = new AbilityVariants { name = variants.name };
                     Set(menu, "m_Variants", children.Select(Ref<BlueprintAbilityReference>).ToArray());
                     foreach (var child in children) child.Parent = ability;
@@ -616,18 +623,9 @@ namespace CallOfTheWild.Wrath.Prototype
                     components.Add(clone);
                     continue;
                 }
-                if (c is ContextCalculateAbilityParamsBasedOnClass paramsByClass)
-                {
-                    var clone = (ContextCalculateAbilityParamsBasedOnClass)CopyData(paramsByClass);
-                    Set(clone, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(dcClass));
-                    Set(clone, "StatType", dcStat);
-                    components.Add(clone);
-                    continue;
-                }
                 components.Add(c);
             }
-            if (!components.Any(c => c is ContextCalculateAbilityParamsBasedOnClass))
-                components.Add(Params(dcClass, dcStat, "Phantom0085SlaParams" + token));
+            components.Add(Params(casterClass, dcStat, "Phantom0085SlaParams" + token));
             if (!components.Any(c => c is AbilityVariants)) components.Add(Cost(resource));
             ability.ComponentsArray = components.ToArray();
             f.Register(ability, token);
@@ -671,7 +669,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 despairAura, UnitCommand.CommandType.Swift);
 
             var shoutResource = FixedResource(f, "DespairDespairingShoutResource", 3);
-            var shout = ConvertToSpellLike(f, f.Cache, f.Native<BlueprintAbility>(CrushingDespairSpellId), "DespairDespairingShout", phantomClass, phantomClass, StatType.Charisma, shoutResource, supernatural: true);
+            var shout = ConvertToSpellLike(f, f.Native<BlueprintAbility>(CrushingDespairSpellId), "DespairDespairingShout", phantomClass, StatType.Charisma, shoutResource, supernatural: true);
             var despairingShout = f.Feature("DespairDespairingShoutFeature", "Despairing Shout",
                 "Three times per day as a standard action, the phantom can emit a shout that acts as crushing despair. The phantom uses its Hit Dice as its caster level, and the DC equals 10 + 1/2 the phantom's Hit Dice + the phantom's Charisma modifier.",
                 Facts(shout), Grant(shoutResource));
@@ -867,7 +865,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 determinationAura, UnitCommand.CommandType.Swift);
 
             var hasteResource = FixedResource(f, "ZealHasteResource", 3);
-            var haste = ConvertToSpellLike(f, f.Cache, f.Native<BlueprintAbility>(HasteSpellId), "ZealHaste", phantomClass, phantomClass, StatType.Charisma, hasteResource, noScaling: true);
+            var haste = ConvertToSpellLike(f, f.Native<BlueprintAbility>(HasteSpellId), "ZealHaste", phantomClass, StatType.Charisma, hasteResource);
             var zealHaste = f.Feature("ZealHasteFeature", "Haste",
                 "Three times per day as a standard action, the phantom can use haste as a spell-like ability, using its Hit Dice as caster level.",
                 Facts(haste), Grant(hasteResource));

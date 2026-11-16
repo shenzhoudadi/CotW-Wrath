@@ -15,6 +15,7 @@ using Kingmaker.Enums;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
+using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
@@ -47,10 +48,17 @@ internal static class Spiritualist0085Tests
     private static Type T(string name) => Main.GetType("CallOfTheWild.Wrath.Prototype." + name, true);
     private static object Get(object o, string f) => AccessTools.Field(o.GetType(), f)?.GetValue(o)
         ?? AccessTools.Field(o.GetType(), "<" + f + ">k__BackingField")?.GetValue(o);
+    private static void Set(object o, string f, object value)
+        => (AccessTools.Field(o.GetType(), f) ?? AccessTools.Field(o.GetType(), "<" + f + ">k__BackingField")).SetValue(o, value);
     private static object Call(string type, string method, params object[] args)
         => AccessTools.Method(T(type), method).Invoke(null, args);
     private static BlueprintGuid Id(string token) => (BlueprintGuid)Call("Spiritualist0085Ids", "Id", token);
     private static object IdsField(string name) => AccessTools.Field(T("Spiritualist0085Ids"), name).GetValue(null);
+    private static bool NoTacticalCombat(ref bool __result)
+    {
+        __result = false;
+        return false;
+    }
 
     private static void Check(bool ok, string message)
     {
@@ -80,6 +88,17 @@ internal static class Spiritualist0085Tests
     internal static int Run(BlueprintsCache cache, Harmony harmony)
     {
         const string prefix = "CotWWrathSpiritualist0085";
+        var vampiricId = BlueprintGuid.Parse("8a28a811ca5d20d49a863e832c31cce1");
+        var freedomId = BlueprintGuid.Parse("0087fc2d64b6095478bc7b8d7d512caf");
+        foreach (var id in new[] { vampiricId, freedomId })
+        {
+            var ability = Load<BlueprintAbility>(cache, id);
+            if (ability.GetComponent<AbilityEffectStickyTouch>() != null) continue;
+            var row = PsychicExpansionTests.NativeRows.Single(r => (string)r["blueprint"]["AssetId"] == id.ToString());
+            ability.ComponentsArray = row["blueprint"]["Data"]["Components"]
+                .Select(c => (BlueprintComponent)PsychicExpansionTests.Read(c, typeof(BlueprintComponent))).ToArray();
+            ability.OnEnable();
+        }
 
         // ---- Stage the audited optional SLA roots (provider/CotW identities
         // from A-spiritualist-assets) so the atomic gate can be exercised offline.
@@ -213,6 +232,13 @@ internal static class Spiritualist0085Tests
         var selection = Load<BlueprintFeatureSelection>(cache, Id("EmotionalFocus"));
         Check(selection != null && ((BlueprintFeatureReference[])Get(selection, "m_AllFeatures")).Length == 6, "emotion selection offers six options");
         var units = new HashSet<BlueprintGuid>();
+        var slaResources = new HashSet<BlueprintAbilityResource>();
+        var slaThresholds = new Dictionary<BlueprintAbilityResource, int>();
+        IEnumerable<BlueprintAbility> Casts(BlueprintAbility ability)
+        {
+            var variants = ability.GetComponent<AbilityVariants>();
+            return variants == null ? new[] { ability } : variants.Variants.SelectMany(Casts);
+        }
         var petType = (PetType)850085;
         Check((int)petType == 850085 && !Enum.GetValues(typeof(PetType)).Cast<PetType>().Contains(petType) && (int)petType != 604767, "PetType 850085 reserved, no native or Making Friends overlap");
         foreach (var row in emotions)
@@ -255,6 +281,23 @@ internal static class Spiritualist0085Tests
             {
                 var entry = prog.LevelEntries.Single(e => e.Level == slaLevels[i]);
                 Check(entry.Features.Count >= 1, n + " SLA entry at level " + slaLevels[i]);
+                var token = n + "Sla" + i;
+                var feature = entry.Features.OfType<BlueprintFeature>().Single(f => f.AssetGuid == Id(token + "Feature"));
+                var grant = feature.GetComponent<AddAbilityResources>();
+                var ability = Load<BlueprintAbility>(cache, Id(token));
+                Check(grant?.Resource != null && grant.RestoreAmount && !grant.RestoreOnLevelUp &&
+                    slaResources.Add(grant.Resource), token + " has an independent daily pool without level-up restoration");
+                slaThresholds.Add(grant.Resource, slaLevels[i]);
+                var leaves = Casts(ability).ToArray();
+                Check(leaves.Length > 0 && leaves.All(leaf =>
+                {
+                    var parameters = leaf.GetComponents<ContextAbilityParamsCalculator>().ToArray();
+                    var cost = leaf.GetComponents<AbilityResourceLogic>().ToArray();
+                    return leaf.Type == AbilityType.SpellLike && leaf.MaterialComponent.Item == null &&
+                        parameters.Length == 1 && parameters[0] is ContextCalculateAbilityParamsBasedOnClass calc &&
+                        calc.CharacterClass == cls && calc.StatType == StatType.Wisdom && cost.Length == 1 &&
+                        cost[0].RequiredResource == grant.Resource && cost[0].Amount == 1;
+                }), token + " executable leaves use only the owner's Spiritualist/Wisdom parameters and one use");
             }
             foreach (var lvl in new[] { 1, 7, 12, 17 })
             {
@@ -262,6 +305,59 @@ internal static class Spiritualist0085Tests
                 Check(entry.Features.OfType<BlueprintFeature>().Any(f => Component(f, "Phantom0085BoundGrant") != null), n + " scoped pet feature grant at level " + lvl);
             }
         }
+
+        var actor = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
+        var descriptor = (UnitDescriptor)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitDescriptor));
+        var progression = new UnitProgressionData();
+        var ownerLevel = new ClassData(cls) { Level = 1 };
+        Set(actor, "Descriptor", descriptor);
+        Set(descriptor, "Unit", actor);
+        Set(actor, "Parts", new Kingmaker.EntitySystem.EntityPartsManager(actor));
+        Set(descriptor, "Progression", progression);
+        Set(progression, "Classes", new List<ClassData> { ownerLevel, new ClassData(inquisitor) { Level = 4 } });
+        var tactical = AccessTools.PropertyGetter(typeof(Kingmaker.Armies.TacticalCombat.TacticalCombatHelper), "IsActive");
+        harmony.Patch(tactical, prefix: new HarmonyMethod(typeof(Spiritualist0085Tests), nameof(NoTacticalCombat)));
+        try
+        {
+            foreach (var pair in slaThresholds)
+                Check(Enumerable.Range(1, 20).All(level =>
+                {
+                    ownerLevel.Level = level;
+                    Set(progression, "m_CharacterLevel", (int?)(level + 4));
+                    return pair.Key.GetMaxAmount(descriptor) == (level < pair.Value ? 0 : 1 + (level - pair.Value) / 4);
+                }), pair.Key.name + " native resource arithmetic ignores four levels in another class");
+        }
+        finally
+        {
+            harmony.Unpatch(tactical, HarmonyPatchType.Prefix, harmony.Id);
+        }
+
+        var vampiricCharge = Load<BlueprintAbility>(cache, Id("FearSla2"));
+        var freedomCharge = Load<BlueprintAbility>(cache, Id("ZealSla3"));
+        var vampiricSpell = Load<BlueprintAbility>(cache, vampiricId);
+        BlueprintGuid Delivery(BlueprintAbility spell) =>
+            ((BlueprintAbilityReference)Get(spell.GetComponent<AbilityEffectStickyTouch>(), "m_TouchDeliveryAbility")).Guid;
+        Check(Delivery(vampiricCharge) == BlueprintGuid.Parse("6cbb040023868574b992677885390f92") &&
+            Delivery(vampiricCharge) == Delivery(vampiricSpell) &&
+            Delivery(freedomCharge) == BlueprintGuid.Parse("4c349361d720e844e846ad8c19959b1e") &&
+            Delivery(freedomCharge) == Delivery(Load<BlueprintAbility>(cache, freedomId)),
+            "held emotional powers keep their native touch delivery identities");
+        const string heldPatch = "Phantom0085Patches+HeldTouchCleanup";
+        Check((bool)Call(heldPatch, "IsEmotionalPower", vampiricCharge) &&
+            (bool)Call(heldPatch, "IsEmotionalPower", freedomCharge) &&
+            !(bool)Call(heldPatch, "IsEmotionalPower", vampiricSpell),
+            "held native spell recovery stays separate from private resource-backed touch casts");
+        var heldMethod = AccessTools.Method(typeof(UnitPartTouch), "HandleObjectLeaveCombat");
+        var heldIl = ((IEnumerable<CodeInstruction>)Call(heldPatch, "Transpiler",
+            PatchProcessor.GetOriginalInstructions(heldMethod))).ToArray();
+        Check(heldIl.Count(i => i.Calls(AccessTools.Method(T(heldPatch), "RestoreSlot"))) == 1 &&
+            heldIl.Any(i => i.operand is MethodInfo method && method.Name == "GetMemorizedSpellSlots"),
+            "held touch cleanup changes only the final spontaneous-slot recovery");
+        Check(new[] { "AngerFuriousWail", "DespairDespairingShout" }.All(token =>
+        {
+            var ability = Load<BlueprintAbility>(cache, Id(token));
+            return ability.Type == AbilityType.Supernatural && !ability.SpellResistance && ability.AvailableMetamagic == 0;
+        }), "the two native supernatural conversions ignore spell resistance and metamagic");
 
         // ---- Phantom class and shared progression ----
         var phantomClass = Load<BlueprintCharacterClass>(cache, Id("PhantomClass"));
