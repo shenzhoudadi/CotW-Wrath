@@ -46,6 +46,9 @@ for guid in ('02b187038a8dce545bb34bbfb346428d', '0c80276018694f24fbaf59ec7b841f
              '918939943bf32ba4a95470ea696c2ba5', 'f894e003d31461f48a02f5caec4e3359', 'e70ecf1ed95ca2f40b754f1adb22bbdd', 'a634f97d23662b347872ffcf580495b3', 'c4a7f98d743bc784c9d4cf2105852c39',
              'c133d22305bab964c88a767cc69b1f9b', '83d3e15962e5d6949b90b5c226a2b487'):
     wanted.setdefault(guid, None)
+for guid in ('dc0c7c1aba755c54f96c089cdf7d14a3', 'a2b05555c704458aaadc34be52a63633',
+             'cea2f6ead41c449191e1acc4ca488bd0'):
+    wanted.setdefault(guid, None)
 
 def parse(raw):
     text = raw.decode('utf-8-sig')

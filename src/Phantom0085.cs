@@ -39,6 +39,7 @@ using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
+using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.Utility;
 using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 using static CallOfTheWild.Wrath.Prototype.Spiritualist0085Ids;
@@ -47,6 +48,8 @@ namespace CallOfTheWild.Wrath.Prototype
 {
     internal static class Phantom0085
     {
+        private static readonly int[] GrowthLevels = { 2, 4, 6, 8, 9, 12, 13, 15 };
+
         private static BlueprintGuid Id(string token) => Spiritualist0085Ids.Id(token);
         private static Kingmaker.Localization.LocalizedString Text(string token, string suffix, string value) =>
             PsychicAssets.Text("Spiritualist0085" + token, suffix, value);
@@ -56,7 +59,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // ---- Phantom class (data from Fighter/Animal donors, hidden) ----
         internal static BlueprintCharacterClass BuildPhantomClass(FactoryShim f, BlueprintCharacterClass fighter,
-            BlueprintCharacterClass animal, BlueprintStatProgression savesHigh)
+            BlueprintCharacterClass animal, BlueprintStatProgression savesLow)
         {
             var cls = f.Add(new BlueprintCharacterClass
             {
@@ -74,9 +77,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 "A phantom was once a sentient creature whose emotional trauma ripped it from the flow of spirits. It found shelter within the consciousness of a spiritualist.");
             Set(cls, "HitDie", DiceType.D10);
             Set(cls, "m_BaseAttackBonus", Get(fighter, "m_BaseAttackBonus"));
-            Set(cls, "m_FortitudeSave", Ref<BlueprintStatProgressionReference>(savesHigh));
-            Set(cls, "m_ReflexSave", Ref<BlueprintStatProgressionReference>(savesHigh));
-            Set(cls, "m_WillSave", Ref<BlueprintStatProgressionReference>(savesHigh));
+            Set(cls, "m_FortitudeSave", Ref<BlueprintStatProgressionReference>(savesLow));
+            Set(cls, "m_ReflexSave", Ref<BlueprintStatProgressionReference>(savesLow));
+            Set(cls, "m_WillSave", Ref<BlueprintStatProgressionReference>(savesLow));
             Set(cls, "m_StartingItems", Get(animal, "m_StartingItems"));
             Set(cls, "m_EquipmentEntities", Get(animal, "m_EquipmentEntities"));
             Set(cls, "m_Archetypes", Array.Empty<BlueprintArchetypeReference>());
@@ -95,7 +98,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var touch = Native<BlueprintFeature>(TouchCalculateId);
             var devotion = Native<BlueprintFeature>(DevotionId);
             var naturalArmor = Native<BlueprintFeature>(NaturalArmorGrowthId);
-            var attrGrowth = Native<BlueprintFeature>(AttributeGrowthId);
+            var attrGrowth = BuildAttributeGrowth(f, "PhantomDexChaGrowth", StatType.Dexterity);
             var multiAttack = Native<BlueprintFeature>("a634f97d23662b347872ffcf580495b3");
 
             // DR 5/slashing at 1; DR magic 5/10/15 at 4/8/12; DR 15/- text at 15
@@ -238,8 +241,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var skillFeature = f.Feature(row.Name + "PhantomSkills", "", "",
                 new AddClassSkill { name = "Phantom0085Skill" + row.Name + "A", Skill = row.Skills[0] },
                 new AddClassSkill { name = "Phantom0085Skill" + row.Name + "B", Skill = row.Skills[1] },
-                new Phantom0085SkillRanks { name = "Phantom0085SkillRanks" + row.Name, Skills = row.Skills },
-                Rank(phantomClass, "OnePlusDivStep"));
+                new Phantom0085SkillRanks { name = "Phantom0085SkillRanks" + row.Name, Skills = row.Skills });
             skillFeature.HideInUI = true;
             skillFeature.HideInCharacterSheetAndLevelUp = true;
 
@@ -255,24 +257,25 @@ namespace CallOfTheWild.Wrath.Prototype
                     "Anger phantom slam damage is 1d8 at levels 1-3, 2d6 at 4-6, 2d8 at 7-9, 3d6 at 10-12 and 3d8 at 13+.",
                     new Phantom0085SlamDice { name = "Phantom0085AngerSlamDice", Large = true },
                     Rank(phantomClass, "Custom", 3, 0, 6, 1, 9, 2, 12, 3, 20, 4));
-                var strCha = BuildStrChaGrowth(f);
+                var strCha = BuildAttributeGrowth(f, "PhantomStrChaGrowth", StatType.Strength);
                 add[0] = Entry(1, skillFeature, baseTrait, largeSlam);
-                foreach (var level in new[] { 2, 4, 6, 8, 9, 12, 13, 15 }) add.Add(Entry(level, strCha));
-                var dexCha = f.Find<BlueprintFeature>("PhantomStrChaGrowth");
+                foreach (var level in GrowthLevels) add.Add(Entry(level, strCha));
+                var dexCha = f.Find<BlueprintFeature>("PhantomDexChaGrowth");
                 remove.Add(Entry(1, f.Find<BlueprintFeature>("PhantomSlamDamage")));
-                foreach (var level in new[] { 2, 4, 6, 8, 9, 12, 13, 15 }) remove.Add(Entry(level, dexCha));
+                foreach (var level in GrowthLevels) remove.Add(Entry(level, dexCha));
             }
             archetype.AddFeatures = add.ToArray();
             archetype.RemoveFeatures = remove.ToArray();
             return archetype;
         }
 
-        private static BlueprintFeature BuildStrChaGrowth(FactoryShim f)
+        private static BlueprintFeature BuildAttributeGrowth(FactoryShim f, string token, StatType primary)
         {
-            if (f.Has("PhantomStrChaGrowth")) return f.Find<BlueprintFeature>("PhantomStrChaGrowth");
-            return f.Feature("PhantomStrChaGrowth", "Phantom Prowess", "Anger phantom receives +1 Strength and +1 Charisma.",
-                new AddStatBonus { name = "Phantom0085StrChaStr", Stat = StatType.Strength, Value = 1 },
-                new AddStatBonus { name = "Phantom0085StrChaCha", Stat = StatType.Charisma, Value = 1 });
+            var growth = f.Feature(token, "Phantom Prowess", "The phantom receives +1 " + primary + " and +1 Charisma.",
+                new AddStatBonus { name = token + "Primary", Stat = primary, Descriptor = ModifierDescriptor.None, Value = 1 },
+                new AddStatBonus { name = token + "Charisma", Stat = StatType.Charisma, Descriptor = ModifierDescriptor.None, Value = 1 });
+            growth.Ranks = GrowthLevels.Length;
+            return growth;
         }
 
         private static BlueprintFeature BuildBaseTrait(FactoryShim f, BlueprintCharacterClass phantomClass, EmotionRow row)
@@ -301,7 +304,11 @@ namespace CallOfTheWild.Wrath.Prototype
                 case "Benevolent":
                     return f.Feature("KindnessPhantomBase", "Benevolent",
                         "When the phantom uses the aid another action, the bonus granted by a successful check increases by 2.",
-                        new Phantom0085Benevolent { name = "Phantom0085Benevolent" });
+                        new Phantom0085Benevolent
+                        {
+                            name = "Phantom0085Benevolent",
+                            Fallback = Ref<BlueprintAbilityReference>(BuildAidAnother(f))
+                        });
                 default:
                     return null;
             }
@@ -465,13 +472,6 @@ namespace CallOfTheWild.Wrath.Prototype
             return c;
         }
 
-        private static AbilityTargetHasFact OpeningTargetFact(BlueprintBuff buff)
-        {
-            var c = new AbilityTargetHasFact { name = "Phantom0085OpeningAllyTarget" };
-            Set(c, "m_CheckedFacts", new[] { Ref<BlueprintUnitFactReference>(buff) });
-            return c;
-        }
-
         private static AddFeatureOnClassLevel ClassLevelGrant(BlueprintCharacterClass cls, int level, BlueprintFeature feature, string name)
         {
             var grant = new AddFeatureOnClassLevel { name = name, Level = level };
@@ -526,11 +526,19 @@ namespace CallOfTheWild.Wrath.Prototype
             mienBuff.ComponentsArray = CopyComponents(f.Native<BlueprintBuff>(EnlargePersonBuffId))
                 .Concat(CopyComponents(f.Native<BlueprintBuff>(RageBuffId))).ToArray();
             var mienResource = FixedResource(f, "AngerFerociousMienResource", 3);
+            var masterLevel = f.Add(new BlueprintUnitProperty
+            {
+                ComponentsArray = new BlueprintComponent[]
+                {
+                    new Phantom0085MasterClassLevel { name = "Phantom0085MienMasterLevel", CharacterClass = Ref<BlueprintCharacterClassReference>(character) }
+                }
+            }, "AngerFerociousMienMasterLevel", "", "");
+            var mienRounds = new ContextValue { ValueType = ContextValueType.CasterCustomProperty };
+            Set(mienRounds, "m_CustomProperty", Ref<BlueprintUnitPropertyReference>(masterLevel));
             var mienAbility = f.Ability("AngerFerociousMienAbility", "Ferocious Mien",
                 "Three times per day as a swift action, a phantom in ectoplasmic form can grow more ferocious and frightening. It becomes one size category larger, as enlarge person, and grows fiercer in combat, as rage. This effect lasts for 1 round per spiritualist class level.",
                 AbilityType.Supernatural, UnitCommand.CommandType.Swift, AbilityRange.Personal,
-                PsychicAssets.Run(Apply(mienBuff, new ContextDurationValue { Rate = DurationRate.Rounds, DiceType = DiceType.Zero, BonusValue = new ContextValue { ValueType = ContextValueType.Rank } }, "Phantom0085MienApply")),
-                Rank(character, "OnePlusDivStep"),
+                PsychicAssets.Run(Apply(mienBuff, new ContextDurationValue { Rate = DurationRate.Rounds, DiceType = DiceType.Zero, BonusValue = mienRounds }, "Phantom0085MienApply")),
                 Cost(mienResource));
             mienAbility.CanTargetSelf = true;
             var ferociousMien = f.Feature("AngerFerociousMien", "Ferocious Mien", NameOf(mienAbility), Facts(mienAbility), Grant(mienResource));
@@ -884,21 +892,79 @@ namespace CallOfTheWild.Wrath.Prototype
             return new[] { critEdge, determinationAuraFeature, zealHaste, zealsResolve };
         }
 
+        private static BlueprintAbility BuildAidAnother(FactoryShim f)
+        {
+            const string description = "Help an adjacent ally in melee. The ally gains +4 on the chosen roll, once, for up to 1 round.";
+            var attack = f.Buff("KindnessAidAttackEffect", "Aid Another: Attack", description,
+                new Phantom0085AidAttackBonus { name = "Phantom0085AidAttackBonus" },
+                new AddInitiatorAttackWithWeaponTrigger
+                {
+                    name = "Phantom0085AidAttackConsume", CheckWeaponRangeType = true, RangeType = WeaponRangeType.Melee,
+                    OnlyHit = false, ActionsOnInitiator = true, Action = PsychicAssets.Actions(new ContextActionRemoveSelf())
+                });
+            var defense = f.Buff("KindnessAidDefenseEffect", "Aid Another: Defense", description,
+                new ACBonusAgainstAttacks
+                {
+                    name = "Phantom0085AidDefenseBonus", AgainstMeleeOnly = true, ArmorClassBonus = 4,
+                    Descriptor = ModifierDescriptor.UntypedStackable
+                },
+                new AddTargetAttackWithWeaponTrigger
+                {
+                    name = "Phantom0085AidDefenseConsume", OnlyMelee = true, OnlyHit = false, WaitForAttackResolve = true,
+                    ActionsOnAttacker = PsychicAssets.Actions(), ActionOnSelf = PsychicAssets.Actions(new ContextActionRemoveSelf())
+                });
+            attack.Stacking = defense.Stacking = StackingType.Stack;
+
+            BlueprintAbility Variant(string token, BlueprintBuff buff)
+            {
+                var remove = new ContextActionRemoveBuff { name = token + "RemoveOwnAid", OnlyFromCaster = true };
+                Set(remove, "m_Buff", Ref<BlueprintBuffReference>(buff));
+                var apply = Apply(buff, new ContextDurationValue { Rate = DurationRate.Rounds, BonusValue = new ContextValue { Value = 1 } }, token + "Apply");
+                var ability = f.Ability(token, NameOf(buff), description, AbilityType.Special, UnitCommand.CommandType.Standard,
+                    AbilityRange.Touch, PsychicAssets.Run(remove, apply));
+                ability.CanTargetSelf = false;
+                ability.CanTargetEnemies = false;
+                return ability;
+            }
+
+            var choices = new[] { Variant("KindnessAidAttack", attack), Variant("KindnessAidDefense", defense) };
+            var variants = new AbilityVariants { name = "Phantom0085AidVariants" };
+            Set(variants, "m_Variants", choices.Select(Ref<BlueprintAbilityReference>).ToArray());
+            var aid = f.Ability("KindnessAidAnother", "Aid Another", description, AbilityType.Special,
+                UnitCommand.CommandType.Standard, AbilityRange.Personal, variants);
+            foreach (var choice in choices)
+                Set(choice, "m_Parent", Ref<BlueprintAbilityReference>(aid));
+            return aid;
+        }
+
         private static BlueprintFeature[] BuildKindness(FactoryShim f, BlueprintCharacterClass character, BlueprintCharacterClass phantomClass)
         {
             // Opening Strike: standard attack; on hit, one threatening ally gains
             // a swift attack against the target. Exceptional Aid adds CHA damage.
             var targetBuff = f.Buff("KindnessOpeningStrikeTarget", "Opening Strike Target",
                 "As a standard action, the phantom can make a melee attack against a foe. If this attack hits, the spiritualist designates one ally threatening that enemy. This ally can make a single attack at his full base attack bonus against that enemy as a swift action.");
+            var allyBuff = f.Buff("KindnessOpeningStrikeAlly", "Opening Strike", DescOf(targetBuff));
+            targetBuff.Stacking = allyBuff.Stacking = StackingType.Stack;
             var allyAbility = f.Ability("KindnessOpeningStrikeAllyAbility", "Opening Strike", DescOf(targetBuff),
                 AbilityType.Special, UnitCommand.CommandType.Swift, AbilityRange.Weapon,
-                OpeningTargetFact(targetBuff));
+                new Phantom0085OpeningStrikeTarget
+                {
+                    name = "Phantom0085OpeningAllyTarget", TargetBuff = Ref<BlueprintBuffReference>(targetBuff),
+                    AllyBuff = Ref<BlueprintBuffReference>(allyBuff)
+                },
+                PsychicAssets.Run(new Phantom0085OpeningStrike
+                {
+                    name = "Phantom0085UseOpeningStrike", TargetBuff = Ref<BlueprintBuffReference>(targetBuff),
+                    AllyBuff = Ref<BlueprintBuffReference>(allyBuff), UseOpening = true
+                }));
             allyAbility.NeedEquipWeapons = true;
-            var allyBuff = f.Buff("KindnessOpeningStrikeAlly", "Opening Strike", DescOf(targetBuff), Facts(allyAbility));
+            allyAbility.CanTargetFriends = false;
+            allyBuff.ComponentsArray = new BlueprintComponent[] { Facts(allyAbility) };
             var openingAbility = f.Ability("KindnessOpeningStrikeAbility", "Opening Strike", DescOf(targetBuff),
                 AbilityType.Special, UnitCommand.CommandType.Standard, AbilityRange.Weapon,
                 PsychicAssets.Run(new Phantom0085OpeningStrike { name = "Phantom0085OpeningStrike", TargetBuff = Ref<BlueprintBuffReference>(targetBuff), AllyBuff = Ref<BlueprintBuffReference>(allyBuff) }));
             openingAbility.NeedEquipWeapons = true;
+            openingAbility.CanTargetFriends = false;
             var openingStrike = f.Feature("KindnessOpeningStrike", "Opening Strike", NameOf(openingAbility), Facts(openingAbility));
 
             // Etheric Healing: lay on hands (self/master and others), phantom HD.
@@ -936,35 +1002,42 @@ namespace CallOfTheWild.Wrath.Prototype
                 "When the spiritualist reaches 7th level, the phantom gains the lay on hands ability with an effective paladin level equal to its Hit Dice. The phantom can use this ability on the spiritualist as a swift action.",
                 Facts(layOthers, laySelf), Grant(healingResource));
 
-            // Mercy selection: four mercies available to a 12th-level paladin.
-            var mercySelection = f.Native<BlueprintFeatureSelection>(MercySelectionId);
-            var phantomMercy = f.Add(new BlueprintFeatureSelection { Ranks = 1 }, "KindnessPhantomMercySelection", "Phantom Mercy",
-                "The phantom selects mercies available to a 12th-level paladin and adds them to its lay on hands ability.");
-            var mercyOptions = new List<BlueprintFeature>();
-            foreach (var reference in (BlueprintFeatureReference[])Get(mercySelection, "m_AllFeatures"))
-            {
-                var mercy = f.Cache.Load(reference.Guid) as BlueprintFeature;
-                if (mercy == null) continue;
-                var prereq = mercy.GetComponent<PrerequisiteClassLevel>();
-                if (prereq != null && prereq.Level > 12) continue;
-                var clone = CopyBlueprint(mercy);
-                clone.AssetGuid = Id("KindnessPhantomMercy" + mercy.name);
-                clone.name = Spiritualist0085Ids.AssetPrefix + "KindnessPhantomMercy" + mercy.name;
-                clone.ComponentsArray = (clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
-                    .Where(c => !(c is PrerequisiteClassLevel) && !(c is PrerequisiteArchetypeLevel)).ToArray();
-                f.Register(clone, "KindnessPhantomMercy" + mercy.name);
-                mercyOptions.Add(clone);
-            }
-            Set(phantomMercy, "m_Features", mercyOptions.Select(Ref<BlueprintFeatureReference>).ToArray());
-            Set(phantomMercy, "m_AllFeatures", mercyOptions.Select(Ref<BlueprintFeatureReference>).ToArray());
             var expandedAid = f.Feature("KindnessExpandedAid", "Expanded Aid",
-                "When the spiritualist reaches 12th level, the phantom can use the aid another action as a move action. Additionally, the phantom selects four mercies available to a 12th-level paladin that it adds to its lay on hands ability.",
-                new Phantom0085AidAnotherActionType { name = "Phantom0085ExpandedAid", ActionType = UnitCommand.CommandType.Move },
-                new Phantom0085GrantSelection { name = "Phantom0085MercyGrant1", Selection = Ref<BlueprintFeatureSelectionReference>(phantomMercy), Count = 4 });
+                "When the spiritualist reaches 12th level, the phantom can use the aid another action as a move action. Additionally, the spiritualist selects four mercies available to a 12th-level paladin that the phantom adds to its lay on hands ability.",
+                new Phantom0085AidAnotherActionType { name = "Phantom0085ExpandedAid", ActionType = UnitCommand.CommandType.Move });
             var exceptionalAid = f.Feature("KindnessExceptionalAid", "Exceptional Aid",
                 "When the spiritualist reaches 17th level, the phantom can use the aid another action as a swift action. Additionally, when designating an ally for an opening strike, that ally gains a bonus equal to the phantom's Charisma modifier on damage rolls for the attack granted to him.",
                 new Phantom0085AidAnotherActionType { name = "Phantom0085ExceptionalAid", ActionType = UnitCommand.CommandType.Swift });
             return new[] { openingStrike, ethericHealing, expandedAid, exceptionalAid };
+        }
+
+        internal static BlueprintFeatureSelection BuildKindnessMercySelection(FactoryShim f)
+        {
+            var mercySelection = f.Native<BlueprintFeatureSelection>(MercySelectionId);
+            var phantomMercy = f.Add(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true }, "KindnessPhantomMercySelection", "Phantom Mercy",
+                "The phantom selects mercies available to a 12th-level paladin and adds them to its lay on hands ability.");
+            var choices = ((BlueprintFeatureReference[])Get(mercySelection, "m_AllFeatures"))
+                .Select(r => f.Cache.Load(r.Guid) as BlueprintFeature)
+                .Where(mercy => mercy != null && (mercy.GetComponent<PrerequisiteClassLevel>()?.Level ?? 0) <= 12)
+                .ToDictionary(mercy => mercy.AssetGuid, mercy => GrantToPet(f, "KindnessPhantomMercy" + mercy.name, mercy));
+            foreach (var pair in choices)
+            {
+                var nativeMercy = f.Cache.Load(pair.Key) as BlueprintFeature;
+                var prerequisites = nativeMercy.GetComponents<PrerequisiteFeature>().Select(p =>
+                {
+                    var copy = (PrerequisiteFeature)CopyData(p);
+                    var nativeReference = (BlueprintFeatureReference)Get(p, "m_Feature");
+                    if (nativeReference != null && choices.TryGetValue(nativeReference.Guid, out var prerequisite))
+                        Set(copy, "m_Feature", Ref<BlueprintFeatureReference>(prerequisite));
+                    return copy;
+                });
+                pair.Value.IsClassFeature = true;
+                pair.Value.ComponentsArray = pair.Value.ComponentsArray.Concat(prerequisites).ToArray();
+            }
+            var options = choices.Values.Select(Ref<BlueprintFeatureReference>).ToArray();
+            Set(phantomMercy, "m_Features", options);
+            Set(phantomMercy, "m_AllFeatures", options);
+            return phantomMercy;
         }
 
         private static ContextRankConfig Rebind(ContextRankConfig source, BlueprintCharacterClass cls)
@@ -995,10 +1068,12 @@ namespace CallOfTheWild.Wrath.Prototype
             var sharedSave = f.Buff("SharedConsciousnessSave", "Shared Consciousness", "",
                 new SavingThrowBonusAgainstDescriptor { name = "Phantom0085SharedSave", SpellDescriptor = Kingmaker.Blueprints.Classes.Spells.SpellDescriptor.MindAffecting, Bonus = new ContextValue { Value = 4 }, ModifierDescriptor = ModifierDescriptor.UntypedStackable });
             SetEnum(sharedSave, "m_Flags", "HiddenInUi");
+            sharedSave.IsClassFeature = true;
             var fusedSave = f.Buff("FusedConsciousnessSave", "Fused Consciousness", "",
                 new SavingThrowBonusAgainstDescriptor { name = "Phantom0085FusedSave", SpellDescriptor = Kingmaker.Blueprints.Classes.Spells.SpellDescriptor.MindAffecting, Bonus = new ContextValue { ValueType = ContextValueType.Rank }, ModifierDescriptor = ModifierDescriptor.UntypedStackable },
                 Rank(character, "Custom", 11, 4, 20, 8));
             SetEnum(fusedSave, "m_Flags", "HiddenInUi");
+            fusedSave.IsClassFeature = true;
             foreach (var row in Emotions)
             {
                 var emotion = emotions.First(e => e.name == Spiritualist0085Ids.AssetPrefix + row.Name + "Emotion");
@@ -1024,7 +1099,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 ActivationType = AbilityActivationType.Immediately,
                 DeactivateImmediately = true,
-                Group = (ActivatableAbilityGroup)850085,
+                Group = ActivatableAbilityGroup.None,
                 WeightInGroup = 1
             }, token, name, description);
             Set(toggle, "m_ActivateWithUnitCommand", UnitCommand.CommandType.Free);
@@ -1176,9 +1251,25 @@ namespace CallOfTheWild.Wrath.Prototype
                 var emotion = emotions.First(e => e.name == Spiritualist0085Ids.AssetPrefix + row.Name + "Emotion");
                 // The four capability wrappers of the secondary emotion, applied
                 // to the same phantom; no second AddPet, same emotion forbidden.
-                var capstone = f.Feature(row.Name + "PotentPhantom", "Potent Phantom: " + row.Name, row.Description,
-                    new Phantom0085PotentGrant { name = "Phantom0085Potent" + row.Name, Emotion = Ref<BlueprintProgressionReference>(emotion) },
-                    NoFeature(emotion, "Phantom0085PotentNotPrimary" + row.Name));
+                var token = row.Name + "PotentPhantom";
+                var name = "Potent Phantom: " + row.Name;
+                var grant = new Phantom0085PotentGrant { name = "Phantom0085Potent" + row.Name, Emotion = Ref<BlueprintProgressionReference>(emotion) };
+                var prerequisite = NoFeature(emotion, "Phantom0085PotentNotPrimary" + row.Name);
+                BlueprintFeature capstone;
+                if (row.Name == "Kindness")
+                {
+                    var mercy = f.Find<BlueprintFeatureSelection>("KindnessPhantomMercySelection");
+                    var withMercies = f.Progression(token, name, row.Description,
+                        new[] { Entry(20, mercy, mercy, mercy, mercy) }, Array.Empty<UIGroup>());
+                    Set(withMercies, "m_Classes", new[] { new BlueprintProgression.ClassWithLevel { m_Class = Ref<BlueprintCharacterClassReference>(character) } });
+                    withMercies.ComponentsArray = new BlueprintComponent[] { grant, prerequisite };
+                    withMercies.IsClassFeature = true;
+                    capstone = withMercies;
+                }
+                else
+                {
+                    capstone = f.Feature(token, name, row.Description, grant, prerequisite);
+                }
                 options.Add(capstone);
             }
             var selection = f.Add(new BlueprintFeatureSelection { Ranks = 1 }, "PotentPhantom", "Potent Phantom",

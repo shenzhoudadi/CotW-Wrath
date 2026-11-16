@@ -21,6 +21,7 @@ using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Parts;
 
 // COTW-0085 B-stage directed checks, contract C-0085-20261115-r1.
 // The host enters with COTW_0085_CASE=spiritualist0085 and routes straight
@@ -188,9 +189,14 @@ internal static class Spiritualist0085Tests
         for (int c = 7; c <= 10; c++)
             Check(list.SpellsByLevel[c].SpellsRefs == null || !list.SpellsByLevel[c].SpellsRefs.Any(), "circle " + c + " stays empty");
         var ghoul = rows.Single(r => label(r) == "Ghoul Touch");
-        Check(guid(ghoul) == null && Get(ghoul, "CotwToken") == null && Get(ghoul, "Provider") == null, "Ghoul Touch has no fake root");
+        var ghoulGuid = BlueprintGuid.Parse("a2b05555c704458aaadc34be52a63633");
+        Check(circle(ghoul) == 2 && guid(ghoul) == ghoulGuid.ToString() &&
+            list.SpellsByLevel[2].SpellsRefs.Any(r => r.Guid == ghoulGuid), "Ghoul Touch uses the native DLC5 cast root at circle 2");
+        var ghoulCast = Load<BlueprintAbility>(cache, ghoulGuid);
+        Check(ghoulCast.GetComponent<Kingmaker.DLC.DlcCondition>() != null &&
+            Component(ghoulCast, "AbilityEffectStickyTouch") != null, "Ghoul Touch preserves the original DLC condition and sticky touch");
         var unavailable = ((string[])AccessTools.Field(T("Spiritualist0085"), "LastUnavailable").GetValue(null));
-        Check(unavailable.Any(u => u.Contains("Ghoul Touch")), "Ghoul Touch reported unavailable");
+        Check(!unavailable.Any(u => u.Contains("Ghoul Touch")), "Ghoul Touch no longer reported missing with the native entry");
         var lesser = rows.Single(r => label(r) == "Animate Dead, Lesser");
         Check(circle(lesser) == 2 && guid(lesser) == "57fcf8016cf04da4a8b33d2add14de7e", "Lesser Animate Dead kept at source circle 2 with the native root");
         Check(list.SpellsByLevel[2].SpellsRefs.Any(r => r.Guid == BlueprintGuid.Parse("57fcf8016cf04da4a8b33d2add14de7e")), "Lesser Animate Dead wired into circle 2 of the private list");
@@ -232,6 +238,13 @@ internal static class Spiritualist0085Tests
             Check(archetype.GetParentClass().name == prefix + "PhantomClass", n + " archetype parent is the private phantom class");
             bool fort = archetype.FortitudeSave != null, refl = archetype.ReflexSave != null, will = archetype.WillSave != null;
             Check(fort == (bool)Get(row, "Fort") && refl == (bool)Get(row, "Ref") && will == (bool)Get(row, "Will"), n + " good saves match the frozen code values");
+            var parent = archetype.GetParentClass();
+            Check(new[] { archetype.FortitudeSave ?? parent.FortitudeSave, archetype.ReflexSave ?? parent.ReflexSave,
+                archetype.WillSave ?? parent.WillSave }.Select(save => save.GetBonus(1)).SequenceEqual(
+                    new[] { fort ? 2 : 0, refl ? 2 : 0, will ? 2 : 0 }), n + " native level-one saves include the low progression");
+            var skill = archetype.AddFeatures.Single(e => e.Level == 1).Features.OfType<BlueprintFeature>()
+                .Single(f => Component(f, "Phantom0085SkillRanks") != null);
+            Check(skill.GetComponent<ContextRankConfig>() == null, n + " skill ranks have no redundant native rank formula");
             var slaLevels = new[] { 5, 7, 9, 16 };
             for (int i = 0; i < 4; i++)
             {
@@ -255,6 +268,56 @@ internal static class Spiritualist0085Tests
         Check(phantomProg.LevelEntries[0].Features.Any(f => f.name == prefix + "PhantomDR5Slashing"), "phantom level 1 grants DR 5/slashing");
         Check(phantomProg.LevelEntries[0].Features.Any(f => f.name == prefix + "PhantomSlamDamage"), "phantom level 1 grants slam dice");
         Check(phantomProg.LevelEntries[14].Features.Any(f => f.name == prefix + "PhantomDR15"), "phantom level 15 grants the DR III entry");
+        var dexCha = Load<BlueprintFeature>(cache, Id("PhantomDexChaGrowth"));
+        var strCha = Load<BlueprintFeature>(cache, Id("PhantomStrChaGrowth"));
+        var anger = Load<BlueprintArchetype>(cache, Id("AngerPhantomArchetype"));
+        var growthLevels = new[] { 2, 4, 6, 8, 9, 12, 13, 15 };
+        int[] GrantLevels(IEnumerable<LevelEntry> entries, BlueprintFeature feature)
+            => entries.Where(e => e.Features.Contains(feature)).Select(e => e.Level).ToArray();
+        Check(GrantLevels(phantomProg.LevelEntries, dexCha).SequenceEqual(growthLevels) &&
+            GrantLevels(anger.RemoveFeatures, dexCha).SequenceEqual(growthLevels) &&
+            GrantLevels(anger.AddFeatures, strCha).SequenceEqual(growthLevels),
+            "Anger replaces all eight shared attribute entries");
+        bool Growth(BlueprintFeature feature, StatType primaryStat) => feature.Ranks == growthLevels.Length &&
+            feature.GetComponents<AddStatBonus>().Where(b => b.Value == 1).Select(b => b.Stat).SequenceEqual(new[] { primaryStat, StatType.Charisma });
+        Check(Growth(dexCha, StatType.Dexterity) && Growth(strCha, StatType.Strength), "phantom attribute bonuses and rank limits match the source");
+        var mien = Load<BlueprintAbility>(cache, Id("AngerFerociousMienAbility"));
+        var mienLevel = Load<Kingmaker.UnitLogic.Mechanics.Properties.BlueprintUnitProperty>(cache, Id("AngerFerociousMienMasterLevel"));
+        var mienAction = mien.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityEffectRunAction>().Actions.Actions
+            .OfType<Kingmaker.UnitLogic.Mechanics.Actions.ContextActionApplyBuff>().Single();
+        Check(mien.GetComponent<ContextRankConfig>() == null &&
+            ((BlueprintUnitPropertyReference)Get(mienAction.DurationValue.BonusValue, "m_CustomProperty")).Guid == mienLevel.AssetGuid &&
+            ((BlueprintCharacterClassReference)Get(Component(mienLevel, "Phantom0085MasterClassLevel"), "CharacterClass")).Guid == cls.AssetGuid,
+            "Ferocious Mien duration reads the owner's Spiritualist level without a divisor");
+        var kindnessBase = Load<BlueprintFeature>(cache, Id("KindnessPhantomBase"));
+        var aid = ((BlueprintAbilityReference)Get(Component(kindnessBase, "Phantom0085Benevolent"), "Fallback")).Get();
+        var aidOptions = aid.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityVariants>().Variants.ToArray();
+        Check(aidOptions.Length == 2 && aidOptions.All(v => v.Parent == aid && v.CanTargetFriends && !v.CanTargetEnemies),
+            "Kindness fallback grants two native ally-targeted variants");
+        var aidAttack = Load<BlueprintBuff>(cache, Id("KindnessAidAttackEffect"));
+        var aidDefense = Load<BlueprintBuff>(cache, Id("KindnessAidDefenseEffect"));
+        Check(aidAttack.GetComponent<AddInitiatorAttackWithWeaponTrigger>()?.CheckWeaponRangeType == true &&
+            aidDefense.GetComponent<AddTargetAttackWithWeaponTrigger>()?.OnlyMelee == true &&
+            aidDefense.GetComponent<ACBonusAgainstAttacks>()?.ArmorClassBonus == 4,
+            "Kindness fallback defense is +4, both variants expire on their next applicable melee attack");
+        var mercy = Load<BlueprintFeatureSelection>(cache, Id("KindnessPhantomMercySelection"));
+        var nativeMercies = ((BlueprintFeatureReference[])Get(
+            Load<BlueprintFeatureSelection>(cache, BlueprintGuid.Parse("02b187038a8dce545bb34bbfb346428d")), "m_AllFeatures"))
+            .Select(r => r.Guid).ToHashSet();
+        var options = ((BlueprintFeatureReference[])Get(mercy, "m_AllFeatures")).Select(r => r.Get()).ToArray();
+        Check(options.Length >= 4 && options.All(option =>
+            nativeMercies.Contains(((BlueprintFeatureReference)Get(Component(option, "Phantom0085BoundGrant"), "Feature")).Guid)),
+            "Mercy options grant the original Paladin fact through the bound phantom");
+        var kindnessFocus = Load<BlueprintProgression>(cache, Id("KindnessEmotion"));
+        var kindnessPotent = Load<BlueprintProgression>(cache, Id("KindnessPotentPhantom"));
+        Check(kindnessFocus.LevelEntries.Single(e => e.Level == 12).Features.Count(f => f == mercy) == 4 &&
+            kindnessPotent.LevelEntries.Single(e => e.Level == 20).Features.Count(f => f == mercy) == 4,
+            "Kindness primary and secondary advances grant four choices through owner level-up");
+        var openingReply = Load<BlueprintAbility>(cache, Id("KindnessOpeningStrikeAllyAbility"));
+        Check(Component(openingReply, "Phantom0085OpeningStrikeTarget") != null &&
+            openingReply.ActionType == Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType.Swift &&
+            (bool)Get(openingReply.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityEffectRunAction>().Actions.Actions.Single(), "UseOpening"),
+            "Opening Strike swift follow-up has source-specific targeting and an executable action");
 
         // ---- Master progression milestones ----
         var masterProg = cls.Progression;
@@ -317,7 +380,14 @@ internal static class Spiritualist0085Tests
         var bondToggle = bond.GetComponent<AddFacts>();
         var tetherActivatable = ((BlueprintUnitFactReference[])Get(tetherToggle, "m_Facts")).Select(r => r.Get()).OfType<BlueprintActivatableAbility>().First();
         var bondActivatable = ((BlueprintUnitFactReference[])Get(bondToggle, "m_Facts")).Select(r => r.Get()).OfType<BlueprintActivatableAbility>().First();
-        Check((int)tetherActivatable.Group == 850085 && (int)bondActivatable.Group == 850085 && tetherActivatable.WeightInGroup == 1 && bondActivatable.WeightInGroup == 1, "Etheric Tether and Spiritual Bond share one mutually exclusive group");
+        var nativeGroups = new UnitPartActivatableAbility();
+        Check(nativeGroups.GetGroupSize(tetherActivatable.Group) == 1 && nativeGroups.GetGroupSize(bondActivatable.Group) == 1 &&
+            tetherActivatable.Group == ActivatableAbilityGroup.None && bondActivatable.Group == ActivatableAbilityGroup.None &&
+            (BlueprintGuid)Call("Phantom0085DamageTransfer", "OtherToggle", false) == bondActivatable.AssetGuid &&
+            (BlueprintGuid)Call("Phantom0085DamageTransfer", "OtherToggle", true) == tetherActivatable.AssetGuid,
+            "native groups accept both toggles and mutual exclusion references only the paired 0085 ability");
+        Check(Load<BlueprintBuff>(cache, Id("SharedConsciousnessSave")).IsClassFeature &&
+            Load<BlueprintBuff>(cache, Id("FusedConsciousnessSave")).IsClassFeature, "consciousness buffs opt out of native respec restoration");
         var inferenceOwner = Load<BlueprintBuff>(cache, Id("SpiritualInferenceOwner"));
         var inferenceAlly = Load<BlueprintBuff>(cache, Id("GreaterSpiritualInferenceAlly"));
         Check(inferenceOwner.Stacking == StackingType.Stack && inferenceAlly.Stacking == StackingType.Stack, "inference buffs stack per owning phantom");
@@ -365,8 +435,31 @@ internal static class Spiritualist0085Tests
         var boundary = AccessTools.PropertySetter(typeof(UnitEntityData), "LastHandledDamage");
         int insert = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Apply")));
         int deliver = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Deliver")));
-        Check(insert > 0 && rewrittenIl[insert + 1].Calls(boundary) && deliver > insert,
-            "C13/C14: native damage IL provides the exact HP boundary and guarded delivery call");
+        int payment = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "ApplyToHitPoints")));
+        Check(insert > 0 && rewrittenIl[insert + 1].Calls(boundary) && payment > insert && deliver > payment,
+            "C13/C14: native damage IL provides the HP, temporary HP and guarded delivery boundaries");
+        var paymentRule = (RuleDealDamage)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(RuleDealDamage));
+        var payments = AccessTools.Field(patch, "Payments").GetValue(null);
+        var paymentAmount = Activator.CreateInstance(patch.GetNestedType("Payment", BindingFlags.NonPublic),
+            BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { 3 }, null);
+        AccessTools.Method(payments.GetType(), "Add").Invoke(payments, new object[] { paymentRule, paymentAmount });
+        AccessTools.Method(patch, "Apply").Invoke(null, new object[] { paymentRule });
+        Check(paymentRule.Result == 3 &&
+            (int)AccessTools.Method(patch, "ApplyToHitPoints").Invoke(null, new object[] { null, paymentRule.Result, paymentRule }) == 3,
+            "C13/C14: a marked payment passes its full integer damage to native ordinary HP");
+        bool OtherMount(UnitEntityData other, PetType? type) =>
+            (bool)Call("Phantom0085Patches+MountSuppression", "IsOtherNativeMountSource", other, petEntity, type);
+        Check(!OtherMount(petEntity, petType) && !OtherMount(otherEntity, PetType.MythicSkeletalChampion) &&
+            !OtherMount(otherEntity, PetType.Clone) && OtherMount(otherEntity, PetType.AnimalCompanion),
+            "mount source follows native exclusions plus the bound phantom");
+        var restPatch = T("Phantom0085Patches+RestResurrectionQueue");
+        var restMethod = AccessTools.Method(typeof(Kingmaker.Controllers.Rest.RestController), "ResurrectDeadUnits");
+        var nativeRest = AccessTools.Method(typeof(Kingmaker.Controllers.Rest.State.CampingState), "GetPartyUnitsForRest");
+        var restIl = ((IEnumerable<CodeInstruction>)AccessTools.Method(restPatch, "Transpiler")
+            .Invoke(null, new object[] { PatchProcessor.GetOriginalInstructions(restMethod) })).ToList();
+        int restQueue = restIl.FindIndex(i => i.Calls(AccessTools.Method(restPatch, "GetResurrectionUnits")));
+        Check(restQueue >= 0 && restIl.Count(i => i.Calls(nativeRest)) == 1 &&
+            restQueue < restIl.FindIndex(i => i.Calls(nativeRest)), "only the native resurrection loop receives the augmented queue");
         var bondedShield = Load<BlueprintBuff>(cache, Id("BondedManifestationEffect"));
         Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085ShieldToIncorporealTouch"), "bonded shield transfers to incorporeal touch AC");
         Check(bondedShield.ComponentsArray.Any(c => c.GetType().Name == "Phantom0085TendrilDice") == false, "tendril dice live on the temporary attack buff, not the shield");

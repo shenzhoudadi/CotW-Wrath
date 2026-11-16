@@ -5,7 +5,7 @@
 ## 🚧 施工中／已认领，请勿重复开发
 
 - **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2 复查 `acca889` 后退回 B 修复，已在原生方法复现等级公式除零与互保组越界，另有豁免、成长、重训、临时 HP 付款和骑乘过滤问题。复用核对定位原生休息复活、Ghoul Touch、Ghost Rider 互保及 ExpandedContent Aid Another。原隔离定向 227/227（13.913 秒）和本地三 DLL 回读结果保留。玩家场景未运行，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[D2 复查及接手](docs/work-packages/COTW-0085/D2-spiritualist-review.md)。
+- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2 修复已进入 D3，最新定向 252/252（14.025 秒），本地 TEST 包三个 DLL 回读一致。继续处理阵亡及原生移除的互保清理，玩家场景未运行，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[B2 修复及 D3 复查](docs/work-packages/COTW-0085/B2-D3-spiritualist.md)。
 
 ## 本次0.14.69 TEST交付
 

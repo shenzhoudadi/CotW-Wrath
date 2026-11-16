@@ -142,12 +142,16 @@ internal static class PsychicExpansionTests
             var bp=row["blueprint"]; var guid=BlueprintGuid.Parse((string)bp["AssetId"]);
             if(cache.Load(guid)!=null) {
                 if (cache.Load(guid) is Kingmaker.Blueprints.Facts.BlueprintUnitFact knownFact) Set(knownFact,"m_Icon",Empty<UnityEngine.Sprite>());
+                if (classGraph && cache.Load(guid) is BlueprintStatProgression knownProgression && knownProgression.Bonuses == null)
+                    knownProgression.Bonuses = (int[])Read(bp["Data"]["Bonuses"], typeof(int[]));
                 if(guid.ToString()=="3c17035ec4717674cae2e841a190e757") {var known=(BlueprintScriptableObject)cache.Load(guid);known.ComponentsArray=((JArray)bp["Data"]["Components"]).Select(c=>(BlueprintComponent)Read(c,typeof(BlueprintComponent))).ToArray();known.OnEnable();}
                 continue;
             }
             string type=((string)bp["Data"]["$type"]).Split(',').Last().Trim();
             var obj=(BlueprintScriptableObject)Activator.CreateInstance(GameTypes.Single(t=>t.Name==type));
             obj.name=(string)row["name"];obj.AssetGuid=guid;
+            if (classGraph && obj is BlueprintStatProgression statProgression)
+                statProgression.Bonuses = (int[])Read(bp["Data"]["Bonuses"], typeof(int[]));
             if (obj is Kingmaker.Blueprints.Facts.BlueprintUnitFact) Set(obj,"m_Icon",Empty<UnityEngine.Sprite>());
             obj.ComponentsArray=((JArray)bp["Data"]["Components"]??new JArray()).Select(c=>(BlueprintComponent)Read(c,typeof(BlueprintComponent))).ToArray();
             foreach(var property in ((JObject)bp["Data"]).Properties().Where(x=>(classGraph?ClassGraphFields.Concat(new[]{"m_AllFeatures","m_Features","Type","Range","ActionType","CanTargetSelf","CanTargetFriends","CanTargetEnemies","CanTargetPoint","SpellResistance","EffectOnEnemy","EffectOnAlly","AvailableMetamagic","SpellsByLevel","m_Type","m_Size","m_Enchantments","m_OverrideDamageDice","m_DamageDice","m_OverrideDamageType","m_DamageType","m_BaseDamage","m_CriticalRollEdge","m_CriticalModifier","m_VisualParameters","m_SecondWeapon","m_AttackType","m_IsLight","m_IsOneHanded","m_IsTwoHanded","m_IsUnarmed","m_IsNatural","m_OverrideAttackBonusStat","m_AttackBonusStatOverride","Prefab","m_Race","Category","DamageType","CriticalRollEdge","CriticalModifier","WeaponFxPrefab","MaterialComponent","Fx","Shape","Size"}):new[]{"m_AllFeatures","m_Features","Type","Range","ActionType","CanTargetSelf","CanTargetFriends","CanTargetEnemies","CanTargetPoint","SpellResistance","EffectOnEnemy","EffectOnAlly","AvailableMetamagic","SpellsByLevel","m_Type","m_Size","m_Enchantments","m_OverrideDamageDice","m_DamageDice","m_OverrideDamageType","m_DamageType","m_BaseDamage","m_CriticalRollEdge","m_CriticalModifier","m_VisualParameters","m_SecondWeapon","m_AttackType","m_IsLight","m_IsOneHanded","m_IsTwoHanded","m_IsUnarmed","m_IsNatural","m_OverrideAttackBonusStat","m_AttackBonusStatOverride","Prefab","m_Race","Category","DamageType","CriticalRollEdge","CriticalModifier","WeaponFxPrefab","MaterialComponent","Fx","Shape","Size"}).Contains(x.Name))) {

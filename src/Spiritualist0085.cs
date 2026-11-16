@@ -55,6 +55,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal const string FighterClassId = "48ac8db94d5de7645906c7d0ad3bcfbd";
         internal const string AnimalClassId = "4cd1757a0eea7694ba5c933729a53920";
         internal const string SavesHighId = "ff4662bde9e75f145853417313842751";
+        internal const string SavesLowId = "dc0c7c1aba755c54f96c089cdf7d14a3";
         internal const string SpectreUnitId = "2f91d7337b60e3b4b9b137198a8c8745";
         internal const string SmilodonUnitId = "8a6986e17799d7d4b90f0c158b31c5b9";
         internal const string GhostFxId = "20f79fea035330b479fc899fa201d232";
@@ -67,7 +68,6 @@ namespace CallOfTheWild.Wrath.Prototype
         internal const string TouchCalculateId = "62ef1cdb90f1d654d996556669caf7fa";
         internal const string DevotionId = "226f939b7dfd47b4697ec52f79799012";
         internal const string NaturalArmorGrowthId = "0d20d88abb7c33a47902bd99019f2ed1";
-        internal const string AttributeGrowthId = "0c80276018694f24fbaf59ec7b841f2b";
         internal const string SkillFocusSelectionId = "c9629ef9eebb88b479b2fbc5e836656a";
         internal const string PowerAttackId = "9972f33f977fc724c838e59641b2fca5";
         internal const string WeaponFinesseId = "90e54424d682d104ab36436bd527af09";
@@ -168,7 +168,7 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         // 137 source rows, circles 0-6 = 6/17/24/28/22/24/16. Source circles are
-        // preserved; Ghoul Touch has no confirmed equivalent and stays reported.
+        // preserved. DLC spell roots retain their own availability conditions.
         internal static readonly SpellRow[] SpellList =
         {
             new SpellRow(0, "Daze", "55f14bc84d7c85446b07a1b5dd6b2b4c"),
@@ -204,7 +204,7 @@ namespace CallOfTheWild.Wrath.Prototype
             new SpellRow(2, "Effortless Armor", "e1291272c8f48c14ab212a599ad17aac"),
             new SpellRow(2, "False Life", "7a5b5bf845779a941a67251539545762"),
             new SpellRow(2, "Force Sword", cotwToken: "ForceSword"),
-            new SpellRow(2, "Ghoul Touch"),
+            new SpellRow(2, "Ghoul Touch", "a2b05555c704458aaadc34be52a63633"),
             new SpellRow(2, "Inflict Moderate Wounds", "65f0b63c45ea82a4f8b8325768a3832d"),
             new SpellRow(2, "Inflict Pain", provider: "InflictPainAbility"),
             new SpellRow(2, "Invisibility", "89940cde01689fb46946b2f8cd7b66b7"),
@@ -577,6 +577,7 @@ namespace CallOfTheWild.Wrath.Prototype
             yield return Spiritualist0085Ids.FighterClassId;
             yield return Spiritualist0085Ids.AnimalClassId;
             yield return Spiritualist0085Ids.SavesHighId;
+            yield return Spiritualist0085Ids.SavesLowId;
             yield return Spiritualist0085Ids.SpectreUnitId;
             yield return Spiritualist0085Ids.SmilodonUnitId;
             yield return Spiritualist0085Ids.GhostFxId;
@@ -591,7 +592,6 @@ namespace CallOfTheWild.Wrath.Prototype
             yield return "a634f97d23662b347872ffcf580495b3";
             yield return "c4a7f98d743bc784c9d4cf2105852c39";
             yield return Spiritualist0085Ids.NaturalArmorGrowthId;
-            yield return Spiritualist0085Ids.AttributeGrowthId;
             yield return Spiritualist0085Ids.SkillFocusSelectionId;
             yield return Spiritualist0085Ids.PowerAttackId;
             yield return Spiritualist0085Ids.WeaponFinesseId;
@@ -649,7 +649,7 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var fighter = f.Native<BlueprintCharacterClass>(Spiritualist0085Ids.FighterClassId);
             var animal = f.Native<BlueprintCharacterClass>(Spiritualist0085Ids.AnimalClassId);
-            var savesHigh = f.Native<BlueprintStatProgression>(Spiritualist0085Ids.SavesHighId);
+            var savesLow = f.Native<BlueprintStatProgression>(Spiritualist0085Ids.SavesLowId);
 
             // ---- Master class (Inquisitor data only; no deity dependency) ----
             var character = f.Add(new BlueprintCharacterClass
@@ -708,7 +708,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(character, "m_Spellbook", Ref<BlueprintSpellbookReference>(book));
 
             // ---- Phantom class and shared progression ----
-            var phantomClass = Phantom0085.BuildPhantomClass(f, fighter, animal, savesHigh);
+            var phantomClass = Phantom0085.BuildPhantomClass(f, fighter, animal, savesLow);
             var phantomProgression = Phantom0085.BuildPhantomProgression(f, phantomClass);
             Set(phantomClass, "m_Progression", Ref<BlueprintProgressionReference>(phantomProgression));
 
@@ -871,12 +871,15 @@ namespace CallOfTheWild.Wrath.Prototype
             // The private grant follows the companion owned by native AddPet.
             var petFeatures = Phantom0085.BuildEmotionFeatures(f, cache, character, phantomClass, row);
             var grants = petFeatures.Select(p => Phantom0085.GrantToPet(f, row.Name + "Grant" + p.name, p)).ToArray();
+            var level12 = new List<BlueprintFeatureBase> { grants[2] };
+            if (row.Name == "Kindness")
+                level12.AddRange(Enumerable.Repeat(Phantom0085.BuildKindnessMercySelection(f), 4));
 
             var progression = f.Progression(row.Name + "Emotion", "Emotion Focus: " + row.Name, row.Description,
                 new[]
                 {
                     Entry(1, grants[0]), Entry(5, slaFeatures[0]), Entry(7, grants[1], slaFeatures[1]),
-                    Entry(9, slaFeatures[2]), Entry(12, grants[2]), Entry(16, slaFeatures[3]), Entry(17, grants[3])
+                    Entry(9, slaFeatures[2]), Entry(12, level12.ToArray()), Entry(16, slaFeatures[3]), Entry(17, grants[3])
                 },
                 new[] { Group(grants), Group(slaFeatures) });
             Set(progression, "m_Classes", new[] { new BlueprintProgression.ClassWithLevel { m_Class = Ref<BlueprintCharacterClassReference>(character) } });
