@@ -306,7 +306,6 @@ namespace CallOfTheWild.Wrath.Prototype
             if (pet == null) return;
             var petPart = pet.Get<UnitPartPet>();
             if (petPart == null) return;
-            Phantom0085Patches.MountSuppression.SuppressWithoutOtherNativeMountSource(master, pet);
             Phantom0085PetGrant.RefreshAll(master, pet);
             Phantom0085AlignmentSync.Sync(master, pet);
             if (pet.Descriptor.State.IsFinallyDead) return;
@@ -1183,6 +1182,9 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool IsPrivatePetGrant(AddPet grant)
             => grant.Type == Spiritualist0085Ids.PhantomPetType && grant.Pet?.GetComponent<Phantom0085Marker>() != null;
 
+        private static bool IsPrivatePhantom(UnitPartPet pet)
+            => pet != null && pet.Type == Spiritualist0085Ids.PhantomPetType && Phantom0085Marker.IsPhantom(pet.Owner);
+
         [HarmonyPatch]
         internal static class ExistingPetReference
         {
@@ -1198,6 +1200,9 @@ namespace CallOfTheWild.Wrath.Prototype
             internal static bool WaitingForRecordedPet(UnitReference reference, UnitEntityData unit)
                 => !string.IsNullOrEmpty(reference.UniqueId) && ReferenceEquals(unit, null);
 
+            internal static bool RetiredRecordedPet(UnitEntityData pet)
+                => pet != null && pet.DestroyMark && pet.Master == null;
+
             [HarmonyPrefix]
             private static bool Prefix(AddPet __instance, System.Reflection.MethodBase __originalMethod)
             {
@@ -1208,7 +1213,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (__originalMethod.Name == "TryUpdatePet" && owner.HoldingState == null) return true;
                 var reference = ((AddPetData)Data.GetValue(__instance)).SpawnedPetRef;
                 var pet = reference.Value;
-                if (WaitingForRecordedPet(reference, pet)) return false;
+                if (WaitingForRecordedPet(reference, pet) || RetiredRecordedPet(pet)) return false;
                 if (pet == null || pet.Blueprint == __instance.Pet && (pet.Master == null || pet.Master == owner))
                     return true;
                 ModEntry.LogSpellDiagnostic($"0085 ignored foreign recorded pet {pet.UniqueId} for owner {owner.UniqueId}.");
@@ -1447,51 +1452,45 @@ namespace CallOfTheWild.Wrath.Prototype
             }
         }
 
-        // The phantom must never be selectable as a mount; narrowed to the
-        // reserved type and the native suitable-mount checker only.
-        [HarmonyPatch(typeof(Kingmaker.UnitLogic.Abilities.Components.TargetCheckers.AbilityTargetIsSuitableMount), "IsTargetRestrictionPassed")]
+        // Target validation and the actual rider both call this predicate.
+        [HarmonyPatch(typeof(AbilityTargetIsSuitableMount), nameof(AbilityTargetIsSuitableMount.CanMount))]
         internal static class MountTargetExclusion
         {
             [HarmonyPrefix]
-            private static bool Prefix(TargetWrapper target, ref bool __result)
+            private static bool Prefix(UnitEntityData pet, ref bool __result)
             {
-                var unit = target?.Unit;
-                if (unit == null) return true;
-                var pet = unit.Get<UnitPartPet>();
-                if (pet != null && pet.Type == Spiritualist0085Ids.PhantomPetType && Phantom0085Marker.IsPhantom(unit))
-                {
-                    __result = false;
-                    return false;
-                }
-                return true;
+                if (!IsPrivatePhantom(pet?.Get<UnitPartPet>())) return true;
+                __result = false;
+                return false;
             }
         }
 
         [HarmonyPatch(typeof(UnitPartPetMaster), "UpdateMountAbility")]
         internal static class MountSuppression
         {
-            [HarmonyPostfix]
-            private static void Postfix(UnitPartPetMaster __instance)
+            [HarmonyTranspiler]
+            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source)
             {
-                var owner = __instance.Owner;
-                if (owner == null) return;
-                var phantom = owner.Get<UnitPartPhantom0085>()?.BoundPet(owner);
-                if (phantom != null) SuppressWithoutOtherNativeMountSource(owner, phantom);
+                var instructions = source.ToList();
+                var type = AccessTools.PropertyGetter(typeof(UnitPartPet), nameof(UnitPartPet.Type));
+                var calls = instructions.Where(instruction => instruction.Calls(type)).ToArray();
+                if (calls.Length != 2)
+                {
+                    ModEntry.LogSpellDiagnostic("0085 mount button: native pet eligibility checks were not found.");
+                    return instructions;
+                }
+                var mountType = AccessTools.Method(typeof(MountSuppression), nameof(NativeMountType));
+                foreach (var call in calls)
+                {
+                    call.opcode = OpCodes.Call;
+                    call.operand = mountType;
+                }
+                return instructions;
             }
 
-            internal static bool IsOtherNativeMountSource(UnitEntityData other, UnitEntityData phantom, PetType? type)
-                => !ReferenceEquals(other, null) && !ReferenceEquals(other, phantom) && type.HasValue &&
-                    type != PetType.MythicSkeletalChampion && type != PetType.Clone;
-
-            internal static void SuppressWithoutOtherNativeMountSource(UnitEntityData owner, UnitEntityData phantom)
-            {
-                var pets = owner.Get<UnitPartPetMaster>()?.Pets;
-                if (pets == null || pets.Any(p => IsOtherNativeMountSource(p.Entity, phantom, p.EntityPart?.Type))) return;
-                var mount = Kingmaker.Blueprints.Root.BlueprintRoot.Instance?.SystemMechanics?.MountAbility;
-                if (mount == null) return;
-                var fact = owner.ActivatableAbilities.GetFact(mount);
-                if (fact != null) owner.RemoveFact(fact);
-            }
+            // Feed the native exclusion only within the mount-button scan.
+            internal static PetType NativeMountType(UnitPartPet pet)
+                => IsPrivatePhantom(pet) ? PetType.Clone : pet.Type;
         }
 
         [HarmonyPatch(typeof(Kingmaker.Controllers.Rest.RestController), "ResurrectDeadUnits")]

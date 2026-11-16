@@ -23,6 +23,7 @@ using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
+using Kingmaker.UnitLogic.Abilities.Components.TargetCheckers;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs;
@@ -128,26 +129,25 @@ internal static class Spiritualist0085Tests
         return false;
     }
 
+    private static UnitEntityData ManagedFixtureUnit(string id)
+    {
+        var unit = (UnitEntityData)FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
+        var descriptor = (UnitDescriptor)FormatterServices.GetUninitializedObject(typeof(UnitDescriptor));
+        Set(unit, "UniqueId", id);
+        Set(unit, "Descriptor", descriptor);
+        Set(descriptor, "Unit", unit);
+        Set(descriptor, "State", new UnitState(descriptor));
+        Set(unit, "Parts", new EntityPartsManager(unit));
+        var proxy = FormatterServices.GetUninitializedObject(AccessTools.Inner(typeof(EntityService), "Proxy"));
+        Set(proxy, "Entity", unit);
+        Set(unit, "Proxy", proxy);
+        return unit;
+    }
+
     private static void CheckRecoveryVisibility(Harmony harmony)
     {
-        TFact Empty<TFact>() => (TFact)FormatterServices.GetUninitializedObject(typeof(TFact));
-        UnitEntityData Unit(string id)
-        {
-            var unit = Empty<UnitEntityData>();
-            var descriptor = Empty<UnitDescriptor>();
-            Set(unit, "UniqueId", id);
-            Set(unit, "Descriptor", descriptor);
-            Set(descriptor, "Unit", unit);
-            Set(descriptor, "State", new UnitState(descriptor));
-            Set(unit, "Parts", new EntityPartsManager(unit));
-            return unit;
-        }
-
-        var master = Unit("0085-recovery-master");
-        var pet = Unit("0085-recovery-pet");
-        var proxy = FormatterServices.GetUninitializedObject(AccessTools.Inner(typeof(EntityService), "Proxy"));
-        Set(proxy, "Entity", master);
-        Set(master, "Proxy", proxy);
+        var master = ManagedFixtureUnit("0085-recovery-master");
+        var pet = ManagedFixtureUnit("0085-recovery-pet");
         Set(master, "m_IsInGame", true);
         Set(master.Descriptor, "m_IsPlayerFactionCached", true);
         Set(master.Descriptor, "AttackFactions", new UnitAttackFactions(master.Descriptor));
@@ -164,7 +164,7 @@ internal static class Spiritualist0085Tests
         Check(!(bool)Get(part, "Confined") && (bool)Get(part, "PendingManifest") && petPart.ShouldBeHidden && !pet.IsInGame,
             "C06/C07: recovery without a local scene clears confinement and defers visibility");
 
-        var local = Empty<SceneEntitiesState>();
+        var local = (SceneEntitiesState)FormatterServices.GetUninitializedObject(typeof(SceneEntitiesState));
         Set(master, "HoldingState", local);
         Set(pet, "HoldingState", local);
         var sceneCheck = AccessTools.Method(link, "CanPlace");
@@ -199,6 +199,55 @@ internal static class Spiritualist0085Tests
     }
 
     private static bool SkipRecoveryFixtureView() => false;
+
+    private static void CheckNativeMountAndRetirement(Harmony harmony, BlueprintUnit phantomBlueprint, BlueprintUnit dogBlueprint, PetType privateType)
+    {
+        var master = ManagedFixtureUnit("0085-mount-master");
+        var otherMaster = ManagedFixtureUnit("0085-mount-other-master");
+        UnitEntityData Pet(string id, BlueprintUnit blueprint, PetType type)
+        {
+            var unit = ManagedFixtureUnit(id);
+            Set(unit.Descriptor, "Blueprint", blueprint);
+            var facts = new EntityFactsManager(unit);
+            Set(unit, "Facts", facts);
+            Set(unit, "Buffs", facts.EnsureFactProcessor<BuffCollection>());
+            var part = unit.Ensure<UnitPartPet>();
+            Set(part, "m_MasterRef", new EntityPartRef<UnitEntityData, UnitPartPetMaster>(master));
+            Set(part, "Type", type);
+            return unit;
+        }
+
+        var phantom = Pet("0085-mount-phantom", phantomBlueprint, privateType);
+        var dog = Pet("0085-mount-dog", dogBlueprint, PetType.AnimalCompanion);
+        var collision = Pet("0085-mount-foreign", dogBlueprint, privateType);
+        const string mountButton = "Phantom0085Patches+MountSuppression";
+        PetType MountType(UnitEntityData unit) => (PetType)Call(mountButton, "NativeMountType", unit.Get<UnitPartPet>());
+        var updateMount = AccessTools.Method(typeof(UnitPartPetMaster), "UpdateMountAbility");
+        var rewritten = (IEnumerable<CodeInstruction>)Call(mountButton, "Transpiler", PatchProcessor.GetOriginalInstructions(updateMount));
+        Check(rewritten.Count(i => i.Calls(AccessTools.Method(T(mountButton), "NativeMountType"))) == 2 &&
+            MountType(phantom) == PetType.Clone && phantom.Get<UnitPartPet>().Type == privateType &&
+            MountType(dog) == PetType.AnimalCompanion && MountType(collision) == privateType,
+            "C17: native mount-button criteria exclude only the private marked phantom, preserving Dog and same-type foreign pets");
+
+        var nativeMount = AccessTools.Method(typeof(AbilityTargetIsSuitableMount), nameof(AbilityTargetIsSuitableMount.CanMount));
+        var prefix = AccessTools.Method(T("Phantom0085Patches+MountTargetExclusion"), "Prefix");
+        harmony.Patch(nativeMount, prefix: new HarmonyMethod(prefix));
+        try
+        {
+            Check(!AbilityTargetIsSuitableMount.CanMount(master, phantom) &&
+                AbilityTargetIsSuitableMount.CanMount(master, dog) && AbilityTargetIsSuitableMount.CanMount(master, collision) &&
+                !AbilityTargetIsSuitableMount.CanMount(otherMaster, dog),
+                "C17: native rider predicate excludes Phantom and retains native ownership checks for Dog and foreign pets");
+        }
+        finally { harmony.Unpatch(nativeMount, prefix); }
+
+        bool Retired(UnitEntityData unit) => (bool)Call("Phantom0085Patches+ExistingPetReference", "RetiredRecordedPet", unit);
+        phantom.MarkForDestroy();
+        Check(!Retired(phantom) && !Retired(dog), "C09: a still-bound pet can use native detach cleanup");
+        phantom.Get<UnitPartPet>().Clear();
+        Check(Retired(phantom) && !Retired(dog) && dog.Master == master,
+            "C09: an already detached and destroy-marked private pet skips repeated cleanup, leaving Dog's binding untouched");
+    }
 
     private static void FailPrivateInsert(SimpleBlueprint __1)
     {
@@ -743,11 +792,7 @@ internal static class Spiritualist0085Tests
         incoming.Reason = incoming;
         Check(!(bool)Call("Phantom0085Patches+ExactDamageTransfer", "CanReceivePayment", incoming, petEntity),
             "C14: native untargetable recipient is rejected before deducting redirected damage from the original hit");
-        bool OtherMount(UnitEntityData other, PetType? type) =>
-            (bool)Call("Phantom0085Patches+MountSuppression", "IsOtherNativeMountSource", other, petEntity, type);
-        Check(!OtherMount(petEntity, petType) && !OtherMount(otherEntity, PetType.MythicSkeletalChampion) &&
-            !OtherMount(otherEntity, PetType.Clone) && OtherMount(otherEntity, PetType.AnimalCompanion),
-            "mount source follows native exclusions plus the bound phantom");
+        CheckNativeMountAndRetirement(harmony, angersGrant.Pet, dogGrant.Pet, petType);
         var restPatch = T("Phantom0085Patches+RestResurrectionQueue");
         var restMethod = AccessTools.Method(typeof(Kingmaker.Controllers.Rest.RestController), "ResurrectDeadUnits");
         var nativeRest = AccessTools.Method(typeof(Kingmaker.Controllers.Rest.State.CampingState), "GetPartyUnitsForRest");
