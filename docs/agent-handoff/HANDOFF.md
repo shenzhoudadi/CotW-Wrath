@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D 的九项退回已修复，227/227 隔离定向与本地包内三个 DLL 回读通过。实际原生伙伴链、战斗包、存读档、重训界面、骑乘按钮等仍待验证。工作分支 `feat/cotw-0085-spiritualist`。[本轮修复](../work-packages/COTW-0085/B-D-fixes.md) · [原 D 复查](../work-packages/COTW-0085/D-spiritualist-review.md)。
+- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D2 复查 `acca889` 后退回 B，已在原生方法复现等级公式除零与互保组越界，并定位可复用的原生与模组实现。玩家场景未运行，安装包未上传。工作分支 `feat/cotw-0085-spiritualist`。[D2 复查及接手](../work-packages/COTW-0085/D2-spiritualist-review.md) · [前轮修复与验证](../work-packages/COTW-0085/B-D-fixes.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
