@@ -40,6 +40,7 @@ using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.UnitLogic.Mechanics.Properties;
 using Kingmaker.UnitLogic.Parts;
 using Kingmaker.UnitLogic.ActivatableAbilities;
@@ -841,30 +842,16 @@ namespace CallOfTheWild.Wrath.Prototype
         protected override bool IsAvailable() => Phantom0085Link.ConfinedPet(Owner) != null;
     }
 
-    // ---- Spiritual Inference aura: owner/ally buffs, condition gated ----
-    [TypeId("b7e10085a10045008500850085008512")]
-    public sealed class Phantom0085InferenceEnter : ContextAction
+    // ---- Spiritual Inference: native area applies buffs, combat rules recheck eligibility ----
+    [TypeId("b7e10085a10045008500850085008525")]
+    public sealed class Phantom0085InferenceCondition : ContextCondition
     {
         public bool Greater;
-        public BlueprintBuffReference OwnerBuff;
-        public BlueprintBuffReference AllyBuff;
-        public override string GetCaption() => "Spiritual Inference";
-        public override void RunAction()
-        {
-            var phantom = Context?.MaybeCaster;
-            var unit = Target?.Unit;
-            if (phantom == null || unit == null || unit == phantom) return;
-            var master = phantom.Get<UnitPartPet>()?.Master;
-            var buff = (unit == master ? OwnerBuff : (Greater ? AllyBuff : null))?.Get();
-            if (buff == null) return;
-            if (!Phantom0085InferenceBonus.Eligible(phantom, unit, Greater, unit == master))
-            {
-                Phantom0085InferenceExit.Remove(unit, phantom, buff);
-                return;
-            }
-            if (!unit.Buffs.Enumerable.Any(b => b.Blueprint == buff && b.Context?.MaybeCaster == phantom))
-                unit.Buffs.AddBuff(buff, phantom, TimeSpan.MaxValue, AbilityParams.Empty);
-        }
+        public bool ForMaster;
+
+        protected override string GetConditionCaption() => "Eligible for Spiritual Inference";
+        protected override bool CheckCondition()
+            => Phantom0085InferenceBonus.Eligible(Context?.MaybeCaster, Target?.Unit, Greater, ForMaster);
     }
 
     [TypeId("b7e10085a1004500850085008500851c")]
@@ -891,41 +878,23 @@ namespace CallOfTheWild.Wrath.Prototype
             return forMaster ? unit == master : greater && unit != master && unit.IsAlly(phantom);
         }
 
+        private bool GrantsBonus()
+            // Buffs written by earlier development builds have no native area owner.
+            => !string.IsNullOrEmpty(Buff.SourceAreaEffectId) &&
+                Eligible(Buff.Context?.MaybeCaster, Owner, Greater, ForMaster);
+
         public void OnEventAboutToTrigger(RuleCalculateAC evt)
         {
-            if (Eligible(Buff.Context?.MaybeCaster, Owner, Greater, ForMaster))
+            if (GrantsBonus())
                 evt.AddModifier(Bonus, Fact, ModifierDescriptor.Shield);
         }
         public void OnEventAboutToTrigger(RuleSavingThrow evt)
         {
-            if (Eligible(Buff.Context?.MaybeCaster, Owner, Greater, ForMaster))
+            if (GrantsBonus())
                 evt.AddModifier(Bonus, Fact, ModifierDescriptor.Circumstance);
         }
         public void OnEventDidTrigger(RuleCalculateAC evt) { }
         public void OnEventDidTrigger(RuleSavingThrow evt) { }
-    }
-
-    [TypeId("b7e10085a10045008500850085008518")]
-    public sealed class Phantom0085InferenceExit : ContextAction
-    {
-        public BlueprintBuffReference OwnerBuff;
-        public BlueprintBuffReference AllyBuff;
-        public override string GetCaption() => "Spiritual Inference end";
-        public override void RunAction()
-        {
-            var unit = Target?.Unit;
-            var phantom = Context?.MaybeCaster;
-            if (unit == null || phantom == null) return;
-            Remove(unit, phantom, OwnerBuff?.Get());
-            Remove(unit, phantom, AllyBuff?.Get());
-        }
-
-        internal static void Remove(UnitEntityData unit, UnitEntityData phantom, BlueprintBuff blueprint)
-        {
-            if (blueprint == null) return;
-            foreach (var fact in unit.Buffs.Enumerable.Where(b => b.Blueprint == blueprint && b.Context?.MaybeCaster == phantom).ToArray())
-                fact.Remove();
-        }
     }
 
     // ---- Phantom Recall: move only the bound manifested phantom ----
@@ -1332,12 +1301,17 @@ namespace CallOfTheWild.Wrath.Prototype
                     return;
                 }
                 var recipient = Phantom0085DamageTransfer.ResolveRecipient(deal, out int amount);
-                if (recipient == null) return;
+                // A direct damage rule rejected at entry would leave this damage unpaid.
+                if (recipient == null || !CanReceivePayment(deal, recipient)) return;
                 Exact.Add(deal, Marker);
                 SetResult.Invoke(deal, new object[] { deal.Result - amount });
                 SetRedirected.Invoke(deal, new object[] { amount });
                 deal.RedirectionTarget = recipient;
             }
+
+            private static bool CanReceivePayment(RuleDealDamage deal, UnitEntityData recipient)
+                => !UnitCommand.CommandTargetUntargetable(deal.Initiator, recipient, deal) &&
+                    !Kingmaker.Designers.GameHelper.IsAttackingGreenNPC(deal.Initiator, recipient);
 
             private static void Deliver(UnitEntityData initiator, UnitEntityData recipient, int amount, RuleDealDamage original)
             {

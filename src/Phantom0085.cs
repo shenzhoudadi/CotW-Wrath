@@ -422,17 +422,18 @@ namespace CallOfTheWild.Wrath.Prototype
         private static BlueprintFeature AuraFeature(FactoryShim f, string token, string name, string description,
             BlueprintAbilityAreaEffect area, UnitCommand.CommandType command)
         {
-            var host = f.Buff(token + "Host", name, description, AreaLink(area, token));
-            SetEnum(host, "m_Flags", "HiddenInUi");
+            var host = AuraHost(f, token, name, description, area);
             var toggle = Toggle(f, token, name, description, host, command);
             return f.Feature(token + "Feature", name, description, Facts(toggle));
         }
 
-        private static AddAreaEffect AreaLink(BlueprintAbilityAreaEffect area, string token)
+        private static BlueprintBuff AuraHost(FactoryShim f, string token, string name, string description, BlueprintAbilityAreaEffect area)
         {
             var link = new AddAreaEffect { name = "Phantom0085AreaLink" + token };
             Set(link, "m_AreaEffect", Ref<BlueprintAbilityAreaEffectReference>(area));
-            return link;
+            var host = f.Buff(token + "Host", name, description, link);
+            SetEnum(host, "m_Flags", "HiddenInUi");
+            return host;
         }
 
         private static ContextRankConfig Rank(BlueprintCharacterClass cls, string progression, params int[] thresholds)
@@ -1221,27 +1222,27 @@ namespace CallOfTheWild.Wrath.Prototype
                 new Phantom0085InferenceBonus { name = "Phantom0085InferenceOwnerBonus", Greater = greater, ForMaster = true, Bonus = greater ? 4 : 2 });
             var allyBuff = f.Buff(token + "Ally", "", "",
                 new Phantom0085InferenceBonus { name = "Phantom0085InferenceAllyBonus", Greater = greater, Bonus = 2 });
-            ownerBuff.Stacking = StackingType.Stack;
-            allyBuff.Stacking = StackingType.Stack;
+            var effects = new List<BlueprintComponent>
+            {
+                AreaBuff(ownerBuff, "Phantom0085InferenceOwnerArea",
+                    new Phantom0085InferenceCondition { name = "Phantom0085InferenceOwnerEligible", Greater = greater, ForMaster = true })
+            };
+            if (greater)
+                effects.Add(AreaBuff(allyBuff, "Phantom0085InferenceAllyArea",
+                    new Phantom0085InferenceCondition { name = "Phantom0085InferenceAllyEligible", Greater = true }));
             var aura = f.Add(new BlueprintAbilityAreaEffect
             {
                 Shape = AreaEffectShape.Cylinder, Size = 10.Feet(), AffectEnemies = false,
-                ComponentsArray = new BlueprintComponent[]
-                {
-                    new AbilityAreaEffectRunAction
-                    {
-                        name = "Phantom0085InferenceAura" + token,
-                        UnitEnter = PsychicAssets.Actions(new Phantom0085InferenceEnter { name = "Phantom0085InferenceEnter" + token, Greater = greater, OwnerBuff = Ref<BlueprintBuffReference>(ownerBuff), AllyBuff = Ref<BlueprintBuffReference>(allyBuff) }),
-                        UnitExit = PsychicAssets.Actions(new Phantom0085InferenceExit { name = "Phantom0085InferenceExit" + token, OwnerBuff = Ref<BlueprintBuffReference>(ownerBuff), AllyBuff = Ref<BlueprintBuffReference>(allyBuff) }),
-                        Round = PsychicAssets.Actions(new Phantom0085InferenceEnter { name = "Phantom0085InferenceRound" + token, Greater = greater, OwnerBuff = Ref<BlueprintBuffReference>(ownerBuff), AllyBuff = Ref<BlueprintBuffReference>(allyBuff) })
-                    }
-                }
+                ComponentsArray = effects.ToArray()
             }, token + "Area", greater ? "Greater Spiritual Inference" : "Spiritual Inference", "");
-            var petFeature = f.Feature(token + "Pet", greater ? "Greater Spiritual Inference" : "Spiritual Inference",
-                greater
-                    ? "At 12th level, whenever allies are within the phantom's reach, each ally gains a +2 shield bonus to AC and a +2 circumstance bonus on saving throws. For the spiritualist, these bonuses increase to +4. The phantom itself does not benefit."
-                    : "At 4th level, whenever the spiritualist is within the reach of her manifested phantom, she gains a +2 shield bonus to AC and a +2 circumstance bonus on saving throws. She doesn't gain these bonuses when the phantom is grappled, helpless or unconscious.",
-                AreaLink(aura, token));
+            var title = greater ? "Greater Spiritual Inference" : "Spiritual Inference";
+            var description = greater
+                ? "At 12th level, whenever allies are within the phantom's reach, each ally gains a +2 shield bonus to AC and a +2 circumstance bonus on saving throws. For the spiritualist, these bonuses increase to +4. The phantom itself does not benefit."
+                : "At 4th level, whenever the spiritualist is within the reach of her manifested phantom, she gains a +2 shield bonus to AC and a +2 circumstance bonus on saving throws. She doesn't gain these bonuses when the phantom is grappled, helpless or unconscious.";
+            var host = AuraHost(f, token, title, description, aura);
+            var spawn = new AuraFeatureComponent { name = "Phantom0085InferenceHost" + token };
+            Set(spawn, "m_Buff", Ref<BlueprintBuffReference>(host));
+            var petFeature = f.Feature(token + "Pet", title, description, spawn);
             if (greater) return GrantToPet(f, token, petFeature);
             var carrier = GrantToPet(f, token + "Grant", petFeature);
             var gate = ClassLevelGrant(character, 12, carrier, "Phantom0085InferenceBeforeGreater");

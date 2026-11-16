@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization;
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
@@ -9,6 +10,7 @@ using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.Enums;
@@ -22,7 +24,9 @@ using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
@@ -79,6 +83,49 @@ internal static class Spiritualist0085Tests
         => bp?.ComponentsArray?.Where(c => c != null && c.GetType().Name == typeName) ?? Enumerable.Empty<BlueprintComponent>();
     private static int Rank(ContextRankConfig config, int level)
         => (int)AccessTools.Method(typeof(ContextRankConfig), "ApplyProgression").Invoke(config, new object[] { level });
+
+    private static void CheckInferenceExit(AbilityAreaEffectBuff effect, Harmony harmony)
+    {
+        TFact Empty<TFact>() => (TFact)FormatterServices.GetUninitializedObject(typeof(TFact));
+        var target = Empty<UnitEntityData>();
+        var facts = new EntityFactsManager(target);
+        Set(target, "Facts", facts);
+        var buffs = new BuffCollection();
+        buffs.Initialize(facts);
+        Set(target, "Buffs", buffs);
+        var oldArea = Empty<AreaEffectEntityData>();
+        Set(oldArea, "UniqueId", "old-inference");
+        foreach (var source in new[] { oldArea.UniqueId, "recreated-inference", "second-phantom" })
+        {
+            var buff = Empty<Buff>();
+            Set(buff, "Blueprint", effect.Buff);
+            Set(buff, "Components", new List<EntityFactComponent>());
+            buff.SourceAreaEffectId = source;
+            buff.RestoreOwnerLink(facts);
+            facts.List.Add(buff);
+        }
+        var remove = AccessTools.Method(typeof(Buff), nameof(Buff.Remove));
+        var removeFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(RemoveInferenceFixtureBuff));
+        harmony.Patch(remove, prefix: new HarmonyMethod(removeFixture));
+        try
+        {
+            effect.HandleUnitExit(null, oldArea, target);
+            effect.HandleUnitExit(null, oldArea, target);
+            Check(facts.List.OfType<Buff>().Select(buff => buff.SourceAreaEffectId)
+                .SequenceEqual(new[] { "recreated-inference", "second-phantom" }),
+                "C15: native exit removes only the retired area, preserving its replacement and a second phantom's aura");
+        }
+        finally { harmony.Unpatch(remove, removeFixture); }
+    }
+
+    private static bool RemoveInferenceFixtureBuff(Buff __instance)
+    {
+        var facts = __instance.Manager;
+        facts.List.Remove(__instance);
+        var cache = Get(facts, "m_Cache");
+        AccessTools.Method(cache.GetType(), "Clear").Invoke(cache, null);
+        return false;
+    }
 
     private static void FailPrivateInsert(SimpleBlueprint __1)
     {
@@ -613,6 +660,16 @@ internal static class Spiritualist0085Tests
         Check(paymentRule.Result == 3 &&
             (int)AccessTools.Method(patch, "ApplyToHitPoints").Invoke(null, new object[] { null, paymentRule.Result, paymentRule }) == 3,
             "C13/C14: a marked payment passes its full integer damage to native ordinary HP");
+        Set(petEntity, "Parts", new EntityPartsManager(petEntity));
+        Set(otherEntity, "Parts", new EntityPartsManager(otherEntity));
+        var protectedDescriptor = (UnitDescriptor)FormatterServices.GetUninitializedObject(typeof(UnitDescriptor));
+        Set(petEntity, "Descriptor", protectedDescriptor);
+        Set(protectedDescriptor, "State", new UnitState(protectedDescriptor));
+        petEntity.State.Features.IsUntargetable.Retain();
+        var incoming = new RuleDealDamage(otherEntity, ownerEntity, new DirectDamage(Kingmaker.RuleSystem.DiceFormula.Zero, 20));
+        incoming.Reason = incoming;
+        Check(!(bool)Call("Phantom0085Patches+ExactDamageTransfer", "CanReceivePayment", incoming, petEntity),
+            "C14: native untargetable recipient is rejected before deducting redirected damage from the original hit");
         bool OtherMount(UnitEntityData other, PetType? type) =>
             (bool)Call("Phantom0085Patches+MountSuppression", "IsOtherNativeMountSource", other, petEntity, type);
         Check(!OtherMount(petEntity, petType) && !OtherMount(otherEntity, PetType.MythicSkeletalChampion) &&
@@ -661,6 +718,26 @@ internal static class Spiritualist0085Tests
         var inference = Load<BlueprintFeature>(cache, Id("SpiritualInference"));
         Check(inference.GetComponent<AddFeatureOnClassLevel>() is AddFeatureOnClassLevel gate && gate.BeforeThisLevel && gate.Level == 12 &&
             Component(inferenceAlly, "Phantom0085InferenceBonus") != null, "C15: basic aura retires at 12 and the ally bonus rechecks its source");
+        var basicArea = Load<BlueprintAbilityAreaEffect>(cache, Id("SpiritualInferenceArea"));
+        var greaterArea = Load<BlueprintAbilityAreaEffect>(cache, Id("GreaterSpiritualInferenceArea"));
+        foreach (var token in new[] { "SpiritualInference", "GreaterSpiritualInference" })
+        {
+            var feature = Load<BlueprintFeature>(cache, Id(token + "Pet"));
+            var host = feature.GetComponent<AuraFeatureComponent>()?.Buff;
+            Check(host?.GetComponent<AddAreaEffect>()?.AreaEffect == Load<BlueprintAbilityAreaEffect>(cache, Id(token + "Area")) &&
+                feature.GetComponent<AddAreaEffect>() == null,
+                "C15: " + token + " spawns its area from a native carrier buff on the pet feature");
+        }
+        var greaterEffects = greaterArea.GetComponents<AbilityAreaEffectBuff>().ToArray();
+        Check(basicArea.GetComponents<AbilityAreaEffectBuff>().Select(effect => effect.Buff.AssetGuid)
+            .SequenceEqual(new[] { Id("SpiritualInferenceOwner") }) &&
+            greaterEffects.Select(effect => effect.Buff.AssetGuid)
+                .SequenceEqual(new[] { Id("GreaterSpiritualInferenceOwner"), Id("GreaterSpiritualInferenceAlly") }) &&
+            new[] { basicArea, greaterArea }.All(area => area.GetComponent<AbilityAreaEffectRunAction>() == null) &&
+            new[] { basicArea, greaterArea }.SelectMany(area => area.GetComponents<AbilityAreaEffectBuff>())
+                .All(effect => effect.CheckConditionEveryRound && effect.Condition.Conditions.Single().GetType() == T("Phantom0085InferenceCondition")),
+            "C15: both auras use native area ownership with per-round phantom eligibility");
+        CheckInferenceExit(greaterEffects.Single(effect => effect.Buff == inferenceAlly), harmony);
         var curse = Load<BlueprintAbility>(cache, Id("HatredSla2"));
         var children = curse.GetComponent<Kingmaker.UnitLogic.Abilities.Components.AbilityVariants>()?.Variants.ToArray();
         Check(children != null && children.Length > 0 && children.All(child => child.Parent == curse &&
