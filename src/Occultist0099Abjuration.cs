@@ -37,6 +37,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var mindBuff = Identify(new BlueprintBuff
             {
                 Stacking = StackingType.Replace,
+                IsClassFeature = true,
                 ComponentsArray = new BlueprintComponent[]
                 {
                     new TemporaryHitPointsFromAbilityValue
@@ -61,6 +62,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var wardBuff = Identify(new BlueprintBuff
             {
                 Stacking = StackingType.Replace,
+                IsClassFeature = true,
                 ComponentsArray = new[] { StatType.SaveFortitude, StatType.SaveReflex, StatType.SaveWill }
                     .Select(stat => (BlueprintComponent)new AddContextStatBonus
                     {

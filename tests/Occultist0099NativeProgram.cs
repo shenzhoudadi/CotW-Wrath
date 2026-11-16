@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using HarmonyLib;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Kingmaker;
 using Kingmaker.Blueprints;
@@ -20,6 +21,7 @@ using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.DLC;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
 using Kingmaker.Inspect;
@@ -28,6 +30,7 @@ using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.Settings;
+using Kingmaker.UI.MVVM._VM.CharGen;
 using Kingmaker.UI.MVVM._VM.CharGen.Phases.Spells;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
@@ -97,6 +100,8 @@ internal static class Occultist0099NativeTests
     private static Action<RuleApplySpell> beforeDispatch;
     private static Action afterBatchRest;
     private static bool applyNativeEffects;
+    private static UnitProgressionData respecXpOwner;
+    private static BlueprintStatProgression respecXpTable;
     private static TimeSpan currentTime = TimeSpan.FromHours(8);
 
     // ------------------------------------------------------------------
@@ -161,6 +166,12 @@ internal static class Occultist0099NativeTests
         }
     }
     private static bool NoUnityProfile(ref IDisposable __result) { __result = null; return false; }
+    private static bool ProvideRespecExperience(UnitProgressionData __instance, ref BlueprintStatProgression __result)
+    {
+        if (__instance != respecXpOwner) return true;
+        __result = respecXpTable;
+        return false;
+    }
     private static bool NoNpcDisposition(ref bool __result) { __result = false; return false; }
     private static bool NeutralDifficulty(ref DifficultySettings __result)
     {
@@ -376,6 +387,7 @@ internal static class Occultist0099NativeTests
         var state = Empty<UnitState>();
         var mechanics = Empty<UnitMechanicFeatures>();
         Set(mechanics, "DomainsByIntelligenceFeature", new Kingmaker.Utility.CountableFlag());
+        Set(mechanics, "LegendaryHero", new Kingmaker.Utility.CountableFlag());
         Set(state, "Features", mechanics);
         Set(state, "m_Conditions", new sbyte[100]);
         Set(state, "m_ConditionsImmunity", new sbyte[100]);
@@ -383,6 +395,7 @@ internal static class Occultist0099NativeTests
 
         var progression = Empty<UnitProgressionData>();
         Set(descriptor, "Progression", progression);
+        Set(progression, "Owner", descriptor);
         Set(progression, "Classes", new List<ClassData>());
         if (cls != null && level > 0)
             ((List<ClassData>)Get(progression, "Classes")).Add(new ClassData(cls) { Level = level });
@@ -1018,6 +1031,229 @@ internal static class Occultist0099NativeTests
         caseStatus["MF03"] = "native_invest_reset_replenish_and_locked_refusal";
     }
 
+    private static Occultist0099FocusPart TransferRespecSurvivors(UnitEntityData unit, bool keepTemporaryClass = true)
+    {
+        // The native first-stage commit captures this interface list before
+        // replacing the character's parts with the respec unit's save data.
+        var survivors = unit.Parts.GetAll<IUnitPartSurviveRespec>(p => p.ShouldSurviveRespec).ToArray();
+        Check(survivors.OfType<Occultist0099FocusPart>().Count() == 1,
+            "MF09 native survivor enumeration captures the active or detached 0099 authority exactly once");
+        unit.Parts.TurnOff();
+        var settings = new JsonSerializerSettings { ContractResolver = new RespecContractResolver(), TypeNameHandling = TypeNameHandling.Auto };
+        var temporaryParts = new EntityPartsManager(unit);
+        if (keepTemporaryClass)
+        {
+            var temporary = temporaryParts.Ensure<Occultist0099FocusPart>();
+            temporary.State = Occultist0099Focus.Create();
+            Occultist0099Focus.BeginCycle(temporary.State, 1, 0, "respec-temporary-day", true);
+        }
+        var replacementParts = JsonConvert.SerializeObject(temporaryParts, settings);
+        JsonConvert.PopulateObject(replacementParts, unit.Parts, settings);
+        unit.Parts.ClearCache();
+        Check(unit.Get<Occultist0099FocusPart>()?.State.LastRestEventId == (keepTemporaryClass ? "respec-temporary-day" : null),
+            "MF09 the native respec resolver replaces the old collection with the temporary build's parts");
+        foreach (var survivor in survivors) survivor.CopyAfterRespec(unit);
+        // ForcePostLoad relinks deserialized parts before native event dispatch.
+        unit.Parts.RestoreOwnerLink(unit);
+        unit.Parts.TurnOn();
+        return unit.Get<Occultist0099FocusPart>();
+    }
+
+    private static void SignalRespecCommitted(UnitEntityData unit)
+        => EventBus.RaiseEvent<IUnitChangedAfterRespecHandler>(handler => handler.HandleUnitChangedAfterRespec(unit));
+
+    private static void FocusAndLearningArchiveNative(Occultist0099FocusPart part)
+    {
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new OptInContractResolver(),
+            TypeNameHandling = TypeNameHandling.Auto
+        };
+        string json = JsonConvert.SerializeObject(part, settings);
+        var loaded = JsonConvert.DeserializeObject<Occultist0099FocusPart>(json, settings);
+        var serializedPart = JObject.Parse(json);
+        Check(loaded?.State != null && loaded.State.Fingerprint() == part.State.Fingerprint() &&
+              (string)serializedPart["LastSuccessfulRest"] == part.State.LastRestEventId,
+            "MF09 the native opt-in serializer preserves all authoritative fields and the last successful rest in the focus part");
+        Check(serializedPart["CopyingFacts"] == null && serializedPart["RespecDraft"] == null,
+            "MF09 transient preview construction flags stay out of the archived ledger");
+        var invalid = part.State.Clone();
+        invalid.RespecBudgetCap = invalid.Spent;
+        Check(Occultist0099Focus.Validate(invalid) == Occultist0099Outcome.RejectedInvalidState && !invalid.Enabled,
+            "MF09 a persisted cap below usable points fails closed even when ordinary conservation holds");
+
+        var spells = Occultist0099Spells.Create(4, 16);
+        Occultist0099Spells.AddSlot(spells, "slot-1", "Abjuration");
+        Occultist0099Spells.Learn(spells, "slot-1", 1, Occultist0099AbjurationCatalog.MageShield);
+        var savedBook = JsonConvert.SerializeObject(new Occultist0099SpellbookData { State = spells }, settings);
+        var loadedBook = JsonConvert.DeserializeObject<Occultist0099SpellbookData>(savedBook, settings);
+        Check(loadedBook?.State?.Fingerprint() == spells.Fingerprint() &&
+              Occultist0099Spells.IsKnown(loadedBook.State, Occultist0099AbjurationCatalog.MageShield),
+            "SP03 native opt-in serialization preserves a learned root, its exact slot, and private book provenance");
+    }
+
+    private static void FocusPreviewAndRespecNative()
+    {
+        var live = Unit("focus-preview-live", occultistClass, 5, 18);
+        var liveHolder = new Feature(focusFact, live.Descriptor);
+        live.Facts.Add(liveHolder);
+        var mind = GrantMindBarrier(live);
+        var extra = Stage(new BlueprintFeature(), Occultist0099Ids.Id("NativeOnlyExtraAbjuration"), "0099N.ExtraSpells");
+        live.Facts.Add(new Feature(extra, live.Descriptor));
+        Rest(live);
+        InvestAndLock(live, 4);
+        var command = NativeCommand(mind, live);
+        Check(CastRule(mind, command).Success, "MF09 live source has a paid command before the native preview is opened");
+        var oldPart = live.Get<Occultist0099FocusPart>();
+        var authority = oldPart.State;
+        string restIdentity = authority.LastRestEventId;
+        string initial = authority.Fingerprint();
+        FocusAndLearningArchiveNative(oldPart);
+        var foreign = Unit("focus-respec-foreign", null, 0, 18);
+        oldPart.CopyAfterRespec(foreign);
+        Check(foreign.Get<Occultist0099FocusPart>() == null,
+            "MF09 a survivor captured for one character cannot populate another unit's ledger");
+
+        var preview = Unit("focus-preview-copy", occultistClass, 5, 18);
+        preview.PreviewOf = new EntityRef<UnitEntityData>(live);
+        preview.Facts.TurnOff();
+        AccessTools.Method(typeof(UnitHelper), "CopyFacts").Invoke(null, new object[] { live, preview });
+        preview.Facts.TurnOn();
+        var draft = preview.Get<Occultist0099FocusPart>().State;
+        Check(!ReferenceEquals(authority, draft) && draft.Fingerprint() == initial &&
+              preview.Resources.GetResourceAmount(focusResource) == authority.Available,
+            "MF09 the real native fact-copy path starts with a deep copy of the paid and locked focus ledger");
+        preview.RemoveFact(preview.Progression.Features.Enumerable.Single(f => f.Blueprint == extra));
+        Check(draft.Fingerprint() == initial, "MF09 dropping Extra Spells in preview does not revoke the base implement");
+        preview.RemoveFact(preview.Progression.Features.Enumerable.Single(f => f.Blueprint == abjurationImplement));
+        Check(draft.Invalidated == 3 && draft.Schools["Abjuration"].Remaining == 0 && !draft.Schools["Abjuration"].Present,
+            "MF09 actual preview fact removal retires only its own copy of the school balance");
+        Stable(initial, authority.Fingerprint(), "MF09 discarding the altered native preview leaves live authority byte-for-byte unchanged");
+
+        var scratch = Unit("focus-respec-vacuum", occultistClass, 1, 10);
+        scratch.PreviewOf = new EntityRef<UnitEntityData>(live);
+        scratch.Facts.Add(new Feature(focusFact, scratch.Descriptor));
+        var scratchState = scratch.Get<Occultist0099FocusPart>().State;
+        Check(!ReferenceEquals(scratchState, authority) && scratchState.Fingerprint() == initial &&
+              scratch.Resources.GetResourceAmount(focusResource) == 0,
+            "MF09 the native respec vacuum sees the inherited day without refilling or exposing it for use");
+
+        var window = Empty<RespecWindowVM>();
+        Set(window, "IsRespec", true);
+        Set(window, "CurrentUnit", new UniRx.ReactiveProperty<UnitEntityData>(live));
+        int completions = 0;
+        Set(window, "m_EndAction", new Action(() => completions++));
+        RespecWindowVM.Instance = window;
+        var sameUnitId = live.UniqueId;
+        respecXpOwner = live.Progression;
+        respecXpTable = new BlueprintStatProgression { Bonuses = Enumerable.Range(0, 22).Select(i => i * 1000).ToArray() };
+        var xpTable = AccessTools.PropertyGetter(typeof(UnitProgressionData), nameof(UnitProgressionData.ExperienceTable));
+        var xpBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(ProvideRespecExperience));
+        harmony.Patch(xpTable, prefix: new HarmonyMethod(xpBoundary));
+        try
+        {
+            var transferred = TransferRespecSurvivors(live);
+            var character = live.Progression.GetClassData(occultistClass);
+            character.Level = 1;
+            Set(live.Progression, "Experience", 5000);
+            Set(live.Progression, "m_CharacterLevel", (int?)1);
+            Set(live.Progression, "m_MythicLevel", (int?)0);
+            SetInt(live, 10);
+            var intermediate = live.Progression.Features.Enumerable.Single(f => f.Blueprint == abjurationImplement);
+            live.RemoveFact(intermediate);
+            SignalRespecCommitted(live);
+            Check(!ReferenceEquals(authority, transferred.State) && transferred.State.Fingerprint() == initial &&
+                  live.UniqueId == sameUnitId,
+                "MF09 the native respec survivor retains the whole cycle through the first committed but unfinished level");
+            window.Complete();
+            Check(completions == 0 && live.Resources.GetResourceAmount(focusResource) == 0 &&
+                  transferred.State.Fingerprint() == initial,
+                "MF09 native Complete cannot finalize while the normal progression still has levels to rebuild");
+            character.Level = 5;
+            Set(live.Progression, "m_CharacterLevel", (int?)5);
+            SetInt(live, 18);
+            mind = GrantMindBarrier(live);
+            window.Complete();
+            Stable(initial, transferred.State.Fingerprint(),
+                "MF09 ending the native rebuild at the same class and Intelligence preserves paid IDs and investment");
+            Check(completions == 1 && live.Buffs.GetBuff(wardingTalisman) != null && live.Resources.GetResourceAmount(focusResource) == 8,
+                "MF09 the finalized build recovers the valid ward and projects the original available balance");
+            AccessTools.Method(typeof(RespecWindowVM), "DisposeImplementation").Invoke(window, null);
+            Stable(initial, transferred.State.Fingerprint(), "MF09 closing the already finalized native window leaves the ledger unchanged");
+        }
+        finally
+        {
+            harmony.Unpatch(xpTable, xpBoundary);
+            respecXpOwner = null;
+            respecXpTable = null;
+            RespecWindowVM.Instance = null;
+        }
+
+        var partial = Empty<RespecWindowVM>();
+        Set(partial, "IsRespec", true);
+        Set(partial, "CurrentUnit", new UniRx.ReactiveProperty<UnitEntityData>(live));
+        RespecWindowVM.Instance = partial;
+        Occultist0099FocusPart lowered;
+        try
+        {
+            lowered = TransferRespecSurvivors(live);
+            SetInt(live, 14);
+            SignalRespecCommitted(live);
+            Check(lowered.State.RespecBudgetCap == null && lowered.State.Available == 8,
+                "MF09 a continued native window does not use temporary post-respec stats for the cap");
+            AccessTools.Method(typeof(RespecWindowVM), "DisposeImplementation").Invoke(partial, null);
+        }
+        finally { RespecWindowVM.Instance = null; }
+        Check(lowered.State.Budget == 9 && lowered.State.RespecBudgetCap == 7 && lowered.State.Spent == 1 &&
+              lowered.State.Invalidated == 2 && lowered.State.Available == 6 && lowered.State.LastRestEventId == restIdentity,
+            "MF09 finalized respec with lower Intelligence applies the lower cap without starting a day");
+        FocusAndLearningArchiveNative(lowered);
+        string clamped = lowered.State.Fingerprint();
+        lowered = TransferRespecSurvivors(live);
+        SignalRespecCommitted(live);
+        Stable(clamped, lowered.State.Fingerprint(), "MF09 repeating the same cap cannot retire the same budget twice");
+
+        var removed = TransferRespecSurvivors(live, keepTemporaryClass: false);
+        live.Progression.Classes.Clear();
+        live.RemoveFact(live.Progression.Features.Enumerable.Single(f => f.Blueprint == abjurationImplement));
+        live.RemoveFact(liveHolder);
+        SignalRespecCommitted(live);
+        Check(!removed.State.ClassPresent && removed.State.Available == 0 && removed.State.Spent == 1 &&
+              removed.State.LastRestEventId == restIdentity && removed.State.ChargedExecutions.Count == 1,
+            "MF09 native respec without any Occultist facts retains only disabled day authority and paid IDs");
+        live.Progression.Classes.Add(new ClassData(occultistClass) { Level = 5 });
+        live.Facts.Add(new Feature(focusFact, live.Descriptor));
+        mind = GrantMindBarrier(live);
+        Check(!((Occultist0099FocusResourceLogic)mind.ResourceLogic).IsAbilityRestrictionPassed(mind) &&
+              live.Resources.GetResourceAmount(focusResource) == 0 && live.Buffs.GetBuff(wardingTalisman) == null,
+            "MF09 same-day reacquisition after committed loss cannot mint a new pool or old ward");
+        Rest(live);
+        Check(removed.State.LastRestEventId != restIdentity && removed.State.RespecBudgetCap == null &&
+              removed.State.Available == 7 && removed.State.Spent == 0 && removed.State.ChargedExecutions.Count == 0,
+            "MF09 the next real rest clears the retired budget cap and creates a legitimate fresh cycle");
+        Check(mindBarrierBuff.IsClassFeature && wardingTalisman.IsClassFeature,
+            "MF09 native respec treats both effects as class-owned and does not carry them as ordinary buffs");
+        caseStatus["MF09"] = "native_copy_facts_respec_survivor_rebuild_window_and_committed_budget";
+    }
+
+    private static void RespecMasteryAuthorityNative()
+    {
+        var unit = Unit("respec-mastery-provenance", occultistClass, 20, 18);
+        unit.Facts.Add(new Feature(focusFact, unit.Descriptor));
+        GrantMindBarrier(unit);
+        InvestAndLock(unit, 4);
+        var state = unit.Get<Occultist0099FocusPart>().State;
+        Occultist0099Focus.SetMastery(state, "Abjuration");
+        Check(Occultist0099Focus.PaySchool(state, "Abjuration", 1, "old-mastery-charge").FromMastery == 1,
+            "MF09 fixture establishes prior mastery spending and its old school authorization");
+        var copied = TransferRespecSurvivors(unit);
+        SignalRespecCommitted(unit);
+        InFocus(unit, f => Check(copied.State.MasterySpent == 1 && copied.State.MasteryRemaining == 3 &&
+              copied.State.ChargedExecutions.Contains("old-mastery-charge") && copied.State.MasterySchool == null &&
+              f.MindBarrier("Abjuration").EffectiveLevel == 20,
+            "MF09 rebuilding the same level and school preserves mastery consumption but requires a newly granted authorization"));
+    }
+
     private static void MF01Native()
     {
         var unit = Unit("mf01", occultistClass, 5, 14);
@@ -1605,6 +1841,8 @@ internal static class Occultist0099NativeTests
 
         MF01Native();
         AbjurationEffectsNative();
+        FocusPreviewAndRespecNative();
+        RespecMasteryAuthorityNative();
         SP01Native();
         SP02Native();
         ExhaustedImplementQuotaNative();
@@ -1625,7 +1863,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B4 directed native recheck (Abjuration focus operations and effects)",
+            ["stage"] = "B5 directed native recheck (focus preview, respec transfer and archive fields)",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -1644,9 +1882,9 @@ internal static class Occultist0099NativeTests
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Managed native RuleCastSpell payment, Mind Barrier application, RuleDealDamage, Warding Talisman modifiers, ApplySpellbook/OnApplyAction, SelectSpell/AddKnown, fact replacement and ApplyRest passed."
+                ? "Native focus and spell learning, CopyFacts, respec survivor transfer, window completion, archived fields and rest passed in the managed fixture."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Real managed native Rulebook, RuleCastSpell, AbilityResourceLogic, AbilityEffectRunAction/ContextActionApplyBuff, buff activation and expiry, damage preparation/calculation/delivery, stat modifiers, facts and ApplyRest. The fixture supplies neutral difficulty and faction inputs and skips Unity profiling/hit visuals. For the effects case a headless executor boundary runs native managed ability effects directly. Other cast cases use a dispatch counter. Command binding is invoked directly. Prior native learning cases stage the preview sources and exercise native choices. No full command OnAction, real scene executor, rendered UI, plan serialization, respec controller, full rest coroutine or immediate scripted rest scene.",
+            ["boundary"] = "Managed native CopyFacts, IUnitPartSurviveRespec enumeration and callback, RespecContractResolver population of the parts collection, RestoreOwnerLink, after-respec notification, real window Complete and close, and opt-in archive resolver. XP table and changed class/stats are fixture inputs. Prior managed casting, buff/damage, learning and ApplyRest checks also run. Full RespecOnCommit scene, player UI, disk save/load, full command OnAction and scripted rest scenes are outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

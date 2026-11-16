@@ -16,7 +16,10 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Controllers.Rest;
+using Kingmaker.ElementsSystem;
 using Kingmaker.EntitySystem.Entities;
+using Kingmaker.PubSubSystem;
+using Kingmaker.UI.MVVM._VM.CharGen;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Parts;
@@ -32,10 +35,131 @@ namespace CallOfTheWild.Wrath.Prototype
     }
 
     [TypeId(Occultist0099Ids.FocusPartTypeId)]
-    public sealed class Occultist0099FocusPart : UnitPart
+    public sealed class Occultist0099FocusPart : UnitPart, IUnitPartSurviveRespec, IUnitChangedAfterRespecHandler
     {
         [JsonProperty] public Occultist0099FocusState State;
         [JsonProperty] internal string LastSuccessfulRest;
+        [JsonProperty] private bool m_RespecPending;
+        [JsonIgnore] internal bool CopyingFacts;
+        [JsonIgnore] internal bool RespecDraft;
+
+        internal bool Rebuilding => m_RespecPending || RespecDraft;
+        internal bool DeferReconciliation => CopyingFacts || Rebuilding;
+
+        public bool ShouldSurviveRespec => State != null;
+
+        internal static Occultist0099FocusPart PreviewSource(UnitEntityData unit)
+        {
+            for (var parent = unit.PreviewOf.Entity; parent != null; parent = parent.PreviewOf.Entity)
+            {
+                var part = parent.Get<Occultist0099FocusPart>();
+                if (part?.State != null) return part;
+            }
+            return null;
+        }
+
+        internal void CopyLedger(Occultist0099FocusPart source)
+        {
+            State = source.State.Clone();
+            LastSuccessfulRest = source.LastSuccessfulRest;
+        }
+
+        public void CopyAfterRespec(UnitEntityData toUnit)
+        {
+            if (toUnit != Owner || State == null) return;
+            var restored = toUnit.Ensure<Occultist0099FocusPart>();
+            restored.CopyLedger(this);
+            restored.m_RespecPending = true;
+            restored.RespecDraft = false;
+        }
+
+        internal static bool RebuildWindowOpen(UnitEntityData unit)
+        {
+            var window = RespecWindowVM.Instance;
+            return window?.IsRespec == true && ReferenceEquals(window.CurrentUnit?.Value, unit);
+        }
+
+        public void HandleUnitChangedAfterRespec(UnitEntityData unit)
+        {
+            if (unit != Owner || !m_RespecPending) return;
+            if (RebuildWindowOpen(unit)) RefreshBuild(unit, false);
+            else FinishRespec();
+        }
+
+        internal void FinishRespec()
+        {
+            if (!m_RespecPending || Owner == null) return;
+            m_RespecPending = false;
+            if (!RefreshBuild(Owner, true)) Occultist0099Focus.RetireClass(State);
+        }
+
+        internal static bool RefreshBuild(UnitEntityData unit, bool respec)
+        {
+            var runtime = Occultist0099NativeScope.RuntimeOf(unit, Occultist0099Ids.FocusFactGuid,
+                typeof(Occultist0099FocusFact0099));
+            return Occultist0099NativeScope.InRuntimeContext(runtime,
+                component => ((Occultist0099FocusFact0099)component).RefreshBuild(respec), false);
+        }
+    }
+
+    [HarmonyPatch(typeof(UnitHelper), "CopyFacts")]
+    internal static class Occultist0099NativeFocusPreview
+    {
+        private static void Prefix(UnitEntityData __0, UnitEntityData __1, out Occultist0099FocusPart __state)
+        {
+            __state = null;
+            if (__0 == __1 || __1.PreviewOf.Entity != __0) return;
+            var direct = __0.Get<Occultist0099FocusPart>();
+            var source = direct?.State != null ? direct : Occultist0099FocusPart.PreviewSource(__1);
+            if (source == null) return;
+            __state = __1.Ensure<Occultist0099FocusPart>();
+            __state.CopyLedger(source);
+            __state.RespecDraft = source != direct || source.Rebuilding;
+            __state.CopyingFacts = true;
+        }
+
+        private static void Finalizer(UnitEntityData __1, Occultist0099FocusPart __state, Exception __exception)
+        {
+            if (__state == null) return;
+            __state.CopyingFacts = false;
+            if (__exception == null) Occultist0099FocusPart.RefreshBuild(__1, false);
+        }
+    }
+
+    [HarmonyPatch(typeof(RespecWindowVM), nameof(RespecWindowVM.Complete))]
+    internal static class Occultist0099NativeRespecComplete
+    {
+        private static void Prefix(RespecWindowVM __instance)
+        {
+            if (!__instance.IsRespec) return;
+            var unit = __instance.CurrentUnit?.Value;
+            var part = unit?.Get<Occultist0099FocusPart>();
+            if (part?.Rebuilding == true && !unit.Progression.CanLevelUpNormal && !unit.Progression.CanLevelUpMythic)
+                part.FinishRespec();
+        }
+    }
+
+    // Existing partial-respec variations can close the native window sooner.
+    // At that point the currently committed build, if any, is authoritative.
+    [HarmonyPatch(typeof(RespecWindowVM), "DisposeImplementation")]
+    internal static class Occultist0099NativeRespecClosed
+    {
+        private static void Prefix(RespecWindowVM __instance)
+        {
+            if (__instance.IsRespec) __instance.CurrentUnit?.Value?.Get<Occultist0099FocusPart>()?.FinishRespec();
+        }
+    }
+
+    [HarmonyPatch(typeof(UnitEntityData), "OnApplyPostLoadFixes")]
+    internal static class Occultist0099NativeRespecLoad
+    {
+        private static void Postfix(UnitEntityData __instance)
+        {
+            // An interrupted rebuild can be loaded without its old window.
+            // Use the final descriptor and body after native stat/load fixes.
+            if (!ContextData<UnitEntityData.RespecCommit>.Current && !Occultist0099FocusPart.RebuildWindowOpen(__instance))
+                __instance.Get<Occultist0099FocusPart>()?.FinishRespec();
+        }
     }
 
     [TypeId(Occultist0099Ids.FocusFactTypeId)]
@@ -52,7 +176,17 @@ namespace CallOfTheWild.Wrath.Prototype
             get
             {
                 var part = Owner.Ensure<Occultist0099FocusPart>();
-                if (part.State == null) part.State = Data.State ?? Occultist0099Focus.Create();
+                if (part.State == null)
+                {
+                    var source = Occultist0099FocusPart.PreviewSource(Owner);
+                    if (source != null)
+                    {
+                        part.CopyLedger(source);
+                        // UnitHelper.Respec starts a vacuum unit without CopyFacts.
+                        part.RespecDraft = true;
+                    }
+                    else part.State = Data.State ?? Occultist0099Focus.Create();
+                }
                 Data.State = null;
                 return part;
             }
@@ -77,10 +211,19 @@ namespace CallOfTheWild.Wrath.Prototype
             return true;
         }
 
-        protected override void OnActivate()
+        protected override void OnActivate() => RefreshBuild(false);
+
+        internal bool RefreshBuild(bool respec)
         {
-            if (ClassLevel() <= 0) return;
+            int level = ClassLevel();
+            if (level <= 0) return false;
             var part = Ledger;
+            if (part.DeferReconciliation)
+            {
+                SyncResourceMirror();
+                SyncWardingTalisman();
+                return true;
+            }
             if (part.LastSuccessfulRest != null && part.LastSuccessfulRest != part.State.LastRestEventId)
                 BeginCycle(part.LastSuccessfulRest, false);
             else if (string.IsNullOrEmpty(part.State.LastRestEventId))
@@ -88,22 +231,26 @@ namespace CallOfTheWild.Wrath.Prototype
             else
                 Occultist0099Focus.ReacquireClass(part.State);
 
-            if (ClassLevel() < part.State.Level)
-                Occultist0099Focus.RespecBudgetDown(part.State, ClassLevel(), IntModifier());
             Occultist0099Focus.Validate(part.State);
             ReconcileSchools();
+            if (respec)
+            {
+                // The rebuilt class will bind its actual mastery selection.
+                // Until then only the spent and remaining mastery points survive.
+                part.State.MasterySchool = null;
+                Occultist0099Focus.RespecBudgetDown(part.State, level, IntModifier());
+            }
             SyncResourceMirror();
             SyncWardingTalisman();
+            return true;
         }
 
         protected override void OnDeactivate()
         {
             var part = Owner.Get<Occultist0099FocusPart>();
-            if (part?.State == null) return;
-            if (ClassLevel() <= 0 && part.State.ClassPresent)
-                foreach (string school in Occultist0099Schools.Order)
-                    Occultist0099Focus.RespecRemoveSchool(part.State, school);
-            Occultist0099Focus.RemoveClass(part.State);
+            if (part?.State == null || part.DeferReconciliation) return;
+            if (ClassLevel() <= 0) Occultist0099Focus.RetireClass(part.State);
+            else Occultist0099Focus.RemoveClass(part.State);
             RemoveMindBarrier();
             SyncWardingTalisman();
         }
@@ -112,15 +259,18 @@ namespace CallOfTheWild.Wrath.Prototype
 
         protected override void OnApplyPostLoadFixes()
         {
-            Occultist0099Focus.Validate(State);
-            ReconcileSchools();
+            if (!Ledger.DeferReconciliation)
+            {
+                Occultist0099Focus.Validate(State);
+                ReconcileSchools();
+            }
             SyncResourceMirror();
             SyncWardingTalisman();
         }
 
         internal void Rest(string identity)
         {
-            if (ClassLevel() <= 0) return;
+            if (ClassLevel() <= 0 || Ledger.DeferReconciliation) return;
             bool reset = BeginCycle(identity, false);
             Occultist0099Focus.Validate(State);
             SyncResourceMirror();
@@ -130,6 +280,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal void SetSchoolPresent(string school, bool present)
         {
+            if (Ledger.DeferReconciliation) return;
             var result = present ? Occultist0099Focus.SetSchoolPresent(State, school, true) :
                 Occultist0099Focus.RespecRemoveSchool(State, school);
             if (result != Occultist0099Outcome.Ok) return;
@@ -201,7 +352,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 Owner.Buffs.AddBuff(blueprint, Owner, (TimeSpan?)null);
         }
 
-        public bool IsOwnedBy(UnitEntityData unit) => unit != null && unit == Owner && ClassLevel() > 0;
+        public bool IsOwnedBy(UnitEntityData unit)
+            => unit != null && unit == Owner && ClassLevel() > 0 && !Ledger.Rebuilding;
 
         public bool CanPaySchool(UnitEntityData caster, string school, int cost,
             string executionId)
@@ -248,7 +400,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var native = resources.PersistantResources
                 .FirstOrDefault(r => r.Blueprint == resource);
             if (native == null) return;
-            native.Amount = State.ClassPresent && State.Enabled ? State.Available : 0;
+            native.Amount = State.ClassPresent && State.Enabled && !Ledger.Rebuilding ? State.Available : 0;
         }
 
         public int AuthoritativeAvailable() => State.Available;
@@ -280,14 +432,14 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         public int WardingTalismanResonance(string school)
-            => ClassLevel() > 0 ? Occultist0099Focus.Resonance(State, school) : 0;
+            => IsOwnedBy(Owner) ? Occultist0099Focus.Resonance(State, school) : 0;
 
         public Occultist0099FocusPower MindBarrier(string school)
             => Occultist0099Focus.MindBarrier(State, school, ClassLevel(), IntModifier());
 
         internal bool CanRetainMindBarrier()
             => State.Enabled && State.ClassPresent && State.Locked &&
-               State.Schools[Occultist0099Ids.SliceSchool].Present && ClassLevel() > 0;
+               State.Schools[Occultist0099Ids.SliceSchool].Present && IsOwnedBy(Owner);
 
         public string StateFingerprint() => State.Fingerprint();
     }
@@ -314,6 +466,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static void Postfix(UnitDescriptor __0)
         {
             var unit = __0?.Unit;
+            if (unit?.PreviewOf.Entity != null) return;
             var part = unit?.Get<Occultist0099FocusPart>();
             var runtime = Occultist0099NativeScope.RuntimeOf(unit,
                 Occultist0099Ids.FocusFactGuid, typeof(Occultist0099FocusFact0099));

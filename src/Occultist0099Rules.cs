@@ -13,6 +13,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace CallOfTheWild.Wrath.Prototype
 {
@@ -69,14 +70,15 @@ namespace CallOfTheWild.Wrath.Prototype
             => PanoplyOrder.Where((p, i) => PanoplyMembers[i].Contains(school)).ToArray();
     }
 
+    [DataContract]
     public sealed class Occultist0099SchoolState
     {
-        public bool Present;            // the implement (school fact) is owned
-        public int Invested;            // A, ordinary investment for this cycle
-        public int Remaining;           // R, unspent ordinary points
-        public int LockedInvestment;    // A frozen at Full Round Lock
-        public int Resonance;           // computed from the locked snapshot
-        public bool ResonanceValid;
+        [DataMember] public bool Present;            // the implement (school fact) is owned
+        [DataMember] public int Invested;            // A, ordinary investment for this cycle
+        [DataMember] public int Remaining;           // R, unspent ordinary points
+        [DataMember] public int LockedInvestment;    // A frozen at Full Round Lock
+        [DataMember] public int Resonance;           // computed from the locked snapshot
+        [DataMember] public bool ResonanceValid;
 
         public Occultist0099SchoolState Clone()
         {
@@ -91,32 +93,34 @@ namespace CallOfTheWild.Wrath.Prototype
 
     // One rest cycle per character. G + sum(R) + U + Q = B is invariant.
     // Mastery points (T/H) are a separate 4-point pool outside B.
+    [DataContract]
     public sealed class Occultist0099FocusState
     {
-        public bool ClassPresent;
-        public bool Enabled;                 // false closes payment and resonance
-        public int Level;                    // actual Occultist level L
-        public int IntModifier;              // effective INT modifier M at cycle start
+        [DataMember] public bool ClassPresent;
+        [DataMember] public bool Enabled;                 // false closes payment and resonance
+        [DataMember] public int Level;                    // actual Occultist level L
+        [DataMember] public int IntModifier;              // effective INT modifier M at cycle start
         // Effective Intelligence score at cycle start (score = 10 + 2*M for
         // the model fixtures; the native adapter passes the real stat). The
         // O-S02 learning/casting gate Int >= 10 + circle reads this.
-        public int Intelligence;
-        public int Budget;                   // B = max(0, L + M)
-        public int Generic;                  // G
-        public int Spent;                    // U, ordinary points actually paid
-        public int Invalidated;              // Q, ordinary points retired by respec
-        public int MasterySpent;             // T
-        public int MasteryRemaining;         // H, T + H <= 4
-        public string MasterySchool;
-        public string PhysicalAttribute;     // Physical Enhancement, chosen before lock
-        public bool Locked;
-        public string LastRestEventId;
-        public Dictionary<string, Occultist0099SchoolState> Schools =
+        [DataMember] public int Intelligence;
+        [DataMember] public int Budget;                   // B = max(0, L + M)
+        [DataMember] public int? RespecBudgetCap;
+        [DataMember] public int Generic;                  // G
+        [DataMember] public int Spent;                    // U, ordinary points actually paid
+        [DataMember] public int Invalidated;              // Q, ordinary points retired by respec
+        [DataMember] public int MasterySpent;             // T
+        [DataMember] public int MasteryRemaining;         // H, T + H <= 4
+        [DataMember] public string MasterySchool;
+        [DataMember] public string PhysicalAttribute;     // Physical Enhancement, chosen before lock
+        [DataMember] public bool Locked;
+        [DataMember] public string LastRestEventId;
+        [DataMember] public Dictionary<string, Occultist0099SchoolState> Schools =
             new Dictionary<string, Occultist0099SchoolState>();
-        public Dictionary<string, int> PanoplyResonance = new Dictionary<string, int>();
-        public Dictionary<string, bool> PanoplyValid = new Dictionary<string, bool>();
-        public HashSet<string> ChargedExecutions = new HashSet<string>();
-        public HashSet<string> ConsumedCorpses = new HashSet<string>();
+        [DataMember] public Dictionary<string, int> PanoplyResonance = new Dictionary<string, int>();
+        [DataMember] public Dictionary<string, bool> PanoplyValid = new Dictionary<string, bool>();
+        [DataMember] public HashSet<string> ChargedExecutions = new HashSet<string>();
+        [DataMember] public HashSet<string> ConsumedCorpses = new HashSet<string>();
 
         public Occultist0099FocusState()
         {
@@ -141,6 +145,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 ClassPresent ? "1" : "0", Enabled ? "1" : "0", Level.ToString(),
                 IntModifier.ToString(), Intelligence.ToString(),
                 Budget.ToString(), Generic.ToString(),
+                RespecBudgetCap?.ToString() ?? "-",
                 Spent.ToString(), Invalidated.ToString(), MasterySpent.ToString(),
                 MasteryRemaining.ToString(), MasterySchool ?? "-",
                 PhysicalAttribute ?? "-", Locked ? "1" : "0",
@@ -167,7 +172,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 ClassPresent = ClassPresent, Enabled = Enabled, Level = Level,
                 IntModifier = IntModifier, Intelligence = Intelligence,
-                Budget = Budget, Generic = Generic,
+                Budget = Budget, RespecBudgetCap = RespecBudgetCap, Generic = Generic,
                 Spent = Spent, Invalidated = Invalidated, MasterySpent = MasterySpent,
                 MasteryRemaining = MasteryRemaining, MasterySchool = MasterySchool,
                 PhysicalAttribute = PhysicalAttribute, Locked = Locked,
@@ -208,9 +213,10 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (s == null || s.Budget < 0 || s.Generic < 0 || s.Spent < 0 ||
                 s.Invalidated < 0 || s.MasterySpent < 0 || s.MasteryRemaining < 0 ||
-                s.MasterySpent + s.MasteryRemaining > 4)
+                s.MasterySpent + s.MasteryRemaining > 4 || s.RespecBudgetCap < 0 || s.RespecBudgetCap > s.Budget)
                 return false;
             if (s.Available + s.Spent + s.Invalidated != s.Budget) return false;
+            if (s.RespecBudgetCap.HasValue && s.Available > Math.Max(0, s.RespecBudgetCap.Value - s.Spent)) return false;
             foreach (string school in Occultist0099Schools.Order)
             {
                 var st = s.Schools[school];
@@ -263,6 +269,7 @@ namespace CallOfTheWild.Wrath.Prototype
             s.IntModifier = intModifier;
             s.Intelligence = 10 + 2 * intModifier;   // model convention
             s.Budget = budget;
+            s.RespecBudgetCap = null;
             s.Generic = budget;
             s.Spent = 0;
             s.Invalidated = 0;
@@ -670,6 +677,7 @@ namespace CallOfTheWild.Wrath.Prototype
             st.Invested = 0;
             st.Remaining = 0;
             InvalidateSchool(s, school);
+            if (s.MasterySchool == school) s.MasterySchool = null;
             return Occultist0099Outcome.Ok;
         }
 
@@ -682,10 +690,11 @@ namespace CallOfTheWild.Wrath.Prototype
             var g = Guard(s);
             if (g != Occultist0099Outcome.Ok) return g;
             int newCap = Math.Max(0, newLevel + newIntModifier);
-            if (newCap >= s.Budget) return Occultist0099Outcome.Noop;
+            if (newCap >= (s.RespecBudgetCap ?? s.Budget)) return Occultist0099Outcome.Noop;
+            s.RespecBudgetCap = newCap;
             int targetAvailable = Math.Max(0, newCap - s.Spent - s.Invalidated);
             int excess = s.Available - targetAvailable;
-            if (excess <= 0) return Occultist0099Outcome.Noop;
+            if (excess <= 0) return Occultist0099Outcome.Ok;
             int fromG = Math.Min(s.Generic, excess);
             s.Generic -= fromG;
             int left = excess - fromG;
@@ -712,6 +721,19 @@ namespace CallOfTheWild.Wrath.Prototype
             // let the same execution id pay twice after same-day reacquire.
             // Only BeginCycle (a genuinely new rest cycle) clears them.
             return Occultist0099Outcome.Ok;
+        }
+
+        public static void RetireClass(Occultist0099FocusState s)
+        {
+            if (IsConsistent(s))
+            {
+                ReacquireClass(s);
+                foreach (string school in Occultist0099Schools.Order.Where(school => s.Schools[school].Present))
+                    RespecRemoveSchool(s, school);
+                RespecBudgetDown(s, 0, 0);
+                s.MasterySchool = null;
+            }
+            RemoveClass(s);
         }
 
         public static Occultist0099Outcome ReacquireClass(Occultist0099FocusState s)

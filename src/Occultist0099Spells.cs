@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace CallOfTheWild.Wrath.Prototype
 {
@@ -122,51 +123,54 @@ namespace CallOfTheWild.Wrath.Prototype
         public static int SliceRows => Roots.Length;
     }
 
+    [DataContract]
     public sealed class Occultist0099Slot
     {
-        public string Key;
-        public string School;             // null for a Panoply
-        public string Panoply;            // null for a school
-        public bool ExtraSpells;
-        public int Sequence;
+        [DataMember] public string Key;
+        [DataMember] public string School;             // null for a Panoply
+        [DataMember] public string Panoply;            // null for a school
+        [DataMember] public bool ExtraSpells;
+        [DataMember] public int Sequence;
     }
 
+    [DataContract]
     public sealed class Occultist0099Source
     {
-        public string Id;
-        public string SlotKey;
-        public int Circle;
-        public string RootGuid;
-        public string Origin;             // "implement" | "same-book-grant"
+        [DataMember] public string Id;
+        [DataMember] public string SlotKey;
+        [DataMember] public int Circle;
+        [DataMember] public string RootGuid;
+        [DataMember] public string Origin;             // "implement" | "same-book-grant"
     }
 
+    [DataContract]
     public sealed class Occultist0099SpellState
     {
-        public int ClassLevel;
+        [DataMember] public int ClassLevel;
         // D-0099-03 fix (C:31): learning AND casting gate Int >= 10 + circle.
         // Temporary Int changes gate new learning/casting but never delete an
         // established quota or a saved source.
-        public int Intelligence = 10;
-        public int NextSequence = 1;
-        public List<Occultist0099Slot> Slots = new List<Occultist0099Slot>();
-        public Dictionary<string, string> Quotas = new Dictionary<string, string>();
-        public List<Occultist0099Source> Sources = new List<Occultist0099Source>();
-        public Dictionary<string, bool> Providers = new Dictionary<string, bool>();
-        public Dictionary<string, bool> PublishedLists = new Dictionary<string, bool>();
-        public HashSet<string> DlcAllowed = new HashSet<string>();
-        public HashSet<string> CotWRootsPublished = new HashSet<string>();
-        public HashSet<string> ForeignBookRoots = new HashSet<string>();
-        public HashSet<string> SameBookGrantSources = new HashSet<string>();
+        [DataMember] public int Intelligence = 10;
+        [DataMember] public int NextSequence = 1;
+        [DataMember] public List<Occultist0099Slot> Slots = new List<Occultist0099Slot>();
+        [DataMember] public Dictionary<string, string> Quotas = new Dictionary<string, string>();
+        [DataMember] public List<Occultist0099Source> Sources = new List<Occultist0099Source>();
+        [DataMember] public Dictionary<string, bool> Providers = new Dictionary<string, bool>();
+        [DataMember] public Dictionary<string, bool> PublishedLists = new Dictionary<string, bool>();
+        [DataMember] public HashSet<string> DlcAllowed = new HashSet<string>();
+        [DataMember] public HashSet<string> CotWRootsPublished = new HashSet<string>();
+        [DataMember] public HashSet<string> ForeignBookRoots = new HashSet<string>();
+        [DataMember] public HashSet<string> SameBookGrantSources = new HashSet<string>();
         // D-0099-06 fix: no longer a hardcoded facade. Create() sets this true
         // only because the development fixture assumes the slice's own CotW
         // roots published; the registration package will drive it from the
         // real atomic publish result, and SetCotWRegistrationComplete is the
         // single write point. While false, no CotW root enters candidates.
-        public bool CotWRegistrationComplete;
+        [DataMember] public bool CotWRegistrationComplete;
         // D-0099-06 fix: variant rows registered by later school packages
         // (Fire Shield warm/cold, sticky touch delivery). Each maps a variant
         // GUID to its canonical root GUID; a variant never owns a quota.
-        public Dictionary<string, string> VariantRoots = new Dictionary<string, string>();
+        [DataMember] public Dictionary<string, string> VariantRoots = new Dictionary<string, string>();
 
         // D-0099-05 fix: the fingerprint covers EVERY mutable field so that
         // preview-cancel byte-for-byte assertions cannot silently miss a leak.
