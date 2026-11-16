@@ -12,6 +12,7 @@ using Newtonsoft.Json.Linq;
 using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
@@ -29,6 +30,7 @@ using Kingmaker.Enums;
 using Kingmaker.Inspect;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
+using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Abilities;
 using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.Settings;
@@ -46,6 +48,7 @@ using Kingmaker.UnitLogic.Commands;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.Utility;
 using CallOfTheWild.Wrath.Prototype;
 
@@ -97,6 +100,7 @@ internal static class Occultist0099NativeTests
     private static JObject nativeRows;
     private static readonly List<UnitEntityData> world = new List<UnitEntityData>();
     private static int skippedComponents;
+    private static int registeredPrivateIdentities;
     private static int castDispatches;
     private static int pointsAtDispatch;
     private static Action<RuleApplySpell> beforeDispatch;
@@ -193,8 +197,14 @@ internal static class Occultist0099NativeTests
     private static bool CastContextBoundary(AbilityData __instance, TargetWrapper __0,
         AbilityParams __1, ref AbilityExecutionContext __result)
     {
-        __result = applyNativeEffects ? new AbilityExecutionContext(__instance, __1 ?? AbilityParams.Empty, __0) :
-            Empty<AbilityExecutionContext>();
+        if (!applyNativeEffects)
+        {
+            __result = Empty<AbilityExecutionContext>();
+            return false;
+        }
+        bool recalculate = __instance.ResourceLogic is Occultist0099FocusResourceLogic logic && logic.School == "Enchantment";
+        __result = new AbilityExecutionContext(__instance, __1 ?? (recalculate ? __instance.CalculateParams() : AbilityParams.Empty), __0);
+        if (recalculate) __result.Recalculate();
         return false;
     }
 
@@ -344,6 +354,7 @@ internal static class Occultist0099NativeTests
         Set(u, "Descriptor", descriptor);
         Set(descriptor, "Unit", u);
         Set(u, "Parts", new EntityPartsManager(u));
+        Set(u, "PreventDirectControl", new CountableFlag());
         Set(u, "UniqueId", "0099N-unit-" + label);
         var proxy = FormatterServices.GetUninitializedObject(
             AccessTools.Inner(typeof(EntityService), "Proxy"));
@@ -386,13 +397,7 @@ internal static class Occultist0099NativeTests
             all.Add(stat);
         }
 
-        var state = Empty<UnitState>();
-        var mechanics = Empty<UnitMechanicFeatures>();
-        Set(mechanics, "DomainsByIntelligenceFeature", new Kingmaker.Utility.CountableFlag());
-        Set(mechanics, "LegendaryHero", new Kingmaker.Utility.CountableFlag());
-        Set(state, "Features", mechanics);
-        Set(state, "m_Conditions", new sbyte[100]);
-        Set(state, "m_ConditionsImmunity", new sbyte[100]);
+        var state = new UnitState(descriptor);
         Set(descriptor, "State", state);
 
         var progression = Empty<UnitProgressionData>();
@@ -516,7 +521,7 @@ internal static class Occultist0099NativeTests
             if (info == null || value == null || value.Type == JTokenType.Null) continue;
             try { info.SetValue(bp, value.ToObject(info.FieldType)); } catch { }
         }
-        foreach (var field in new[] { "m_SpellList", "m_CharacterClass", "m_SpellsPerDay",
+        foreach (var field in new[] { "m_Parent", "m_SpellList", "m_CharacterClass", "m_SpellsPerDay",
                                       "m_SpellsKnown", "m_SpellSlots", "m_BaseAttackBonus", "m_FortitudeSave", "m_WillSave" })
         {
             var info = AccessTools.Field(type, field);
@@ -613,14 +618,24 @@ internal static class Occultist0099NativeTests
                 var assets = (System.Collections.IDictionary)Get(factory, "Assets");
                 built = (BlueprintAbility)assets["AlliedCloak"];
             }
+            else if (root.Name == "CotWWrathPsychicDazeMass")
+            {
+                LoadRows("9934fedff1b14994ea90205d189c8759", "02707231be1d3a74ba7e38a426c8df37", "a95311b3dc996964cbaa30ff9965aaf6",
+                    "625827490ea69d84d8e599a33929fdc6", "57614b50e8d86b24395931fffc5e409b", "09478937695300944a179530664e42ec",
+                    "3bec99efd9a363242a6c8d9957b75e91", "fd389783027d63343b4a5634bd81645f", "455ac88e22f55804ab87c2467deff1d6",
+                    "018af8005220ac94a9a4f47b3e9c2b4e", "9054d3988d491d944ac144e27b6bc318", "706e61781d692a042b35941f14bc41c5");
+                var entries = (System.Collections.IEnumerable)AccessTools.Method(Production("PsychicWardingSpells"), "Build")
+                    .Invoke(null, new[] { factory });
+                built = entries.Cast<object>().Select(entry => (BlueprintAbility)Get(entry, "Ability")).Single(ability => ability.AssetGuid == P(root.Guid));
+            }
             Check(built != null && built.AssetGuid.ToString() == root.Guid,
                 "HOST the real CotW builder publishes " + root.Name +
                 " at its frozen A identity");
             if (built == null) return;
             built.OnEnable();
             cache.AddCachedBlueprint(built.AssetGuid, built);
-            Check(built.GetComponent<SpellComponent>()?.School == SpellSchool.Abjuration,
-                "HOST the production " + root.Name + " really is Abjuration");
+            Check(built.GetComponent<SpellComponent>()?.School.ToString() == root.School,
+                "HOST the production " + root.Name + " really is " + root.School);
             return;
         }
 
@@ -1767,7 +1782,8 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.FocusResourceLogicTypeId, Occultist0099Ids.FocusPartTypeId,
             Occultist0099Ids.SpellbookFactTypeId, Occultist0099Ids.FocusPropertyTypeId,
             Occultist0099Ids.FocusOperationTypeId, Occultist0099Ids.ImplementSchoolTypeId,
-            Occultist0099Ids.ImplementSlotTypeId
+            Occultist0099Ids.ImplementSlotTypeId, Occultist0099Ids.SchoolValueTypeId, Occultist0099Ids.SameRaceTypeId,
+            Occultist0099Ids.SchoolPowerGrantTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
                 "GATE private TypeId " + id + " has no native collision");
@@ -1841,6 +1857,219 @@ internal static class Occultist0099NativeTests
         Check(!Registered(), "SP08 a Fire Shield child with only a dangling variant rejects the whole optional root");
     }
 
+    private static readonly List<int> EnchantmentSaves = new List<int>();
+    private static bool EnchantmentSavePasses;
+    private static BlueprintRoot EnchantmentFixtureRoot;
+
+    private static bool EnchantmentRootBoundary(ref BlueprintRoot __result)
+    {
+        __result = EnchantmentFixtureRoot;
+        return false;
+    }
+
+    private static bool EnchantmentSaveBoundary(RuleSavingThrow __instance)
+    {
+        EnchantmentSaves.Add(__instance.DifficultyClass);
+        __instance.AutoPass = EnchantmentSavePasses;
+        return false;
+    }
+
+    private static void EnchantmentNative(BlueprintsCache detached, BlueprintCharacterClass character)
+    {
+        T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
+        var bookBlueprint = character.Spellbook;
+        var progression = character.Progression;
+        var powers = Asset<BlueprintFeatureSelection>("FocusPowerSelection");
+        var slots = bookBlueprint.GetComponent<Occultist0099SpellbookMarker0099>().ImplementLists;
+        Check(progression.LevelEntries.SelectMany(entry => entry.Features.Where(f => f == powers).Select(_ => entry.Level))
+                  .SequenceEqual(Enumerable.Range(0, 10).Select(i => 2 * i + 1)) &&
+              progression.LevelEntries.SelectMany(entry => entry.Features.OfType<BlueprintFeatureSelection>()
+                  .Where(selection => selection != powers).Select(_ => entry.Level)).SequenceEqual(new[] { 1, 1, 2, 6, 10, 14, 18 }),
+            "ENCH native progression schedules the seven distinct implement choices and ten focus-power choices at the audited levels");
+        Check(slots.Length == 26 && slots.Select(slot => slot.List.Guid).Distinct().Count() == slots.Length,
+            "ENCH all school and slot alternatives have distinct stable native learning lists");
+        var command = Native<BlueprintAbility>("feb70aab86cc17f4bb64432c83737ac2");
+        var massDaze = Native<BlueprintAbility>("f48b6e526d69d694507e0d0c4d954eb8");
+        var source = slots.Single(slot => slot.SlotKey == "slot-1" && slot.School == "Enchantment").List.Get();
+        Check(source.GetSpells(1).Contains(command) && source.GetSpells(4).Contains(massDaze) &&
+              !source.GetSpells(1).Any(ability => ability.AssetGuid == P(Occultist0099AbjurationCatalog.MageShield)) &&
+              !source.GetSpells(0).Any(),
+            "ENCH the private source lists reuse exact Command and Mass Daze roots, with the audited circle and school filtering");
+
+        var unit = Unit("enchantment-spellcaster", character, 7, 16);
+        var same = Unit("enchantment-same-race", character, 7, 10);
+        var other = Unit("enchantment-other-race", character, 8, 10);
+        var skill = new ModifiableValueSkill(unit.Stats, unit.Stats.Charisma, StatType.SkillUseMagicDevice);
+        var persuasion = new ModifiableValueSkill(unit.Stats, unit.Stats.Charisma, StatType.SkillPersuasion);
+        foreach (var stat in new[] { skill, persuasion })
+        {
+            unit.Stats.AllStats.Add(stat);
+            Set(unit.Stats, stat.Type.ToString(), stat);
+        }
+        foreach (var stat in new[] { StatType.AdditionalAttackBonus, StatType.AdditionalDamage })
+            same.Stats.AllStats.Add(new ModifiableValue(same.Stats, stat));
+        var apprentice = Unit("enchantment-umd-progression", character, 2, 16);
+        var apprenticeSkill = new ModifiableValueSkill(apprentice.Stats, apprentice.Stats.Charisma, StatType.SkillUseMagicDevice);
+        apprentice.Stats.AllStats.Add(apprenticeSkill);
+        Set(apprentice.Stats, "SkillUseMagicDevice", apprenticeSkill);
+        apprentice.Facts.Add(new Feature(Asset<BlueprintFeature>("MagicItemSkill"), apprentice.Descriptor));
+        Eq(1, apprenticeSkill.ModifiedValue, "ENCH Magic Item Skill is +1 when granted at level two");
+        apprentice.Progression.GetClassData(character).Level = 4;
+        apprentice.Progression.ReapplyFeaturesOnLevelUp();
+        Eq(2, apprenticeSkill.ModifiedValue, "ENCH native level-up refresh updates the same Magic Item Skill bonus at level four");
+        var race = new BlueprintRace { AssetGuid = P(Occultist0099Ids.Id("HostTestRace")), name = "0099N.TestRace" };
+        Set(unit.Progression, "m_Race", race);
+        Set(same.Progression, "m_Race", race);
+        Set(unit.Progression, "m_Selections", new Dictionary<BlueprintFeatureSelection, FeatureSelectionData>());
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MentalFocusFact"), unit.Descriptor));
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("OccultistSpellbookFact"), unit.Descriptor));
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MagicItemSkill"), unit.Descriptor));
+        Eq(3, skill.ModifiedValue, "ENCH Magic Item Skill adds half the actual occultist level to UMD through the native stat");
+        var book = unit.Descriptor.DemandSpellbook(bookBlueprint);
+        Set(book, "m_BaseLevelInternal", 7);
+        var state = LevelState(book);
+        var first = state.AddSelection(null, progression, Asset<BlueprintFeatureSelection>("ImplementSelection"), 1);
+        var second = state.AddSelection(null, progression, Asset<BlueprintFeatureSelection>("ExtraImplementSelection"), 1);
+        var extra = new SelectFeature(second, Asset<BlueprintFeature>("slot-2-Enchantment-ExtraSpells"));
+        Check(!extra.Check(state, unit.Descriptor), "ENCH native prerequisites reject the extra spell option before the base school");
+        var bindingPower = Asset<BlueprintFeature>("BindingPatternPower");
+        var bindingPick = new SelectFeature(state.AddSelection(null, progression, powers, 7), bindingPower);
+        Check(!bindingPick.Check(state, unit.Descriptor), "ENCH native focus choice rejects Binding Pattern when its school is missing");
+        var choose = new SelectFeature(first, Asset<BlueprintFeature>("slot-1-Enchantment-Implement"));
+        Check(choose.Check(state, unit.Descriptor), "ENCH the first school is selectable through the native choice");
+        choose.Apply(state, unit.Descriptor);
+        var choice = unit.Progression.Features.Enumerable.Single(fact => fact.Blueprint == choose.Item.Feature);
+        Check(extra.Check(state, unit.Descriptor) &&
+              !new SelectFeature(second, Asset<BlueprintFeature>("slot-2-Enchantment-Implement")).Check(state, unit.Descriptor),
+            "ENCH the native choice immediately exposes Extra Spells and excludes a second base grant");
+        extra.Apply(state, unit.Descriptor);
+        var third = state.AddSelection(null, progression, Asset<BlueprintFeatureSelection>("slot-3-ImplementSelection"), 2);
+        Check(!new SelectFeature(third, Asset<BlueprintFeature>("slot-3-Enchantment-ExtraSpells")).Check(state, unit.Descriptor),
+            "ENCH only one native Extra Spells pick can be taken per school");
+        state.OnApplyAction();
+        Check(NativeCheck(new SelectSpell(bookBlueprint, source, 1, command, 0), state, unit.Descriptor),
+            "ENCH a real selected implement offers Command to the native spell-learning entry");
+        var extraSource = slots.Single(slot => slot.SlotKey == "slot-2" && slot.School == "Enchantment" && slot.ExtraSpells).List.Get();
+        var learnExtra = new SelectSpell(bookBlueprint, extraSource, 1, command, 0);
+        Check(NativeCheck(learnExtra, state, unit.Descriptor), "ENCH the extra source has a separate native offer");
+        learnExtra.Apply(state, unit.Descriptor);
+        Check(book.IsKnown(command), "ENCH the extra source learns the root in the private book");
+        var focus = unit.Get<Occultist0099FocusPart>().State;
+        Check(focus.Schools["Enchantment"].Present && !focus.Schools["Abjuration"].Present,
+            "ENCH choosing an implement activates only its school ledger");
+
+        var classData = unit.Progression.GetClassData(character);
+        classData.Level = 6;
+        Check(!bindingPick.Check(state, unit.Descriptor), "ENCH native focus choice rejects Binding Pattern at real level six");
+        classData.Level = 7;
+        Check(bindingPick.Check(state, unit.Descriptor), "ENCH native focus choice accepts Binding Pattern at real level seven");
+        bindingPick.Apply(state, unit.Descriptor);
+        foreach (var power in powers.Features.Where(power => power != bindingPower))
+        {
+            var pick = new SelectFeature(state.AddSelection(null, progression, powers, 7), power);
+            Check(pick.Check(state, unit.Descriptor), "ENCH native focus choice offers " + power.name);
+            pick.Apply(state, unit.Descriptor);
+        }
+        var invest = unit.Abilities.Enumerable.Single(a => a.Blueprint == Asset<BlueprintAbility>("EnchantmentInvestFocusAbility")).Data;
+        var lockFocus = unit.Abilities.Enumerable.Single(a => a.Blueprint == Asset<BlueprintAbility>("LockFocusAbility")).Data;
+        var cloud = unit.Abilities.Enumerable.Single(a => a.Blueprint == Asset<BlueprintAbility>("CloudMindAbility")).Data;
+        var bind = unit.Abilities.Enumerable.Single(a => a.Blueprint == Asset<BlueprintAbility>("BindingPatternAbility")).Data;
+        var assault = unit.Abilities.Enumerable.Single(a => a.Blueprint == Asset<BlueprintAbility>("InspiredAssaultAbility")).Data;
+        var obey = unit.Abilities.Enumerable.Single(a => a.Blueprint == Asset<BlueprintAbility>("ObeyAbility")).Data;
+        var variants = obey.Blueprint.GetComponent<AbilityVariants>().Variants.Select(child => new AbilityData(obey, child)).ToArray();
+        Check(variants.Select(variant => variant.Blueprint.AssetGuid).SequenceEqual(new[] { "ObeyHaltAbility", "ObeyFallAbility", "ObeyRunAbility" }
+                .Select(token => Asset<BlueprintAbility>(token).AssetGuid)) &&
+              variants.All(variant => variant.Blueprint.Parent == obey.Blueprint && variant.Blueprint.CustomRange == new Feet(30)) &&
+              command.GetComponent<AbilityVariants>().Variants.Count() == 4 &&
+              command.GetComponent<AbilityVariants>().Variants.All(variant => variant.Parent == command),
+            "ENCH three private Obey branches preserve all four ordinary Command branches and their native parent");
+        Check(variants.All(variant => !((AbilityResourceLogic)variant.ResourceLogic).IsAbilityRestrictionPassed(variant)),
+            "ENCH native Obey variants reject spending before focus is locked");
+
+        var saveMethod = AccessTools.Method(typeof(RuleSavingThrow), nameof(RuleSavingThrow.OnTrigger));
+        var saveBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(EnchantmentSaveBoundary));
+        harmony.Patch(saveMethod, prefix: new HarmonyMethod(saveBoundary));
+        applyNativeEffects = true;
+        try
+        {
+            // Executions still dispatch through the real resource adapter and managed actions.
+            for (int i = 0; i < 6; i++) Check(CastRule(invest).Success, "ENCH private investment action succeeds before lock");
+            Check(CastRule(lockFocus).Success && focus.Schools["Enchantment"].LockedInvestment == 6 &&
+                  skill.ModifiedValue == 5 && persuasion.ModifiedValue == 2 && unit.Stats.Charisma.ModifiedValue == 10,
+                "ENCH lock adds capped competence to UMD and Persuasion without changing Charisma");
+            var presence = unit.Buffs.GetBuff(Asset<BlueprintBuff>("GloriousPresenceBuff"));
+            Check(presence != null && presence.Blueprint.GetComponent<CourtBardCharismaCheck01445>().Descriptor == ModifierDescriptor.Competence,
+                "ENCH locked resonance attaches the shared native Charisma-check handler with the competence descriptor");
+            var charisma = new RuleSkillCheck(unit, StatType.Charisma, 15);
+            presence?.CallComponents<CourtBardCharismaCheck01445>(component => component.OnEventAboutToTrigger(charisma));
+            Eq(2, charisma.Bonus.ModifiedValue, "ENCH Glorious Presence adds its competence modifier to the Charisma check rather than the ability score");
+
+            RuleCastSpell CastOn(AbilityData spell, UnitEntityData target) => Rulebook.Trigger(new RuleCastSpell(spell, target));
+            EnchantmentSavePasses = false;
+            var dazed = Native<BlueprintBuff>("9934fedff1b14994ea90205d189c8759");
+            var staggered = Native<BlueprintBuff>("df3950af5a783bd4d91ab73eb8fa0fd3");
+            var paralysis = Native<BlueprintBuff>("2cfcce5b62d3e6d4082ec31b58468cc8");
+            CastOn(cloud, same);
+            CastOn(cloud, other);
+            Check(same.Buffs.GetBuff(dazed) != null && other.Buffs.GetBuff(staggered) != null &&
+                  other.Buffs.GetBuff(dazed) == null && focus.Schools["Enchantment"].Remaining == 4,
+                "ENCH two real Cloud Mind casts pay once each and split at equal versus higher Hit Dice");
+            var bindingCast = CastOn(bind, same);
+            var paralysisBuff = same.Buffs.GetBuff(paralysis);
+            Check(bindingCast.Success && paralysisBuff != null && same.Buffs.GetBuff(staggered) != null &&
+                  same.State.HasCondition(UnitCondition.Paralyzed) && same.State.HasCondition(UnitCondition.Staggered),
+                "ENCH Binding Pattern applies the reused paralysis and stagger on a failed Will save");
+            EnchantmentSavePasses = true;
+            paralysisBuff?.CallComponents<BuffStatusCondition>(condition => ((Kingmaker.Controllers.Units.ITickEachRound)condition).OnNewRound());
+            EnchantmentSavePasses = false;
+            Check(same.Buffs.GetBuff(paralysis) == null && same.State.HasCondition(UnitCondition.Staggered) &&
+                  !same.State.HasCondition(UnitCondition.Paralyzed),
+                "ENCH the reused native re-save releases paralysis and retains stagger for the remaining duration");
+            CastOn(assault, same);
+            Check(same.Buffs.GetBuff(Asset<BlueprintBuff>("InspiredAssaultBuff")) != null &&
+                  same.Stats.GetStat(StatType.AdditionalAttackBonus).ModifiedValue == 2 &&
+                  same.Stats.GetStat(StatType.AdditionalDamage).ModifiedValue == 2,
+                "ENCH Inspired Assault uses the native attack and damage morale modifiers at the level-six step");
+            EnchantmentSaves.Clear();
+            CastOn(variants[0], same);
+            CastOn(variants[2], other);
+            Check(EnchantmentSaves.SequenceEqual(new[] { 18, 16 }) &&
+                  same.Buffs.GetBuff(Native<BlueprintBuff>("1baa8a3dffc1f104f9942abe852f631a")) != null &&
+                  other.Buffs.GetBuff(Native<BlueprintBuff>("9c8b488120d2b4d4f8243720d754c88e")) != null,
+                "ENCH Obey applies each original native action after one Will save, with +2 DC only for the known same race");
+            Check(focus.Schools["Enchantment"].Remaining == 0 && unit.Buffs.GetBuff(presence.Blueprint) == presence &&
+                  !((AbilityResourceLogic)variants[1].ResourceLogic).IsAbilityRestrictionPassed(variants[1]),
+                "ENCH six focus powers exhaust the school, keep the locked resonance, and reject a further Obey variant");
+            classData.Level = 20;
+            Check(Occultist0099Focus.SetMastery(focus, "Enchantment") == Occultist0099Outcome.Ok && CastOn(assault, same).Success,
+                "ENCH the selected mastery state pays a private focus power after the ordinary pool is exhausted");
+            var masteredAssault = same.Buffs.GetBuff(Asset<BlueprintBuff>("InspiredAssaultBuff"));
+            Check(masteredAssault?.TimeLeft == TimeSpan.FromMinutes(24) &&
+                  same.Stats.GetStat(StatType.AdditionalAttackBonus).ModifiedValue == 4,
+                "ENCH Inspired Assault preserves the explicit +4 cap and uses effective level 24 for duration");
+            Check(CastOn(variants[1], same).Success && same.State.HasCondition(UnitCondition.Prone) &&
+                  same.Buffs.GetBuff(Native<BlueprintBuff>("1e9d53aaa310894499ba610f0a2306a3")) != null,
+                "ENCH the third Obey branch applies the original native prone effect through the private variant");
+        }
+        finally
+        {
+            applyNativeEffects = false;
+            EnchantmentSavePasses = false;
+            harmony.Unpatch(saveMethod, saveBoundary);
+        }
+        unit.RemoveFact(choice);
+        Check(!focus.Schools["Enchantment"].Present && persuasion.ModifiedValue == 0 && skill.ModifiedValue == 3 &&
+              !unit.Abilities.Enumerable.Any(ability => new[] { cloud.Blueprint, bind.Blueprint, assault.Blueprint, obey.Blueprint }.Contains(ability.Blueprint)),
+            "ENCH native implement loss withdraws its base and additional abilities and resonance without touching Magic Item Skill");
+        Check(!book.IsKnown(command), "ENCH removing the base implement also retires the dependent extra spell");
+        unit.Facts.Add(new Feature(choose.Item.Feature, unit.Descriptor));
+        state.OnApplyAction();
+        Check(unit.Abilities.Enumerable.Any(ability => ability.Blueprint == obey.Blueprint) &&
+              !book.IsKnown(command) && NativeCheck(learnExtra, state, unit.Descriptor),
+            "ENCH restoring the school also restores the exact existing extra slot and selected powers without relearning the removed root");
+        caseStatus["Enchantment"] = "native_progression_choice_focus_and_reused_action_graphs";
+    }
+
     private static void RegistrationNative(JArray auditedRows, string donorTable)
     {
         var catalogue = (Occultist0099SpellRoot[])AccessTools.Field(Production("Occultist0099SpellCatalog"), "Roots").GetValue(null);
@@ -1853,18 +2082,26 @@ internal static class Occultist0099NativeTests
             "SP08 the 143 production mappings agree with the frozen source, schools, circles and provider identities");
 
         var detached = new BlueprintsCache();
-        var register = AccessTools.Method(Production("Occultist0099NativeRegistration"), "RegisterAbjurationInDetachedCache");
+        var register = AccessTools.Method(Production("Occultist0099NativeRegistration"), "RegisterInDetachedCache");
         bool TryRegister(BlueprintsCache target) => (bool)register.Invoke(null, new object[] { target });
         Check(!TryRegister(cache), "SP08 the production development entry refuses the ordinary process cache");
         const string alchemistClassId = "0937bec61c0dabc468428f496580c721";
         const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
-        LoadRows(new[] { alchemistClassId, proficienciesId }.Concat(Occultist0099AbjurationCatalog.Knacks).ToArray());
-        foreach (var id in catalogue.Where(row => (row.School == "Abjuration" || row.IsKnack) && row.Source != "External")
-                     .Select(row => row.Guid).Concat(new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc" }))
+        var rows = catalogue.Where(row => (row.School == "Abjuration" || row.School == "Enchantment" || row.IsKnack) && row.Source != "External").ToArray();
+        var coreDonors = (string[])AccessTools.Field(Production("Occultist0099Enchantment"), "DonorIds").GetValue(null);
+        var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a" }
+            .Concat(coreDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
+        LoadRows(expectedDonors);
+        foreach (var row in rows.Where(row => row.Source == "CotW" && cache.Load(P(row.Guid)) == null)) StageAbsentRoot(row);
+        foreach (var id in expectedDonors)
         {
             var donor = cache.Load(P(id));
             if (donor != null) detached.AddCachedBlueprint(donor.AssetGuid, donor);
+            else Check(false, "HOST B7 donor missing from the archive " + id);
         }
+        var resolve = AccessTools.Method(Production("Occultist0099Donors"), "Resolve");
+        foreach (var row in rows.Where(row => resolve.Invoke(null, new object[] { detached, new[] { row } }) == null))
+            Check(false, "HOST current strict provider contract rejects the expected core root " + row.Name);
         var alchemist = Native<BlueprintCharacterClass>(alchemistClassId);
         var root = Empty<BlueprintRoot>();
         root.AssetGuid = P("2d77316c72b9ed44f888ceefc2a131f6");
@@ -1873,10 +2110,18 @@ internal static class Occultist0099NativeTests
         var original = new[] { Ref<BlueprintCharacterClassReference>(alchemist) };
         Set(root.Progression, "m_CharacterClasses", original);
         detached.AddCachedBlueprint(root.AssetGuid, root);
-        var privateIds = Occultist0099Ids.SliceTokens.Select(token => P(Occultist0099Ids.Id(token))).ToArray();
+        var tokens = (string[])AccessTools.Method(Production("Occultist0099NativeRegistration"), "IdentityTokens").Invoke(null, null);
+        var privateIds = tokens.Select(token => P(Occultist0099Ids.Id(token))).ToArray();
         bool Vacant() => privateIds.All(id => detached.Load(id) == null) && ReferenceEquals(Get(root.Progression, "m_CharacterClasses"), original);
         Check(!TryRegister(detached) && Vacant(), "SP08 missing mandatory Alchemist table leaves the real class list and all private cache entries untouched");
         detached.AddCachedBlueprint(P(donorTable), Native<BlueprintSpellsTable>(donorTable));
+        var holdBuff = Native<BlueprintBuff>("2cfcce5b62d3e6d4082ec31b58468cc8");
+        detached.RemoveCachedBlueprint(holdBuff.AssetGuid);
+        Check(!TryRegister(detached) && Vacant(), "SP08 a missing mandatory Enchantment effect cannot publish either school");
+        detached.AddCachedBlueprint(holdBuff.AssetGuid, new BlueprintBuff { name = holdBuff.name, AssetGuid = holdBuff.AssetGuid,
+            ComponentsArray = Array.Empty<BlueprintComponent>() });
+        Check(!TryRegister(detached) && Vacant(), "SP08 an identity-only paralysis donor cannot omit the native effect or its recurring save");
+        detached.AddCachedBlueprint(holdBuff.AssetGuid, holdBuff);
         var processRoot = (BlueprintRoot)cache.Load(root.AssetGuid);
         bool temporaryProcessRoot = processRoot == null;
         if (temporaryProcessRoot)
@@ -1932,10 +2177,13 @@ internal static class Occultist0099NativeTests
         Check(interrupted && Vacant(), "SP08 interruption after real cache insertion rolls back every owned object and the class list");
         Check(LocalizationUnchanged(), "SP08 rollback preserves both global localization stores");
 
-        Check(TryRegister(detached), "SP08 restored mandatory donor and vacant identities publish the complete detached Abjuration graph");
+        bool registered = TryRegister(detached);
+        Check(registered, "SP08 restored mandatory donor and vacant identities publish the detached school graph");
+        if (!registered) return;
         Check(LocalizationUnchanged(), "SP08 a successful detached graph does not publish process localization");
         Kingmaker.Localization.LocalizationManager.CurrentPack = previousPack;
         var entries = privateIds.Select(detached.Load).ToArray();
+        registeredPrivateIdentities = entries.Length;
         Check(entries.All(entry => entry != null) && root.Progression.CharacterClasses.Count() == 2 &&
               root.Progression.CharacterClasses.First() == alchemist,
             "SP08 each signed asset is present and only one class was appended to the unchanged native entry");
@@ -1946,7 +2194,7 @@ internal static class Occultist0099NativeTests
         var listsBefore = baseList.SpellsByLevel;
         Check(publishedBook.CharacterClass == publishedClass && publishedBook.Spontaneous &&
               publishedBook.SpellsPerDay == Native<BlueprintSpellsTable>(donorTable) &&
-              publishedClass.Progression.LevelEntries.Single().Features.OfType<BlueprintFeatureSelection>().Count() == 2 &&
+              publishedClass.Progression.LevelEntries.Single(entry => entry.Level == 1).Features.OfType<BlueprintFeatureSelection>().Count() == 3 &&
               baseList.GetSpells(0).Count == 6 && baseList.SpellsByLevel.Length == 11,
             "SP08 the real graph links its spontaneous Alchemist-table book, both implement choices and six fixed knacks");
         Check(TryRegister(detached) && entries.SequenceEqual(privateIds.Select(detached.Load)) &&
@@ -2003,7 +2251,7 @@ internal static class Occultist0099NativeTests
 
         var unit = Unit("registered-0099-source", publishedClass, 7, 16);
         unit.Facts.Add(new Feature((BlueprintFeature)detached.Load(P(Occultist0099Ids.SpellbookFactGuid)), unit.Descriptor));
-        var implement = new Feature((BlueprintFeature)detached.Load(P(Occultist0099Ids.Id("AbjurationImplementFocus"))), unit.Descriptor);
+        var implement = new Feature((BlueprintFeature)detached.Load(P(Occultist0099Ids.Id("slot-1-Abjuration-Implement"))), unit.Descriptor);
         unit.Facts.Add(implement);
         var functioning = unit.Descriptor.DemandSpellbook(publishedBook);
         Set(functioning, "m_BaseLevelInternal", 7);
@@ -2018,7 +2266,28 @@ internal static class Occultist0099NativeTests
         Check(TryRegister(detached) && !baseList.GetSpells(3).Contains(cloak) && !sourceList.GetSpells(3).Contains(cloak),
             "SP08 withdrawn provider publication removes only the optional private row on retry");
         FireShieldVariantsNative(detached, byId["017970c386634351bfdea34d6a4d4c74"], wizardList, effect);
-        caseStatus["SP08"] = "native_atomic_detached_abjuration_graph_only_full_class_not_run";
+        var ignorePrerequisites = AccessTools.PropertyGetter(typeof(IgnorePrerequisites), nameof(IgnorePrerequisites.Ignore));
+        var retail = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NotTacticalCombat));
+        var rootGetter = AccessTools.PropertyGetter(typeof(BlueprintRoot), nameof(BlueprintRoot.Instance));
+        var rootBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(EnchantmentRootBoundary));
+        var visual = AccessTools.Method(typeof(Kingmaker.UnitLogic.Mechanics.Actions.ContextActionSpawnFx), "RunAction");
+        var noVisual = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NoReplenish));
+        EnchantmentFixtureRoot = root;
+        var difficulty = Empty<Kingmaker.Settings.Difficulty.DifficultyPresetsList>();
+        difficulty.StatsAdjustmentPresets = new[] { new Kingmaker.Settings.Difficulty.DifficultyPresetsList.StatsAdjustmentPreset() };
+        Set(root, "m_DifficultyList", difficulty);
+        harmony.Patch(rootGetter, prefix: new HarmonyMethod(rootBoundary));
+        harmony.Patch(ignorePrerequisites, prefix: new HarmonyMethod(retail));
+        harmony.Patch(visual, prefix: new HarmonyMethod(noVisual));
+        try { EnchantmentNative(detached, publishedClass); }
+        finally
+        {
+            harmony.Unpatch(ignorePrerequisites, retail);
+            harmony.Unpatch(rootGetter, rootBoundary);
+            harmony.Unpatch(visual, noVisual);
+            EnchantmentFixtureRoot = null;
+        }
+        caseStatus["SP08"] = "native_atomic_detached_abjuration_and_enchantment_graph_only_full_class_not_run";
         caseStatus["SP03"] = "native_copy_serialization_and_last_registered_implement_revoke_only";
     }
 
@@ -2116,7 +2385,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B6 detached native Abjuration registration and provider validation",
+            ["stage"] = "B7 Enchantment school and native implement and focus-power progression",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -2124,20 +2393,21 @@ internal static class Occultist0099NativeTests
             ["slicePublished"] = Occultist0099Ids.SlicePublished,
             ["releaseEligible"] = false,
             ["productionBridgesInstalled"] = bridges,
+            ["registeredPrivateIdentities"] = registeredPrivateIdentities,
             ["nativeRootsLoaded"] = loadedRoots,
             ["hostStagedRoots"] = hostStaged,
             ["hostStagedRootNames"] = new JArray(stagedRoots),
             ["skippedArchiveComponents"] = skippedComponents,
-            ["rootFixtureBoundary"] = "18 Abjuration roots comprise 13 native archive blueprints, 4 roots built by the existing CotW psychic builders, and a host-staged TTT Cloak of Winds root. Only the CotW icon import is substituted. The detached cache provider fixtures stage reciprocal Cloak and Fire Shield publications with signed identities. Actual provider assemblies were not loaded.",
+            ["rootFixtureBoundary"] = "The Abjuration roots use 13 Wrath archive entries, 4 existing CotW Psychic builders and a host-staged TTT Cloak. Enchantment uses 11 non-knack Wrath roots and the existing CotW Mass Daze builder. The two optional ExpandedContent candidates stay absent. The detached cache also stages Cloak and Fire Shield reciprocal publications. Actual provider assemblies were not loaded.",
             ["checks"] = checks,
             ["failures"] = new JArray(failures),
             ["hostLoggedExceptions"] = hostLogs,
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Native Abjuration graph publication, rollback, provider-list refresh and existing focus and spell paths passed in the managed fixture."
+                ? "Detached two-school publication, rollback, seven-slot progression, Enchantment focus effects and native source lifecycle passed in the managed fixture."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Uses a real detached BlueprintsCache and an independent class list. Registration publishes the Abjuration development graph and level-one progression only. Existing managed focus, rest, preview, archive and respec-step checks are retained. The ordinary startup path, full class, player UI and disk saves are outside scope.",
+            ["boundary"] = "Uses a real detached BlueprintsCache and independent class list. Native SelectFeature, source lists, focus payments, parameter calculation and effects run for Enchantment. Saving throw fixture supplies pass or fail while recording DC; Unity presentation and combat dispatch are replaced. The mastery cap check seeds ledger mastery. Ordinary startup, the rest of the class, player UI and disk saves are outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",

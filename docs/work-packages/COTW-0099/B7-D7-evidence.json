@@ -1,0 +1,228 @@
+{
+  "workPackage": "COTW-0099",
+  "contract": "C-0099-20261115-r1",
+  "reviewStartCommit": "8ccf147fd2a364c62a2652ac1f219a1b5e3e502a",
+  "stage": "B7 Enchantment school and detached native choice progression",
+  "independentReview": {
+    "reviewer": "occultist_d",
+    "result": "PASS_IN_DIRECTED_SCOPE",
+    "nativeEvidence": "native-11.json",
+    "closedFindings": [
+      "Retire extra powers with the native school fact and restore the exact prior source slot without relearning",
+      "Reapply the native Magic Item Skill modifier at level-up",
+      "Preserve Inspired Assault morale cap under mastery",
+      "Treat native Hold Monster buff with recurring Will as mandatory"
+    ]
+  },
+  "reuse": {
+    "Wrath": [
+      "Command Halt, Fall and Flee actions and buffs",
+      "DazeBuff",
+      "Staggered",
+      "HoldMonsterBuff with recurring Will",
+      "Native feature prerequisites and ability-parameter calculation",
+      "Native feature stat reapplication",
+      "Alchemist slots and native Knacks"
+    ],
+    "CotW": [
+      "Mass Daze",
+      "Charisma-check component shared with Court Bard",
+      "Native element owner rebuild from SpellBatch01447"
+    ],
+    "optional": [
+      "ExpandedContent Inflict Pain and Mass Inflict Pain retain the shared donor catalogue entries; assemblies not loaded"
+    ]
+  },
+  "builds": [
+    {
+      "log": "build-1.log",
+      "wallSeconds": 1.458,
+      "result": "FAIL",
+      "cause": "Conditional namespace"
+    },
+    {
+      "log": "build-2.log",
+      "wallSeconds": 1.929,
+      "result": "PASS"
+    },
+    {
+      "log": "build-3.log",
+      "wallSeconds": 1.141,
+      "result": "FAIL",
+      "cause": "Fixture diagnostic variable shadowing"
+    },
+    {
+      "log": "build-4.log",
+      "wallSeconds": 1.111,
+      "result": "PASS"
+    },
+    {
+      "log": "build-5.log",
+      "wallSeconds": 1.149,
+      "result": "PASS"
+    },
+    {
+      "log": "build-6.log",
+      "wallSeconds": 1.192,
+      "result": "FAIL",
+      "cause": "Fixture resource restriction interface"
+    },
+    {
+      "log": "build-7.log",
+      "wallSeconds": 1.125,
+      "result": "PASS"
+    },
+    {
+      "log": "build-8.log",
+      "wallSeconds": 1.209,
+      "result": "PASS"
+    },
+    {
+      "log": "build-9.log",
+      "wallSeconds": 1.11,
+      "result": "PASS"
+    },
+    {
+      "log": "build-10.log",
+      "wallSeconds": 1.139,
+      "result": "PASS"
+    },
+    {
+      "log": "build-11.log",
+      "wallSeconds": 1.191,
+      "result": "PASS"
+    },
+    {
+      "log": "build-12.log",
+      "wallSeconds": 1.929,
+      "result": "PASS"
+    },
+    {
+      "log": "build-13.log",
+      "wallSeconds": 1.225,
+      "result": "PASS"
+    },
+    {
+      "log": "build-14.log",
+      "wallSeconds": 1.366,
+      "result": "FAIL",
+      "cause": "UnitCondition namespace"
+    },
+    {
+      "log": "build-15.log",
+      "wallSeconds": 2.001,
+      "result": "PASS"
+    },
+    {
+      "log": "build-16.log",
+      "wallSeconds": 1.171,
+      "result": "PASS",
+      "warnings": 0,
+      "errors": 0
+    }
+  ],
+  "nativeRuns": [
+    {
+      "log": "native-1.log",
+      "wallSeconds": 3.871,
+      "result": "NATIVE_DIRECTED_FAIL",
+      "checks": 226,
+      "failures": 2,
+      "cause": "Fixture archive importer omitted native Command parent fields"
+    },
+    {
+      "log": "native-2.log",
+      "wallSeconds": 3.89,
+      "result": "NATIVE_DIRECTED_FAIL",
+      "checks": 226,
+      "failures": 2,
+      "cause": "Confirmed missing fixture parent fields"
+    },
+    {
+      "log": "native-3.log",
+      "wallSeconds": 3.784,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 245,
+      "failures": 0
+    },
+    {
+      "log": "native-4.log",
+      "wallSeconds": 4.059,
+      "result": "ABORTED",
+      "cause": "Retail prerequisite flag invoked Unity startup service"
+    },
+    {
+      "log": "native-5.log",
+      "wallSeconds": 3.841,
+      "result": "ABORTED",
+      "cause": "Ordinary Command Approach donor absent from fixture"
+    },
+    {
+      "log": "native-6.log",
+      "wallSeconds": 3.897,
+      "result": "ABORTED",
+      "cause": "Fixture lacked native difficulty root"
+    },
+    {
+      "log": "native-7.log",
+      "wallSeconds": 3.965,
+      "result": "NATIVE_DIRECTED_FAIL",
+      "checks": 273,
+      "failures": 1,
+      "cause": "Fixture UnitState and control flags were uninitialised"
+    },
+    {
+      "log": "native-8.log",
+      "wallSeconds": 3.869,
+      "result": "NATIVE_DIRECTED_FAIL",
+      "checks": 273,
+      "failures": 1,
+      "cause": "Native Daze visual attempted Unity scene work"
+    },
+    {
+      "log": "native-9.log",
+      "wallSeconds": 3.858,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 287,
+      "failures": 0
+    },
+    {
+      "log": "native-10.log",
+      "wallSeconds": 3.832,
+      "result": "ABORTED",
+      "cause": "Fixture lacked neutral skill-check difficulty preset"
+    },
+    {
+      "log": "native-11.log",
+      "wallSeconds": 3.915,
+      "result": "NATIVE_DIRECTED_PASS",
+      "checks": 290,
+      "failures": 0,
+      "hostExceptions": 0,
+      "skippedArchiveComponents": 0,
+      "registeredPrivateIdentities": 100
+    }
+  ],
+  "rawLogs": "C:/Users/xuenc/agent-tools/occultist-next/B7-enchantment",
+  "sourceSha256": {
+    "src/CourtBard01445.cs": "5751694BD6D4AD8F524C0EBF1E946C9F7585B7C165735DDCE8B0B99B707FF39F",
+    "src/Occultist0099Abjuration.cs": "641EC25CE0BBEE7D48A4D7307D02B2317F799A230395F54FDD96A0A37891647B",
+    "src/Occultist0099Enchantment.cs": "88449CE56B834AEA387993D1587B0D576B53D4A862654DEB971A19900B4EAC7A",
+    "src/Occultist0099Ids.cs": "9FD668A58C82AD62BCB62F2A5E71C5028F1B15ADCF8CB205CFC0B1BF7834D046",
+    "src/Occultist0099Native.cs": "491D6BC5DAD765AA2CBBB24B067A32FC343F6F73CA1CB76F6160A29B250F46B3",
+    "src/Occultist0099NativeRegistration.cs": "5F615A3FD29F25FC7182A1ECE4B5EF5C0180E39FBFCF61746070CCA74575BD75",
+    "src/Occultist0099NativeWiring.cs": "A3C7969248FA650A4AAF044443EF3BF86F385C2B3D930CCEE14CBE470F0525A6",
+    "tests/Occultist0099NativeProgram.cs": "67225784EC517FE44681DD92CC801E79D9FAFAF49139555D253C73A437CF027D"
+  },
+  "slicePublished": false,
+  "releaseEligible": false,
+  "unverified": [
+    "Full Abjuration and six further schools, four Panoplies",
+    "Other original class features, actual level-20 mastery pick and ordinary startup registration",
+    "Actual providers and already-learned root recovery, whole level-up and respec UI, disk saves and gameplay"
+  ],
+  "modelSupplement": "not_run",
+  "historicalSuites": "not_run",
+  "packaging": "not_run",
+  "upload": "not_run"
+}

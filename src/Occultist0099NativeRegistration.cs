@@ -8,6 +8,7 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Root;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -15,6 +16,10 @@ using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Localization;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.Mechanics;
+using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.Enums;
 using static CallOfTheWild.Wrath.Prototype.Occultist0099Abjuration;
 using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 
@@ -31,17 +36,51 @@ namespace CallOfTheWild.Wrath.Prototype
             internal BlueprintCharacterClass Character;
             internal BlueprintScriptableObject[] Assets;
             internal BlueprintSpellList List;
-            internal BlueprintSpellList[] ImplementLists;
+            internal Dictionary<BlueprintSpellList, string> ImplementLists;
         }
 
         private static readonly ConditionalWeakTable<BlueprintsCache, Graph> Published = new ConditionalWeakTable<BlueprintsCache, Graph>();
-        private static readonly Occultist0099SpellRoot[] AbjurationRows = Occultist0099SpellCatalog.Roots
-            .Where(row => row.School == Occultist0099Ids.SliceSchool || row.IsKnack).ToArray();
+        private static readonly string[] Schools = { Occultist0099Ids.SliceSchool, Occultist0099Enchantment.School };
+        private static readonly int[] ImplementLevels = { 1, 1, 2, 6, 10, 14, 18 };
+        private static readonly Occultist0099SpellRoot[] Rows = Occultist0099SpellCatalog.Roots
+            .Where(row => row.IsKnack || Schools.Contains(row.School)).ToArray();
+
+        private static string SlotKey(int index) => "slot-" + (index + 1);
+        private static string SelectionToken(int index) => index == 0 ? "ImplementSelection" :
+            index == 1 ? "ExtraImplementSelection" : SlotKey(index) + "-ImplementSelection";
+        private static string ChoiceToken(int index, string school, bool extra)
+            => index == 1 && school == Occultist0099Ids.SliceSchool && extra ? "AbjurationExtraSpells" :
+                SlotKey(index) + "-" + school + (extra ? "-ExtraSpells" : "-Implement");
+        private static string ListToken(int index, string school, bool extra)
+            => SlotKey(index) + "-" + school + (extra ? "-ExtraLearnList" : "-LearnList");
+
+        internal static string[] IdentityTokens()
+        {
+            var ids = new HashSet<string>(Occultist0099Ids.SliceTokens)
+            {
+                "EnchantmentEffectiveLevel", "EnchantmentDCLevel", "GloriousPresenceValue", "GloriousPresenceBuff",
+                "CloudMindAbility", "BindingPatternAbility", "InspiredAssaultBuff", "InspiredAssaultAbility", "ObeyAbility",
+                "ObeyHaltAbility", "ObeyFallAbility", "ObeyRunAbility", "EnchantmentInvestFocusAbility", "EnchantmentReplenishFocusAbility",
+                "EnchantmentImplementFocus", "BindingPatternPower", "InspiredAssaultPower", "ObeyPower", "FocusPowerSelection", "MagicItemSkill"
+            };
+            foreach (var school in Schools) ids.Add(school + "ExtraSpellSource");
+            for (int index = 0; index < ImplementLevels.Length; index++)
+            {
+                ids.Add(SelectionToken(index));
+                foreach (var school in Schools)
+                    foreach (bool extra in index == 0 ? new[] { false } : new[] { false, true })
+                    {
+                        ids.Add(ChoiceToken(index, school, extra));
+                        ids.Add(ListToken(index, school, extra));
+                    }
+            }
+            return ids.ToArray();
+        }
 
         // The normal startup path stays closed until the complete set of
         // schools, panoplies and progression is built. A detached cache uses
         // the same transaction with the currently implemented school graph.
-        internal static bool RegisterAbjurationInDetachedCache(BlueprintsCache cache)
+        internal static bool RegisterInDetachedCache(BlueprintsCache cache)
         {
             var processCache = ResourcesLibrary.BlueprintsCache;
             if (cache == null || ReferenceEquals(cache, processCache)) return false;
@@ -61,7 +100,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var day = Occultist0099Donors.DailyTable(cache);
                 var alchemist = cache.Load(BlueprintGuid.Parse(AlchemistClass)) as BlueprintCharacterClass;
                 var proficiencies = cache.Load(BlueprintGuid.Parse(Proficiencies)) as BlueprintFeature;
-                var spells = Occultist0099Donors.Resolve(cache, AbjurationRows);
+                var spells = Occultist0099Donors.Resolve(cache, Rows);
                 if (day == null || alchemist?.name != "AlchemistClass" || alchemist.AssetGuid != BlueprintGuid.Parse(AlchemistClass) ||
                     proficiencies?.AssetGuid != BlueprintGuid.Parse(Proficiencies) || spells == null) return false;
                 if (!spells.Keys.Any(row => row.Guid == Occultist0099AbjurationCatalog.MageShield) ||
@@ -80,10 +119,12 @@ namespace CallOfTheWild.Wrath.Prototype
                         return true;
                     }
                 }
-                var manifest = Occultist0099Ids.SliceTokens.Select(token => BlueprintGuid.Parse(Occultist0099Ids.Id(token))).ToArray();
+                var manifest = IdentityTokens().Select(token => BlueprintGuid.Parse(Occultist0099Ids.Id(token))).ToArray();
                 if (ClassReferences(previous, BlueprintGuid.Parse(Occultist0099Ids.ClassGuid)) != 0 ||
                     manifest.Any(id => loaded.Contains(id))) return false;
-                var graph = BuildAbjuration(root, alchemist, day, proficiencies, spells);
+                var enchantment = Occultist0099Enchantment.Build(cache, DetachedText);
+                if (enchantment == null) return false;
+                var graph = BuildGraph(root, alchemist, day, proficiencies, spells, enchantment);
                 var ids = new HashSet<BlueprintGuid>(graph.Assets.Select(asset => asset.AssetGuid));
                 if (ids.Count != graph.Assets.Length || !ids.SetEquals(manifest))
                     throw new InvalidOperationException("Occultist development graph differs from its private identity manifest.");
@@ -113,6 +154,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 foreach (var asset in graph.Assets)
                 {
+                    Set(asset, "m_AllElements", SpellBatch01447.Elements(asset.ComponentsArray, new HashSet<object>(IdentityComparer)).ToList());
                     asset.OnEnable();
                     if (loaded.Contains(asset.AssetGuid))
                         throw new InvalidOperationException("Occultist identity was occupied during registration: " + asset.name);
@@ -133,12 +175,12 @@ namespace CallOfTheWild.Wrath.Prototype
             }
         }
 
-        private static Graph BuildAbjuration(BlueprintRoot root, BlueprintCharacterClass alchemist, BlueprintSpellsTable day,
-            BlueprintFeature proficiencies, Dictionary<Occultist0099SpellRoot, BlueprintAbility> spells)
+        private static Graph BuildGraph(BlueprintRoot root, BlueprintCharacterClass alchemist, BlueprintSpellsTable day,
+            BlueprintFeature proficiencies, Dictionary<Occultist0099SpellRoot, BlueprintAbility> spells, BlueprintScriptableObject[] enchantment)
         {
             var shield = spells.Single(row => row.Key.Guid == Occultist0099AbjurationCatalog.MageShield).Value;
             var resistance = spells.Single(row => row.Key.Name == "SpellResistance").Value;
-            var mechanics = Build(shield, resistance, DetachedText);
+            var mechanics = Build(shield, resistance, DetachedText).Concat(enchantment).ToArray();
             T Mechanic<T>(string token) where T : BlueprintScriptableObject
                 => (T)mechanics.Single(asset => asset.AssetGuid == BlueprintGuid.Parse(Occultist0099Ids.Id(token)));
 
@@ -159,10 +201,41 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(character, "m_WillSave", Get(alchemist, "m_FortitudeSave"));
             Set(character, "m_Archetypes", Array.Empty<BlueprintArchetypeReference>());
 
-            var list = Identify(new BlueprintSpellList(), "OccultistSpellList", "", "", null);
-            var firstList = Identify(new BlueprintSpellList(), "slot-1-Abjuration-LearnList", "", "", null);
-            var extraList = Identify(new BlueprintSpellList(), "slot-2-Abjuration-ExtraLearnList", "", "", null);
-            foreach (var row in new[] { list, firstList, extraList }) row.ComponentsArray = Array.Empty<BlueprintComponent>();
+            var list = EmptySpellList("OccultistSpellList");
+            var implementLists = new Dictionary<BlueprintSpellList, string>();
+            var descriptors = new List<Occultist0099ImplementSpellList>();
+            var choices = new List<BlueprintFeature>();
+            var selections = new List<BlueprintFeatureSelection>();
+            var extraMarkers = Schools.ToDictionary(school => school, school => Feature(school + "ExtraSpellSource", school + " Extra Spells"));
+            foreach (var marker in extraMarkers.Values)
+            {
+                marker.HideInUI = true;
+                marker.HideInCharacterSheetAndLevelUp = true;
+            }
+            for (int i = 0; i < ImplementLevels.Length; i++)
+            {
+                var options = new List<BlueprintFeature>();
+                foreach (string school in Schools)
+                {
+                    var first = Mechanic<BlueprintFeature>(school + "ImplementFocus");
+                    var extraMarker = extraMarkers[school];
+                    foreach (bool extra in i == 0 ? new[] { false } : new[] { false, true })
+                    {
+                        var source = EmptySpellList(ListToken(i, school, extra));
+                        implementLists.Add(source, school);
+                        descriptors.Add(new Occultist0099ImplementSpellList
+                            { SlotKey = SlotKey(i), School = school, ExtraSpells = extra, List = Ref<BlueprintSpellListReference>(source) });
+                        var requirement = extra ? new BlueprintComponent[] { Requires(first), Excludes(extraMarker), Facts(extraMarker) }
+                            : new BlueprintComponent[] { Excludes(first), Facts(first) };
+                        var slot = new Occultist0099ImplementSlot
+                            { name = "OccultistImplementSlot", SlotKey = SlotKey(i), School = school, ExtraSpells = extra };
+                        options.Add(Feature(ChoiceToken(i, school, extra), school + (extra ? " Extra Spells" : " Implement"),
+                            requirement.Concat(new[] { slot }).ToArray()));
+                    }
+                }
+                choices.AddRange(options);
+                selections.Add(Selection(SelectionToken(i), "Implement", "Choose an occultist implement.", options));
+            }
             var zero = Identify(new BlueprintSpellsTable
             {
                 Levels = Enumerable.Range(0, 21).Select(_ => new SpellsLevelEntry { Count = new int[11] }).ToArray(),
@@ -173,11 +246,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 Name = character.LocalizedName, Spontaneous = true, CastingAttribute = StatType.Intelligence, CantripsType = CantripsType.Cantrips,
                 ComponentsArray = new BlueprintComponent[] { new Occultist0099SpellbookMarker0099
                 {
-                    name = "OccultistPrivateBook", ImplementLists = new[]
-                    {
-                        new Occultist0099ImplementSpellList { SlotKey = "slot-1", School = Occultist0099Ids.SliceSchool, List = Ref<BlueprintSpellListReference>(firstList) },
-                        new Occultist0099ImplementSpellList { SlotKey = "slot-2", School = Occultist0099Ids.SliceSchool, List = Ref<BlueprintSpellListReference>(extraList), ExtraSpells = true }
-                    }
+                    name = "OccultistPrivateBook", ImplementLists = descriptors.ToArray()
                 } }
             }, "OccultistSpellbook", "", "", null);
             Set(book, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(character));
@@ -194,31 +263,53 @@ namespace CallOfTheWild.Wrath.Prototype
                 name = "OccultistFocusAuthority", CharacterClass = Ref<BlueprintCharacterClassReference>(character),
                 FocusResource = Ref<BlueprintAbilityResourceReference>(resource),
                 MindBarrierBuff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("MindBarrierBuff")),
-                WardingTalisman = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("WardingTalismanBuff"))
+                WardingTalisman = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("WardingTalismanBuff")),
+                SchoolResonances = new[] { new Occultist0099SchoolResonance { School = Occultist0099Enchantment.School,
+                    Buff = Ref<BlueprintBuffReference>(Mechanic<BlueprintBuff>("GloriousPresenceBuff")) } }
             }, Facts(Mechanic<BlueprintAbility>("ResetFocusAbility"), Mechanic<BlueprintAbility>("LockFocusAbility")));
             var learning = Feature("OccultistSpellbookFact", "Implement Spells", new Occultist0099SpellbookFact0099
                 { name = "OccultistSpellSourceAuthority", CharacterClass = Ref<BlueprintCharacterClassReference>(character) });
-            var first = Mechanic<BlueprintFeature>("AbjurationImplementFocus");
-            first.ComponentsArray = first.ComponentsArray.Concat(new BlueprintComponent[]
-                { new Occultist0099ImplementSlot { name = "OccultistAbjurationFirstSlot", SlotKey = "slot-1" } }).ToArray();
-            var needsBase = new PrerequisiteFeature { name = "OccultistExtraAbjurationNeedsBase" };
-            Set(needsBase, "m_Feature", Ref<BlueprintFeatureReference>(first));
-            var extra = Feature("AbjurationExtraSpells", "Abjuration Extra Spells", needsBase,
-                new Occultist0099ImplementSlot { name = "OccultistAbjurationExtraSlot", SlotKey = "slot-2", ExtraSpells = true });
-            var firstSelection = Selection("ImplementSelection", first);
-            var extraSelection = Selection("ExtraImplementSelection", extra);
+            var enchantmentImplement = Mechanic<BlueprintFeature>("EnchantmentImplementFocus");
+            var binding = new PrerequisiteClassLevel { name = "OccultistBindingPatternLevel", Level = 7 };
+            Set(binding, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(character));
+            var powers = new[]
+            {
+                Feature("BindingPatternPower", "Binding Pattern", Requires(enchantmentImplement), binding,
+                    GrantPower(enchantmentImplement, Mechanic<BlueprintAbility>("BindingPatternAbility"))),
+                Feature("InspiredAssaultPower", "Inspired Assault", Requires(enchantmentImplement),
+                    GrantPower(enchantmentImplement, Mechanic<BlueprintAbility>("InspiredAssaultAbility"))),
+                Feature("ObeyPower", "Obey", Requires(enchantmentImplement),
+                    GrantPower(enchantmentImplement, Mechanic<BlueprintAbility>("ObeyAbility")))
+            };
+            var powerSelection = Selection("FocusPowerSelection", "Focus Power", "Choose a focus power for one of your implements.", powers);
+            var halfLevel = new ContextRankConfig { name = "OccultistHalfClassLevel" };
+            SetEnum(halfLevel, "m_BaseValueType", "ClassLevel");
+            SetEnum(halfLevel, "m_Progression", "Div2");
+            Set(halfLevel, "m_Class", new[] { Ref<BlueprintCharacterClassReference>(character) });
+            var itemSkill = Feature("MagicItemSkill", "Magic Item Skill", halfLevel,
+                new AddContextStatBonus { name = "OccultistUseMagicDevice", Descriptor = ModifierDescriptor.UntypedStackable,
+                    Stat = StatType.SkillUseMagicDevice, Value = new ContextValue { ValueType = ContextValueType.Rank } });
+            itemSkill.ReapplyOnLevelUp = true;
             var knacks = Feature("OccultistKnacksFeature", "Knacks");
+            var career = new List<BlueprintFeature>[21];
+            for (int i = 1; i < career.Length; i++) career[i] = new List<BlueprintFeature>();
+            career[1].AddRange(new[] { proficiencies, focus, learning, knacks });
+            career[2].Add(itemSkill);
+            for (int i = 0; i < selections.Count; i++) career[ImplementLevels[i]].Add(selections[i]);
+            for (int i = 1; i <= 19; i += 2) career[i].Add(powerSelection);
             var progression = Identify(new BlueprintProgression
             {
                 Ranks = 1, IsClassFeature = true, ComponentsArray = Array.Empty<BlueprintComponent>(), UIGroups = Array.Empty<UIGroup>(),
-                LevelEntries = new[] { ArchetypeBatch01445.Entry(1, proficiencies, focus, learning, knacks, firstSelection, extraSelection) }
+                LevelEntries = Enumerable.Range(1, 20).Where(level => career[level].Count > 0)
+                    .Select(level => ArchetypeBatch01445.Entry(level, career[level].ToArray())).ToArray()
             }, "OccultistProgression", "Occultist", "", null, DetachedText);
             Set(progression, "m_Classes", new[] { new BlueprintProgression.ClassWithLevel { m_Class = Ref<BlueprintCharacterClassReference>(character) } });
             Set(character, "m_Progression", Ref<BlueprintProgressionReference>(progression));
 
-            var graph = new Graph { Root = root, Character = character, List = list, ImplementLists = new[] { firstList, extraList },
-                Assets = new BlueprintScriptableObject[] { character, book, list, firstList, extraList, zero, resource, focus,
-                    learning, extra, firstSelection, extraSelection, knacks, progression }.Concat(mechanics).ToArray() };
+            var graph = new Graph { Root = root, Character = character, List = list, ImplementLists = implementLists,
+                Assets = new BlueprintScriptableObject[] { character, book, list, zero, resource, focus,
+                    learning, knacks, progression, powerSelection, itemSkill }.Concat(mechanics).Concat(implementLists.Keys)
+                    .Concat(extraMarkers.Values).Concat(choices).Concat(selections).Concat(powers).ToArray() };
             UpdateSpellLists(graph, spells);
             return graph;
         }
@@ -227,15 +318,40 @@ namespace CallOfTheWild.Wrath.Prototype
             => Identify(new BlueprintFeature { Ranks = 1, IsClassFeature = true, ComponentsArray = components },
                 token, label, "", null, DetachedText);
 
+        private static BlueprintSpellList EmptySpellList(string token)
+            => Identify(new BlueprintSpellList { ComponentsArray = Array.Empty<BlueprintComponent>() }, token, "", "", null);
+
+        private static PrerequisiteFeature Requires(BlueprintFeature feature)
+        {
+            var requirement = new PrerequisiteFeature { name = "Requires" + feature.name };
+            Set(requirement, "m_Feature", Ref<BlueprintFeatureReference>(feature));
+            return requirement;
+        }
+
+        private static PrerequisiteNoFeature Excludes(BlueprintFeature feature)
+        {
+            var requirement = new PrerequisiteNoFeature { name = "Excludes" + feature.name };
+            Set(requirement, "m_Feature", Ref<BlueprintFeatureReference>(feature));
+            return requirement;
+        }
+
+        private static Occultist0099SchoolPowerGrant GrantPower(BlueprintFeature implement, BlueprintAbility power)
+        {
+            var grant = new Occultist0099SchoolPowerGrant { name = "OccultistRequires" + implement.name };
+            Set(grant, "m_CheckedFact", Ref<BlueprintUnitFactReference>(implement));
+            Set(grant, "m_Feature", Ref<BlueprintUnitFactReference>(power));
+            return grant;
+        }
+
         // A detached graph can carry localization keys without writing to the process pack.
         private static LocalizedString DetachedText(string token, string suffix, string _)
             => new LocalizedString { Key = "cotw-wrath.psychic.full." + token + "." + suffix };
 
-        private static BlueprintFeatureSelection Selection(string token, BlueprintFeature feature)
+        private static BlueprintFeatureSelection Selection(string token, string label, string description, IEnumerable<BlueprintFeature> features)
         {
             var selection = Identify(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true,
-                ComponentsArray = Array.Empty<BlueprintComponent>() }, token, "Implement", "Choose an occultist implement.", null, DetachedText);
-            var options = new[] { Ref<BlueprintFeatureReference>(feature) };
+                ComponentsArray = Array.Empty<BlueprintComponent>() }, token, label, description, null, DetachedText);
+            var options = features.Select(Ref<BlueprintFeatureReference>).ToArray();
             Set(selection, "m_Features", options);
             Set(selection, "m_AllFeatures", options);
             return selection;
@@ -243,11 +359,12 @@ namespace CallOfTheWild.Wrath.Prototype
 
         private static void UpdateSpellLists(Graph graph, Dictionary<Occultist0099SpellRoot, BlueprintAbility> spells)
         {
-            var lists = new[] { graph.List }.Concat(graph.ImplementLists).ToArray();
+            var lists = new[] { graph.List }.Concat(graph.ImplementLists.Keys).ToArray();
             var next = lists.Select(list => SpellListCompatibility.Build(Enumerable.Range(0, 7).Select(circle =>
             {
                 var row = new SpellLevelList(circle);
-                foreach (var spell in spells.Where(s => s.Key.Circle == circle && (list == graph.List || !s.Key.IsKnack)))
+                foreach (var spell in spells.Where(s => s.Key.Circle == circle &&
+                             (list == graph.List || !s.Key.IsKnack && s.Key.School == graph.ImplementLists[list])))
                     row.SpellsRefs.Add(Ref<BlueprintAbilityReference>(spell.Value));
                 return row;
             }).ToArray())).ToArray();

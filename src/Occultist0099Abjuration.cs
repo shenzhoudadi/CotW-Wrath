@@ -75,16 +75,16 @@ namespace CallOfTheWild.Wrath.Prototype
 
             var invest = Operation("InvestFocusAbility", "Invest Mental Focus: Abjuration",
                 "Invest 1 point of unallocated mental focus in Abjuration before locking your focus.",
-                Occultist0099FocusAction.Invest, UnitCommand.CommandType.Free, shield);
+                Occultist0099FocusAction.Invest, UnitCommand.CommandType.Free, shield, text);
             var replenish = Operation("ReplenishFocusAbility", "Replenish Mental Focus: Abjuration",
                 "Spend 1 unallocated point of mental focus to replenish a spent Abjuration point.",
-                Occultist0099FocusAction.Replenish, UnitCommand.CommandType.Free, shield);
+                Occultist0099FocusAction.Replenish, UnitCommand.CommandType.Free, shield, text);
             var reset = Operation("ResetFocusAbility", "Reset Mental Focus",
                 "Return unspent invested points to your general pool before locking your focus.",
-                Occultist0099FocusAction.Reset, UnitCommand.CommandType.Free, shield);
+                Occultist0099FocusAction.Reset, UnitCommand.CommandType.Free, shield, text);
             var locked = Operation("LockFocusAbility", "Lock Mental Focus",
                 "Finalize your investments and activate your implements' resonant powers until you rest.",
-                Occultist0099FocusAction.Lock, UnitCommand.CommandType.Standard, shield);
+                Occultist0099FocusAction.Lock, UnitCommand.CommandType.Standard, shield, text);
             locked.SetIsFullRoundAction(true);
             var implement = Identify(new BlueprintFeature
             {
@@ -97,13 +97,14 @@ namespace CallOfTheWild.Wrath.Prototype
             }, "AbjurationImplementFocus", "Abjuration Implement", "Gain Mind Barrier and Warding Talisman.", shield, text);
             return new BlueprintScriptableObject[] { absorption, wardBonus, mindBuff, mindAbility, wardBuff,
                 invest, replenish, reset, locked, implement };
-
-            BlueprintAbility Operation(string token, string label, string description,
-                Occultist0099FocusAction action, UnitCommand.CommandType command, BlueprintAbility icon)
-                => Identify(SelfAbility(AbilityType.Special, command, new BlueprintComponent[]
-                    { new Occultist0099FocusOperation { name = "OccultistFocus" + action, Action = action } }),
-                    token, label, description, icon, text);
         }
+
+        internal static BlueprintAbility Operation(string token, string label, string description, Occultist0099FocusAction action,
+            UnitCommand.CommandType command, BlueprintAbility icon, Func<string, string, string, LocalizedString> text,
+            string school = Occultist0099Ids.SliceSchool)
+            => Identify(SelfAbility(AbilityType.Special, command, new BlueprintComponent[]
+                { new Occultist0099FocusOperation { name = "OccultistFocus" + action, Action = action, School = school } }),
+                token, label, description, icon, text);
 
         private static BlueprintAbility SelfAbility(AbilityType type, UnitCommand.CommandType command,
             BlueprintComponent[] components) => new BlueprintAbility
@@ -122,7 +123,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 }
             }, token, "", "", null);
 
-        private static ContextValue PropertyValue(BlueprintUnitProperty property)
+        internal static ContextValue PropertyValue(BlueprintUnitProperty property)
         {
             var value = new ContextValue { ValueType = ContextValueType.CasterCustomProperty };
             Set(value, "m_CustomProperty", Ref<BlueprintUnitPropertyReference>(property));

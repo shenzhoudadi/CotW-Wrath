@@ -9,6 +9,7 @@ using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
+using Kingmaker.Designers.Mechanics.Facts;
 using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.PubSubSystem;
@@ -350,9 +351,18 @@ namespace CallOfTheWild.Wrath.Prototype
             Occultist0099Spells.SetIntelligence(state, IntelligenceScore());
         }
 
-        protected override void OnActivate() => Sync();
+        protected override void OnActivate() => RestoreImplementSources();
         protected override void OnPostLoad() => Sync();
-        protected override void OnApplyPostLoadFixes() => Sync();
+        protected override void OnApplyPostLoadFixes() => RestoreImplementSources();
+
+        private void RestoreImplementSources()
+        {
+            Sync();
+            foreach (var source in Owner.Progression.Features.Enumerable.Where(fact => fact.Active && !fact.IsDisposed)
+                         .SelectMany(fact => fact.Blueprint.GetComponents<Occultist0099ImplementSlot>())
+                         .OrderBy(source => source.ExtraSpells || source.Panoply != null))
+                Occultist0099Spells.AddSlot(State, source.SlotKey, source.School, source.ExtraSpells, source.Panoply);
+        }
 
         public void HandleUnitRest(UnitEntityData unit)
         {
@@ -368,9 +378,13 @@ namespace CallOfTheWild.Wrath.Prototype
             var state = State;
             if (present)
             {
-                Occultist0099Spells.AddSlot(state, implement.SlotKey, implement.School, implement.ExtraSpells, implement.Panoply);
+                if (Occultist0099Spells.AddSlot(state, implement.SlotKey, implement.School, implement.ExtraSpells, implement.Panoply)
+                        == Occultist0099Outcome.Ok && !implement.ExtraSpells && implement.Panoply == null)
+                    RestoreImplementSources();
                 return;
             }
+            if (!state.Slots.Any(slot => slot.Key == implement.SlotKey && slot.School == implement.School &&
+                    slot.ExtraSpells == implement.ExtraSpells && slot.Panoply == implement.Panoply)) return;
             var previous = Occultist0099Spells.KnownRoots(state);
             if (Occultist0099Spells.RemoveSlot(state, implement.SlotKey) != Occultist0099Outcome.Ok) return;
             var removed = new HashSet<string>(previous.Except(Occultist0099Spells.KnownRoots(state)));
@@ -464,6 +478,20 @@ namespace CallOfTheWild.Wrath.Prototype
         public string StateFingerprint() => State.Fingerprint();
         public int OpenQuotaCount(int circle)
             => Occultist0099Spells.QuotaCount(State, circle);
+    }
+
+    [TypeId(Occultist0099Ids.SchoolPowerGrantTypeId)]
+    public sealed class Occultist0099SchoolPowerGrant : AddFeatureIfHasFact, IUnitGainFactHandler, IUnitLostFactHandler
+    {
+        public void HandleUnitGainFact(EntityFact fact)
+        {
+            if (fact?.Blueprint == CheckedFact) base.OnActivate();
+        }
+
+        public void HandleUnitLostFact(EntityFact fact)
+        {
+            if (fact?.Blueprint == CheckedFact) base.OnDeactivate();
+        }
     }
 
     [TypeId(Occultist0099Ids.ImplementSlotTypeId)]

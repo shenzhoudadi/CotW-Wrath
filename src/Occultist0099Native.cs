@@ -170,6 +170,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintAbilityResourceReference FocusResource;
         public BlueprintBuffReference WardingTalisman;
         public BlueprintBuffReference MindBarrierBuff;
+        public Occultist0099SchoolResonance[] SchoolResonances = Array.Empty<Occultist0099SchoolResonance>();
 
         private Occultist0099FocusPart Ledger
         {
@@ -221,7 +222,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (part.DeferReconciliation)
             {
                 SyncResourceMirror();
-                SyncWardingTalisman();
+                SyncResonance();
                 return true;
             }
             if (part.LastSuccessfulRest != null && part.LastSuccessfulRest != part.State.LastRestEventId)
@@ -241,7 +242,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 Occultist0099Focus.RespecBudgetDown(part.State, level, IntModifier());
             }
             SyncResourceMirror();
-            SyncWardingTalisman();
+            SyncResonance();
             return true;
         }
 
@@ -252,7 +253,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (ClassLevel() <= 0) Occultist0099Focus.RetireClass(part.State);
             else Occultist0099Focus.RemoveClass(part.State);
             RemoveMindBarrier();
-            SyncWardingTalisman();
+            SyncResonance();
         }
 
         protected override void OnPostLoad() => Occultist0099Focus.Validate(State);
@@ -265,7 +266,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 ReconcileSchools();
             }
             SyncResourceMirror();
-            SyncWardingTalisman();
+            SyncResonance();
         }
 
         internal void Rest(string identity)
@@ -275,7 +276,7 @@ namespace CallOfTheWild.Wrath.Prototype
             Occultist0099Focus.Validate(State);
             SyncResourceMirror();
             if (reset) RemoveMindBarrier();
-            SyncWardingTalisman();
+            SyncResonance();
         }
 
         internal void SetSchoolPresent(string school, bool present)
@@ -285,9 +286,8 @@ namespace CallOfTheWild.Wrath.Prototype
                 Occultist0099Focus.RespecRemoveSchool(State, school);
             if (result != Occultist0099Outcome.Ok) return;
             SyncResourceMirror();
-            if (school != Occultist0099Ids.SliceSchool) return;
-            if (!present) RemoveMindBarrier();
-            SyncWardingTalisman();
+            if (!present && school == Occultist0099Ids.SliceSchool) RemoveMindBarrier();
+            SyncResonance();
         }
 
         private void ReconcileSchools()
@@ -330,7 +330,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 state.ChargedExecutions.Add(executionId);
                 SyncResourceMirror();
-                if (action == Occultist0099FocusAction.Lock) SyncWardingTalisman();
+                if (action == Occultist0099FocusAction.Lock) SyncResonance();
             }
             return true;
         }
@@ -341,12 +341,17 @@ namespace CallOfTheWild.Wrath.Prototype
             if (blueprint != null) Owner.Buffs.GetBuff(blueprint)?.Remove();
         }
 
-        private void SyncWardingTalisman()
+        private void SyncResonance()
         {
-            var blueprint = WardingTalisman?.Get();
+            SyncResonanceBuff(Occultist0099Ids.SliceSchool, WardingTalisman?.Get());
+            foreach (var resonance in SchoolResonances) SyncResonanceBuff(resonance.School, resonance.Buff?.Get());
+        }
+
+        private void SyncResonanceBuff(string school, BlueprintBuff blueprint)
+        {
             if (blueprint == null) return;
             var current = Owner.Buffs.GetBuff(blueprint);
-            if (WardingTalismanResonance(Occultist0099Ids.SliceSchool) <= 0)
+            if (WardingTalismanResonance(school) <= 0)
                 current?.Remove();
             else if (current == null)
                 Owner.Buffs.AddBuff(blueprint, Owner, (TimeSpan?)null);
@@ -442,6 +447,13 @@ namespace CallOfTheWild.Wrath.Prototype
                State.Schools[Occultist0099Ids.SliceSchool].Present && IsOwnedBy(Owner);
 
         public string StateFingerprint() => State.Fingerprint();
+    }
+
+    [Serializable]
+    public sealed class Occultist0099SchoolResonance
+    {
+        public string School;
+        public BlueprintBuffReference Buff;
     }
 
     // One identity for a batch of applied rests, including paired units.

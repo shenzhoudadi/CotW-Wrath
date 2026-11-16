@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成。B6 完成防护系隔离原生登记、回滚和供体校验，独立 D6 复查通过。复用 Wrath 的 Alchemist 位表和首级 Knacks 学习，以及 CotW 和外部已有法术。编译 0 警告、0 错误（1.949 秒），隔离原生 241/241（3.703 秒），模型 344/344（2.342 秒）。继续 B/D 完成其余七校、四 Panoply、职业成长和普通启动登记。真实提供方、已学法术的存读档、实机、打包和上传未运行，认领仍开放。[B6 / D6 与证据](../work-packages/COTW-0099/B6-D6-native-registration.md)。
+- **COTW-0099 Occultist** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 已完成。B7 已接好 Enchantment 全校、七次法器与十次 Focus Power 的进度和 Magic Item Skill，独立 D7 定向复查通过。复用 Wrath 的 Command 分支、Daze、Stagger 与 Hold Monster 重掷，以及 CotW 的 Mass Daze 和魅力检定组件。编译零警告、零错误（1.171 秒），隔离原生 290/290（3.915 秒）。继续 B/D 完成防护系余项、另外六校、四 Panoply、剩余职业特性与普通启动登记。实际提供方、完整升级/重训、存读档、实机及出包未运行，认领仍开放。[B7 / D7 与证据](../work-packages/COTW-0099/B7-D7-enchantment.md)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
