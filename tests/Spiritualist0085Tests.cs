@@ -265,6 +265,53 @@ internal static class Spiritualist0085Tests
 
         // ---- Phantom class and shared progression ----
         var phantomClass = Load<BlueprintCharacterClass>(cache, Id("PhantomClass"));
+        var angersGrant = Load<BlueprintProgression>(cache, Id("AngerEmotion")).GetComponent<AddPet>();
+        var dogGrant = Load<BlueprintFeature>(cache, BlueprintGuid.Parse("f894e003d31461f48a02f5caec4e3359")).GetComponent<AddPet>();
+        var progressionDonor = new BlueprintPet
+        {
+            AssetGuid = BlueprintGuid.Parse("0085008500850085008500850085f5e1"),
+            ComponentsArray = new BlueprintComponent[] { new AddClassLevels { name = "0085 test owner override" } }
+        };
+        cache.AddCachedBlueprint(progressionDonor.AssetGuid, progressionDonor);
+        var donorReference = new BlueprintPet.Reference();
+        AccessTools.Field(typeof(BlueprintPet.Reference), "deserializedGuid").SetValue(donorReference, progressionDonor.AssetGuid);
+        var ownerOverride = new AddClassLevelsToPets();
+        AccessTools.Field(typeof(AddClassLevelsToPets), "m_BlueprintPet").SetValue(ownerOverride, donorReference);
+        const string overridePatch = "Phantom0085Patches+PetLevelOverride";
+        Check(ownerOverride.LevelsProgression != null &&
+            Call(overridePatch, "OwnerProgression", ownerOverride, angersGrant) == null &&
+            ReferenceEquals(Call(overridePatch, "OwnerProgression", ownerOverride, dogGrant), ownerOverride.LevelsProgression),
+            "C03: the native owner override remains available to Dog and does not replace the private Phantom class");
+        var overrideOriginal = AccessTools.Method(typeof(AddPet), "TryLevelUpPet");
+        var overrideInstructions = ((IEnumerable<CodeInstruction>)Call(overridePatch, "Transpiler",
+            PatchProcessor.GetOriginalInstructions(overrideOriginal))).ToArray();
+        var nativeLevel = AccessTools.Method(typeof(AddClassLevels), "LevelUp",
+            new[] { typeof(AddClassLevels), typeof(Kingmaker.UnitLogic.UnitDescriptor), typeof(int), typeof(Kingmaker.UnitLogic.UnitFact) });
+        Check(nativeLevel != null &&
+            overrideInstructions.Count(i => i.Calls(AccessTools.Method(T(overridePatch), "OwnerProgression"))) == 1 &&
+            overrideInstructions.Any(i => i.Calls(nativeLevel)),
+            "C03: only the native owner override lookup is redirected, preserving native leveling");
+        var orphan = (object)default(UnitReference);
+        AccessTools.Field(typeof(UnitReference), "m_UniqueId").SetValue(orphan, "saved-phantom-not-yet-loaded");
+        const string referencePatch = "Phantom0085Patches+ExistingPetReference";
+        Check((bool)Call(referencePatch, "WaitingForRecordedPet", orphan, null) &&
+            !(bool)Call(referencePatch, "WaitingForRecordedPet", default(UnitReference), null) &&
+            AccessTools.Property(typeof(AddPet), "Data")?.PropertyType == typeof(AddPetData) &&
+            AccessTools.Property(typeof(AddPet), "Owner")?.PropertyType == typeof(UnitEntityData),
+            "C17: an unresolved native save reference waits while a fresh grant is eligible to spawn");
+        var recallState = Activator.CreateInstance(T("UnitPartPhantom0085"));
+        var zero = new UnityEngine.Vector3(0f, 0f, 0f);
+        var landing = new UnityEngine.Vector3(2f, 0f, 0f);
+        var upstairs = new UnityEngine.Vector3(2f, 2f, 0f);
+        void Remember() => AccessTools.Method(recallState.GetType(), "RememberRecall").Invoke(recallState, new object[] { "owned", zero, landing });
+        bool Recalled(string id, UnityEngine.Vector3 anchor, UnityEngine.Vector3 position)
+            => (bool)AccessTools.Method(recallState.GetType(), "AtLastRecallLanding").Invoke(recallState, new object[] { id, anchor, position });
+        Remember();
+        Check(Recalled("owned", zero, landing) && !Recalled("other", zero, landing) &&
+            !Recalled("owned", zero, upstairs) && !Recalled("owned", upstairs, landing),
+            "C05: a prior recall only suppresses its bound pet at the same owner anchor and 3-D landing");
+        AccessTools.Method(recallState.GetType(), "ClearRecall").Invoke(recallState, null);
+        Check(!Recalled("owned", zero, landing), "C05: area unload clears the previous landing record");
         Check(phantomClass != null && phantomClass.HideInUI, "phantom class hidden from players");
         Check((DiceType)Get(phantomClass, "HitDie") == DiceType.D10, "phantom d10 hit die");
         Check(phantomClass.GetComponent<Kingmaker.Blueprints.Classes.Prerequisites.PrerequisiteIsPet>() != null, "phantom class is pet-only");

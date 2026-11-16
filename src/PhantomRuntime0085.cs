@@ -63,8 +63,27 @@ namespace CallOfTheWild.Wrath.Prototype
         [JsonProperty] internal string Emotion;
         [JsonProperty] internal string PetId;
         [JsonProperty] internal bool PendingManifest;
+        [JsonProperty] internal readonly List<EntityFactRef<Feature>> OwnedFocus = new List<EntityFactRef<Feature>>();
+        // Old local TEST saves tracked only the blueprint GUID.
         [JsonProperty] internal readonly List<string> GrantedFocus = new List<string>();
         private string lastBindingConflict;
+        private string lastRecalledPet;
+        private UnityEngine.Vector3 lastRecallAnchor;
+        private UnityEngine.Vector3 lastRecallLanding;
+
+        internal bool AtLastRecallLanding(string pet, UnityEngine.Vector3 anchor, UnityEngine.Vector3 position)
+            => lastRecalledPet != null && lastRecalledPet == pet &&
+                Phantom0085Link.SamePosition(lastRecallAnchor, anchor) &&
+                Phantom0085Link.SamePosition(lastRecallLanding, position);
+
+        internal void RememberRecall(string pet, UnityEngine.Vector3 anchor, UnityEngine.Vector3 position)
+        {
+            lastRecalledPet = pet;
+            lastRecallAnchor = anchor;
+            lastRecallLanding = position;
+        }
+
+        internal void ClearRecall() => lastRecalledPet = null;
 
         internal UnitEntityData BoundPet(UnitEntityData master)
         {
@@ -144,21 +163,16 @@ namespace CallOfTheWild.Wrath.Prototype
             if (IsReapplying) return;
             var part = master?.Get<UnitPartPhantom0085>();
             if (part == null || part.Emotion != Emotion) return;
-            foreach (var key in part.GrantedFocus.ToArray())
-            {
-                var focus = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(BlueprintGuid.Parse(key));
-                if (focus != null && master.HasFact(focus)) master.RemoveFact(focus);
-                part.GrantedFocus.Remove(key);
-            }
             ClearCombatLink(master);
             part.Confined = false;
             part.PendingManifest = false;
             part.PetId = null;
             part.Emotion = null;
+            part.ClearRecall();
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
 
-        public void OnAreaBeginUnloading() { }
+        public void OnAreaBeginUnloading() => Owner?.Get<UnitPartPhantom0085>()?.ClearRecall();
         public void OnAreaDidLoad()
         {
             var master = Owner;
@@ -207,6 +221,7 @@ namespace CallOfTheWild.Wrath.Prototype
             part.PetId = null;
             part.Confined = false;
             part.PendingManifest = false;
+            part.ClearRecall();
             ClearCombatLink(master);
             Phantom0085ConsciousnessGrant.RefreshAll(master);
         }
@@ -246,20 +261,20 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!SameLocalArea(master, pet) || !path) return false;
             FreePlaceSelector.PlaceSpawnPlaces(1, 0.5f, master.Position);
             var destination = FreePlaceSelector.GetRelaxedPosition(0, projectOnGround: true);
+            var anchor = path.GetNearest(master.Position);
             var nearest = path.GetNearest(destination);
-            if (nearest.node?.Walkable != true || VectorDistanceHorizontal(nearest.position, destination) > 0.5f ||
-                VectorDistanceHorizontal(master.Position, destination) > 10.Feet().Meters)
+            if (anchor.node?.Walkable != true || nearest.node?.Walkable != true || anchor.node.Area != nearest.node.Area ||
+                (nearest.position - destination).sqrMagnitude > 0.25f ||
+                (master.Position - destination).sqrMagnitude > 10.Feet().Meters * 10.Feet().Meters)
                 return false;
-            if (VectorDistanceHorizontal(pet.Position, destination) <= 0.1f) return !requireMovement;
+            var before = pet.Position;
+            if (SamePosition(before, destination)) return !requireMovement;
             pet.Position = destination;
-            return true;
+            return !requireMovement || !SamePosition(before, pet.Position);
         }
 
-        private static float VectorDistanceHorizontal(UnityEngine.Vector3 from, UnityEngine.Vector3 to)
-        {
-            from.y = to.y;
-            return UnityEngine.Vector3.Distance(from, to);
-        }
+        internal static bool SamePosition(UnityEngine.Vector3 from, UnityEngine.Vector3 to)
+            => (from - to).sqrMagnitude <= 0.01f;
 
         internal static void Reproject(UnitEntityData master, UnitPartPhantom0085 part)
         {
@@ -661,7 +676,7 @@ namespace CallOfTheWild.Wrath.Prototype
         // fused never double-grant or strip each other's Skill Focus.
         internal static void RefreshAll(UnitEntityData master)
         {
-            if (master == null) return;
+            if (master == null || !master.PreviewOf.IsEmpty) return;
             var part = master.Get<UnitPartPhantom0085>();
             if (part == null) return;
             var grants = new List<Phantom0085ConsciousnessGrant>();
@@ -683,27 +698,35 @@ namespace CallOfTheWild.Wrath.Prototype
             }
             // Reconcile Skill Focus: add missing desired, remove tracked stale.
             var characterClass = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(Spiritualist0085Ids.Id(Spiritualist0085.RootToken));
+            if (characterClass == null) return;
+            foreach (var key in part.GrantedFocus)
+            {
+                var focus = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(BlueprintGuid.Parse(key));
+                var fact = focus == null ? null : master.Progression.Features.GetFact(focus);
+                if (fact?.SourceClass == characterClass) part.OwnedFocus.Add(fact);
+            }
+            part.GrantedFocus.Clear();
+            foreach (var reference in part.OwnedFocus.ToArray())
+            {
+                var fact = reference.Fact;
+                if (fact == null || fact.SourceClass != characterClass ||
+                    !ReferenceEquals(fact, master.Progression.Features.GetFact(fact.Blueprint)))
+                {
+                    part.OwnedFocus.Remove(reference);
+                    continue;
+                }
+                if (desired.Contains(fact.Blueprint.AssetGuid)) continue;
+                master.RemoveFact(fact);
+                part.OwnedFocus.Remove(reference);
+            }
             foreach (var guid in desired)
             {
                 var focus = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(guid);
-                if (focus == null) continue;
-                var key = guid.ToString();
-                var fact = master.Progression.Features.GetFact(focus);
-                if (fact == null)
+                if (focus != null && !master.HasFact(focus) && master.AddFact(focus) is Feature fact)
                 {
-                    fact = master.AddFact(focus) as Feature;
-                    if (!part.GrantedFocus.Contains(key)) part.GrantedFocus.Add(key);
-                }
-                if (characterClass != null && fact != null && fact.SourceClass == null && part.GrantedFocus.Contains(key))
                     fact.SetSource(characterClass, master.Progression.GetClassLevel(characterClass));
-            }
-            foreach (var key in part.GrantedFocus.ToArray())
-            {
-                var guid = BlueprintGuid.Parse(key);
-                if (desired.Contains(guid)) continue;
-                var focus = ResourcesLibrary.TryGetBlueprint<BlueprintFeature>(guid);
-                if (focus != null && master.HasFact(focus)) master.RemoveFact(focus);
-                part.GrantedFocus.Remove(key);
+                    part.OwnedFocus.Add(fact);
+                }
             }
             // Reconcile the mode save buffs.
             ReconcileSave(master, "SharedConsciousnessSave", sharedActive && !fusedActive);
@@ -921,8 +944,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if (petPart == null || petPart.ShouldBeHidden) return;
             var resource = ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(Spiritualist0085Ids.Id("PhantomRecallResource"));
             if (resource == null || master.Resources.GetResourceAmount(resource) < 1) return;
-            if (pet.DistanceTo(master) <= 5.Feet().Meters) return;
-            if (Phantom0085Link.TryMoveNearMaster(master, pet)) master.Resources.Spend(resource, 1);
+            if (part.AtLastRecallLanding(pet.UniqueId, master.Position, pet.Position) ||
+                !Phantom0085Link.TryMoveNearMaster(master, pet)) return;
+            master.Resources.Spend(resource, 1);
+            part.RememberRecall(pet.UniqueId, master.Position, pet.Position);
         }
     }
 
@@ -1119,6 +1144,70 @@ namespace CallOfTheWild.Wrath.Prototype
     // ---- Native damage, action, mount and rest integration ----
     internal static class Phantom0085Patches
     {
+        internal static bool IsPrivatePetGrant(AddPet grant)
+            => grant.Type == Spiritualist0085Ids.PhantomPetType && grant.Pet?.GetComponent<Phantom0085Marker>() != null;
+
+        [HarmonyPatch]
+        internal static class ExistingPetReference
+        {
+            private static readonly System.Reflection.PropertyInfo Owner = AccessTools.Property(typeof(AddPet), "Owner");
+            private static readonly System.Reflection.PropertyInfo Data = AccessTools.Property(typeof(AddPet), "Data");
+
+            private static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+            {
+                yield return AccessTools.Method(typeof(AddPet), "TryUpdatePet");
+                yield return AccessTools.Method(typeof(AddPet), "OnDeactivate");
+            }
+
+            internal static bool WaitingForRecordedPet(UnitReference reference, UnitEntityData unit)
+                => !string.IsNullOrEmpty(reference.UniqueId) && ReferenceEquals(unit, null);
+
+            [HarmonyPrefix]
+            private static bool Prefix(AddPet __instance, System.Reflection.MethodBase __originalMethod)
+            {
+                if (!IsPrivatePetGrant(__instance)) return true;
+                var owner = (UnitEntityData)Owner.GetValue(__instance);
+                if (owner == null || owner.IsPet || !owner.PreviewOf.IsEmpty) return false;
+                // Native AddPet registers its spawn callback while the owner has no holding state.
+                if (__originalMethod.Name == "TryUpdatePet" && owner.HoldingState == null) return true;
+                var reference = ((AddPetData)Data.GetValue(__instance)).SpawnedPetRef;
+                var pet = reference.Value;
+                if (WaitingForRecordedPet(reference, pet)) return false;
+                if (pet == null || pet.Blueprint == __instance.Pet && (pet.Master == null || pet.Master == owner))
+                    return true;
+                ModEntry.LogSpellDiagnostic($"0085 ignored foreign recorded pet {pet.UniqueId} for owner {owner.UniqueId}.");
+                return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(AddPet), "TryLevelUpPet")]
+        internal static class PetLevelOverride
+        {
+            [HarmonyTranspiler]
+            private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source)
+            {
+                var instructions = source.ToList();
+                var getter = AccessTools.PropertyGetter(typeof(AddClassLevelsToPets), nameof(AddClassLevelsToPets.LevelsProgression));
+                var calls = instructions.Where(i => i.Calls(getter)).ToArray();
+                if (calls.Length != 1)
+                {
+                    ModEntry.LogSpellDiagnostic("0085 pet level override: native owner progression lookup was not found.");
+                    return instructions;
+                }
+                var call = calls[0];
+                var argument = new CodeInstruction(OpCodes.Ldarg_0);
+                argument.labels.AddRange(call.labels);
+                call.labels.Clear();
+                call.opcode = OpCodes.Call;
+                call.operand = AccessTools.Method(typeof(PetLevelOverride), nameof(OwnerProgression));
+                instructions.Insert(instructions.IndexOf(call), argument);
+                return instructions;
+            }
+
+            internal static AddClassLevels OwnerProgression(AddClassLevelsToPets ownerOverride, AddPet grant)
+                => IsPrivatePetGrant(grant) ? null : ownerOverride?.LevelsProgression;
+        }
+
         [HarmonyPatch(typeof(ActivatableAbility), nameof(ActivatableAbility.TryStart))]
         internal static class BondedFirstRound
         {
@@ -1302,7 +1391,7 @@ namespace CallOfTheWild.Wrath.Prototype
         // Emotion skill ranks follow the phantom class level. The native
         // AddClassLevels.LevelUp is the only upgrade point the contract allows
         // us to touch; the postfix is narrowed to marked 0085 units.
-        [HarmonyPatch(typeof(AddClassLevels), "LevelUp", new[] { typeof(AddClassLevels), typeof(UnitDescriptor), typeof(int) })]
+        [HarmonyPatch(typeof(AddClassLevels), "LevelUp", new[] { typeof(AddClassLevels), typeof(UnitDescriptor), typeof(int), typeof(UnitFact) })]
         internal static class SkillRankLevelSync
         {
             [HarmonyPostfix]
