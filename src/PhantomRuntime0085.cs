@@ -804,19 +804,28 @@ namespace CallOfTheWild.Wrath.Prototype
             if (deal == null || deal.IsFake || deal.RedirectionTarget.Value != null || deal.RedirectedPercent != 0 || deal.RedirectedDamage != 0)
                 return null;
             var victim = deal.Target;
-            if (victim == null) return null;
-            var victimPart = victim.Get<UnitPartPet>();
-            bool spiritualBond = victimPart?.Type != Spiritualist0085Ids.PhantomPetType;
-            var master = spiritualBond ? victim : victimPart.Master;
-            var pet = Phantom0085Link.ManifestedPet(master);
-            if (pet == null || !ExpectedVictim(spiritualBond, victim, master, pet)) return null;
-            if (!master.Buffs.Enumerable.Any(b => b.IsTurnedOn && !b.IsSuppressed &&
-                b.Blueprint.GetComponent<Phantom0085DamageTransfer>()?.SpiritualBond == spiritualBond))
-                return null;
-
+            var recipient = Counterpart(victim, out bool spiritualBond);
+            if (recipient == null) return null;
+            var pet = spiritualBond ? recipient : victim;
+            var master = spiritualBond ? victim : recipient;
             int hpDamage = EffectiveHpDamage(deal.Result, (int)victim.Stats.TemporaryHitPoints);
             amount = TransferAmount(spiritualBond, hpDamage, pet.HPLeft, master.HPLeft, pet.Stats.Constitution.ModifiedValue);
-            return amount > 0 ? (spiritualBond ? pet : master) : null;
+            return amount > 0 ? recipient : null;
+        }
+
+        internal static UnitEntityData Counterpart(UnitEntityData victim, out bool spiritualBond)
+        {
+            var victimPart = victim?.Get<UnitPartPet>();
+            bool bondMode = victimPart?.Type != Spiritualist0085Ids.PhantomPetType;
+            spiritualBond = bondMode;
+            if (victim == null) return null;
+            var master = bondMode ? victim : victimPart.Master;
+            var pet = Phantom0085Link.ManifestedPet(master);
+            if (pet == null || !ExpectedVictim(bondMode, victim, master, pet)) return null;
+            if (!master.Buffs.Enumerable.Any(b => b.IsTurnedOn && !b.IsSuppressed &&
+                b.Blueprint.GetComponent<Phantom0085DamageTransfer>()?.SpiritualBond == bondMode))
+                return null;
+            return bondMode ? pet : master;
         }
 
         // Pure contract arithmetic (C13/C14), offline-testable. HP semantics:
@@ -1307,15 +1316,21 @@ namespace CallOfTheWild.Wrath.Prototype
         [HarmonyPatch(typeof(RuleDealDamage), nameof(RuleDealDamage.OnTrigger))]
         internal static class ExactDamageTransfer
         {
-            private static readonly ConditionalWeakTable<RuleDealDamage, object> Exact = new ConditionalWeakTable<RuleDealDamage, object>();
             private sealed class Payment
             {
                 internal readonly int Amount;
-                internal Payment(int amount) => Amount = amount;
+                internal readonly UnitEntityData Recipient;
+                internal bool Applied;
+
+                internal Payment(int amount, UnitEntityData recipient)
+                {
+                    Amount = amount;
+                    Recipient = recipient;
+                }
             }
 
+            private static readonly ConditionalWeakTable<RuleDealDamage, Payment> Exact = new ConditionalWeakTable<RuleDealDamage, Payment>();
             private static readonly ConditionalWeakTable<RuleDealDamage, Payment> Payments = new ConditionalWeakTable<RuleDealDamage, Payment>();
-            private static readonly object Marker = new object();
             private static readonly System.Reflection.MethodInfo SetResult = AccessTools.PropertySetter(typeof(RuleDealDamage), "Result");
             private static readonly System.Reflection.MethodInfo SetRedirected = AccessTools.PropertySetter(typeof(RuleDealDamage), "RedirectedDamage");
 
@@ -1330,7 +1345,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 var directCalls = instructions.Where(i => i.Calls(directDamage)).ToArray();
                 var handleDamage = AccessTools.Method(typeof(ModifiableValueTemporaryHitPoints), nameof(ModifiableValueTemporaryHitPoints.HandleDamage));
                 var hpCalls = instructions.Where(i => i.Calls(handleDamage)).ToArray();
-                if (points.Length != 1 || directCalls.Length != 1 || hpCalls.Length != 1 || SetResult == null || SetRedirected == null)
+                var damageSetter = AccessTools.PropertySetter(typeof(UnitEntityData), nameof(UnitEntityData.Damage));
+                var damageWrites = instructions.Where(i => i.Calls(damageSetter)).ToArray();
+                if (points.Length != 1 || directCalls.Length != 1 || hpCalls.Length != 1 ||
+                    damageWrites.Length != 1 || SetResult == null || SetRedirected == null)
                 {
                     ModEntry.LogSpellDiagnostic("0085 exact damage transfer disabled: native damage application boundary was not found.");
                     return instructions;
@@ -1360,6 +1378,12 @@ namespace CallOfTheWild.Wrath.Prototype
                 hpCall.opcode = OpCodes.Call;
                 hpCall.operand = AccessTools.Method(typeof(ExactDamageTransfer), nameof(ApplyToHitPoints));
                 instructions.Insert(instructions.IndexOf(hpCall), payment);
+                // Settle after the native HP write, before observers can change the recipient.
+                instructions.InsertRange(instructions.IndexOf(damageWrites[0]) + 1, new[]
+                {
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ExactDamageTransfer), nameof(Settle)))
+                });
                 return instructions;
             }
 
@@ -1374,7 +1398,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var recipient = Phantom0085DamageTransfer.ResolveRecipient(deal, out int amount);
                 // A direct damage rule rejected at entry would leave this damage unpaid.
                 if (recipient == null || !CanReceivePayment(deal, recipient)) return;
-                Exact.Add(deal, Marker);
+                Exact.Add(deal, new Payment(amount, recipient));
                 SetResult.Invoke(deal, new object[] { deal.Result - amount });
                 SetRedirected.Invoke(deal, new object[] { amount });
                 deal.RedirectionTarget = recipient;
@@ -1384,20 +1408,50 @@ namespace CallOfTheWild.Wrath.Prototype
                 => !UnitCommand.CommandTargetUntargetable(deal.Initiator, recipient, deal) &&
                     !Kingmaker.Designers.GameHelper.IsAttackingGreenNPC(deal.Initiator, recipient);
 
+            private static void Settle(RuleDealDamage original)
+            {
+                if (!Exact.TryGetValue(original, out var payment)) return;
+                var recipient = payment.Recipient;
+                try
+                {
+                    if (Phantom0085Link.Alive(recipient) &&
+                        ReferenceEquals(Phantom0085DamageTransfer.Counterpart(original.Target, out _), recipient) &&
+                        CanReceivePayment(original, recipient))
+                    {
+                        var derived = new RuleDealDamage(original.Initiator, recipient, new DirectDamage(DiceFormula.Zero, payment.Amount))
+                        {
+                            Reason = original.Reason
+                        };
+                        Payments.Add(derived, payment);
+                        Game.Instance.Rulebook.TriggerEvent(derived);
+                    }
+                }
+                finally
+                {
+                    if (!payment.Applied)
+                    {
+                        // The victim's temporary HP was already handled by the native write.
+                        original.Target.Damage += payment.Amount;
+                        SetResult.Invoke(original, new object[] { original.Result + payment.Amount });
+                        SetRedirected.Invoke(original, new object[] { 0 });
+                        original.RedirectionTarget = default;
+                        Exact.Remove(original);
+                    }
+                }
+            }
+
             private static void Deliver(UnitEntityData initiator, UnitEntityData recipient, int amount, RuleDealDamage original)
             {
                 if (!Exact.Remove(original))
-                {
                     Kingmaker.Designers.GameHelper.DealDirectDamage(initiator, recipient, amount);
-                    return;
-                }
-                var payment = new RuleDealDamage(initiator, recipient, new DirectDamage(DiceFormula.Zero, amount));
-                Payments.Add(payment, new Payment(amount));
-                Game.Instance.Rulebook.TriggerEvent(payment);
             }
 
             private static int ApplyToHitPoints(ModifiableValueTemporaryHitPoints temporaryHp, int result, RuleDealDamage deal)
-                => Payments.TryGetValue(deal, out _) ? result : temporaryHp.HandleDamage(result);
+            {
+                if (!Payments.TryGetValue(deal, out var payment)) return temporaryHp.HandleDamage(result);
+                payment.Applied = true;
+                return result;
+            }
         }
 
         private static readonly BlueprintGuid ExpandedContentAid = BlueprintGuid.Parse("1eea0d80c6b7407aa8a902f6e750ea95");

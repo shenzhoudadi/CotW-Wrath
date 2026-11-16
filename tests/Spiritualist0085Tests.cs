@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.Serialization;
 using HarmonyLib;
 using Kingmaker;
@@ -352,6 +353,154 @@ internal static class Spiritualist0085Tests
         }
     }
 
+    private static DamageFixtureObserver damageFixtureObserver;
+
+    private sealed class DamageFixtureObserver : IDamageHandler
+    {
+        internal RuleDealDamage Original;
+        internal UnitEntityData Receiver;
+        internal bool BlockPayment;
+
+        public void HandleDamageDealt(RuleDealDamage deal)
+        {
+            if (!BlockPayment && ReferenceEquals(deal, Original)) Receiver.State.Features.IsUntargetable.Retain();
+        }
+
+    }
+
+    private static void ProtectFixturePayment(RuleDealDamage __instance)
+    {
+        var observer = damageFixtureObserver;
+        if (observer?.BlockPayment == true && __instance != observer.Original && __instance.Target == observer.Receiver)
+            observer.Receiver.State.Features.IsUntargetable.Retain();
+    }
+
+    private static T ResolveFixtureDamage<T>(T rule) where T : RulebookEvent
+    {
+        if (rule is RuleCalculateDamage calculate)
+        {
+            var source = calculate.DamageBundle.Single();
+            int amount = source.Bonus;
+            calculate.CalculatedDamage.Add(new DamageValue(source, amount, amount, amount, 1));
+        }
+        return rule;
+    }
+
+    private static IEnumerable<CodeInstruction> DamageFixtureBoundaries(IEnumerable<CodeInstruction> source)
+    {
+        var visuals = AccessTools.Method(typeof(Kingmaker.Visual.HitSystem.HitPlayer), "PlayDamageHit");
+        foreach (var instruction in source)
+        {
+            if (instruction.Calls(visuals))
+            {
+                instruction.opcode = OpCodes.Pop;
+                instruction.operand = null;
+            }
+            if (instruction.operand is MethodInfo method && method.DeclaringType == typeof(Rulebook) &&
+                method.Name == "Trigger" && method.IsGenericMethod)
+            {
+                instruction.opcode = OpCodes.Call;
+                instruction.operand = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(ResolveFixtureDamage))
+                    .MakeGenericMethod(method.GetGenericArguments());
+            }
+            yield return instruction;
+        }
+    }
+
+    private static void CheckNativeDamageTransfer(Harmony harmony, UnitEntityData master, UnitEntityData pet, UnitEntityData initiator)
+    {
+        Set(master.Descriptor, "Stats", new CharacterStats(master.Descriptor));
+        var actors = new[] { master, pet, initiator };
+        foreach (var unit in actors)
+            Set(unit.Descriptor, "m_IsPlayerFactionCached", true);
+        void Health(UnitEntityData unit, int hp)
+        {
+            Set(unit.Stats.HitPoints, "ModifiedValue", 50);
+            unit.Damage = 50 - hp;
+        }
+        Buff LinkBuff(string token)
+        {
+            var blueprint = ResourcesLibrary.TryGetBlueprint<BlueprintBuff>(Id(token + "Effect"));
+            return master.Facts.Add(new Buff(blueprint, new MechanicsContext(master, master.Descriptor, blueprint), null));
+        }
+        RuleDealDamage Damage(UnitEntityData target, int amount)
+        {
+            var deal = new RuleDealDamage(initiator, target, new DirectDamage(DiceFormula.Zero, amount));
+            deal.Reason = deal;
+            return deal;
+        }
+
+        var scene = AccessTools.Method(T("Phantom0085Link"), "CanPlace");
+        var sceneFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(AllowRecoveryFixturePlacement));
+        var damageMethod = AccessTools.Method(typeof(RuleDealDamage), nameof(RuleDealDamage.OnTrigger));
+        var damageFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(DamageFixtureBoundaries));
+        var paymentFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(ProtectFixturePayment));
+        var tactical = AccessTools.PropertyGetter(typeof(Kingmaker.Armies.TacticalCombat.TacticalCombatHelper), "IsActive");
+        var noTactical = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(NoTacticalCombat));
+        var observer = new DamageFixtureObserver();
+        Buff active = null;
+        harmony.Patch(scene, prefix: new HarmonyMethod(sceneFixture));
+        harmony.Patch(tactical, prefix: new HarmonyMethod(noTactical));
+        harmony.CreateClassProcessor(T("Phantom0085Patches+ExactDamageTransfer")).Patch();
+        harmony.Patch(damageMethod, transpiler: new HarmonyMethod(damageFixture));
+        harmony.Patch(damageMethod, prefix: new HarmonyMethod(paymentFixture));
+        damageFixtureObserver = observer;
+        EventBus.Subscribe(observer);
+        try
+        {
+            Set(pet.Stats.Constitution, "ModifiedValue", 13);
+            Health(master, 10);
+            Health(pet, 1);
+            active = LinkBuff("EthericTether");
+            observer.Original = Damage(pet, 16);
+            observer.Receiver = master;
+            observer.Original.OnTrigger(null);
+            Check(pet.HPLeft == -12 && master.HPLeft == 7 && observer.Original.RedirectedDamage == 3 &&
+                master.State.Features.IsUntargetable.Count == 1,
+                $"C13: damage notification preserves exact payment (master {master.HPLeft}, phantom {pet.HPLeft}, " +
+                $"redirected {observer.Original.RedirectedDamage}, damage result {observer.Original.Result})");
+            master.State.Features.IsUntargetable.Release();
+            Health(master, 10);
+            Health(pet, 1);
+            observer.BlockPayment = true;
+            observer.Original = Damage(pet, 16);
+            observer.Original.OnTrigger(null);
+            Check(master.HPLeft == 10 && pet.HPLeft == -15 && observer.Original.Result == 16 &&
+                observer.Original.RedirectedDamage == 0 && observer.Original.RedirectionTarget.Value == null &&
+                master.State.Features.IsUntargetable.Count == 1,
+                "C13: an engine-rejected payment restores all original damage before notification");
+            if (master.State.Features.IsUntargetable.Count > 0) master.State.Features.IsUntargetable.Release();
+            observer.BlockPayment = false;
+            observer.Original = null;
+            active.Remove();
+            active = LinkBuff("SpiritualBond");
+            Health(master, 5);
+            Health(pet, 1);
+            master.Stats.TemporaryHitPoints.AddModifier(100, (EntityFact)null, ModifierDescriptor.UntypedStackable);
+            var petTemporary = pet.Stats.TemporaryHitPoints.AddModifier(4, (EntityFact)null, ModifierDescriptor.UntypedStackable);
+            var bond = Damage(master, 120);
+            bond.OnTrigger(null);
+            Check(master.HPLeft == -2 && pet.HPLeft == -12 && bond.RedirectedDamage == 13 &&
+                (int)master.Stats.TemporaryHitPoints == 0 && (int)pet.Stats.TemporaryHitPoints == 4,
+                $"C14: 120 damage preserves exact payment (master {master.HPLeft}, phantom {pet.HPLeft}, redirected {bond.RedirectedDamage}, " +
+                $"temporary HP {master.Stats.TemporaryHitPoints.ModifiedValue}/{pet.Stats.TemporaryHitPoints.ModifiedValue}, result {bond.Result})");
+            petTemporary.Remove();
+        }
+        finally
+        {
+            active?.Remove();
+            EventBus.Unsubscribe(observer);
+            damageFixtureObserver = null;
+            harmony.Unpatch(damageMethod, paymentFixture);
+            harmony.Unpatch(damageMethod, damageFixture);
+            harmony.Unpatch(damageMethod, AccessTools.Method(T("Phantom0085Patches+ExactDamageTransfer"), "Transpiler"));
+            harmony.Unpatch(scene, sceneFixture);
+            harmony.Unpatch(tactical, noTactical);
+            foreach (var unit in actors)
+                Set(unit.Descriptor, "m_IsPlayerFactionCached", false);
+        }
+    }
+
     private static void CheckNativePetBinding(BlueprintCharacterClass spiritualist, BlueprintCharacterClass unrelated, BlueprintFeature anger,
         BlueprintFeature dogFeature, BlueprintFaction neutral)
     {
@@ -434,6 +583,7 @@ internal static class Spiritualist0085Tests
         Set(state, "PlayerState", player);
         stateField.SetValue(game, state);
         Set(game, "TimeController", new Kingmaker.Controllers.TimeController());
+        Set(game, "Rulebook", new Rulebook());
         gameField.SetValue(null, game);
         var progressionRoot = game.BlueprintRoot.Progression;
         var oldXP = Get(progressionRoot, "m_XPTable");
@@ -508,6 +658,7 @@ internal static class Spiritualist0085Tests
             Check(FixtureLevelRequests.Count == 0 && Bound(a, partA) == petA,
                 "C03: four unrelated class levels leave the native Phantom request unchanged");
             CheckRecallExecution(native, a, petA, dog, petB);
+            CheckNativeDamageTransfer(native, a, petA, dog);
             var saveSettings = new JsonSerializerSettings { ContractResolver = new OptInContractResolver() };
             Set(partA, "Confined", true);
             petA.Get<UnitPartPet>().SetHidden(true);
@@ -1115,12 +1266,13 @@ internal static class Spiritualist0085Tests
         int insert = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Apply")));
         int deliver = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Deliver")));
         int payment = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "ApplyToHitPoints")));
-        Check(insert > 0 && rewrittenIl[insert + 1].Calls(boundary) && payment > insert && deliver > payment,
+        int settle = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Settle")));
+        Check(insert > 0 && rewrittenIl[insert + 1].Calls(boundary) && payment > insert && settle > payment && deliver > settle,
             "C13/C14: native damage IL provides the HP, temporary HP and guarded delivery boundaries");
         var paymentRule = (RuleDealDamage)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(RuleDealDamage));
         var payments = AccessTools.Field(patch, "Payments").GetValue(null);
         var paymentAmount = Activator.CreateInstance(patch.GetNestedType("Payment", BindingFlags.NonPublic),
-            BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { 3 }, null);
+            BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { 3, null }, null);
         AccessTools.Method(payments.GetType(), "Add").Invoke(payments, new object[] { paymentRule, paymentAmount });
         AccessTools.Method(patch, "Apply").Invoke(null, new object[] { paymentRule });
         Check(paymentRule.Result == 3 &&
