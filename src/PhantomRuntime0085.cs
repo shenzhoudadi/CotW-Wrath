@@ -792,13 +792,10 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static BlueprintGuid OtherToggle(bool spiritualBond)
             => Spiritualist0085Ids.Id(spiritualBond ? "EthericTether" : "SpiritualBond");
 
-        internal static int EffectiveHpDamage(int damage, int temporaryHp)
-            => damage <= 0 ? 0 : Math.Max(0, damage - Math.Max(0, temporaryHp));
-
         internal static bool ExpectedVictim(bool spiritualBond, UnitEntityData victim, UnitEntityData master, UnitEntityData pet)
             => !ReferenceEquals(victim, null) && ReferenceEquals(victim, spiritualBond ? master : pet);
 
-        internal static UnitEntityData ResolveRecipient(RuleDealDamage deal, out int amount)
+        internal static UnitEntityData ResolveRecipient(RuleDealDamage deal, int hpDamage, out int amount)
         {
             amount = 0;
             if (deal == null || deal.IsFake || deal.RedirectionTarget.Value != null || deal.RedirectedPercent != 0 || deal.RedirectedDamage != 0)
@@ -808,7 +805,6 @@ namespace CallOfTheWild.Wrath.Prototype
             if (recipient == null) return null;
             var pet = spiritualBond ? recipient : victim;
             var master = spiritualBond ? victim : recipient;
-            int hpDamage = EffectiveHpDamage(deal.Result, (int)victim.Stats.TemporaryHitPoints);
             amount = TransferAmount(spiritualBond, hpDamage, pet.HPLeft, master.HPLeft, pet.Stats.Constitution.ModifiedValue);
             return amount > 0 ? recipient : null;
         }
@@ -1338,32 +1334,19 @@ namespace CallOfTheWild.Wrath.Prototype
             private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source)
             {
                 var instructions = source.ToList();
-                var lastDamage = AccessTools.PropertySetter(typeof(UnitEntityData), "LastHandledDamage");
                 var directDamage = AccessTools.Method(typeof(Kingmaker.Designers.GameHelper), nameof(Kingmaker.Designers.GameHelper.DealDirectDamage),
                     new[] { typeof(UnitEntityData), typeof(UnitEntityData), typeof(int) });
-                var points = instructions.Where(i => i.Calls(lastDamage)).ToArray();
                 var directCalls = instructions.Where(i => i.Calls(directDamage)).ToArray();
                 var handleDamage = AccessTools.Method(typeof(ModifiableValueTemporaryHitPoints), nameof(ModifiableValueTemporaryHitPoints.HandleDamage));
                 var hpCalls = instructions.Where(i => i.Calls(handleDamage)).ToArray();
                 var damageSetter = AccessTools.PropertySetter(typeof(UnitEntityData), nameof(UnitEntityData.Damage));
                 var damageWrites = instructions.Where(i => i.Calls(damageSetter)).ToArray();
-                if (points.Length != 1 || directCalls.Length != 1 || hpCalls.Length != 1 ||
-                    damageWrites.Length != 1 || SetResult == null || SetRedirected == null)
+                if (directCalls.Length != 1 || hpCalls.Length != 1 || damageWrites.Length != 1 ||
+                    SetResult == null || SetRedirected == null)
                 {
                     ModEntry.LogSpellDiagnostic("0085 exact damage transfer disabled: native damage application boundary was not found.");
                     return instructions;
                 }
-
-                // The native rule has already applied MinHP, difficulty and other
-                // redirection. It has not touched temporary HP or normal HP yet.
-                var point = points[0];
-                var load = new CodeInstruction(OpCodes.Ldarg_0);
-                load.labels.AddRange(point.labels);
-                point.labels.Clear();
-                instructions.InsertRange(instructions.IndexOf(point), new[]
-                {
-                    load, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ExactDamageTransfer), nameof(Apply)))
-                });
 
                 var call = directCalls[0];
                 var rule = new CodeInstruction(OpCodes.Ldarg_0);
@@ -1385,23 +1368,6 @@ namespace CallOfTheWild.Wrath.Prototype
                     new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ExactDamageTransfer), nameof(Settle)))
                 });
                 return instructions;
-            }
-
-            private static void Apply(RuleDealDamage deal)
-            {
-                if (Payments.TryGetValue(deal, out var payment))
-                {
-                    SetResult.Invoke(deal, new object[] { payment.Amount });
-                    SetRedirected.Invoke(deal, new object[] { 0 });
-                    return;
-                }
-                var recipient = Phantom0085DamageTransfer.ResolveRecipient(deal, out int amount);
-                // A direct damage rule rejected at entry would leave this damage unpaid.
-                if (recipient == null || !CanReceivePayment(deal, recipient)) return;
-                Exact.Add(deal, new Payment(amount, recipient));
-                SetResult.Invoke(deal, new object[] { deal.Result - amount });
-                SetRedirected.Invoke(deal, new object[] { amount });
-                deal.RedirectionTarget = recipient;
             }
 
             private static bool CanReceivePayment(RuleDealDamage deal, UnitEntityData recipient)
@@ -1448,9 +1414,22 @@ namespace CallOfTheWild.Wrath.Prototype
 
             private static int ApplyToHitPoints(ModifiableValueTemporaryHitPoints temporaryHp, int result, RuleDealDamage deal)
             {
-                if (!Payments.TryGetValue(deal, out var payment)) return temporaryHp.HandleDamage(result);
-                payment.Applied = true;
-                return result;
+                if (Payments.TryGetValue(deal, out var payment))
+                {
+                    SetResult.Invoke(deal, new object[] { payment.Amount });
+                    SetRedirected.Invoke(deal, new object[] { 0 });
+                    payment.Applied = true;
+                    return payment.Amount;
+                }
+
+                int hpDamage = temporaryHp.HandleDamage(result);
+                var recipient = Phantom0085DamageTransfer.ResolveRecipient(deal, hpDamage, out int amount);
+                if (recipient == null || !CanReceivePayment(deal, recipient)) return hpDamage;
+                Exact.Add(deal, new Payment(amount, recipient));
+                SetResult.Invoke(deal, new object[] { result - amount });
+                SetRedirected.Invoke(deal, new object[] { amount });
+                deal.RedirectionTarget = recipient;
+                return hpDamage - amount;
             }
         }
 

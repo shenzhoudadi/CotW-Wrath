@@ -17,10 +17,12 @@ using Kingmaker.EntitySystem.Stats;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.Enums;
+using Kingmaker.Enums.Damage;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.RuleSystem.Rules.Damage;
+using Kingmaker.Settings;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Alignments;
 using Kingmaker.UnitLogic.Abilities;
@@ -354,6 +356,26 @@ internal static class Spiritualist0085Tests
     }
 
     private static DamageFixtureObserver damageFixtureObserver;
+    private static UnitEntityData damageFixtureEnemy;
+    private static DifficultySettings damageFixtureDifficulty;
+
+    private static bool FixtureEnemyFaction(UnitEntityData __instance, ref bool __result)
+    {
+        if (__instance != damageFixtureEnemy) return true;
+        __result = true;
+        return false;
+    }
+
+    private static DifficultySettings FixtureDifficulty() => damageFixtureDifficulty;
+
+    private static IEnumerable<CodeInstruction> DamageFixtureSettingsSource(IEnumerable<CodeInstruction> source)
+    {
+        var instructions = source.ToList();
+        var getter = AccessTools.PropertyGetter(typeof(SettingsRoot), nameof(SettingsRoot.Difficulty));
+        instructions.Single(i => i.Calls(getter)).operand =
+            AccessTools.Method(typeof(Spiritualist0085Tests), nameof(FixtureDifficulty));
+        return instructions;
+    }
 
     private sealed class DamageFixtureObserver : IDamageHandler
     {
@@ -485,6 +507,16 @@ internal static class Spiritualist0085Tests
                 $"C14: 120 damage preserves exact payment (master {master.HPLeft}, phantom {pet.HPLeft}, redirected {bond.RedirectedDamage}, " +
                 $"temporary HP {master.Stats.TemporaryHitPoints.ModifiedValue}/{pet.Stats.TemporaryHitPoints.ModifiedValue}, result {bond.Result})");
             petTemporary.Remove();
+            CheckDamageScaling(harmony, master, pet, initiator);
+            Health(master, 5);
+            Health(pet, 1);
+            master.Stats.TemporaryHitPoints.AddModifier(10, ModifierDescriptor.Profane);
+            master.Stats.TemporaryHitPoints.AddModifier(6, ModifierDescriptor.Profane);
+            var overlapping = Damage(master, 18);
+            overlapping.OnTrigger(null);
+            Check(master.HPLeft == 3 && pet.HPLeft == 1 && overlapping.RedirectedDamage == 0 &&
+                master.Stats.TemporaryHitPoints.ModifiedValue == 0,
+                $"C14: overlapping native temporary HP use actual absorption (master {master.HPLeft}, phantom {pet.HPLeft}, redirected {overlapping.RedirectedDamage})");
         }
         finally
         {
@@ -498,6 +530,45 @@ internal static class Spiritualist0085Tests
             harmony.Unpatch(tactical, noTactical);
             foreach (var unit in actors)
                 Set(unit.Descriptor, "m_IsPlayerFactionCached", false);
+        }
+    }
+
+    private static void CheckDamageScaling(Harmony harmony, UnitEntityData master, UnitEntityData pet, UnitEntityData initiator)
+    {
+        var settings = (DifficultySettings)FormatterServices.GetUninitializedObject(typeof(DifficultySettings));
+        var scale = (SettingsEntityFloat)FormatterServices.GetUninitializedObject(typeof(SettingsEntityFloat));
+        Set(scale, "m_CurrentValueIsSet", true);
+        Set(scale, "m_CurrentValue", 1.5f);
+        Set(settings, "DamageToParty", scale);
+        var difficultyMethod = AccessTools.Method(typeof(RuleDealDamage), "ApplyDifficultyModifiers");
+        var enemyGetter = AccessTools.PropertyGetter(typeof(UnitEntityData), nameof(UnitEntityData.IsPlayersEnemy));
+        var settingsFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(DamageFixtureSettingsSource));
+        var enemyFixture = AccessTools.Method(typeof(Spiritualist0085Tests), nameof(FixtureEnemyFaction));
+        damageFixtureDifficulty = settings;
+        damageFixtureEnemy = initiator;
+        Set(initiator.Descriptor, "m_IsPlayerFactionCached", false);
+        harmony.Patch(difficultyMethod, transpiler: new HarmonyMethod(settingsFixture));
+        harmony.Patch(enemyGetter, prefix: new HarmonyMethod(enemyFixture));
+        try
+        {
+            master.Damage = 45;
+            pet.Damage = 49;
+            master.Stats.TemporaryHitPoints.AddModifier(161, ModifierDescriptor.UntypedStackable);
+            var damage = new RuleDealDamage(initiator, master, new EnergyDamage(DiceFormula.Zero, 121, DamageEnergyType.Cold));
+            damage.Reason = damage;
+            damage.OnTrigger(null);
+            Check(damage.DamageBeforeDifficulty == 121 && damage.Result == 168 && damage.RedirectedDamage == 13 &&
+                master.HPLeft == -2 && pet.HPLeft == -12 && master.Stats.TemporaryHitPoints.ModifiedValue == 0,
+                $"C14: native 1.5x rounds 121 to 181 before temporary HP and transfer (result {damage.Result}, " +
+                $"redirected {damage.RedirectedDamage}, master {master.HPLeft}, phantom {pet.HPLeft})");
+        }
+        finally
+        {
+            harmony.Unpatch(enemyGetter, enemyFixture);
+            harmony.Unpatch(difficultyMethod, settingsFixture);
+            Set(initiator.Descriptor, "m_IsPlayerFactionCached", true);
+            damageFixtureEnemy = null;
+            damageFixtureDifficulty = null;
         }
     }
 
@@ -1244,11 +1315,7 @@ internal static class Spiritualist0085Tests
         Check(transfer(true, 20, 1, 5, 13) == 13, "C14: 20 damage transfers exactly 13 (phantom 1 -> -12, owner 5 -> -2)");
         Check(transfer(true, 20, 0, 5, 13) == 0, "C14: phantom below 1 HP transfers zero");
         Check(transfer(true, 3, 10, 5, 13) == 0, "C14: non-lethal-to-owner packet transfers zero");
-        var effective = AccessTools.Method(transferType, "EffectiveHpDamage");
-        int HpDamage(int damage, int temporary) => (int)effective.Invoke(null, new object[] { damage, temporary });
         Check(transfer(false, 200, 185, 10, 13) == 3, "C13: 200-point packet can transfer exactly 3");
-        Check(transfer(false, HpDamage(16, 16), 1, 10, 13) == 0 &&
-            transfer(false, HpDamage(20, 4), 1, 10, 13) == 3, "C13: only effective normal HP damage is transferred");
         var ownerEntity = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
         var petEntity = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
         var otherEntity = (UnitEntityData)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(UnitEntityData));
@@ -1262,21 +1329,20 @@ internal static class Spiritualist0085Tests
         var originalIl = PatchProcessor.GetOriginalInstructions(nativeDamage);
         var rewrittenIl = ((IEnumerable<CodeInstruction>)AccessTools.Method(patch, "Transpiler")
             .Invoke(null, new object[] { originalIl })).ToList();
-        var boundary = AccessTools.PropertySetter(typeof(UnitEntityData), "LastHandledDamage");
-        int insert = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Apply")));
+        var damageSetter = AccessTools.PropertySetter(typeof(UnitEntityData), nameof(UnitEntityData.Damage));
+        int damageWrite = rewrittenIl.FindIndex(i => i.Calls(damageSetter));
         int deliver = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Deliver")));
         int payment = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "ApplyToHitPoints")));
         int settle = rewrittenIl.FindIndex(i => i.Calls(AccessTools.Method(patch, "Settle")));
-        Check(insert > 0 && rewrittenIl[insert + 1].Calls(boundary) && payment > insert && settle > payment && deliver > settle,
+        Check(payment > 0 && damageWrite > payment && settle == damageWrite + 2 && deliver > settle,
             "C13/C14: native damage IL provides the HP, temporary HP and guarded delivery boundaries");
         var paymentRule = (RuleDealDamage)System.Runtime.Serialization.FormatterServices.GetUninitializedObject(typeof(RuleDealDamage));
         var payments = AccessTools.Field(patch, "Payments").GetValue(null);
         var paymentAmount = Activator.CreateInstance(patch.GetNestedType("Payment", BindingFlags.NonPublic),
             BindingFlags.Instance | BindingFlags.NonPublic, null, new object[] { 3, null }, null);
         AccessTools.Method(payments.GetType(), "Add").Invoke(payments, new object[] { paymentRule, paymentAmount });
-        AccessTools.Method(patch, "Apply").Invoke(null, new object[] { paymentRule });
-        Check(paymentRule.Result == 3 &&
-            (int)AccessTools.Method(patch, "ApplyToHitPoints").Invoke(null, new object[] { null, paymentRule.Result, paymentRule }) == 3,
+        int hpDamage = (int)AccessTools.Method(patch, "ApplyToHitPoints").Invoke(null, new object[] { null, paymentRule.Result, paymentRule });
+        Check(paymentRule.Result == 3 && hpDamage == 3,
             "C13/C14: a marked payment passes its full integer damage to native ordinary HP");
         Set(petEntity, "Parts", new EntityPartsManager(petEntity));
         Set(otherEntity, "Parts", new EntityPartsManager(otherEntity));
