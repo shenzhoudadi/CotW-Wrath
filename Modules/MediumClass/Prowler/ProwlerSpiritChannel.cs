@@ -38,6 +38,14 @@ namespace MediumClass.Prowler
             var marshal = Channel("ProwlerChannelMarshal", Guids.ProwlerChannelMarshal, Guids.Marshal, IconPrefix + "spiritmarshal2.png");
             var trickster = Channel("ProwlerChannelTrickster", Guids.ProwlerChannelTrickster, Guids.Trickster, IconPrefix + "spirittrickster2.png");
 
+            var parentAbility = AbilityConfigurator.New("ProwlerSpiritAbility", Guids.ProwlerChannelAbility)
+                .SetDisplayName("ProwlerSpirit.Name")
+                .SetDescription("ProwlerSpirit.Description")
+                .SetIcon(AbilityRefs.ShamanWanderingHexAbility.Reference.Get().Icon)
+                .SetActionType(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType.Free)
+                .AddAbilityVariants(new() { champion, guardian, marshal, trickster })
+                .Configure();
+
             return FeatureConfigurator.New("ProwlerSpirit", Guids.ProwlerSpirit)
                 .SetDisplayName("ProwlerSpirit.Name")
                 .SetDescription("ProwlerSpirit.Description")
@@ -55,8 +63,8 @@ namespace MediumClass.Prowler
                     c.SpiritIntermediatePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.ChampionSuddenAttack);
                     c.SpiritGreaterPower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.ChampionFleetCharge);
                     c.SpiritSupremePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.LegendaryChampion);
-                    c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SaveFortitude, StatType.AdditionalDamage, StatType.AdditionalAttackBonus };
-                    c.Penalties = new StatType[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld, StatType.BonusCasterLevel };
+                    c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SaveFortitude, StatType.AdditionalDamage, StatType.AdditionalAttackBonus, StatType.AdditionalCMB };
+                    c.Penalties = new StatType[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld };
                 })
                 // 美洲豹 · 守护者
                 .AddComponent<MediumSpiritComponent>(c =>
@@ -71,7 +79,7 @@ namespace MediumClass.Prowler
                     c.SpiritGreaterPower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.GuardianGreater);
                     c.SpiritOverwriteGreater = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.SecondaryGuardianGreater);
                     c.SpiritSupremePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.LegendaryGuardian);
-                    c.Stats = new StatType[] { StatType.AC, StatType.SaveReflex, StatType.SaveFortitude };
+                    c.Stats = new StatType[] { StatType.AC, StatType.AdditionalCMD, StatType.SaveReflex, StatType.SaveFortitude, StatType.AttackOfOpportunityCount };
                     c.Penalties = new StatType[] { StatType.AdditionalDamage };
                 })
                 // 狮子 · 统帅
@@ -110,7 +118,7 @@ namespace MediumClass.Prowler
                     c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld, StatType.SkillLoreNature, StatType.SkillLoreReligion,
                         StatType.SkillMobility, StatType.SkillPerception, StatType.SkillPersuasion, StatType.SkillStealth, StatType.SkillThievery, StatType.SkillUseMagicDevice, StatType.SaveReflex, StatType.Initiative };
                 })
-                .AddFacts(new() { champion, guardian, marshal, trickster })
+                .AddFacts(new() { parentAbility })
                 .Configure();
         }
 

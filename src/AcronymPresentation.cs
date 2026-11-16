@@ -22,7 +22,7 @@ namespace CallOfTheWild.Wrath.Prototype
 
         // Class tokens carry no information once the class is known and would
         // collapse every acronym back to the same letters. Longest first.
-        private static readonly string[] ClassPrefixes = { "SublimeChord" };
+        private static readonly string[] ClassPrefixes = { "UltimateMagus", "SublimeChord" };
 
         private static readonly Dictionary<string, string> Cache =
             new Dictionary<string, string>(StringComparer.Ordinal);

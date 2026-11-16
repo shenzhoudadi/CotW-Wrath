@@ -50,7 +50,19 @@ var used = new HashSet<string>();
 var optionalFile = Path.Combine(root, "Medium", "SpiritAffinityOptional.cs");
 foreach (var file in Directory.GetFiles(Path.Combine(root, "Medium"), "SpiritAffinity*.cs").Where(f => f != optionalFile))
     foreach (Match m in Regex.Matches(File.ReadAllText(file), "\"(SpiritAffinity\\.[A-Za-z.]+)\""))
-        used.Add(m.Groups[1].Value);
+    {
+        var key = m.Groups[1].Value;
+        if (key == "SpiritAffinity.LegendarySkill.")
+        {
+            foreach (var skill in new[] {
+                "SkillAthletics", "SkillMobility", "SkillThievery", "SkillStealth",
+                "SkillKnowledgeArcana", "SkillKnowledgeWorld", "SkillLoreNature", "SkillLoreReligion",
+                "SkillPerception", "SkillPersuasion", "SkillUseMagicDevice" })
+                used.Add(key + skill + ".Name");
+            continue;
+        }
+        used.Add(key);
+    }
 // The optional file builds "<key>.Name" / "<key>.Description" from a base key.
 foreach (Match m in Regex.Matches(File.ReadAllText(optionalFile), "\"(SpiritAffinity\\.[A-Za-z.]+)\""))
 {

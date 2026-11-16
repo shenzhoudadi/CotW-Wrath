@@ -1,24 +1,22 @@
-﻿using BlueprintCore.Actions.Builder;
+using BlueprintCore.Actions.Builder;
 using BlueprintCore.Actions.Builder.ContextEx;
 using BlueprintCore.Blueprints.CustomConfigurators;
 using BlueprintCore.Blueprints.CustomConfigurators.Classes;
 using BlueprintCore.Blueprints.CustomConfigurators.UnitLogic.Abilities;
 using BlueprintCore.Blueprints.CustomConfigurators.UnitLogic.Buffs;
 using BlueprintCore.Blueprints.References;
+using BlueprintCore.Utils;
 using BlueprintCore.Utils.Types;
 using Kingmaker.Blueprints;
-using Kingmaker.EntitySystem.Stats;
-using Kingmaker.Enums;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
-using Kingmaker.UnitLogic.Abilities.Components.CasterCheckers;
-using Kingmaker.UnitLogic.Mechanics.Components;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
+using Kingmaker.UnitLogic.Commands.Base;
+using Kingmaker.UnitLogic.Mechanics;
+using MediumClass.Medium.NewActions;
+using MediumClass.Medium.NewComponents.AbilitySpecific;
 using MediumClass.Utilities;
 using MediumClass.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static UnityModManagerNet.UnityModManager.ModEntry;
 
 namespace MediumClass.Medium.Spirits.Guardian
@@ -32,33 +30,95 @@ namespace MediumClass.Medium.Spirits.Guardian
 
         public static void ConfigureEnabled()
         {
-            Logger.Log("Generating Guardian Greater Ability");
+            Logger.Log("Generating Guardian Determination (Greater Spirit Power)");
 
-            var ability = AbilityConfigurator.New(FeatName + "Ability", Guids.GuardianGreaterAbility)
-                .CopyFrom(AbilityRefs.SmiteEvilAbility, c => c is not (ContextRankConfig or AbilityResourceLogic or AbilityCasterAlignment))
+            var reachBuff = BuffConfigurator.New(FeatName + "ReachBuff", Guids.GuardianGreaterReachBuff)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/guardiansmite.png")
+                .SetFlags(BlueprintBuff.Flags.RemoveOnRest)
+                .SetStacking(StackingType.Replace)
+                .AddComponent<GuardianDeterminationReachComponent>()
+                .Configure();
+
+            var tempHpBuff = BuffConfigurator.New(FeatName + "TempHpBuff", Guids.GuardianGreaterTempHpBuff)
+                .SetDisplayName("GuardianGreaterTempHp.Name")
+                .SetDescription("GuardianGreaterTempHp.Description")
+                .SetIcon("assets/icons/spiritguardian.png")
+                .SetFlags(BlueprintBuff.Flags.RemoveOnRest)
+                .SetStacking(StackingType.Replace)
+                .AddComponent<GuardianDeterminationTempHpComponent>()
+                .Configure();
+
+            var fullRoundAbility = AbilityConfigurator.New(FeatName + "Ability", Guids.GuardianGreaterAbility)
+                .SetDisplayName(DisplayName)
+                .SetDescription(Description)
+                .SetIcon("assets/icons/guardiansmite.png")
+                .SetType(AbilityType.Supernatural)
+                .SetRange(AbilityRange.Personal)
+                .SetCanTargetSelf(true)
+                .SetActionType(UnitCommand.CommandType.Standard)
+                .SetIsFullRoundAction(true)
+                .AddAbilityEffectRunAction(
+                    actions: ActionsBuilder.New()
+                        .ApplyBuff(reachBuff, ContextDuration.Fixed(1, DurationRate.Rounds), toCaster: true, isFromSpell: false, isNotDispelable: true))
+                .Configure();
+
+            var freeReachAbility = AbilityConfigurator.New(FeatName + "FreeAbility", Guids.GuardianGreaterFreeAbility)
+                .SetDisplayName("GuardianGreaterFree.Name")
+                .SetDescription("GuardianGreaterFree.Description")
+                .SetIcon("assets/icons/guardiansmite.png")
+                .SetType(AbilityType.Supernatural)
+                .SetRange(AbilityRange.Personal)
+                .SetCanTargetSelf(true)
+                .SetActionType(UnitCommand.CommandType.Free)
                 .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResource)
-                .AddContextRankConfig(ContextRankConfigs.StatBonus(stat: StatType.Charisma, min: 0, max: 20))
-                .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: AbilityRankType.DamageBonus, max: 20, min: 0))
+                .AddAbilityEffectRunAction(
+                    actions: ActionsBuilder.New()
+                        .Add<ContextActionSpiritInfluence>()
+                        .ApplyBuff(reachBuff, ContextDuration.Fixed(1, DurationRate.Rounds), toCaster: true, isFromSpell: false, isNotDispelable: true))
+                .Configure();
+
+            var tempHpAbility = AbilityConfigurator.New(FeatName + "TempHpAbility", Guids.GuardianGreaterTempHpAbility)
+                .SetDisplayName("GuardianGreaterTempHp.Name")
+                .SetDescription("GuardianGreaterTempHp.Description")
+                .SetIcon("assets/icons/spiritguardian.png")
+                .SetType(AbilityType.Supernatural)
+                .SetRange(AbilityRange.Personal)
+                .SetCanTargetSelf(true)
+                .SetActionType(UnitCommand.CommandType.Free)
+                .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResource)
+                .AddAbilityEffectRunAction(
+                    actions: ActionsBuilder.New()
+                        .Add<ContextActionSpiritInfluence>()
+                        .ApplyBuff(tempHpBuff, ContextDuration.Fixed(10, DurationRate.Rounds), toCaster: true, isFromSpell: false, isNotDispelable: true))
                 .Configure();
 
             FeatureConfigurator.New(FeatName, Guids.GuardianGreater)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
-                .AddFacts(new() { ability })
+                .AddFacts(new() { fullRoundAbility, freeReachAbility, tempHpAbility })
                 .Configure();
 
-            var secondaryability = AbilityConfigurator.New(FeatName + "SecondaryAbility", Guids.SecondaryGuardianGreaterAbility)
-                .CopyFrom(ability, c => c is not AbilityResourceLogic)
+            var secondaryFreeReach = AbilityConfigurator.New(FeatName + "SecondaryFreeAbility", Guids.SecondaryGuardianGreaterFreeAbility)
+                .CopyFrom(freeReachAbility, c => c is not AbilityResourceLogic)
                 .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResourceGuardian)
+                .Configure();
+
+            var secondaryTempHp = AbilityConfigurator.New(FeatName + "SecondaryTempHpAbility", Guids.SecondaryGuardianGreaterTempHpAbility)
+                .CopyFrom(tempHpAbility, c => c is not AbilityResourceLogic)
+                .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResourceGuardian)
+                .Configure();
+
+            // Keep SecondaryGuardianGreaterAbility guid resolvable for existing saves.
+            AbilityConfigurator.New(FeatName + "SecondaryAbility", Guids.SecondaryGuardianGreaterAbility)
+                .CopyFrom(fullRoundAbility)
                 .Configure();
 
             FeatureConfigurator.New(FeatName + "Secondary", Guids.SecondaryGuardianGreater)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
-                .AddFacts(new() { secondaryability })
+                .AddFacts(new() { fullRoundAbility, secondaryFreeReach, secondaryTempHp })
                 .AddRemoveFeatureOnApply(Guids.GuardianGreater)
                 .Configure();
         }

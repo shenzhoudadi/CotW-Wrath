@@ -115,58 +115,64 @@ namespace MediumClass.Medium.Spirits.Marshal
                 .Configure();
 
             var savingthrowabilityswift = AbilityConfigurator.New(FeatName + "SavingThrowAbilitySwift", Guids.MarshalInspiringCallSavingThrowAbilitySwift)
-                .SetDisplayName(DisplayNameSaves)
+                .SetDisplayName("MarshalInspiringCallSavesSwift.Name")
                 .SetDescription(Description)
                 .SetIcon("assets/icons/inspiringcallsaves.png")
+                .AddAbilityShowIfCasterHasFact(unitFact: Guids.MarshalInspiringCallSwift)
                 .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuff(savingthrowsbuff, durationValue: ContextDuration.Fixed(1, Kingmaker.UnitLogic.Mechanics.DurationRate.Rounds)))
                 .AddAbilityTargetsAround(radius: FeetExtension.Feet(50), spreadSpeed: FeetExtension.Feet(0), targetType: TargetType.Ally)
                 .SetActionType(UnitCommand.CommandType.Swift)
                 .Configure();
 
             var attackabilityswift = AbilityConfigurator.New(FeatName + "AttackAbilitySwift", Guids.MarshalInspiringCallAttackAbilitySwift)
-                .SetDisplayName(DisplayNameAttack)
+                .SetDisplayName("MarshalInspiringCallAttackSwift.Name")
                 .SetDescription(Description)
                 .SetIcon("assets/icons/inspiringcallattack.png")
+                .AddAbilityShowIfCasterHasFact(unitFact: Guids.MarshalInspiringCallSwift)
                 .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuff(attackbuff, durationValue: ContextDuration.Fixed(1, Kingmaker.UnitLogic.Mechanics.DurationRate.Rounds)))
                 .AddAbilityTargetsAround(radius: FeetExtension.Feet(50), spreadSpeed: FeetExtension.Feet(0), targetType: TargetType.Ally)
                 .SetActionType(UnitCommand.CommandType.Swift)
                 .Configure();
 
             var savingthrowabilitymove = AbilityConfigurator.New(FeatName + "SavingThrowAbilityMove", Guids.MarshalInspiringCallSavingThrowAbilityMove)
-                .SetDisplayName(DisplayNameSaves)
+                .SetDisplayName("MarshalInspiringCallSavesMove.Name")
                 .SetDescription(Description)
                 .SetIcon("assets/icons/inspiringcallsaves.png")
+                .AddAbilityShowIfCasterHasFact(unitFact: Guids.MarshalInspiringCallMove)
                 .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuff(savingthrowsbuff, durationValue: ContextDuration.Fixed(1, Kingmaker.UnitLogic.Mechanics.DurationRate.Rounds)))
                 .AddAbilityTargetsAround(radius: FeetExtension.Feet(50), spreadSpeed: FeetExtension.Feet(0), targetType: TargetType.Ally)
                 .SetActionType(UnitCommand.CommandType.Move)
                 .Configure();
 
             var attackabilitymove = AbilityConfigurator.New(FeatName + "AttackAbilityMove", Guids.MarshalInspiringCallAttackAbilityMove)
-                .SetDisplayName(DisplayNameAttack)
+                .SetDisplayName("MarshalInspiringCallAttackMove.Name")
                 .SetDescription(Description)
                 .SetIcon("assets/icons/inspiringcallattack.png")
+                .AddAbilityShowIfCasterHasFact(unitFact: Guids.MarshalInspiringCallMove)
                 .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuff(attackbuff, durationValue: ContextDuration.Fixed(1, Kingmaker.UnitLogic.Mechanics.DurationRate.Rounds)))
                 .AddAbilityTargetsAround(radius: FeetExtension.Feet(50), spreadSpeed: FeetExtension.Feet(0), targetType: TargetType.Ally)
                 .SetActionType(UnitCommand.CommandType.Move)
                 .Configure();
 
             var savingthrowabilitystandard = AbilityConfigurator.New(FeatName + "SavingThrowAbilityStandard", Guids.MarshalInspiringCallSavingThrowAbilityStandard)
-                .SetDisplayName(DisplayNameSaves)
+                .SetDisplayName("MarshalInspiringCallSavesStandard.Name")
                 .SetDescription(Description)
                 .SetIcon("assets/icons/inspiringcallsaves.png")
                 .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuff(savingthrowsbuff, durationValue: ContextDuration.Fixed(1, Kingmaker.UnitLogic.Mechanics.DurationRate.Rounds)))
                 .AddAbilityTargetsAround(radius: FeetExtension.Feet(50), spreadSpeed: FeetExtension.Feet(0), targetType: TargetType.Ally)
+                .SetActionType(UnitCommand.CommandType.Standard)
                 .Configure();
 
             var attackabilitystandard = AbilityConfigurator.New(FeatName + "AttackAbilityStandard", Guids.MarshalInspiringCallAttackAbilityStandard)
-                .SetDisplayName(DisplayNameAttack)
+                .SetDisplayName("MarshalInspiringCallAttackStandard.Name")
                 .SetDescription(Description)
                 .SetIcon("assets/icons/inspiringcallattack.png")
                 .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuff(attackbuff, durationValue: ContextDuration.Fixed(1, Kingmaker.UnitLogic.Mechanics.DurationRate.Rounds)))
                 .AddAbilityTargetsAround(radius: FeetExtension.Feet(50), spreadSpeed: FeetExtension.Feet(0), targetType: TargetType.Ally)
+                .SetActionType(UnitCommand.CommandType.Standard)
                 .Configure();
 
-            var abilityswift = AbilityConfigurator.New(FeatName + "AbilitySwift", Guids.MarshalInspiringCallAbilitySwift)
+            AbilityConfigurator.New(FeatName + "AbilitySwift", Guids.MarshalInspiringCallAbilitySwift)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/marshalinspiringcall.png")
@@ -174,7 +180,7 @@ namespace MediumClass.Medium.Spirits.Marshal
                 .AddAbilityVariants(new() { savingthrowabilityswift, attackabilityswift })
                 .Configure();
 
-            var abilitymove = AbilityConfigurator.New(FeatName + "AbilityMove", Guids.MarshalInspiringCallAbilityMove)
+            AbilityConfigurator.New(FeatName + "AbilityMove", Guids.MarshalInspiringCallAbilityMove)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/marshalinspiringcall.png")
@@ -187,23 +193,27 @@ namespace MediumClass.Medium.Spirits.Marshal
                 .SetDescription(Description)
                 .SetIcon("assets/icons/marshalinspiringcall.png")
                 .SetActionType(UnitCommand.CommandType.Free)
-                .AddAbilityVariants(new() { savingthrowabilitystandard, attackabilitystandard })
+                .AddAbilityVariants(new()
+                {
+                    savingthrowabilitystandard,
+                    attackabilitystandard,
+                    savingthrowabilitymove,
+                    attackabilitymove,
+                    savingthrowabilityswift,
+                    attackabilityswift
+                })
                 .Configure();
 
             FeatureConfigurator.New(FeatName + "Swift", Guids.MarshalInspiringCallSwift)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon(BuffRefs.InspireCompetenceEffectBuff.Reference.Get().Icon)
-                .AddFacts(new() { abilityswift })
-                .AddRemoveFeatureOnApply(Guids.MarshalInspiringCallMove)
                 .Configure();
 
             FeatureConfigurator.New(FeatName + "Move", Guids.MarshalInspiringCallMove)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon(BuffRefs.InspireCompetenceEffectBuff.Reference.Get().Icon)
-                .AddFacts(new() { abilitymove })
-                .AddRemoveFeatureOnApply(Guids.MarshalInspiringCallStandard)
                 .Configure();
 
             FeatureConfigurator.New(FeatName + "Standard", Guids.MarshalInspiringCallStandard)

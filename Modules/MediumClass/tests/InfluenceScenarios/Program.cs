@@ -41,7 +41,7 @@ using(var game=AssemblyDefinition.ReadAssembly(args[0])) {
         }
     }
 }
-for(int rank=1;rank<=10;rank++)Equal(rank<3?1:rank<6?2:rank<9?3:4,InfluenceMath.MythicBonus(rank),"mythic rank "+rank);
+for(int rank=0;rank<=10;rank++)Equal(rank,InfluenceMath.MythicBonus(rank),"mythic rank "+rank);
 for(int cap=5;cap<=9;cap++)for(int n=0;n<=cap+1;n++)for(int cost=0;cost<=6;cost++)
     Equal(cost==0||n+cost<=cap,InfluenceMath.CanAccept(n,cost,cap),"capacity boundary");
 Equal(0,InfluenceMath.Migrate(0,false,true),"unchanneled old save");
@@ -115,7 +115,7 @@ Check(!MediumInfluenceRules.IsFreeSurge(legendary),"Legendary Marshal never cons
 var slot=new MechanicActionBarSlotAbility{Ability=paid};
 Equal(5,slot.GetResource(),"action bar current points");Equal("5/5",slot.GetCountText(5),"action bar cap label");
 hero.Facts.Add(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid));hero.Progression.MythicLevel=9;
-Equal(9,common.GetMaxAmount(hero),"mythic cap native resource API");
+Equal(14,common.GetMaxAmount(hero),"mythic cap native resource API");
 Equal(5,MediumInfluenceRules.Amount(hero),"mythic cap doesn't refill counter");
 hero.Resources.Add(alias,true);
 Equal(5,hero.Resources.GetResource(alias).Amount,"aliasgrant mirrors without reset");
@@ -171,37 +171,11 @@ Equal(3,MediumInfluenceRules.Amount(hardened),"hardened soul doesn't reset point
 Check(hardened.Buffs.Active.Contains(penalty),"hardened soul retains penaltyat3");
 hardened.Facts.Add(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid));
 hardened.Progression.MythicLevel=9;
-Equal(12,MediumInfluenceRules.Cap(hardened),"hardened+mythiccap12");
+Equal(17,MediumInfluenceRules.Cap(hardened),"hardened+mythiccap17");
 Equal(3,MediumInfluenceRules.Amount(hardened),"combinedcapdoesn'tresetpoints");
-MediumInfluenceRules.TryAccept(hardened,9);
-Equal(12,MediumInfluenceRules.Amount(hardened),"combinedcapacityusable");
+MediumInfluenceRules.TryAccept(hardened,14);
+Equal(17,MediumInfluenceRules.Amount(hardened),"combinedcapacityusable");
 Check(!MediumInfluenceRules.TryAccept(hardened,1),"combinedcapacityhardlimit");
-// 缚灵者变体：共鸣上限 +1，且降灵期间共鸣惩罚常驻（不看累计值）。
-var binder=Fresh();
-Equal(0,MediumInfluenceRules.Amount(binder),"binder starts zero");
-binder.Facts.Add(BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderFeature));
-Equal(6,MediumInfluenceRules.Cap(binder),"binder cap is base+1");
-MediumInfluenceRules.RefreshPenalty(binder);
-Check(!binder.Buffs.Active.Contains(penalty),"unchannelled binder has no penalty");
-binder.Unit.Get<UnitPartMedium>().ActiveSpiritClasses.Add("champion");
-MediumInfluenceRules.TryAccept(binder,1);
-Equal(1,MediumInfluenceRules.Amount(binder),"binder first channel still costs 1");
-Check(binder.Buffs.Active.Contains(penalty),"binder penalty is permanent at 1 influence");
-for(int i=0;i<5;i++)MediumInfluenceRules.Soothe(binder);
-Equal(1,MediumInfluenceRules.Amount(binder),"binder soothe still floors at 1 while channelled");
-Check(binder.Buffs.Active.Contains(penalty),"binder penalty survives soothing to the floor");
-// 休息会移除降灵 buff，常驻惩罚随本次降灵一起结束。
-binder.Unit.Get<UnitPartMedium>().ActiveSpiritClasses.Clear();
-MediumInfluenceRules.Reset(binder);
-Equal(0,MediumInfluenceRules.Amount(binder),"binder rest clears influence");
-Check(!binder.Buffs.Active.Contains(penalty),"ended session ends the permanent penalty");
-binder.Unit.Get<UnitPartMedium>().ActiveSpiritClasses.Add("hierophant");
-MediumInfluenceRules.TryAccept(binder,1);
-Check(binder.Buffs.Active.Contains(penalty),"a new session restores the permanent penalty");
-binder.Facts.Add(BlueprintTool.Get<BlueprintFeature>(HardenedSoul.FeatureGuid));
-binder.Facts.Add(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid));
-binder.Progression.MythicLevel=9;
-Equal(13,MediumInfluenceRules.Cap(binder),"binder cap stacks with hardened soul and mythic");
 // 反向对照：普通通灵者仍然是 3 点阈值与基础上限。
 var ordinary=Fresh();
 Equal(0,MediumInfluenceRules.Amount(ordinary),"ordinary medium starts zero");

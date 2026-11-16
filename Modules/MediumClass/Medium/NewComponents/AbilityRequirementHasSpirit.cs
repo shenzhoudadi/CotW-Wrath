@@ -31,7 +31,7 @@ namespace MediumClass.Medium.NewComponents
         {
             return !Not
                 ? LocalizationText.Get("Requires a Spirit Channeled", "需要先降灵一位英灵。")
-                : LocalizationText.Get("Requires an unchanneled spirit; additional spirits require Mythic Multiple Spirits and are limited in number.", "只能选择尚未降灵的英灵；追加降灵需要神话多重降灵，且数量受其限制。");
+                : LocalizationText.Get("Requires an unchanneled spirit; additional spirits require Devoted Spirits or Mythic Multiple Spirits and are limited in number.", "只能选择尚未降灵的英灵；追加降灵需要虔信英灵或神话多重降灵，且数量受其限制。");
 
         }
 

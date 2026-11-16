@@ -308,6 +308,17 @@ namespace MediumClass.Medium
             Kingmaker.Blueprints.BlueprintCharacterClassReference spirit) =>
             spirit?.Get() != null && medium.Spirits.TryGetValue(spirit, out var entry) ? entry.SpiritFocus : 0;
     }
+    internal static class SpiritBonusValue
+    {
+        internal static int ForSpirit(Kingmaker.EntitySystem.Entities.UnitEntityData owner,
+            Kingmaker.Blueprints.BlueprintCharacterClassReference spirit)
+        {
+            var medium = owner?.Get<NewUnitParts.UnitPartMedium>();
+            if (medium == null || spirit == null || !medium.Spirits.TryGetValue(spirit, out var entry)) return 0;
+            return owner.Progression.Features.GetRank(entry.SpiritBonus.SpiritBonusFeature)
+                + MultiSpiritRules.EffectiveSpiritFocus(medium, spirit);
+        }
+    }
 }
 namespace MediumClass.Medium.NewUnitParts
 {

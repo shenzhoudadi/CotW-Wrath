@@ -124,9 +124,10 @@ namespace MediumClass.Medium {
     internal static class MythicInfluence {internal const string FeatureGuid="ae859d6d-ffb3-4ba4-93c7-f6458f02db1e";}
     internal static class MultiSpiritRules {internal static int NextChannelCost(Kingmaker.EntitySystem.Entities.UnitEntityData owner)=>1;}
 }
-// The archetype's blueprints cannot be built offline; only its rule hook is modelled.
 namespace MediumClass.Features.MediumSpecific {
-    internal static class SpiritBinder { internal static bool HasFeature(UnitDescriptor owner)=>owner?.HasFact(BlueprintCore.Utils.BlueprintTool.Get<Kingmaker.Blueprints.Classes.BlueprintFeature>(MediumClass.Utilities.Guids.SpiritBinderFeature))==true; }
+    internal static class MediumAttributeRules {
+        internal static Kingmaker.EntitySystem.Stats.StatType CastingStat(UnitDescriptor owner) => Kingmaker.EntitySystem.Stats.StatType.Charisma;
+    }
 }
 
 

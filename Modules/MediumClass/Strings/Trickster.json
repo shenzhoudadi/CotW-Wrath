@@ -7,8 +7,8 @@
   },
   {
     "Key": "Trickster.Description",
-    "enGB": "A trickster spirit is a savvy and manipulative master of skills.\nSpirit Bonus: When you channel a trickster, your spirit bonus applies on Dexterity checks, skill checks, and Reflex saves.\nSeance Boon: Choose one skill when you gain this seance boon. You gain a +1 bonus on skill checks using that skill, and that skill counts as a class skill for you.\nInfluence Penalty: The time you spend focusing on skills makes you weak of body and mind. You take a penalty to Will, Fortitude, AC, CMD, and CMB.\nTrickster's Edge (Lesser, Su): Choose any one skill. This skill counts as a class skills for you, and you are treated as if you had an additional number of ranks in that skill equal to your medium level (to a maximum of your character level).\nSurprise Strike (Intermediate, Su): When you attack an opponent that's denied its Dexterity bonus to AC, you deal 1d6 points of extra precision damage for every 3 medium levels. Your target counts as flat-footed against the first attack you make against that target in a day, regardless of abilities like uncanny dodge. After your first attack, that target is immune to being made flat-footed by your surprise strike for 24 hours.\nTransfer Magic (Greater, Su): You can allow the trickster to gain 1 point of influence over you to make a melee touch attack against another creature as a standard action. If the attack succeeds, you randomly steal one of the harmless spells active on that creature, ending the effect for the original creature and gaining all remaining duration for yourself. This ability does not work on personal range or instantaneous- or permanent-duration spells.\nLegendary Trickster (Supreme, Su): Once per day, instead of rolling for a skill check, you can choose your d20 result. Additionally, you gain the ability to change form at will as if using greater polymorph and use the ability on others.",
-    "zhCN": "诡术师英灵精明老练，善于操纵他人，是各种技能的大师。\n英灵同调：降灵诡术师时，你的英灵同调适用于敏捷检定、技能检定和反射豁免。\n降灵奖励：获得此降灵奖励时，选择一项技能。使用该技能的检定获得+1加值，且该技能视为你的本职技能。\n共鸣惩罚：你过度专注于技能，导致身心变得脆弱。你的意志、强韧、防御等级（AC）、战技防御（CMD）和战技加值（CMB）承受减值。\n诡术师绝技（次级，超自然）：选择任意一项技能。该技能视为你的本职技能，且你视为在该技能上额外拥有等同于通灵者等级的技能等级，最高不超过角色等级。\n诡击（中等，超自然）：攻击无法将敏捷加值计入防御等级（AC）的对手时，每3个通灵者等级额外造成1d6精准伤害。你每天第一次攻击某个目标时，该目标在对抗这次攻击时视为措手不及，即使拥有直觉闪避等能力也不例外。在你的第一次攻击之后，该目标在24小时内免疫由你的诡击造成的措手不及。\n妙手窃法（高等，超自然）：你可以让诡术师对你的共鸣增加1点，以一个标准动作对另一个生物进行近战接触攻击。如果攻击成功，你随机窃取该生物身上一个正在生效的无害法术：结束它对原目标的效果，并使你自己获得全部剩余持续时间。此能力无法窃取作用范围为自身，或持续时间为立即、永久的法术。\n传奇诡术师（至高，超自然）：每天一次，你可以在技能检定时直接选择d20的结果，而不进行掷骰。此外，你可以随意改变形态，如同使用高等变形术，并可将此能力用于他人。"
+    "enGB": "A trickster spirit is a savvy and manipulative master of skills.\nSpirit Bonus: When you channel a trickster, your spirit bonus applies on initiative, Dexterity checks, skill checks, and Reflex saves.\nSeance Boon: Choose one skill when you gain this seance boon. You gain a +1 bonus on skill checks using that skill, and that skill counts as a class skill for you.\nInfluence Penalty: The time you spend focusing on skills makes you weak of body and mind. You take a penalty to Will, Fortitude, AC, CMD, and CMB.\nTrickster's Edge (Lesser, Su): Choose any one skill. This skill counts as a class skills for you, and you are treated as if you had an additional number of ranks in that skill equal to your medium level (to a maximum of your character level).\nSurprise Strike (Intermediate, Su): You gain the rogue's sneak attack ability equal to your medium level (+1d6 precision damage for every 2 medium levels, up to 10d6 at 20th level). Your target counts as flat-footed against the first attack you make against that target in a day, regardless of abilities like uncanny dodge. After your first attack, that target is immune to being made flat-footed by your surprise strike for 24 hours.\nSwift Break (Greater, Su): As a swift action, accept 3 points of influence to make an enemy within medium range flat-footed for 1 round (no save, shared by your whole party, though it does not affect targets immune to being flat-footed).\nLegendary Trickster (Supreme, Su): Once per day, instead of rolling for a skill check, you can choose your d20 result. Additionally, you gain the ability to change form at will as if using greater polymorph and use the ability on others.",
+    "zhCN": "诡术师英灵精明老练，善于操纵他人，是各种技能的大师。\n英灵同调：降灵诡术师时，你的英灵同调适用于先攻、敏捷检定、技能检定和反射豁免。\n降灵奖励：获得此降灵奖励时，选择一项技能。使用该技能的检定获得+1加值，且该技能视为你的本职技能。\n共鸣惩罚：你过度专注于技能，导致身心变得脆弱。你的意志、强韧、防御等级（AC）、战技防御（CMD）和战技加值（CMB）承受等同于英灵同调的减值。\n诡术师绝技（次级，超自然）：选择任意一项技能。该技能视为你的本职技能，且你视为在该技能上额外拥有等同于通灵者等级的技能等级，最高不超过角色等级。\n诡击（中等，超自然）：你获得等同于通灵者等级的游荡者偷袭能力（每2个通灵者等级+1d6精准伤害，20级10d6）。你每天第一次攻击某个目标时，该目标在对抗这次攻击时视为措手不及，即使拥有直觉闪避等能力也不例外。在你的第一次攻击之后，该目标在24小时内免疫由你的诡击造成的措手不及。\n迅捷破防（高等，超自然）：以一个迅捷动作，你让诡术师对你施加3点共鸣，使中距离内一个目标在1轮内处于措手不及状态（无豁免、全队共享，但无法使免疫措手不及的目标陷入措手不及）。\n传奇诡术师（至高，超自然）：每天一次，你可以在技能检定时直接选择d20的结果，而不进行掷骰。此外，你可以随意改变形态，如同使用高等变形术，并可将此能力用于他人。"
   },
   {
     "Key": "TricksterSpiritBonus.Name",
@@ -18,8 +18,8 @@
   },
   {
     "Key": "TricksterSpiritBonus.Description",
-    "enGB": "When you channel a trickster, your spirit bonus applies on Dexterity checks, skill checks, and Reflex saves.",
-    "zhCN": "降灵诡术师时，你的英灵同调适用于敏捷检定、技能检定和反射豁免。"
+    "enGB": "When you channel a trickster, your spirit bonus applies on initiative, Dexterity checks, skill checks, and Reflex saves.",
+    "zhCN": "降灵诡术师时，你的英灵同调适用于先攻、敏捷检定、技能检定和反射豁免。"
   },
   {
     "Key": "TricksterSeanceBoon.Name",
@@ -35,13 +35,13 @@
   {
     "Key": "TricksterTransferMagic.Name",
     "ProcessTemplates": false,
-    "enGB": "Transfer Magic - Trickster",
-    "zhCN": "妙手窃法·诡术师"
+    "enGB": "Swift Break - Trickster",
+    "zhCN": "迅捷破防·诡术师"
   },
   {
     "Key": "TricksterTransferMagic.Description",
-    "enGB": "You can allow the trickster to gain 1 point of influence over you to make a melee touch attack against another creature as a standard action. If the attack succeeds, you randomly steal one of the harmless spells of the highest spell level active on that creature, ending the effect for the original creature and gaining all remaining duration for yourself. This ability does not work on personal range or instantaneous- or permanent-duration spells.",
-    "zhCN": "你可以让诡术师对你的共鸣增加1点，以一个标准动作对另一个生物进行近战接触攻击。如果攻击成功，你会从该生物身上正在生效的无害法术中，随机窃取一个最高环级的法术：结束它对原目标的效果，并使你自己获得全部剩余持续时间。此能力无法窃取作用范围为自身，或持续时间为立即、永久的法术。"
+    "enGB": "As a swift action, you can allow the trickster to gain 3 points of influence over you to render one enemy within medium range flat-footed for 1 round (no save, shared by all allies, though targets immune to being flat-footed are unaffected).",
+    "zhCN": "以一个迅捷动作，你让诡术师对你施加3点共鸣，使中距离内一个目标在1轮内处于措手不及状态（无豁免、全队共享，但无法使免疫措手不及的目标陷入措手不及）。"
   },
   {
     "Key": "TrickstersEdge.Name",
@@ -139,8 +139,8 @@
   },
   {
     "Key": "SurpriseStrike.Description",
-    "enGB": "When you attack an opponent that's denied its Dexterity bonus to AC, you deal 1d6 points of extra precision damage for every 3 medium levels. Your target counts as flat-footed against the first attack you make against that target in a day, regardless of abilities like uncanny dodge. After your first attack, that target is immune to being made flat-footed by your surprise strike for 24 hours.",
-    "zhCN": "攻击无法将敏捷加值计入防御等级（AC）的对手时，每3个通灵者等级额外造成1d6精准伤害。你每天第一次攻击某个目标时，该目标在对抗这次攻击时视为措手不及，即使拥有直觉闪避等能力也不例外。在你的第一次攻击之后，该目标在24小时内免疫由你的诡击造成的措手不及。"
+    "enGB": "You gain the rogue's sneak attack ability equal to your medium level (+1d6 precision damage for every 2 medium levels, up to 10d6 at 20th level). Your target counts as flat-footed against the first attack you make against that target in a day, regardless of abilities like uncanny dodge. After your first attack, that target is immune to being made flat-footed by your surprise strike for 24 hours.",
+    "zhCN": "你获得等同于通灵者等级的游荡者偷袭能力（每2个通灵者等级+1d6精准伤害，20级10d6）。你每天第一次攻击某个目标时，该目标在对抗这次攻击时视为措手不及，即使拥有直觉闪避等能力也不例外。在你的第一次攻击之后，该目标在24小时内免疫由你的诡击造成的措手不及。"
   },
   {
     "Key": "TricksterSeanceBoonAthletics.Name",

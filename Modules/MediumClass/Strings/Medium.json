@@ -67,8 +67,8 @@
   {
     "Key": "MediumChannelSpirit.Description",
     "ProcessTemplates": false,
-    "enGB": "Each day, you channel a spirit and gain its seance boon and spirit powers until you rest. The first spirit adds 1 point of influence. The Mythic Multiple Spirits ability allows additional, different spirits for increasing influence costs. All active spirits share accumulated influence. At 3 points the spirits' penalties take effect. The base influence cap is 5; powers that would exceed your cap cannot be used. Rest ends channeling and resets influence to 0.",
-    "zhCN": "每天，你可以降灵一位英灵，获得其降灵奖励与英灵之力，直到休息。首次降灵增加1点共鸣。选择“神话·多重降灵”后，可用递增的共鸣代价降灵更多不同英灵。所有已降灵英灵共用累计共鸣；共鸣达到3点时，承受这些英灵的共鸣惩罚。基础共鸣上限为5点，不能使用会超过上限的能力。休息结束降灵并将共鸣重置为0。"
+    "enGB": "Each day, you channel a spirit and gain its seance boon and spirit powers until you rest. The first spirit adds 1 point of influence. The Mythic Multiple Spirits ability allows additional, different spirits. All active spirits share accumulated influence. At 3 points the spirits' penalties take effect. The base influence cap is 3 plus half your medium level plus your Charisma modifier; powers that would exceed your cap cannot be used. Rest ends channeling and resets influence to 0.",
+    "zhCN": "每天，你可以降灵一位英灵，获得其降灵奖励与英灵之力，直到休息。首次降灵增加1点共鸣。选择“神话·多重降灵”后，可降灵更多不同英灵。所有已降灵英灵共用累计共鸣；共鸣达到3点时，承受这些英灵的共鸣惩罚。基础共鸣上限为3点加上通灵者等级的一半再加上魅力调整值，不能使用会超过上限的能力。休息结束降灵并将共鸣重置为0。"
   },
   {
     "Key": "MediumInfluence.Name",
@@ -206,8 +206,8 @@
   {
     "Key": "MythicExpandedInfluence.Description",
     "ProcessTemplates": false,
-    "enGB": "Increase your shared influence cap by 1 + one-third your mythic rank, rounded down: +1 at ranks 1-2, +2 at ranks 3-5, +3 at ranks 6-8, and +4 at ranks 9-10. This changes neither current influence nor the 3-point penalty threshold. Numerical penalty reduction from Mythic Multiple Spirits is applied separately.",
-    "zhCN": "共享共鸣上限增加“1＋神话等级的三分之一（向下取整）”：神话1—2阶+1，3—5阶+2，6—8阶+3，9—10阶+4。此能力不会改变当前共鸣，也不会改变3点开始产生共鸣惩罚的阈值；神话多重降灵的数值减罚效果另行计算。"
+    "enGB": "You have learned to harness mythic power to control your spirits.\nEffect: Your influence cap increases by an amount equal to your mythic rank.",
+    "zhCN": "你学会了利用神话之力制御英灵的方法。\n效果：你的共鸣上限增加等于你的神话阶层的点数。"
   },
   {
     "Key": "SpiritSurge.CombatLog",
@@ -303,55 +303,55 @@
     "Key": "RobinHood.Name",
     "ProcessTemplates": false,
     "enGB": "Robin Hood (Trickster)",
-    "zhCN": "Robin Hood (Trickster)"
+    "zhCN": "绿林义贼罗宾汉（传奇诡术师）"
   },
   {
     "Key": "RobinHood.Description",
     "ProcessTemplates": false,
-    "enGB": "A non-evil, non-lawful medium can channel Robin Hood. His spirit bonus applies to Dexterity checks, Dexterity-based skills, Bluff and Reflex saves. He shares the Trickster seance boon, influence and spirit focus. At level 6 he grants Surprise Strike, which improves with medium levels as for the Trickster.",
-    "zhCN": "A non-evil, non-lawful medium can channel Robin Hood. His spirit bonus applies to Dexterity checks, Dexterity-based skills, Bluff and Reflex saves. He shares the Trickster seance boon, influence and spirit focus. At level 6 he grants Surprise Strike, which improves with medium levels as for the Trickster."
+    "enGB": "A non-evil, non-lawful medium can channel Robin Hood. His spirit bonus applies to initiative, Dexterity checks, Dexterity-based skills, Bluff, and Reflex saves. He shares the Trickster seance boon, influence, and spirit focus. At level 6 he grants Surprise Strike (+1d6 precision damage for every 2 medium levels, up to 10d6 at 20th level).",
+    "zhCN": "只有非邪恶且非守序阵营的通灵者方能降灵罗宾汉。他的英灵同调适用于先攻、敏捷检定、基于敏捷的技能检定、沟通（唬骗）以及反射豁免。他与诡术师共享降灵奖励、共鸣与英灵专攻。6级起授予“诡击”（每2个通灵者等级额外造成+1d6精准伤害，20级时达到10d6）。"
   },
   {
     "Key": "RobinHoodLesser.Name",
     "ProcessTemplates": false,
     "enGB": "Robin Hood: Outlaw Archer",
-    "zhCN": "Robin Hood: Outlaw Archer"
+    "zhCN": "罗宾汉：绿林义弓"
   },
   {
     "Key": "RobinHoodLesser.Description",
     "ProcessTemplates": false,
     "enGB": "You gain proficiency with longbows and shortbows, including composite bows, and double their range. While channeling Robin Hood, add Hurricane Bow (Gravity Bow) at spell level 1, Sense Vitals at 2, Chameleon Stride, Greater at 3 and Invisibility, Greater at 4 to your known medium spells as those spell levels become available. These temporary spells are removed when this power ends; spells you already know are retained.",
-    "zhCN": "You gain proficiency with longbows and shortbows, including composite bows, and double their range. While channeling Robin Hood, add Hurricane Bow (Gravity Bow) at spell level 1, Sense Vitals at 2, Chameleon Stride, Greater at 3 and Invisibility, Greater at 4 to your known medium spells as those spell levels become available. These temporary spells are removed when this power ends; spells you already know are retained."
+    "zhCN": "你擅长长弓和短弓（包括复合弓），并使其射程翻倍。降灵罗宾汉期间，在达到对应法术环级时，将以下法术临时加入你的通灵者已知法术：1环飓风之弓（Gravity Bow）、2环弱点感知（Sense Vitals）、3环高等变色龙步（Chameleon Stride, Greater）、4环高等隐形术（Invisibility, Greater）。此英灵之力结束时移除这些临时法术；你原本已知的法术会保留。"
   },
   {
     "Key": "RobinHoodGreater.Name",
     "ProcessTemplates": false,
     "enGB": "Robin Hood: Distant Archer",
-    "zhCN": "Robin Hood: Distant Archer"
+    "zhCN": "罗宾汉：百步穿杨"
   },
   {
     "Key": "RobinHoodGreater.Description",
     "ProcessTemplates": false,
     "enGB": "With a longbow or shortbow, gain +1 on attack and damage rolls per full 10 feet between you and the target. Against targets more than 30 feet away, also add your positive Wisdom modifier to attack and damage rolls.",
-    "zhCN": "With a longbow or shortbow, gain +1 on attack and damage rolls per full 10 feet between you and the target. Against targets more than 30 feet away, also add your positive Wisdom modifier to attack and damage rolls."
+    "zhCN": "使用长弓或短弓时，你与目标每相距完整10尺，攻击检定与伤害掷骰便获得+1加值。对距离超过30尺的目标，还将你的正感知调整值加到攻击检定与伤害掷骰上。"
   },
   {
     "Key": "RobinHoodSupreme.Name",
     "ProcessTemplates": false,
     "enGB": "Robin Hood: Unseen Legend",
-    "zhCN": "Robin Hood: Unseen Legend"
+    "zhCN": "罗宾汉：林影传奇"
   },
   {
     "Key": "RobinHoodSupreme.Description",
     "ProcessTemplates": false,
     "enGB": "As a swift action, allow Robin Hood to gain 1 point of influence over you to become invisible as greater invisibility for a number of rounds equal to your medium level. While this effect lasts, your attacks treat their target as flat-footed, even if that target is normally immune to being flat-footed. This does not remove immunity to critical hits or precision damage. The effect ends when you lose this spirit power.",
-    "zhCN": "As a swift action, allow Robin Hood to gain 1 point of influence over you to become invisible as greater invisibility for a number of rounds equal to your medium level. While this effect lasts, your attacks treat their target as flat-footed, even if that target is normally immune to being flat-footed. This does not remove immunity to critical hits or precision damage. The effect ends when you lose this spirit power."
+    "zhCN": "以一个迅捷动作，让罗宾汉对你的共鸣增加1点，获得等同于通灵者等级轮数的“高等隐形术”效果。持续期间，你的攻击将目标视为措手不及，即使目标通常免疫措手不及也不例外（但不会移除目标对重击或精准伤害的免疫）。失去此英灵之力时效果结束。"
   },
   {
     "Key": "RobinHoodSupreme.Duration",
     "ProcessTemplates": false,
     "enGB": "1 round/medium level",
-    "zhCN": "1 round/medium level"
+    "zhCN": "每通灵者等级1轮"
   },
   {
     "Key": "RobinHood.NoSave",

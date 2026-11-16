@@ -8,7 +8,7 @@ namespace MediumClass.Medium
             Math.Max(0, forgonePowers) * (mastery ? 4 : 2) + (mastery ? 2 : 0);
         internal const int BaseCap = 5;
         internal const int PenaltyThreshold = 3;
-        internal static int MythicBonus(int rank) => 1 + Math.Max(0, rank) / 3;
+        internal static int MythicBonus(int rank) => Math.Max(0, rank);
         internal static bool CanAccept(int current, int cost, int cap) =>
             cost >= 0 && (cost == 0 || (current <= cap && cost <= cap - current));
         internal static int Migrate(int oldRemaining, bool channelled, bool hadPropitiation) =>

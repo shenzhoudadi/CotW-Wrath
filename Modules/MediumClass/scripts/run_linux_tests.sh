@@ -34,7 +34,6 @@ CMD[HarmonyCompatibility]="run|--|$STAGE|$H236"
 CMD[MythicRegistration]="run|--|$SRC/bin/Release/net472/BlueprintCore.dll"
 CMD[SpiritActionBar]="run|--|$GAME_CS"
 CMD[SpiritActionBar2]="run|-p:TestFramework=net9.0|--|--reflection-smoke|$GAME_CS"
-CMD[SpiritBinderArchetype]="run|--|$STAGE|$GAME_CS|$SRC/Strings/Feats.json"
 CMD[SpiritChannelLifecycle]="run"
 CMD[SpiritInfluenceScenarios]="run|--|$STAGE|$SRC/Strings/Feats.json"
 CMD[SpiritSaveRestore]="run|--|$GAME_CS|$STAGE"
@@ -44,7 +43,7 @@ CMD[SpiritSpellcastingScenarios]="run"
 CMD[MediumProgressionLevels]="run|--|$GAME_CS|$BPZ|$STAGE"
 CMD[SuddenAttack]="run|--|$GAME_CS|$STAGE|$BPZ"
 NET472=(InfluenceScenarios SpiritSurgeScenarios SpiritActionBar SpiritSpellcastingScenarios SpiritSpellcastingCompatibility)
-SUITES=("$@"); [ ${#SUITES[@]} -eq 0 ] && SUITES=(ArchmageDamage CombatLog HardenedSoul HarmonyCompatibility MythicRegistration SpiritActionBar SpiritActionBar2 SpiritBinderArchetype SpiritChannelLifecycle SpiritInfluenceScenarios SpiritSaveRestore SpiritSpellcasting SpiritSpellcastingCompatibility SpiritSpellcastingScenarios MediumProgressionLevels SuddenAttack InfluenceScenarios SpiritSurgeScenarios)
+SUITES=("$@"); [ ${#SUITES[@]} -eq 0 ] && SUITES=(ArchmageDamage CombatLog HardenedSoul HarmonyCompatibility MythicRegistration SpiritActionBar SpiritActionBar2 SpiritChannelLifecycle SpiritInfluenceScenarios SpiritSaveRestore SpiritSpellcasting SpiritSpellcastingCompatibility SpiritSpellcastingScenarios MediumProgressionLevels SuddenAttack InfluenceScenarios SpiritSurgeScenarios)
 status=0
 for s in "${SUITES[@]}"; do
   d=${s%2}; proj=$(ls tests/$d/*.csproj | head -1); log=$OUT/$s.log

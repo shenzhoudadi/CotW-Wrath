@@ -145,7 +145,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             int active = SpiritBonusValue.Of(owner);
             if (active > 0) return active;
             var baseBonus = BlueprintCore.Utils.BlueprintTool.Get<BlueprintFeature>(Guids.MediumSpiritBonus);
-            return baseBonus != null ? owner.Progression.Features.GetRank(baseBonus) : 0;
+            return baseBonus != null ? SpiritBonusValue.AdjustedBaseRank(owner, baseBonus) : 0;
         }
 
         private static int _cachedDiscoveryCount = -1;

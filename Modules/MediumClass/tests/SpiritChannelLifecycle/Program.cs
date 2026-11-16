@@ -64,7 +64,7 @@ foreach (string primary in new[] { "Champion", Guids.Archmage, Guids.Trickster }
         int lesser = effective >= 1 && !caster ? 1 : caster && effective < 1 ? 1 : 0;
         Equal(lesser, owner.Progression.Features.GetRank(entry.SpiritLesserPower.Get()), context + ": lesser/prohibition " + active.Get().Name);
         int expectedIntermediate = effective >= 2
-            ? active.Get().Name == Guids.Trickster ? 6 : 1 : 0;
+            ? active.Get().Name == Guids.Trickster ? 10 : 1 : 0;
         Equal(expectedIntermediate, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), context + ": intermediate ranks " + active.Get().Name);
         Equal(effective >= 3 ? 1 : 0, owner.Progression.Features.GetRank(entry.SpiritGreaterPower.Get()), context + ": greater follows effective rank " + active.Get().Name);
         Equal(effective >= 4 ? 1 : 0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), context + ": supreme follows effective rank even after Beacon " + active.Get().Name);
@@ -78,7 +78,7 @@ foreach (string primary in new[] { "Champion", Guids.Archmage, Guids.Trickster }
         var entry = state.Spirits[inactive];
         bool lent = beacon && inactive == beaconed;
         var intermediate = entry.OverwriteIntermediatePower ?? entry.SpiritIntermediatePower;
-        Equal(lent ? inactive.Get().Name == Guids.Trickster ? 6 : 1 : 0,
+        Equal(lent ? inactive.Get().Name == Guids.Trickster ? 10 : 1 : 0,
             owner.Progression.Features.GetRank(intermediate.Get()), context + ": beacon lent intermediate " + inactive.Get().Name);
         if (entry.OverwriteIntermediatePower != null)
             Equal(0, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), context + ": beacon intermediate never duplicates base");
@@ -117,10 +117,10 @@ foreach (string primary in new[] { "Champion", Guids.Archmage, Guids.Trickster }
     state.AdditionalSpirits = null;
     var entry = state.Spirits[state.PrimarySpirit];
     foreach (var feature in Powers(entry)) owner.AddFact(feature);
-    owner.Progression.Features.Counts[entry.SpiritIntermediatePower.Get()] = 6;
+    owner.Progression.Features.Counts[entry.SpiritIntermediatePower.Get()] = 10;
     var component = new ApplySpirits { Owner = owner };
     component.OnActivate();
-    Equal(6, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "old save reactivation preserves restored Trickster ranks");
+    Equal(10, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "old save reactivation preserves restored Trickster ranks");
     component.OnDeactivate();
     Equal(0, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "old save channel ends with no residual Trickster rank");
     Check(!state.ActiveSpiritClasses.Any(), "old save without additional list clears safely");
@@ -134,12 +134,12 @@ foreach (string primary in new[] { "Champion", Guids.Archmage, Guids.Trickster }
     var component = new ApplySpirits { Owner = owner };
     component.OnActivate();
     var intermediate = state.Spirits[state.PrimarySpirit].SpiritIntermediatePower.Get();
-    Equal(2, owner.Progression.Features.GetRank(intermediate), "level 8 Trickster receives 2 ranks");
+    Equal(4, owner.Progression.Features.GetRank(intermediate), "level 8 Trickster receives 4 ranks");
     owner.SpiritClassLevel = 9;
     component.HandleUnitReapplyFeaturesOnLevelUp();
-    Equal(3, owner.Progression.Features.GetRank(intermediate), "level 9 Trickster adds one earned rank");
+    Equal(4, owner.Progression.Features.GetRank(intermediate), "level 9 Trickster keeps 4 ranks");
     component.HandleUnitReapplyFeaturesOnLevelUp();
-    Equal(3, owner.Progression.Features.GetRank(intermediate), "repeat level-up callback cannot duplicate rank");
+    Equal(4, owner.Progression.Features.GetRank(intermediate), "repeat level-up callback cannot duplicate rank");
     component.OnDeactivate();
     Equal(0, owner.Progression.Features.GetRank(intermediate), "all earned ranks removed after channel ends");
 }
@@ -360,8 +360,8 @@ foreach (int current in new[] { 5, 6, 10 })
     // 20 级星界灯塔是一枚 2 轮 buff：它只补足到诡术师的 6 个 rank，因此到期
     // 只收回自己补的那 1 级——三重降灵借出的 5 级属于别人，必须原样留着。
     var beaconLend = ApplySpirits.GrantSecondary(owner, refs[Guids.Trickster]);
-    Equal(6, owner.Progression.Features.GetRank(power.Get()), "level 20 Beacon lends its six ranks even during a trance");
-    Equal(1, beaconLend.Intermediate, "beacon only adds the ranks the trance did not already lend");
+    Equal(10, owner.Progression.Features.GetRank(power.Get()), "level 20 Beacon lends its ten ranks even during a trance");
+    Equal(5, beaconLend.Intermediate, "beacon only adds the ranks the trance did not already lend");
     ApplySpirits.RevokeSecondary(owner, refs[Guids.Trickster], beaconLend);
     Equal(5, owner.Progression.Features.GetRank(power.Get()), "beacon expiry revokes only the rank it added");
     trance.OnTurnOff();
@@ -378,9 +378,9 @@ foreach (int current in new[] { 5, 6, 10 })
     Equal(0, owner.Progression.Features.GetRank(power.Get()), "promotion removes the temporary grant before the formal channel");
     state.AdditionalSpirits.Add(refs[Guids.Trickster]);
     new ApplySpirits { Owner = owner }.RefreshActiveSpirits();
-    Equal(6, owner.Progression.Features.GetRank(power.Get()), "formal additional Trickster receives the correct permanent ranks");
+    Equal(10, owner.Progression.Features.GetRank(power.Get()), "formal additional Trickster receives the correct permanent ranks");
     trance.OnTurnOff();
-    Equal(6, owner.Progression.Features.GetRank(power.Get()), "late duplicate trance teardown cannot erase the formal channel");
+    Equal(10, owner.Progression.Features.GetRank(power.Get()), "late duplicate trance teardown cannot erase the formal channel");
 }
 
 // Execute the production fixed-integer modifier components, not a mocked
@@ -564,20 +564,20 @@ foreach (bool secondaryOnly in new[] { false, true })
     owner.SpiritClassLevel = 10;
     var trance = new MediumTranceOfManyComponent { Owner = owner, Spirit = trickster };
     trance.OnActivate();
-    Equal(3, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 10 trance lends the intermediate power at Trickster scaling (10/3)");
+    Equal(5, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 10 trance lends the intermediate power at Trickster scaling (10/2)");
     Equal(0, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), "level 10 trance does not lend the greater power");
     Equal(0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "level 10 trance does not lend the supreme power");
     trance.OnActivate();
-    Equal(3, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "repeat activation never stacks the lent ranks");
+    Equal(5, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "repeat activation never stacks the lent ranks");
     owner.SpiritClassLevel = 14;
     trance.HandleUnitReapplyFeaturesOnLevelUp();
     Equal(1, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), "level 14 adds the greater power on level up");
-    Equal(4, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 14 raises the scaled intermediate ranks (14/3)");
+    Equal(7, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 14 raises the scaled intermediate ranks (14/2)");
     Equal(0, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "level 14 still withholds the supreme power");
     owner.SpiritClassLevel = 18;
     trance.HandleUnitReapplyFeaturesOnLevelUp();
     Equal(1, owner.Progression.Features.GetRank(entry.SpiritSupremePower.Get()), "level 18 adds the supreme power on level up");
-    Equal(6, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 18 raises the scaled intermediate ranks (18/3), never duplicates them");
+    Equal(9, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "level 18 raises the scaled intermediate ranks (18/2), never duplicates them");
     trance.OnDeactivate();
     Equal(0, owner.Progression.Features.GetRank(entry.SpiritIntermediatePower.Get()), "trance end revokes the intermediate ranks");
     Equal(0, owner.Progression.Features.GetRank((entry.OverwriteGreaterPower ?? entry.SpiritGreaterPower).Get()), "trance end revokes the greater power");

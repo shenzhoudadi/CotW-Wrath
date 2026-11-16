@@ -65,9 +65,9 @@ BlueprintTool.Assets[Guids.Medium] = medium;
 var names = typeof(Guids).GetFields(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Where(f => f.IsLiteral).ToDictionary(f => (string)f.GetRawConstantValue(), f => f.Name);
 foreach (var multiRank in new[] { Guids.MediumSpiritBonus, Guids.SpiritPower, Guids.SpiritSurge })
     BlueprintTool.Assets[multiRank] = new BlueprintFeature { name = names[multiRank], AssetGuid = multiRank, Ranks = 10 };
-var binderMarker = new BlueprintFeature { name = "BinderMarker", AssetGuid = Guids.SpiritBinderFeature };
-var binderSelection = new BlueprintFeatureSelection { name = "BinderBonusFeat", AssetGuid = Guids.SpiritBinderBonusFeat };
-BlueprintTool.Assets[Guids.SpiritBinderFeature] = binderMarker; BlueprintTool.Assets[Guids.SpiritBinderBonusFeat] = binderSelection;
+var binderMarker = new BlueprintFeature { name = "ArchetypeMarker", AssetGuid = "archetype-marker" };
+var binderSelection = new BlueprintFeatureSelection { name = "ArchetypeBonusFeat", AssetGuid = "archetype-bonus-feat" };
+BlueprintTool.Assets["archetype-marker"] = binderMarker; BlueprintTool.Assets["archetype-bonus-feat"] = binderSelection;
 // Spirit Affinity is a selection granted at 3/7/11/15/19; only its presence in the level entries matters here.
 var affinity = new BlueprintFeatureSelection { name = "MediumSpiritAffinity", AssetGuid = Guids.MediumSpiritAffinity, Ranks = 5 };
 BlueprintTool.Assets[Guids.MediumSpiritAffinity] = affinity;
@@ -223,7 +223,7 @@ foreach (int lead in Enumerable.Range(0, 20))
         selectionsRequested.Where(s => s.Feature == binderSelection).ToList();
     Check(BinderPicks().Count == 0, "Binder: no bonus feat before any Medium level");
     LevelUp(unit, medium);
-    Check(Held(unit).ContainsKey("SpiritBinderFeature") && BinderPicks().Count == 0, "Binder Medium 1: marker, no bonus feat yet");
+    Check(Held(unit).ContainsKey("ArchetypeMarker") && BinderPicks().Count == 0, "Binder Medium 1: marker, no bonus feat yet");
     LevelUp(unit, medium); LevelUp(unit, medium);
     Check(BinderPicks().Select(s => s.Level).SequenceEqual(new[] { 2, 3 }), "Binder Medium 2 and 3 offer one bonus feat each");
     for (int i = 0; i < 4; i++) LevelUp(unit, knight);
@@ -316,13 +316,13 @@ foreach (var order in new[] { "KM", "KKKKKKKM", "KMKKM", "KKKMMKKKKM", "MKKKKKKK
     void Binder(UnitEntityData unit)
     {
         var data = unit.Descriptor.Progression.SureProgressionData(progression);
-        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderFeature) } });
-        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderBonusFeat) } });
+        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { binderMarker } });
+        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { binderSelection } });
     }
     var unit = Build("KKKMM", oldBug: true, before: Binder);
     selectionsRequested.Clear();
     Recover(unit);
-    Check(Held(unit).ContainsKey("SpiritBinderFeature"), "Binder: the level-1 marker is granted by the recovery");
+    Check(Held(unit).ContainsKey("ArchetypeMarker"), "Binder: the level-1 marker is granted by the recovery");
     Check(selectionsRequested.Count == 0, "the recovery does not request or grant bonus-feat selections");
     Check(UnityModManagerNet.UnityModManager.ModEntry.ModLogger.Lines.Any(l => l.Contains("feature selection(s)")), "and it says so");
 }
@@ -335,8 +335,8 @@ foreach (var order in new[] { "KM", "KKKKKKKM", "KMKKM", "KKKMMKKKKM", "MKKKKKKK
     void Binder(UnitEntityData unit)
     {
         var data = unit.Descriptor.Progression.SureProgressionData(progression);
-        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderFeature) } });
-        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderBonusFeat) } });
+        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { binderMarker } });
+        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { binderSelection } });
     }
     foreach (bool oldBug in new[] { false, true })
     {

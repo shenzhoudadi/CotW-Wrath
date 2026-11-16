@@ -215,6 +215,14 @@ namespace MediumClass.Medium
 
             var robin = Spirits.RobinHood.RobinHood.ChannelAbility();
 
+            var channelAbility = AbilityConfigurator.New(FeatName + "Ability", Guids.MediumChannelSpiritAbility)
+                .SetDisplayName(DisplayName)
+                .SetDescription(Description)
+                .SetIcon(AbilityRefs.ShamanWanderingHexAbility.Reference.Get().Icon)
+                .SetActionType(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType.Free)
+                .AddAbilityVariants(new() { a, c, g, h, m, t, ad, robin })
+                .Configure();
+
             Feature = FeatureConfigurator.New(FeatName, Guids.MediumChannelSpirit)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
@@ -244,8 +252,8 @@ namespace MediumClass.Medium
                     c.SpiritIntermediatePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.ChampionSuddenAttack);
                     c.SpiritGreaterPower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.ChampionFleetCharge);
                     c.SpiritSupremePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.LegendaryChampion);
-                    c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SaveFortitude, StatType.AdditionalDamage, StatType.AdditionalAttackBonus };
-                    c.Penalties = new StatType[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld, StatType.BonusCasterLevel };
+                    c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SaveFortitude, StatType.AdditionalDamage, StatType.AdditionalAttackBonus, StatType.AdditionalCMB };
+                    c.Penalties = new StatType[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld };
                 })
                 .AddComponent<MediumSpiritComponent>(c => {
                     c.SpiritClass = BlueprintTool.GetRef<BlueprintCharacterClassReference>(Guids.Guardian);
@@ -258,7 +266,7 @@ namespace MediumClass.Medium
                     c.SpiritGreaterPower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.GuardianGreater);
                     c.SpiritOverwriteGreater = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.SecondaryGuardianGreater);
                     c.SpiritSupremePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.LegendaryGuardian);
-                    c.Stats = new StatType[] { StatType.AC, StatType.SaveReflex, StatType.SaveFortitude };
+                    c.Stats = new StatType[] { StatType.AC, StatType.AdditionalCMD, StatType.SaveReflex, StatType.SaveFortitude, StatType.AttackOfOpportunityCount };
                     c.Penalties = new StatType[] { StatType.AdditionalDamage };
                 })
                 .AddComponent<MediumSpiritComponent>(c => {
@@ -316,11 +324,11 @@ namespace MediumClass.Medium
                     c.SpiritIntermediatePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.ChampionSuddenAttack);
                     c.SpiritGreaterPower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.ChampionFleetCharge);
                     c.SpiritSupremePower = BlueprintTool.GetRef<BlueprintFeatureReference>(Guids.MediumAdrielDeathCurse);
-                    c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SaveFortitude, StatType.AdditionalDamage, StatType.AdditionalAttackBonus };
-                    c.Penalties = new StatType[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld, StatType.BonusCasterLevel };
+                    c.Stats = new StatType[] { StatType.SkillAthletics, StatType.SaveFortitude, StatType.AdditionalDamage, StatType.AdditionalAttackBonus, StatType.AdditionalCMB };
+                    c.Penalties = new StatType[] { StatType.SkillKnowledgeArcana, StatType.SkillKnowledgeWorld };
                 })
                 .AddComponent<MediumSpiritComponent>(Spirits.RobinHood.RobinHood.ConfigureEntry)
-                .AddFacts(new() { a, c, g, h, m, t, ad, robin })
+                .AddFacts(new() { channelAbility })
                 .Configure();
         }
 

@@ -11,6 +11,7 @@ using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using MediumClass.Features.MediumSpecific;
 using MediumClass.Medium.NewUnitParts;
 using MediumClass.Prowler;
 using MediumClass.Utilities;
@@ -52,6 +53,11 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 
         public override void OnTurnOn()
         {
+            if (Context?.MaybeCaster == Owner && MediumAttributeRules.HasFocusedSpiritualism(Owner?.Descriptor))
+            {
+                RemoveModifiers();
+                return;
+            }
             var plan = BuildPlan();
             if (plan == null) return;
             // A repeated OnTurnOn without an OnTurnOff in between (reapply, load) must not stack.
@@ -66,6 +72,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 
         public void OnEventAboutToTrigger(RuleSkillCheck evt)
         {
+            if (Context?.MaybeCaster == Owner && MediumAttributeRules.HasFocusedSpiritualism(Owner?.Descriptor)) return;
             // Attribute checks use RuleSkillCheck too. Never increase the actual
             // attribute score: that would also raise skills, saves, HP and DCs.
             if (!MarshalSpiritRules.AttributeChecks.Contains(evt.StatType)) return;
@@ -91,6 +98,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             {
                 try
                 {
+                    if (Context?.MaybeCaster == Owner && MediumAttributeRules.HasFocusedSpiritualism(Owner?.Descriptor)) return 0;
                     return BuildPlan()?.Concentration?.Total ?? 0;
                 }
                 catch (Exception e)
@@ -175,7 +183,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             BlueprintCharacterClassReference marshal)
         {
             if (!medium.IsActiveSpirit(marshal) || !medium.Spirits.TryGetValue(marshal, out var entry)) return (0, 0);
-            return (caster.Progression.Features.GetRank(entry.SpiritBonus.SpiritBonusFeature.Get()),
+            return (SpiritBonusValue.AdjustedBaseRank(caster, entry.SpiritBonus.SpiritBonusFeature.Get()),
                 MultiSpiritRules.EffectiveSpiritFocus(medium, marshal));
         }
 

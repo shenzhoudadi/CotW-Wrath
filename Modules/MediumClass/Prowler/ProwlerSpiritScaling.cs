@@ -42,8 +42,6 @@ namespace MediumClass.Prowler
 
             // 守护者中等英灵之力“吸收冲击”：DR/抗力 = 职业等级的一半。
             AppendClassLevel(BlueprintTool.Get<BlueprintFeature>(Guids.GuardianAbsorbBlow), AbilityRankType.Default, bloodrager, archetype);
-            // 守护者高等英灵之力“守护者惩击”：伤害档位 = 职业等级。
-            AppendClassLevel(BlueprintTool.Get<BlueprintAbility>(Guids.GuardianGreaterAbility), AbilityRankType.DamageBonus, bloodrager, archetype);
 
             // 同一个“吸收冲击”还会把“恩典”作为2环法术加入通灵者已知法术。绝境巡行者没有通灵者法术书，
             // 因此为拥有该能力的角色补一份指向血怒者法术书的同类组件（纯通灵者不受影响：他们同样没有血怒者法术书）。

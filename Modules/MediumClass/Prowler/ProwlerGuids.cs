@@ -19,5 +19,6 @@ namespace MediumClass.Prowler
         internal const string ChannelGuardian = "3c5f9a7b-6a6a-1850-c5a7-2b19ceeb0dc9";
         internal const string ChannelMarshal = "76f3f569-f852-ee78-1922-e0dfc8896431";
         internal const string ChannelTrickster = "6c9c0ccb-c689-4687-dc94-2818d38fb295";
+        internal const string ChannelAbility = "734e8e98-096d-4c33-af2b-6e97f72dd22e";
     }
 }

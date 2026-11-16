@@ -51,11 +51,14 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             var bonuses = medium.ActiveSpiritClasses.SelectMany(s =>
                 (medium.Spirits[s].SpiritBonus.Stats ?? Array.Empty<StatType>()).Select(stat => new {
                     Stat = stat,
-                    Amount = Owner.Progression.Features.GetRank(medium.Spirits[s].SpiritBonus.SpiritBonusFeature)
-                        + MultiSpiritRules.EffectiveSpiritFocus(medium, s)
+                    Amount = SpiritBonusValue.ForSpirit(Owner, s)
                 }));
             foreach (var group in bonuses.GroupBy(b => b.Stat))
-                Owner.Stats.GetStat(group.Key)?.AddModifier(group.Max(b => b.Amount), Runtime, ModifierDescriptor.UntypedStackable);
+            {
+                int amount = group.Max(b => b.Amount);
+                if (amount > 0)
+                    Owner.Stats.GetStat(group.Key)?.AddModifier(amount, Runtime, ModifierDescriptor.UntypedStackable);
+            }
 		}
 
 		// Token: 0x0600BC6A RID: 48234 RVA: 0x00313508 File Offset: 0x00311708

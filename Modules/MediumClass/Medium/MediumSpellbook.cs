@@ -4,6 +4,7 @@ using BlueprintCore.Blueprints.References;
 using BlueprintCore.Utils;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes.Spells;
+using Kingmaker.EntitySystem.Stats;
 using MediumClass.Utilities;
 using MediumClass.Utils;
 using System.Linq;
@@ -210,13 +211,17 @@ namespace MediumClass.Medium
             ConfigureSpellSlotsTable();
             ConfigureSpellsKnownTable();
             CreateSpellList();
-            return SpellbookConfigurator.New(SpellbookName, Guids.MediumSpellbook)
+            return CreateVariantSpellbook(SpellbookName, Guids.MediumSpellbook, StatType.Charisma);
+        }
+
+        internal static BlueprintSpellbook CreateVariantSpellbook(string name, string guid, StatType castingAttribute) =>
+            SpellbookConfigurator.New(name, guid)
                 .SetName(DisplayName)
                 .SetCharacterClass(Guids.Medium)
                 .SetSpellsPerDay(Guids.MediumSpellsPerDayTable)
                 .SetSpellsKnown(Guids.MediumSpellsKnownTable)
                 .SetSpellList(Guids.MediumSpellList)
-                .SetCastingAttribute(Kingmaker.EntitySystem.Stats.StatType.Charisma)
+                .SetCastingAttribute(castingAttribute)
                 .SetIsMythic(false)
                 .SetSpontaneous(true)
                 .SetCantripsType(CantripsType.Orisions)
@@ -226,6 +231,5 @@ namespace MediumClass.Medium
                 .SetAllSpellsKnown(false)
                 .SetCasterLevelModifier(0)
                 .Configure();
-        }
     }   
 }

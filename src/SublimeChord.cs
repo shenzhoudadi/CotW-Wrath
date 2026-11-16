@@ -68,6 +68,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static int Probes;
 
         internal static BlueprintsCache CurrentCache => Cache;
+        internal static BlueprintSpellbook Spellbook => Book;
 
         // Registration runs in BlueprintsCache.Init's postfix, when most native
         // performance blueprints are still just TOC entries. Discovery is

@@ -33,11 +33,24 @@ namespace MediumClass.Medium
         {
             var facts = ChannelSpirit.Feature?.GetComponents<AddFacts>().FirstOrDefault()?.Facts;
             if (facts == null) yield break;
+            var seen = new HashSet<BlueprintAbility>();
             foreach (var fact in facts)
             {
-                if (!(fact is BlueprintAbility channel)) continue;
-                var spirit = SpiritOf(channel);
-                if (spirit != null) yield return (spirit, channel);
+                if (!(fact is BlueprintAbility ability)) continue;
+                var variantsComp = ability.GetComponent<AbilityVariants>();
+                if (variantsComp != null && variantsComp.Variants.Length > 0)
+                {
+                    foreach (var variant in variantsComp.Variants)
+                    {
+                        if (variant == null || !seen.Add(variant)) continue;
+                        var spirit = SpiritOf(variant);
+                        if (spirit != null) yield return (spirit, variant);
+                    }
+                    continue;
+                }
+                if (!seen.Add(ability)) continue;
+                var directSpirit = SpiritOf(ability);
+                if (directSpirit != null) yield return (directSpirit, ability);
             }
         }
 

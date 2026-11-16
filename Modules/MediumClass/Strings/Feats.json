@@ -116,8 +116,8 @@
   {
     "Key": "Adriel.Description",
     "ProcessTemplates": false,
-    "enGB": "Adriel was born to a royal line but never claimed a throne; a peerless duelist and warlord, he won every war he fought yet died uncrowned. Channeling Adriel uses the Champion tier's spirit bonus, seance boon, influence penalty, intermediate power (Sudden Attack) and greater power (Fleet Charge), but replaces the lesser power with Challenge and the supreme power with Death Curse.\nSpirit Bonus: When you channel Adriel, your spirit bonus applies on attack rolls, non-spell damage rolls, Strength checks, Strength-based skill checks, and Fortitude saves.\nSeance Boon: You gain a +2 bonus on all non-spell damage rolls.\nInfluence Penalty: You take a penalty on spell attack rolls and caster level checks, Knowledge (Arcana) and Knowledge (World) checks.\nAdriel and the Champion share one tier: you cannot channel both at the same time.",
-    "zhCN": "阿德里尔生于王室旁支，却终其一生未曾加冕；他是无可匹敌的决斗者与统帅，赢下了参与的所有战争，最后仍未戴上王冠。降灵阿德里尔时，沿用勇士职介的英灵同调、降灵奖励、共鸣惩罚、中等英灵之力（瞬袭）与高等英灵之力（疾袭），但次级英灵之力由“挑战”取代，至高英灵之力由“恶咒”取代。\n英灵同调：降灵阿德里尔时，你的英灵同调加值作用于攻击检定、非法术伤害骰、力量检定、基于力量的技能检定与强韧豁免。\n降灵奖励：你的所有非法术伤害骰获得+2加值。\n共鸣惩罚：你的法术攻击检定与施法者等级检定、知识（奥术）与知识（世界）检定受到减值。\n阿德里尔与勇士同属一个职介：同一时间只能降灵其中之一。"
+    "enGB": "Adriel was born to a royal line but never claimed a throne; a peerless duelist and warlord, he won every war he fought yet died uncrowned. Channeling Adriel uses the Champion tier's spirit bonus, seance boon, influence penalty, intermediate power (Sudden Attack) and greater power (Fleet Charge), but replaces the lesser power with Challenge and the supreme power with Death Curse.\nSpirit Bonus: When you channel Adriel, your spirit bonus applies on attack rolls, CMB, non-spell damage rolls, Strength checks, Strength-based skill checks, and Fortitude saves.\nSeance Boon: You gain a +2 bonus on all non-spell damage rolls.\nInfluence Penalty: You take a penalty equal to your spirit bonus on Intelligence checks, Intelligence-based skill checks, spell DCs, spell attack rolls, and spell damage rolls.\nAdriel and the Champion share one tier: you cannot channel both at the same time.",
+    "zhCN": "阿德里尔生于王室旁支，却终其一生未曾加冕；他是无可匹敌的决斗者与统帅，赢下了参与的所有战争，最后仍未戴上王冠。降灵阿德里尔时，沿用勇士职介的英灵同调、降灵奖励、共鸣惩罚、中等英灵之力（瞬袭）与高等英灵之力（疾袭），但次级英灵之力由“挑战”取代，至高英灵之力由“恶咒”取代。\n英灵同调：降灵阿德里尔时，你的英灵同调加值作用于攻击检定、战技检定（CMB）、非法术伤害骰、力量检定、基于力量的技能检定与强韧豁免。\n降灵奖励：你的所有非法术伤害骰获得+2加值。\n共鸣惩罚：你的智力检定、基于智力的技能检定，以及法术难度等级（DC）、法术攻击检定和法术伤害掷骰承受等同于英灵同调的减值。\n阿德里尔与勇士同属一个职介：同一时间只能降灵其中之一。"
   },
   {
     "Key": "MediumAdrielChallenge.Name",
@@ -270,40 +270,88 @@
     "zhCN": "恶咒（电击与酸蚀）"
   },
   {
-    "Key": "SpiritBinderArchetype.Name",
+    "Key": "DevotedMediumArchetype.Name",
     "ProcessTemplates": false,
-    "enGB": "Spirit Binder",
-    "zhCN": "缚灵者"
+    "enGB": "Devoted Medium",
+    "zhCN": "虔信者"
   },
   {
-    "Key": "SpiritBinderArchetype.Description",
+    "Key": "DevotedMediumArchetype.Description",
     "ProcessTemplates": false,
-    "enGB": "You hold your spirits by force rather than by pact. At 1st level, you gain Restless Spirit. You also gain a bonus feat at 2nd, 3rd, 5th, 7th, 9th, and 11th level, chosen from the combined list of fighter bonus feats and wizard bonus feats.",
-    "zhCN": "缚灵者以强力而非契约束缚英灵。1 级时获得“永不安宁”职业能力；并在 2、3、5、7、9、11 级各获得一个额外专长，可从战斗专长（战士额外专长）与法师额外专长合并而成的列表中任选其一。"
+    "enGB": "A devoted medium forms deep bonds with the spirits of her family, homeland, faith, or nation, offering her mind and body so those entities can manifest through her. Through this tight connection, she achieves a unique fusion with the many spirits within her.",
+    "zhCN": "虔信者与其家族、故土、信仰或国度的英灵缔结了深厚的羁绊，献出自己的身心，以使这些实体能通过他显现。通过这种紧密的联系，虔信者与他体内的众多英灵之间形成了一种独特的融合。"
   },
   {
-    "Key": "SpiritBinderRestlessSpirit.Name",
+    "Key": "DevotedMediumDiminishedSpiritBonus.Name",
     "ProcessTemplates": false,
-    "enGB": "Restless Spirit",
-    "zhCN": "永不安宁"
+    "enGB": "Diminished Spirit Bonus",
+    "zhCN": "弱化英灵同调"
   },
   {
-    "Key": "SpiritBinderRestlessSpirit.Description",
+    "Key": "DevotedMediumDiminishedSpiritBonus.Description",
     "ProcessTemplates": false,
-    "enGB": "Your spirits never rest. While you channel a spirit, its influence penalty always applies, no matter how little influence you have accumulated. Your maximum influence increases by 1.",
-    "zhCN": "你的英灵永不安宁。只要处于降灵状态，英灵的共鸣惩罚就始终生效，与累计的共鸣值无关。你的共鸣上限 +1。"
+    "enGB": "Because she channels multiple spirits at once, a devoted medium's spirit bonus is 1 lower than that of a medium of the same level (minimum +0). At 12th level, this reduction increases to 2 lower than a normal medium of the same level.",
+    "zhCN": "由于同时引导多个英灵，虔信者的能力有所减弱。他的英灵同调加值比同等级的通灵者低1点（最低为+0）。在12级时，此加值降低为比同等级通灵者低2点。"
   },
   {
-    "Key": "SpiritBinderBonusFeat.Name",
+    "Key": "DevotedMediumPactOfDedication.Name",
     "ProcessTemplates": false,
-    "enGB": "Spirit Binder Bonus Feat",
-    "zhCN": "缚灵者额外专长"
+    "enGB": "Pact of Dedication",
+    "zhCN": "献身契约"
   },
   {
-    "Key": "SpiritBinderBonusFeat.Description",
+    "Key": "DevotedMediumPactOfDedication.Description",
     "ProcessTemplates": false,
-    "enGB": "Choose one feat from the combined list of fighter bonus feats and wizard bonus feats. You must still meet its prerequisites.",
-    "zhCN": "从战斗专长与法师额外专长合并而成的列表中选择一个专长，仍需满足该专长的先决条件。"
+    "enGB": "A devoted medium uses Wisdom instead of Charisma to determine her spellcasting, influence limit, and any other medium class features normally based on Charisma.",
+    "zhCN": "虔信者可以使用感知代替魅力来决定其施法、灵力点以及任何其他通常基于魅力的通灵者职业特性的效果。"
+  },
+  {
+    "Key": "DevotedMediumDevotedSpirits.Name",
+    "ProcessTemplates": false,
+    "enGB": "Devoted Spirits",
+    "zhCN": "虔信英灵"
+  },
+  {
+    "Key": "DevotedMediumDevotedSpirits.Description",
+    "ProcessTemplates": false,
+    "enGB": "At 1st level, a devoted medium can channel two spirits simultaneously, gaining the powers granted by both (if multiple spirits' spirit bonuses apply to the same type of check, the bonus applies only once). At 10th level, a devoted medium can channel a third spirit simultaneously, adding its powers to the first two. This ability alters spirits and replaces Trance of Many.",
+    "zhCN": "虔信者在1级时可以同时降灵两个英灵，获得这两个英灵所授予的能力（如果多个英灵的英灵同调加值作用于同一类型的检定，该加值仅应用一次）。在10级时，虔信者可以同时降灵第三个英灵，其能力将附加于前两个英灵的能力之上。此能力调整了英灵，并取代多重降灵。"
+  },
+  {
+    "Key": "LoremasterArchetype.Name",
+    "ProcessTemplates": false,
+    "enGB": "Loremaster",
+    "zhCN": "博学者"
+  },
+  {
+    "Key": "LoremasterArchetype.Description",
+    "ProcessTemplates": false,
+    "enGB": "By studying the arcane lore of spirits, a loremaster learns to channel the raw knowledge of ages past without suffering the fickle and often deceptive favors of individual spirits. A loremaster's intellect is his greatest weapon, taking whatever form of threat he desires.",
+    "zhCN": "通过研究英灵的神秘魔法，博学者学会了引导历代的原始知识，无需承受英灵那反复无常且常具欺骗性的恩惠。博学者的智慧是他最强大的武器，能化作他所期望的任何威胁形态。"
+  },
+  {
+    "Key": "LoremasterScholarlyMeditations.Name",
+    "ProcessTemplates": false,
+    "enGB": "Scholarly Meditations",
+    "zhCN": "学者冥想"
+  },
+  {
+    "Key": "LoremasterScholarlyMeditations.Description",
+    "ProcessTemplates": false,
+    "enGB": "A loremaster uses Intelligence instead of Charisma to determine his spellcasting, influence limit, and any other medium class features normally based on Charisma.",
+    "zhCN": "博学者可以使用智力而非魅力来决定其法术施放、灵力点以及任何其他通常基于魅力的通灵者职业特性的效果。"
+  },
+  {
+    "Key": "LoremasterFocusedSpiritualism.Name",
+    "ProcessTemplates": false,
+    "enGB": "Focused Spiritualism",
+    "zhCN": "专注降灵"
+  },
+  {
+    "Key": "LoremasterFocusedSpiritualism.Description",
+    "ProcessTemplates": false,
+    "enGB": "A loremaster can never add his own spirit surge dice to his rolls. However, his spirit bonus is 1 higher than that of a medium of the same level starting at 1st level, and increases by an additional +1 at 10th, 14th, and 18th level. This ability modifies Spirit Bonus and Spirit Surge.",
+    "zhCN": "博学者永远无法将自己的灵力奔涌骰加到自己的骰检定中。然而，博学者的英灵同调比同等级的通灵者高1点，从1级开始生效。该加值在10级、14级和18级时额外提高+1。此能力修改英灵同调和灵力奔涌。"
   },
   {
     "Key": "SpiritAffinity.Name",
@@ -484,5 +532,143 @@
     "ProcessTemplates": false,
     "enGB": "You cannot be caught flat-footed, an invisible attacker does not deny you your Dexterity bonus, and you cannot be flanked.",
     "zhCN": "你不会陷入措手不及，隐形攻击者也不能让你失去敏捷加值，并且你无法被夹击。"
+  },
+  {
+    "Key": "SpiritAffinity.InsightFromBeyond.Name",
+    "ProcessTemplates": false,
+    "enGB": "Insight from Beyond",
+    "zhCN": "界外洞察"
+  },
+  {
+    "Key": "SpiritAffinity.InsightFromBeyond.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain one bonus feat of your choice for which you meet the prerequisites. You can select this affinity multiple times.",
+    "zhCN": "你获得 1 个自选通用专长（需满足所选专长前提）。本亲和可多次选择。"
+  },
+  {
+    "Key": "SpiritAffinity.InspiringSpirit.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Spirit",
+    "zhCN": "英灵激励"
+  },
+  {
+    "Key": "SpiritAffinity.InspiringSpirit.Description",
+    "ProcessTemplates": false,
+    "enGB": "All allies within 30 feet gain a morale bonus equal to your spirit bonus on saving throws against charm, compulsion, and fear effects.",
+    "zhCN": "30 尺内的所有盟友在对抗魅惑（Charm）、胁迫（Compulsion）和恐惧（Fear）效果的豁免检定上获得等同英灵同调加值的士气加值。"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill",
+    "zhCN": "传奇技能"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.Description",
+    "ProcessTemplates": false,
+    "enGB": "Each time you channel a spirit, you may choose one skill. That skill becomes a class skill for you and gains extra skill ranks equal to your medium level (to a maximum of your character level). If you channel a Trickster spirit, this bonus stacks independently with Trickster's Edge.",
+    "zhCN": "每次英灵降灵时，你可以选择 1 项技能：该技能视为你的本职技能，并获得等同通灵者等级的额外技能等级（上限不超过总角色等级）。若引导诡术师，则额外独立叠加，不与诡术师自身技能冲突。"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillAthletics.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Athletics",
+    "zhCN": "传奇技能·运动"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillMobility.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Mobility",
+    "zhCN": "传奇技能·灵巧"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillThievery.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Thievery",
+    "zhCN": "传奇技能·巧手"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillStealth.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Stealth",
+    "zhCN": "传奇技能·隐匿"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillKnowledgeArcana.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Knowledge (Arcana)",
+    "zhCN": "传奇技能·知识（神秘）"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillKnowledgeWorld.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Knowledge (World)",
+    "zhCN": "传奇技能·知识（世界）"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillLoreNature.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Lore (Nature)",
+    "zhCN": "传奇技能·学识（自然）"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillLoreReligion.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Lore (Religion)",
+    "zhCN": "传奇技能·学识（宗教）"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillPerception.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Perception",
+    "zhCN": "传奇技能·察觉"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillPersuasion.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Persuasion",
+    "zhCN": "传奇技能·沟通"
+  },
+  {
+    "Key": "SpiritAffinity.LegendarySkill.SkillUseMagicDevice.Name",
+    "ProcessTemplates": false,
+    "enGB": "Legendary Skill - Use Magic Device",
+    "zhCN": "传奇技能·使用魔法装置"
+  },
+  {
+    "Key": "SpiritAffinity.ForcefulMetamagic.Name",
+    "ProcessTemplates": false,
+    "enGB": "Forceful Metamagic",
+    "zhCN": "超魔奔涌"
+  },
+  {
+    "Key": "SpiritAffinity.ForcefulMetamagic.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain one bonus metamagic feat. As a swift action, you can apply any metamagic feat you know to the next medium spell you cast within 1 round without increasing the spell slot level or casting time, then take influence equal to the metamagic feat's normal spell level adjustment.",
+    "zhCN": "你获得 1 个额外超魔专长。以一个迅捷动作，你可以将已知的超魔专长应用至 1 轮内施放的下一个通灵者法术，不增加消耗的法术位环级、不增加施法时间，之后承受等同正常应用该超魔专长时调整的法术环级的共鸣。"
+  },
+  {
+    "Key": "SpiritAffinity.FortifiedResolve.Name",
+    "ProcessTemplates": false,
+    "enGB": "Fortified Resolve",
+    "zhCN": "强化决心"
+  },
+  {
+    "Key": "SpiritAffinity.FortifiedResolve.Description",
+    "ProcessTemplates": false,
+    "enGB": "At 7th level, as a swift action you can accept 1 point of influence to immediately end any fear or harmful emotion effect currently affecting you.",
+    "zhCN": "通灵者 7 级起，以一个迅捷动作承受 1 点共鸣，立即结束任何影响自身的恐惧或负面情绪效果。"
+  },
+  {
+    "Key": "SpiritAffinity.PlentifulMagic.Name",
+    "ProcessTemplates": false,
+    "enGB": "Plentiful Magic",
+    "zhCN": "丰沛魔法"
+  },
+  {
+    "Key": "SpiritAffinity.PlentifulMagic.Description",
+    "ProcessTemplates": false,
+    "enGB": "You gain 1 additional spell slot for each spell level of your spirit spellbook (Archmage/Hierophant).",
+    "zhCN": "对于英灵法术书（大法师/大祭司等）的每一个法术环级，获得 1 个额外法术位。"
   }
 ]

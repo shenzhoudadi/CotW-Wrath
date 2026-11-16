@@ -220,7 +220,7 @@ namespace MediumClass
                 Logger.Log("Configuring Classes.");
                 Medium.MediumClass.ConfigureEnabled();
                 // 变体依赖已配置好的通灵者本体（职业与升级表）。
-                SpiritBinder.Configure();
+                Features.MediumSpecific.MediumArchetypes.Configure();
                 Prowler.ProwlerBuild.ConfigureBlueprints();
             }
             private static void ConfigureClassFeats()

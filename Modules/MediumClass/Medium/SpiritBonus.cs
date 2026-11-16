@@ -41,6 +41,7 @@ namespace MediumClass.Medium
                 .SetDescription(Description)
                 .SetIcon("assets/icons/tranceofthree.png")
                 .AddComponent<MediumContextSpiritBonusComponent>()
+                .AddComponent<SpiritAttunementRulesComponent>()
                 .AddComponent<RobinHoodDexterityChecks>()
                 .Configure();
 

@@ -53,14 +53,15 @@ namespace MediumClass.Medium
         internal static int Cap(UnitDescriptor owner) => BaseCap(owner) +
             (owner?.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid)) == true
                 ? InfluenceMath.MythicBonus(owner.Progression.MythicLevel) : 0) +
-            (HardenedSoul.HasFeature(owner) ? 3 : 0) +
-            (SpiritBinder.HasFeature(owner) ? 1 : 0);
+            (HardenedSoul.HasFeature(owner) ? 3 : 0);
 
         /// <summary>
-        /// A flat 3, plus half the Medium class level, plus the Charisma
-        /// modifier. This is the authoritative cap: <see cref="InfluenceCapPatch"/>
-        /// replaces BlueprintAbilityResource.GetMaxAmount for every influence
-        /// resource, so the blueprint's own Amount block never decides the limit.
+        /// A flat 3, plus half the Medium class level, plus the casting
+        /// attribute modifier (Charisma by default, Wisdom for Devoted Medium,
+        /// Intelligence for Loremaster). This is the authoritative cap:
+        /// <see cref="InfluenceCapPatch"/> replaces BlueprintAbilityResource.GetMaxAmount
+        /// for every influence resource, so the blueprint's own Amount block
+        /// never decides the limit.
         /// A negative modifier floors at 0 instead of producing a negative cap.
         /// </summary>
         internal static int BaseCap(UnitDescriptor owner)
@@ -71,9 +72,10 @@ namespace MediumClass.Medium
             foreach (var data in owner.Progression.Classes)
                 if (data?.CharacterClass != null && data.CharacterClass.AssetGuid == medium)
                     level += data.Level;
-            int charisma = owner.Stats.GetStat(StatType.Charisma) is ModifiableValueAttributeStat stat
+            var statType = MediumAttributeRules.CastingStat(owner);
+            int attrBonus = owner.Stats.GetStat(statType) is ModifiableValueAttributeStat stat
                 ? stat.BonusWithoutTemp : 0;
-            return Math.Max(0, 3 + level / 2 + charisma);
+            return Math.Max(0, 3 + level / 2 + attrBonus);
         }
         internal static bool CanAccept(UnitDescriptor owner, int cost) => owner != null
             && owner.Resources.GetResource(BlueprintTool.Get<BlueprintAbilityResource>(Guids.MediumInfluenceResource)) != null
@@ -108,9 +110,9 @@ namespace MediumClass.Medium
             RefreshPenalty(owner);
         }
 
-        /// <summary>共鸣惩罚是否应当生效。缚灵者的英灵从不安宁，因此不看累计值。</summary>
+        /// <summary>共鸣惩罚是否应当生效。</summary>
         internal static bool PenaltyApplies(UnitDescriptor owner) => HasSpirit(owner)
-            && (SpiritBinder.HasFeature(owner) || Amount(owner) >= InfluenceMath.PenaltyThreshold);
+            && Amount(owner) >= InfluenceMath.PenaltyThreshold;
 
         internal static void RefreshPenalty(UnitDescriptor owner)
         {

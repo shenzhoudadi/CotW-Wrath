@@ -146,10 +146,8 @@ namespace MediumClass.NewComponents
             {
                 int ranks = (spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.Trickster)
                     || spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.RobinHood))
-                    ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(Owner) / 3) : 1;
+                    ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(Owner) / 2) : 1;
                 AddPower(entry.SpiritIntermediatePower, ranks);
-                AddPower(entry.SpiritIntermediatePowerMove);
-                AddPower(entry.SpiritIntermediatePowerSwift);
             }
             else
             {
@@ -157,10 +155,26 @@ namespace MediumClass.NewComponents
                 RemovePower(entry.SpiritIntermediatePowerMove);
                 RemovePower(entry.SpiritIntermediatePowerSwift);
             }
-            if (rank >= 3) AddPower(entry.SpiritGreaterPower);
-            else RemovePower(entry.SpiritGreaterPower);
-            if (rank >= 4) AddPower(entry.SpiritSupremePower);
-            else RemovePower(entry.SpiritSupremePower);
+            if (rank >= 3)
+            {
+                AddPower(entry.SpiritGreaterPower);
+                AddPower(entry.SpiritIntermediatePowerMove);
+            }
+            else
+            {
+                RemovePower(entry.SpiritGreaterPower);
+                RemovePower(entry.SpiritIntermediatePowerMove);
+            }
+            if (rank >= 4)
+            {
+                AddPower(entry.SpiritSupremePower);
+                AddPower(entry.SpiritIntermediatePowerSwift);
+            }
+            else
+            {
+                RemovePower(entry.SpiritSupremePower);
+                RemovePower(entry.SpiritIntermediatePowerSwift);
+            }
         }
 
         private void TryApplySpirit() => RefreshActiveSpirits();
@@ -236,13 +250,11 @@ namespace MediumClass.NewComponents
             if (entry == null) return grant;
             int ranks = (spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.Trickster)
                     || spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.RobinHood))
-                ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(owner) / 3) : 1;
+                ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(owner) / 2) : 1;
             if (grant.Tiers < 1)
             {
                 if (entry.OverwriteIntermediatePower?.Get() != null)
                     RemovePower(owner, entry.SpiritIntermediatePower);
-                grant.Move = AddPower(owner, entry.SpiritIntermediatePowerMove);
-                grant.Swift = AddPower(owner, entry.SpiritIntermediatePowerSwift);
                 grant.Tiers = 1;
             }
             // Trickster and Robin Hood scale their intermediate power with
@@ -257,11 +269,13 @@ namespace MediumClass.NewComponents
                     grant.Greater = AddPower(owner, entry.OverwriteGreaterPower);
                 }
                 else grant.Greater = AddPower(owner, entry.SpiritGreaterPower);
+                grant.Move = AddPower(owner, entry.SpiritIntermediatePowerMove);
                 grant.Tiers = 2;
             }
             if (tiers >= 3 && grant.Tiers < 3)
             {
                 grant.Supreme = AddPower(owner, entry.SpiritSupremePower);
+                grant.Swift = AddPower(owner, entry.SpiritIntermediatePowerSwift);
                 grant.Tiers = 3;
             }
             return grant;

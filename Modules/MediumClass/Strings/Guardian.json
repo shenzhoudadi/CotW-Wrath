@@ -7,8 +7,8 @@
   },
   {
     "Key": "Guardian.Description",
-    "enGB": "A guardian spirit is an exemplar of protection and defense.\nSpirit Bonus: When you channel a guardian, your spirit bonus applies to AC and on Constitution checks, Fortitude saves, and Reflex saves.\nSeance Boon: You gain a +1 bonus to CMD.\nInfluence Penalty: You are incredibly cautious and guarded in all things, and your caution sometimes gets in the way. When attacking, you always fight defensively, and when casting a spell, you always cast defensively. Because of your focus on defense, you take a penalty on damage rolls equal to your spirit bonus.\nGuardian’s Shield (Lesser, Su): You gain proficiency in heavy armors and shields (including tower shields).\nAbsorb Blow (Intermediate, Su): You gain DR/— and resistance to acid, cold, electricity, fire, and sonic equal to 1/2 your medium level. Add Bestow Grace to your medium spells known as a 2nd-level spell.\nGuardian Smite (Greater, Su): The medium allows the guardian to gain one influence over him to use Smite Evil as per the Paladin class feature.\nLegendary Guardian (Supreme, Su): Medium's Charisma inspires her allies so much that even when their hit points drop below 0 they continue to fight, even though they are still considered dead (or unconscious) for all effects and can be cured by Breath of Life or similar Spells as per spell description. After the encounter or upon receiving a number of attacks equal to Medium's Charisma modifier allies in this state fall dead (or unconscious). If all of the Medium's allies die that way, she becomes fully drained and dies.'",
-    "zhCN": "守护者英灵是保护与防御的典范。\n英灵同调：降灵守护者时，你的英灵同调适用于防御等级（AC）、体质检定、强韧豁免和反射豁免。\n降灵奖励：你的战技防御（CMD）获得+1加值。\n共鸣惩罚：你在所有事情上都极度谨慎、处处设防，而这份谨慎有时反而成为阻碍。攻击时，你总是进行防御式战斗；施法时，你总是进行防御式施法。由于过度专注防御，你的伤害掷骰承受等同于英灵同调的减值。\n守护者坚盾（次级，超自然）：你擅长重甲和盾牌（包括塔盾）。\n吸收冲击（中等，超自然）：你获得等同于通灵者等级1/2的伤害减免（DR/—），以及等量的强酸、寒冷、电击、火焰和音波抗力。将恩典（游戏内称“施恩”）作为2环法术加入你的通灵者已知法术。\n守护者惩击（高等，超自然）：通灵者可以让守护者对自己的共鸣增加一点，使用圣武士职业能力制裁邪恶（游戏内称“辟邪斩”）。\n传奇守护者（至高，超自然）：通灵者的魅力极大地鼓舞盟友，使他们即使生命值降至0以下也能继续战斗。不过，在所有效果的判定中，他们仍视为死亡（或昏迷），并可以按法术说明接受生命之息或类似法术的治疗。战斗结束后，或承受的攻击次数达到通灵者的魅力调整值后，处于此状态的盟友会倒下并死亡（或昏迷）。如果通灵者的所有盟友都以这种方式死亡，通灵者也会耗尽力量而死。"
+    "enGB": "A guardian spirit is an exemplar of protection and defense.\nSpirit Bonus: When you channel a guardian, your spirit bonus applies to AC, CMD, Constitution checks, Fortitude saves, Reflex saves, and the number of attacks of opportunity you can make per round.\nSeance Boon: You gain a +1 bonus to CMD.\nInfluence Penalty: Because of your focus on defense, you take a penalty on damage rolls equal to your spirit bonus.\nGuardian’s Shield (Lesser, Su): You gain proficiency in heavy armors and shields (including tower shields). In addition, you gain a free-action persistent toggle: party members and animal companions within 5 + 5 × floor(spirit bonus / 2) feet take half damage from any source, with the halved portion redirected to you.\nAbsorb Blow (Intermediate, Su): You gain DR/— and resistance to acid, cold, electricity, fire, and sonic equal to 1/2 your medium level. Add Bestow Grace to your medium spells known as a 2nd-level spell.\nGuardian's Determination (Greater, Su): By spending a full-round action or accepting 1 point of influence as a free action, you increase your threat range by 5 + (spirit bonus - 1) × 5 feet until the start of your next turn and can teleport into weapon reach to make attacks of opportunity within that range. In addition, you can accept 1 point of influence as a free action to gain temporary hit points equal to twice your medium level for 1 minute.\nLegendary Guardian (Supreme, Su): Medium's Charisma inspires her allies so much that even when their hit points drop below 0 they continue to fight, even though they are still considered dead (or unconscious) for all effects and can be cured by Breath of Life or similar Spells as per spell description. After the encounter or upon receiving a number of attacks equal to Medium's Charisma modifier allies in this state fall dead (or unconscious). If all of the Medium's allies die that way, she becomes fully drained and dies.",
+    "zhCN": "守护者英灵是保护与防御的典范。\n英灵同调：降灵守护者时，你的英灵同调适用于防御等级（AC）、战技防御（CMD）、体质检定、强韧豁免、反射豁免，以及每轮可以进行的借机攻击次数。\n降灵奖励：你的战技防御（CMD）获得+1加值。\n共鸣惩罚：由于过度专注防御，你的伤害掷骰承受等同于英灵同调的减值。\n守护者坚盾（次级，超自然）：你擅长重甲和盾牌（包括塔盾）。此外，你获得一个自由动作持久开关：位于你「5＋5×(英灵同调加值/2，向下取整)」尺范围内的队伍成员与动物伙伴所受到的任何伤害减半，被减半的部分由你代为承受。\n吸收冲击（中等，超自然）：你获得等同于通灵者等级1/2的伤害减免（DR/—），以及等量的强酸、寒冷、电击、火焰和音波抗力。将恩典（游戏内称“施恩”）作为2环法术加入你的通灵者已知法术。\n守护者决心（高等，超自然）：通过花费一个整轮动作，或者以自由动作让守护者对你的共鸣增加1点，你可以将你的威胁范围提升「5＋(英灵同调加值−1)×5」尺，持续至你的下一回合开始；当引发借机攻击的目标不在你的实际武器触及内时，你可以瞬移到该敌人附近将其纳入你的触及范围内并执行借机攻击。此外，你可以承受1点共鸣，在1分钟内获得相当于你通灵者等级两倍的临时生命值。\n传奇守护者（至高，超自然）：通灵者的魅力极大地鼓舞盟友，使他们即使生命值降至0以下也能继续战斗。不过，在所有效果的判定中，他们仍视为死亡（或昏迷），并可以按法术说明接受生命之息或类似法术的治疗。战斗结束后，或承受的攻击次数达到通灵者的魅力调整值后，处于此状态的盟友会倒下并死亡（或昏迷）。如果通灵者的所有盟友都以这种方式死亡，通灵者也会耗尽力量而死。"
   },
   {
     "Key": "GuardianSpiritBonus.Name",
@@ -18,8 +18,8 @@
   },
   {
     "Key": "GuardianSpiritBonus.Description",
-    "enGB": "When you channel a guardian, your spirit bonus applies to AC and on Constitution checks, Fortitude saves, and Reflex saves.",
-    "zhCN": "降灵守护者时，你的英灵同调适用于防御等级（AC）、体质检定、强韧豁免和反射豁免。"
+    "enGB": "When you channel a guardian, your spirit bonus applies to AC, CMD, Constitution checks, Fortitude saves, Reflex saves, and attacks of opportunity per round.",
+    "zhCN": "降灵守护者时，你的英灵同调适用于防御等级（AC）、战技防御（CMD）、体质检定、强韧豁免、反射豁免，以及每轮可以进行的借机攻击次数。"
   },
   {
     "Key": "GuardianSeanceBoon.Name",
@@ -40,7 +40,7 @@
   },
   {
     "Key": "GuardianAbsorbBlow.Description",
-    "enGB": "You gain DR/? and resistance to acid, cold, electricity, fire, and sonic equal to 1/2 your medium level. Add bestow grace to your medium spells known as a 2nd-level spell.",
+    "enGB": "You gain DR/— and resistance to acid, cold, electricity, fire, and sonic equal to 1/2 your medium level. Add bestow grace to your medium spells known as a 2nd-level spell.",
     "zhCN": "你获得等同于通灵者等级1/2的伤害减免（DR/—），以及等量的强酸、寒冷、电击、火焰和音波抗力。将恩典（游戏内称“施恩”）作为2环法术加入你的通灵者已知法术。"
   },
   {
@@ -57,13 +57,35 @@
   {
     "Key": "GuardianGreater.Name",
     "ProcessTemplates": false,
-    "enGB": "Guardian Smite",
-    "zhCN": "守护者惩击"
+    "enGB": "Guardian's Determination",
+    "zhCN": "守护者决心"
   },
   {
     "Key": "GuardianGreater.Description",
-    "enGB": "You can allow the guardian to gain 1 point of influence over you as a swift action to smite evil as per the paladin class.",
-    "zhCN": "你可以用一个迅捷动作，让守护者对你的共鸣增加1点，如同圣武士一样使用制裁邪恶（游戏内称“辟邪斩”）。"
+    "enGB": "Spend a full-round action (or accept 1 point of influence as a free action) to expand your threat range by 5 + (spirit bonus - 1) × 5 feet until the start of your next turn, teleporting into weapon reach when executing attacks of opportunity beyond normal reach. You can also accept 1 point of influence as a free action to gain temporary hit points equal to twice your medium level for 1 minute.",
+    "zhCN": "花费一个整轮动作（或以自由动作承受1点共鸣）将威胁范围提升「5＋(英灵同调加值−1)×5」尺，持续至下一回合开始，对超出武器触及的敌人发动借机攻击时可瞬移至其附近。也可承受1点共鸣以自由动作获得相当于通灵者等级两倍的临时生命值，持续1分钟。"
+  },
+  {
+    "Key": "GuardianGreaterFree.Name",
+    "ProcessTemplates": false,
+    "enGB": "Guardian's Determination (Free)",
+    "zhCN": "守护者决心（自由动作）"
+  },
+  {
+    "Key": "GuardianGreaterFree.Description",
+    "enGB": "As a free action, accept 1 point of influence to expand your threat range by 5 + (spirit bonus - 1) × 5 feet until the start of your next turn and teleport into weapon reach for attacks of opportunity within that range.",
+    "zhCN": "以自由动作承受1点共鸣，将威胁范围提升「5＋(英灵同调加值−1)×5」尺，持续至下一回合开始，并在执行借机攻击时瞬移至敌人附近将其纳入触及范围。"
+  },
+  {
+    "Key": "GuardianGreaterTempHp.Name",
+    "ProcessTemplates": false,
+    "enGB": "Guardian's Determination (Temp HP)",
+    "zhCN": "守护者决心（临时生命值）"
+  },
+  {
+    "Key": "GuardianGreaterTempHp.Description",
+    "enGB": "As a free action, accept 1 point of influence to gain temporary hit points equal to twice your medium level for 1 minute.",
+    "zhCN": "以自由动作承受1点共鸣，在1分钟内获得相当于你通灵者等级两倍的临时生命值。"
   },
   {
     "Key": "GuardianLesser.Name",
@@ -74,7 +96,19 @@
   {
     "Key": "GuardianLesser.Description",
     "ProcessTemplates": false,
-    "enGB": "You gain proficiency in heavy armor and shields, including tower shields.",
-    "zhCN": "你擅长重甲和盾牌（包括塔盾）。"
+    "enGB": "You gain proficiency in heavy armor and shields, including tower shields. In addition, you gain a free-action toggle that halves all damage taken by party members and animal companions within 5 + 5 × floor(spirit bonus / 2) feet and redirects the halved damage to you.",
+    "zhCN": "你擅长重甲和盾牌（包括塔盾）。此外，你获得一个自由动作持久开关：位于你「5＋5×(英灵同调加值/2，向下取整)」尺范围内的队伍成员与动物伙伴所受到的任何伤害减半，被减半的部分由你代为承受。"
+  },
+  {
+    "Key": "GuardianShieldOther.Name",
+    "ProcessTemplates": false,
+    "enGB": "Guardian's Shield (Redirect Damage)",
+    "zhCN": "守护者坚盾（代受伤害）"
+  },
+  {
+    "Key": "GuardianShieldOther.Description",
+    "ProcessTemplates": false,
+    "enGB": "While active, party members and animal companions within 5 + 5 × floor(spirit bonus / 2) feet take half damage from any source, and you take the redirected half.",
+    "zhCN": "开启时，位于你「5＋5×(英灵同调加值/2，向下取整)」尺范围内的队伍成员与动物伙伴受到的任何伤害减半，被减半的部分由你代为承受。"
   }
 ]

@@ -66,7 +66,31 @@ namespace CallOfTheWild.Wrath.Prototype
             var dual=f.Feature("DualAmplificationFeature01458",N("DualAmplificationFeature"),D("DualAmplificationFeature"),Major(cls),new DualAmplification01458());Icon(dual,f.Native<BlueprintUnitFact>("f180e72e4a9cbaa4da8be9bc958132ef"));result.Add(dual);
             result.AddRange(Mimic(f,cls,modes));return result.ToArray();
         }
-        internal static int MetaCost(Metamagic meta)=>meta==PsychicCasting.Logical||meta==TopplingSpell.Metamagic?1:meta.DefaultCost();
+        // MetamagicHelper.DefaultCost() logs "Unknown metamagic: <flag>" with a
+        // full stack trace for third-party metamagic bits (0x1000, 0x80000, ...).
+        // Divine Metamagic scans the whole feat pool, so calling it there used to
+        // spam the log on every feat-selection refresh. Mirror the native table
+        // here and return 0 for unknown bits instead of logging.
+        internal static int MetaCost(Metamagic meta)
+        {
+            if (meta == PsychicCasting.Logical || meta == TopplingSpell.Metamagic) return 1;
+            switch (meta)
+            {
+                case Metamagic.Empower: return 2;
+                case Metamagic.Maximize: return 3;
+                case Metamagic.Quicken: return 4;
+                case Metamagic.Extend: return 1;
+                case Metamagic.Heighten: return 0;
+                case Metamagic.Reach: return 1;
+                case Metamagic.CompletelyNormal: return -1;
+                case Metamagic.Persistent: return 2;
+                case Metamagic.Selective: return 1;
+                case Metamagic.Bolstered: return 1;
+                case Metamagic.Piercing: return 1;
+                case Metamagic.Intensified: return 1;
+                default: return 0;
+            }
+        }
         static IEnumerable<BlueprintFeature> Mimic(PsychicAssets f,BlueprintCharacterClass cls,List<BlueprintActivatableAbility> modes)
         {
             var stock=NativeMetamagics.Select(f.Native<BlueprintFeature>).Concat(new[]{f.Native<BlueprintFeature>(PsychicClass.LogicalId),f.Cache.Load(Id("TopplingSpellFeat")) as BlueprintFeature}.Where(v=>v!=null)).ToArray();

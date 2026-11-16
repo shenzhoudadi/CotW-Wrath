@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using BlueprintCore.Blueprints.CustomConfigurators.Classes;
 using BlueprintCore.Utils;
@@ -69,20 +70,28 @@ namespace MediumClass.Medium
                 // A saved channel with unrecoverable choice is not a new session.
                 // Replacing its buff would reset influence inside OnDeactivate.
                 return !owner.HasFact(BlueprintTool.Get<BlueprintBuff>(Guids.MediumChannelSpiritPrimarySpiritBuff));
-            if (!owner.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicSpirits.MultipleSpiritsGuid))) return false;
-            // The mythic ability buys one extra legend, two from mythic rank 7.
-            // It is a hard cap: without it a medium channels exactly one.
             return state.ActiveSpiritClasses.Count() < MaxSpirits(owner);
         }
 
         /// <summary>
-        /// How many legends may be channeled at once: the primary spirit plus
-        /// the mythic ability's extra one, plus a second extra from mythic rank
-        /// 7. Temporary lends (Astral Beacon, Trance of Many) are not channeled
+        /// How many legends may be channeled at once:
+        /// - Base Medium: 1 (2 with Mythic Multiple Spirits, 3 from mythic rank 7).
+        /// - Devoted Medium (Devoted Spirits): 2 from 1st level, 3 from 10th level.
+        /// Temporary lends (Astral Beacon, Trance of Many) are not channeled
         /// and never count here.
         /// </summary>
-        internal static int MaxSpirits(UnitEntityData owner) =>
-            (owner?.Descriptor?.Progression?.MythicLevel ?? 0) >= 7 ? 3 : 2;
+        internal static int MaxSpirits(UnitEntityData owner)
+        {
+            int cap = 1;
+            if (owner?.Descriptor != null)
+            {
+                if (Features.MediumSpecific.MediumAttributeRules.HasDevotedSpirits(owner.Descriptor))
+                    cap = Math.Max(cap, MediumSpiritSpellbookRules.MediumLevel(owner.Descriptor) >= 10 ? 3 : 2);
+                if (owner.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicSpirits.MultipleSpiritsGuid)))
+                    cap = Math.Max(cap, (owner.Descriptor.Progression?.MythicLevel ?? 0) >= 7 ? 3 : 2);
+            }
+            return cap;
+        }
 
         private static readonly (string Legendary, string Tier)[] LegendaryTiers = {
             (Guids.Adriel, Guids.Champion),

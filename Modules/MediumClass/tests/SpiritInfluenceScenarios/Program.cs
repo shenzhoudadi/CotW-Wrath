@@ -480,7 +480,10 @@ if (args.Length >= 1 && File.Exists(args[0]))
         Guids.MediumAdrielDeathCurseAbilityNegative, Guids.MediumAdrielDeathCurseAbilityFire,
         Guids.MediumAdrielDeathCurseAbilityCold, Guids.MediumAdrielDeathCurseAbilityElectricity,
         Guids.MediumAdrielDeathCurseAbilityAcid,
-        Guids.SpiritBinderArchetype, Guids.SpiritBinderFeature, Guids.SpiritBinderBonusFeat,
+        Guids.DevotedMediumArchetype, Guids.DevotedMediumSpellbook, Guids.DevotedMediumDiminishedSpiritBonus,
+        Guids.DevotedMediumPactOfDedication, Guids.DevotedMediumDevotedSpirits,
+        Guids.LoremasterArchetype, Guids.LoremasterSpellbook, Guids.LoremasterScholarlyMeditations,
+        Guids.LoremasterFocusedSpiritualism,
     };
     foreach (var guid in newGuids)
         Check(literals.Contains(guid), "the installer references new GUID " + guid);
@@ -535,8 +538,11 @@ if (args.Length >= 1 && File.Exists(args[0]))
     Check(penalty != null, "the installer ships the resonance penalty component");
     bool Calls(MethodDefinition method, string name) => method.Body != null
         && method.Body.Instructions.Any(i => i.Operand is MethodReference call && call.Name == name);
-    Check(penalty != null && AllMethods(penalty).Any(m => Calls(m, "EffectiveSpiritFocus")),
-        "the penalty resolves the effective spirit focus through MultiSpiritRules");
+    var spiritBonusValue = mod.MainModule.GetType("MediumClass.Medium.SpiritBonusValue");
+    Check(spiritBonusValue != null && AllMethods(spiritBonusValue).Any(m => Calls(m, "EffectiveSpiritFocus")),
+        "SpiritBonusValue resolves the effective spirit focus through MultiSpiritRules");
+    Check(penalty != null && AllMethods(penalty).Any(m => Calls(m, "ForSpirit") || Calls(m, "EffectiveSpiritFocus")),
+        "the penalty resolves the effective spirit focus through SpiritBonusValue / MultiSpiritRules");
     Check(penalty != null && !AllMethods(penalty).Where(m => m.Body != null)
         .SelectMany(m => m.Body.Instructions)
         .Any(i => i.OpCode == OpCodes.Ldfld && i.Operand is FieldReference raw
@@ -548,8 +554,8 @@ if (args.Length >= 1 && File.Exists(args[0]))
     Check(allyMirror != null, "the installer ships the ally mirror component");
     Check(allyMirror != null && AllMethods(allyMirror).Any(m => Calls(m, "get_ActiveCompanions")),
         "the ally mirror enumerates the whole party to find every channeling medium");
-    Check(allyMirror != null && AllMethods(allyMirror).Any(m => Calls(m, "EffectiveSpiritFocus")),
-        "the ally mirror resolves the effective spirit focus through MultiSpiritRules");
+    Check(allyMirror != null && AllMethods(allyMirror).Any(m => Calls(m, "ForSpirit") || Calls(m, "EffectiveSpiritFocus")),
+        "the ally mirror resolves the effective spirit focus through SpiritBonusValue / MultiSpiritRules");
 
     // Production wiring: the Marshal registration uses the narrow passive scope,
     // while the surge component has its own broad active scope.
@@ -687,8 +693,13 @@ if (args.Length >= 1 && File.Exists(args[0]))
         "MediumAdrielChallengeBuffTarget.Description", "MediumAdrielChallengeBuffSelf.Name",
         "MediumAdrielChallengeBuffSelf.Description", "MediumAdrielChallengeAbility.Name",
         "MediumAdrielChallengeAbility.Description", "MediumAdrielDeathCurse.Name", "MediumAdrielDeathCurse.Description",
-        "SpiritBinderArchetype.Name", "SpiritBinderArchetype.Description", "SpiritBinderBonusFeat.Name",
-        "SpiritBinderBonusFeat.Description", "SpiritBinderRestlessSpirit.Name", "SpiritBinderRestlessSpirit.Description",
+        "DevotedMediumArchetype.Name", "DevotedMediumArchetype.Description",
+        "DevotedMediumDiminishedSpiritBonus.Name", "DevotedMediumDiminishedSpiritBonus.Description",
+        "DevotedMediumPactOfDedication.Name", "DevotedMediumPactOfDedication.Description",
+        "DevotedMediumDevotedSpirits.Name", "DevotedMediumDevotedSpirits.Description",
+        "LoremasterArchetype.Name", "LoremasterArchetype.Description",
+        "LoremasterScholarlyMeditations.Name", "LoremasterScholarlyMeditations.Description",
+        "LoremasterFocusedSpiritualism.Name", "LoremasterFocusedSpiritualism.Description",
     };
     keys = keys.Concat(new[] { "Negative", "Fire", "Cold", "Electricity", "Acid" }
         .Select(suffix => "MediumAdrielDeathCurse" + suffix + ".Name")).ToArray();
@@ -712,7 +723,7 @@ if (args.Length >= 1 && File.Exists(args[0]))
             Check(!string.IsNullOrWhiteSpace(texts.Chinese), key + " has chinese text");
         }
     }
-    Equal(33, keys.Length, "the 0.3.2 localization set is complete");
+    Equal(41, keys.Length, "the 0.3.2+archetypes localization set is complete");
 }
 else
 {

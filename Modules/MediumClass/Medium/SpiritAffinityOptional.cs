@@ -206,6 +206,10 @@ namespace MediumClass.Medium
                     }
                 }
 
+                SyncSelectionFromNativeFeats(Guids.MediumSpiritAffinityInsightFromBeyond, metamagicOnly: false);
+                SyncSelectionFromNativeFeats(Guids.MediumSpiritAffinityForcefulMetamagic, metamagicOnly: true);
+                SpiritAffinity.SyncForcefulMetamagicPresentation();
+
                 if (!string.IsNullOrEmpty(WeaponTrainingSourceGuid) && WeaponGroupSubSelections.Count > 0)
                 {
                     var source = BlueprintTool.Get<BlueprintFeatureSelection>(WeaponTrainingSourceGuid);
@@ -235,9 +239,29 @@ namespace MediumClass.Medium
         internal static bool IsManagedSelection(BlueprintGuid guid)
         {
             string s = guid.ToString();
+            if (string.Equals(s, Guids.MediumSpiritAffinityInsightFromBeyond, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(s, Guids.MediumSpiritAffinityForcefulMetamagic, StringComparison.OrdinalIgnoreCase))
+                return true;
             if (SyncTargets.Any(t => string.Equals(t.SelectionGuid, s, StringComparison.OrdinalIgnoreCase)))
                 return true;
             return WeaponGroupSubSelections.Any(g => string.Equals(g, s, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static void SyncSelectionFromNativeFeats(string selectionGuid, bool metamagicOnly)
+        {
+            var selection = BlueprintTool.Get<BlueprintFeatureSelection>(selectionGuid);
+            var native = BlueprintTool.Get<BlueprintFeatureSelection>(Guids.NativeBasicFeatSelection);
+            if (selection == null || native?.m_AllFeatures == null) return;
+
+            var known = new HashSet<string>((selection.m_AllFeatures ?? Array.Empty<BlueprintFeatureReference>())
+                .Where(r => r != null).Select(r => r.deserializedGuid.ToString()));
+            var newcomers = native.m_AllFeatures
+                .Where(r => r != null
+                    && (!metamagicOnly || r.Get()?.GetComponent<Kingmaker.UnitLogic.FactLogic.AddMetamagicFeat>() != null)
+                    && known.Add(r.deserializedGuid.ToString()))
+                .ToArray();
+            if (newcomers.Length > 0)
+                AppendChoices(selection, newcomers.ToList());
         }
 
         private static bool HasOptions(string sourceGuid)

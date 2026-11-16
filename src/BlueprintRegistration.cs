@@ -189,6 +189,8 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(AlliedSpellcaster0576.ModuleName, () => AlliedSpellcaster0576.Register(cache), report);
             RegisterModule(UnarmedTwf0610.ModuleName, () => UnarmedTwf0610.Register(cache), report);
             RegisterModule(AnimateDead0598.ModuleName, () => AnimateDead0598.Register(cache), report);
+            RegisterModule(WordsOfCreation.ModuleName, () => WordsOfCreation.Register(cache), report);
+            RegisterModule(DivineMetamagic.ModuleName, () => DivineMetamagic.Register(cache), report);
             RegisterAvailableModule(Insinuator0095.ModuleName, () => Insinuator0095.Register(cache), report);
             RegisterAvailableModule(KineticKnightBladeRush.ModuleName, () => KineticKnightBladeRush.Register(cache, report), report);
             RegisterAvailableModule(EsotericStarseeker0081.ModuleName, () => EsotericStarseeker0081.Register(cache), report);
@@ -203,10 +205,12 @@ namespace CallOfTheWild.Wrath.Prototype
             // Original Wrath content, not a Kingmaker port. Registered last so
             // the automatic spellbook/performance discovery sees every provider.
             RegisterModule(SublimeChord.ModuleName, () => SublimeChord.Register(cache), report);
+            RegisterModule(UltimateMagus.ModuleName, () => UltimateMagus.Register(cache), report);
             // Universal spellbook recognition for the native prestige pickers.
             // Runs after Sublime Chord so its own book exists and is excluded as
             // a prestige book. The ModMenu toggle gates the whole pass.
             RegisterModule("Spellbook recognition", () => SpellbookRecognition.Register(cache), report);
+            RegisterModule("Esoteric Knight psychic compatibility", () => EsotericKnightPsychicCompat.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -307,6 +311,7 @@ namespace CallOfTheWild.Wrath.Prototype
             // HA can publish its class after initial registration; the scholar
             // gate defers until the real provider roots are present.
             RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
+            RegisterModule("Esoteric Knight psychic compatibility", () => EsotericKnightPsychicCompat.Reconcile(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)

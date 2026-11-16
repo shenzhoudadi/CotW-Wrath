@@ -35,10 +35,34 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         private static BlueprintsCache Cache;
         private static bool Reconciling;
-        private static bool Pending;
-        private static int Scans;
+        private static int KnownBookCount = -1;
+        private static BlueprintSpellbook[] CachedBooks = Array.Empty<BlueprintSpellbook>();
         private static readonly HashSet<BlueprintGuid> KnownPickers = new HashSet<BlueprintGuid>();
+        private static readonly Dictionary<BlueprintGuid, int> CheckedNonPickers = new Dictionary<BlueprintGuid, int>();
+        private static readonly Dictionary<BlueprintGuid, int> InjectedBookVersion = new Dictionary<BlueprintGuid, int>();
         private static readonly object PickerGate = new object();
+
+        // Native prestige spellbook pickers + PrestigePlus pickers: load explicitly
+        // during Register because they are still unloaded TOC entries at cache init.
+        private const string DragonDiscipleProgressionId = "69fc2bad2eb331346a6c777423e0d0f7";
+        private const string PrestigePlusSpellupgrade2Id = "05dc9561054241bd9e9f404f59ab68c5";
+        private const string DragonDiscipleSelectionId = "8c1ba14c0b6dcdb439c56341385ee474";
+
+        private static readonly string[] KnownPickerGuids = {
+            "ae04b7cdeb88b024b9fd3882cc7d3d76", // ArcaneTricksterSpellbookSelection
+            "8c1ba14c0b6dcdb439c56341385ee474", // DragonDiscipleSpellbookSelection
+            "dc3ab8d0484467a4787979d93114ebc3", // EldritchKnightSpellbookSelection
+            "7a28ab4dfc010834eabc770152997e87", // LoremasterSpellbookSelection
+            "97f510c6483523c49bc779e93e4c4568", // MysticTheurgeArcaneSpellbookSelection
+            "7cd057944ce7896479717778330a4933", // MysticTheurgeDivineSpellbookSelection
+            "ea20b26d9d0ede540af3c74246dade41", // WinterWitchSpellbookSelection
+            "68782aa7a302b6d43a42a71c6e9b5277", // HellknightSigniferSpellbook
+            PrestigePlusSpellupgrade2Id,        // PrestigePlus Spellupgrade2
+            "e995a687ec474a299afe1c2715e0cc24", // PrestigePlus Spellupgrade
+            "7e72ea5394887f04a8cc48b305d3a6ac", // HomebrewArchetypes RazPSpellbookSelection
+            "638b1fbb6bc04ec481adde3ddbc6ae5b", // ExpandedContent StargazerSpellbook
+            "f5007987c484485a92e30821881f908d"  // MysticalMayhem CyphermageSpellbookSelection
+        };
 
         internal static void Register(BlueprintsCache cache)
         {
@@ -46,47 +70,99 @@ namespace CallOfTheWild.Wrath.Prototype
             // The toggle is read once per session: injected variants live in the
             // blueprint graph, so changing it takes effect after a restart.
             if (!SpellbookRecognitionSettings.Enabled) return;
+            foreach (var id in KnownPickerGuids)
+            {
+                try { cache.Load(BlueprintGuid.Parse(id)); } catch { }
+            }
             Reconcile(cache);
         }
 
-        // Late providers are handled through the same bounded rescan as Sublime
-        // Chord: no timer, no per-frame polling, no forced load of the whole TOC.
+        // Late providers are handled on-demand when any selection is opened,
+        // without polling or forcing load of the whole TOC.
         internal static void Reconcile(BlueprintsCache cache)
         {
             if (cache == null || Reconciling || !SpellbookRecognitionSettings.Enabled) return;
-            // Bounded: the first pass runs at cache init, later passes only when
-            // a provider published something. Ten is far more than needed and
-            // keeps a pathological UI loop from turning this into a stall.
-            if (Interlocked.Increment(ref Scans) > 10) return;
             Reconciling = true;
             try
             {
+                CleanupDragonDiscipleDuplicate(cache);
                 var f = new PsychicAssets(cache);
+                RefreshBooks(cache);
+                if (CachedBooks.Length == 0) return;
                 var snapshot = SublimeChord.Snapshot(cache);
-                var books = snapshot.OfType<BlueprintSpellbook>().Where(Eligible).ToArray();
-                if (books.Length == 0) return;
                 foreach (var selection in snapshot.OfType<BlueprintFeatureSelection>())
-                {
-                    var refs = (BlueprintFeatureReference[])Get(selection, "m_AllFeatures");
-                    if (refs == null || refs.Length == 0 || refs.Length > 200) continue;
-                    if (!IsPicker(cache, selection)) continue;
-                    try { Inject(cache, f, selection, books); }
-                    catch (Exception e) { ModEntry.LogSpellDiagnostic("Spellbook recognition skipped " + selection.AssetGuid + ": " + e.Message); }
-                }
+                    TryInjectSelection(cache, f, selection);
             }
             catch (Exception e) { ModEntry.LogSpellDiagnostic("Spellbook recognition skipped: " + e.Message); }
             finally { Reconciling = false; }
         }
 
-        // Only base casting classes: a prestige class's own book (Sublime Chord,
-        // Psychic Detective) is not something another prestige class builds on.
-        // Restrict to a class's default book so archetype variants do not
-        // multiply the injected set; variants are already offered natively or by
-        // the provider that created them.
+        private static void CleanupDragonDiscipleDuplicate(BlueprintsCache cache)
+        {
+            var prog = cache.Load(BlueprintGuid.Parse(DragonDiscipleProgressionId)) as BlueprintProgression;
+            if (prog?.LevelEntries == null) return;
+            var ppId = BlueprintGuid.Parse(PrestigePlusSpellupgrade2Id);
+            var ddId = BlueprintGuid.Parse(DragonDiscipleSelectionId);
+            bool hasLevel2Native = prog.LevelEntries.Any(e => e.Level == 2 && e.Features.Any(f => f != null && f.AssetGuid == ddId));
+            if (!hasLevel2Native) return;
+            var level1 = prog.LevelEntries.FirstOrDefault(e => e.Level == 1);
+            if (level1 == null) return;
+            var l1Refs = Get(level1, "m_Features") as List<BlueprintFeatureBaseReference>;
+            if (l1Refs == null) return;
+            l1Refs.RemoveAll(r => r != null && r.Guid == ppId);
+        }
+
+        private static void RefreshBooks(BlueprintsCache cache)
+        {
+            var snapshot = SublimeChord.Snapshot(cache);
+            var books = snapshot.OfType<BlueprintSpellbook>().Where(Eligible).ToArray();
+            if (books.Length != KnownBookCount)
+            {
+                CachedBooks = books;
+                KnownBookCount = books.Length;
+            }
+        }
+
+        private static void TryInjectSelection(BlueprintsCache cache, PsychicAssets f, BlueprintFeatureSelection selection)
+        {
+            if (selection == null) return;
+            var refs = (BlueprintFeatureReference[])Get(selection, "m_AllFeatures");
+            int count = refs?.Length ?? 0;
+            if (count == 0 || count > 250) return;
+
+            lock (PickerGate)
+            {
+                if (InjectedBookVersion.TryGetValue(selection.AssetGuid, out int ver) && ver == KnownBookCount)
+                    return;
+                if (CheckedNonPickers.TryGetValue(selection.AssetGuid, out int nonCount) && nonCount == count)
+                    return;
+            }
+
+            if (!IsPicker(cache, selection))
+            {
+                lock (PickerGate) CheckedNonPickers[selection.AssetGuid] = count;
+                return;
+            }
+
+            try
+            {
+                Inject(cache, f, selection, CachedBooks);
+                lock (PickerGate) InjectedBookVersion[selection.AssetGuid] = KnownBookCount;
+            }
+            catch (Exception e)
+            {
+                ModEntry.LogSpellDiagnostic("Spellbook recognition skipped " + selection.AssetGuid + ": " + e.Message);
+            }
+        }
+
+        // Include base classes, archetype spellbooks (Skirnir, etc.), and standalone
+        // prestige casting classes like Sublime Chord, while excluding mythic,
+        // alchemist, and psychic/medium spellbooks.
         private static bool Eligible(BlueprintSpellbook book)
-            => book != null && !book.IsMythic && book.SpellsPerDay != null &&
-               book.CharacterClass != null && !book.CharacterClass.PrestigeClass &&
-               book.CharacterClass.Spellbook == book;
+            => book != null && !book.IsMythic && !book.IsAlchemist && !PsychicCasting.IsPsychic(book) &&
+               book.AssetGuid != BlueprintGuid.Parse(MediumIntegration.BookId) &&
+               book.SpellsPerDay != null && book.CharacterClass != null &&
+               (!book.CharacterClass.PrestigeClass || book == SublimeChord.Spellbook);
 
         // A picker is a feature selection whose candidates are ALL spellbook
         // variants. Mixed selections are left alone: they are something else
@@ -107,12 +183,15 @@ namespace CallOfTheWild.Wrath.Prototype
             bool hasBaseBook = false;
             foreach (var reference in refs)
             {
-                var bp = reference == null ? null : cache.Load(reference.Guid);
+                if (reference == null) continue;
+                var bp = cache.Load(reference.Guid);
+                if (bp == null) continue;
                 BlueprintSpellbook book;
                 if (bp is BlueprintFeatureReplaceSpellbook feature) book = feature.Spellbook;
                 else if (bp is BlueprintProgression progression) book = ProgressionBook(progression);
+                else if (bp is BlueprintFeature directFeature) book = DirectLevelUpBook(directFeature);
                 else return false;
-                if (book == null) return false;
+                if (book == null) continue;
                 books++;
                 if (book.CharacterClass != null && book.CharacterClass.Spellbook == book) hasBaseBook = true;
             }
@@ -135,7 +214,21 @@ namespace CallOfTheWild.Wrath.Prototype
                 .Where(t => t.Spellbook != null).ToArray();
             var progressionTemplates = entries.OfType<BlueprintProgression>()
                 .Where(p => ProgressionBook(p) != null).ToArray();
-            if (featureTemplates.Length == 0 && progressionTemplates.Length == 0) return;
+            var directTemplates = entries.OfType<BlueprintFeature>()
+                .Where(b => !(b is BlueprintFeatureReplaceSpellbook) && !(b is BlueprintProgression) && DirectLevelUpBook(b) != null)
+                .ToArray();
+            if (featureTemplates.Length == 0 && progressionTemplates.Length == 0 && directTemplates.Length == 0) return;
+
+            // Ensure BlueprintFeatureReplaceSpellbook pickers (such as PrestigePlus
+            // Spellupgrade2) run at ReplaceSpellbook priority before ApplySpellbook,
+            // otherwise selecting a spellbook at level 1 has no effect on slots/CL.
+            if (featureTemplates.Length > 0 && selection.Group == FeatureGroup.None)
+            {
+                selection.Group = FeatureGroup.ReplaceSpellbook;
+                var groups = selection.Groups ?? Array.Empty<FeatureGroup>();
+                if (!groups.Contains(FeatureGroup.ReplaceSpellbook))
+                    selection.Groups = groups.Concat(new[] { FeatureGroup.ReplaceSpellbook }).ToArray();
+            }
 
             // Anything the picker already offers is skipped, whichever shape it
             // used. This is what keeps a third-party picker (which already lists
@@ -147,6 +240,11 @@ namespace CallOfTheWild.Wrath.Prototype
                 var b = ProgressionBook(p);
                 if (b != null) existing.Add(b.AssetGuid);
             }
+            foreach (var d in directTemplates)
+            {
+                var b = DirectLevelUpBook(d);
+                if (b != null) existing.Add(b.AssetGuid);
+            }
 
             var added = new List<BlueprintFeatureBase>();
             // A mixed picker can hold both arcane and divine variants; take one
@@ -155,6 +253,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var divineFeature = featureTemplates.FirstOrDefault(t => !t.Spellbook.IsArcane);
             var arcaneProgression = progressionTemplates.FirstOrDefault(p => ProgressionBook(p).IsArcane);
             var divineProgression = progressionTemplates.FirstOrDefault(p => !ProgressionBook(p).IsArcane);
+            var arcaneDirect = directTemplates.FirstOrDefault(d => DirectLevelUpBook(d).IsArcane);
+            var divineDirect = directTemplates.FirstOrDefault(d => !DirectLevelUpBook(d).IsArcane);
 
             if (arcaneFeature != null)
                 AddGroup(books, true, existing, added, b => FeatureVariant(cache, f, arcaneFeature, b));
@@ -164,6 +264,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 AddGroup(books, true, existing, added, b => ProgressionVariant(cache, f, arcaneProgression, b));
             if (divineProgression != null)
                 AddGroup(books, false, existing, added, b => ProgressionVariant(cache, f, divineProgression, b));
+            if (arcaneDirect != null)
+                AddGroup(books, true, existing, added, b => DirectFeatureVariant(cache, f, arcaneDirect, b));
+            if (divineDirect != null)
+                AddGroup(books, false, existing, added, b => DirectFeatureVariant(cache, f, divineDirect, b));
 
             Append(selection, added);
         }
@@ -202,25 +306,42 @@ namespace CallOfTheWild.Wrath.Prototype
             if (existing != null) return existing;
 
             var cls = book.CharacterClass;
-            var clone = f.Clone(template, token, "施法职业：" + (cls.Name ?? book.name),
+            string label = cls.Name ?? book.name;
+            if (cls.Spellbook != book && !string.IsNullOrEmpty(book.Name))
+                label = label + "（" + book.Name + "）";
+            var clone = f.Clone(template, token, "施法职业：" + label,
                 "以该职业的法术书作为本进阶职业的施法基础；不改变该职业本身的法术位或可知法术。");
             // m_Spellbook lives on the feature, not in ComponentsArray, so the
             // memberwise clone still aliases the template's reference. Replace it
             // with a fresh reference instead of mutating the shared one.
             Set(clone, "m_Spellbook", Ref<BlueprintSpellbookReference>(book));
-            foreach (var component in clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+            int minSpellLevel = ExtractMinSpellLevel(clone.ComponentsArray);
+            var kept = (clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .Where(c => !(c is Prerequisite))
+                .ToArray();
+            foreach (var component in kept)
                 Retarget(component, template.Spellbook, book);
-            // Every archetype variant of one class shares that class, so a class
-            // gate alone would list all of them at once. Require actual ownership
-            // of this exact spellbook.
-            clone.ComponentsArray = clone.ComponentsArray
+            clone.ComponentsArray = kept
                 .Concat(new BlueprintComponent[] {
                     new SpellbookOwnedPrerequisite { name = "SpellbookOwned",
-                        Book = Ref<BlueprintSpellbookReference>(book) }
+                        Book = Ref<BlueprintSpellbookReference>(book),
+                        MinSpellLevel = minSpellLevel }
                 }).ToArray();
             clone.OnEnable();
             cache.AddCachedBlueprint(clone.AssetGuid, clone);
             return clone;
+        }
+
+        private static int ExtractMinSpellLevel(BlueprintComponent[] components)
+        {
+            int maxReq = 0;
+            if (components == null) return 0;
+            foreach (var c in components)
+            {
+                if (c is PrerequisiteClassSpellLevel pcs && pcs.RequiredSpellLevel > maxReq)
+                    maxReq = pcs.RequiredSpellLevel;
+            }
+            return maxReq;
         }
 
         private static BlueprintProgression ProgressionVariant(BlueprintsCache cache, PsychicAssets f,
@@ -233,19 +354,32 @@ namespace CallOfTheWild.Wrath.Prototype
 
             var templateBook = ProgressionBook(template);
             var cls = book.CharacterClass;
-            var clone = f.Clone(template, token, "施法职业：" + (cls.Name ?? book.name),
+            string label = cls.Name ?? book.name;
+            if (cls.Spellbook != book && !string.IsNullOrEmpty(book.Name))
+                label = label + "（" + book.Name + "）";
+            var clone = f.Clone(template, token, "施法职业：" + label,
                 "以该职业的法术书作为本进阶职业的施法基础；不改变该职业本身的法术位或可知法术。");
             // LevelEntries is not part of ComponentsArray, so the memberwise
             // clone still shares the template's entry objects. Copy them before
             // editing; blueprint references inside stay shared on purpose.
+            // Keep template's m_Classes (the prestige class) so progression level
+            // tracks prestige class levels rather than the base class.
             clone.LevelEntries = CopyData(template.LevelEntries);
             var classes = (BlueprintProgression.ClassWithLevel[])Get(clone, "m_Classes")
                           ?? Array.Empty<BlueprintProgression.ClassWithLevel>();
-            Set(clone, "m_Classes", new[] {
-                new BlueprintProgression.ClassWithLevel {
-                    m_Class = Ref<BlueprintCharacterClassReference>(cls),
-                    AdditionalLevel = classes.Length > 0 ? classes[0].AdditionalLevel : 0 }
-            });
+            Set(clone, "m_Classes", CopyData(classes));
+            int minSpellLevel = ExtractMinSpellLevel(clone.ComponentsArray);
+            var kept = (clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .Where(c => !(c is Prerequisite))
+                .ToArray();
+            foreach (var component in kept)
+                Retarget(component, templateBook, book);
+            clone.ComponentsArray = kept
+                .Concat(new BlueprintComponent[] {
+                    new SpellbookOwnedPrerequisite { name = "SpellbookOwned",
+                        Book = Ref<BlueprintSpellbookReference>(book),
+                        MinSpellLevel = minSpellLevel }
+                }).ToArray();
             // The same level-up feature is referenced from every LevelEntry, so
             // clone it once per source GUID and reuse that instance. Each clone
             // must also be published: a progression referencing an unpublished
@@ -323,6 +457,52 @@ namespace CallOfTheWild.Wrath.Prototype
             return string.Equals(cleaned, guid.ToString().Replace("-", ""), StringComparison.OrdinalIgnoreCase);
         }
 
+        private static BlueprintSpellbook DirectLevelUpBook(BlueprintFeature feature)
+        {
+            if (feature == null) return null;
+            foreach (var level in (feature.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .OfType<AddSpellbookLevel>())
+            {
+                var book = (Get(level, "m_Spellbook") as BlueprintSpellbookReference)?.Get();
+                if (book != null) return book;
+            }
+            return null;
+        }
+
+        private static BlueprintFeature DirectFeatureVariant(BlueprintsCache cache, PsychicAssets f,
+            BlueprintFeature template, BlueprintSpellbook book)
+        {
+            var token = "SpellbookRecognitionD/" + template.AssetGuid + "/" + book.AssetGuid;
+            if (f.Assets.TryGetValue(token, out var staged)) return (BlueprintFeature)staged;
+            var existing = cache.Load(Id(token)) as BlueprintFeature;
+            if (existing != null) return existing;
+
+            var templateBook = DirectLevelUpBook(template);
+            var cls = book.CharacterClass;
+            string label = cls.Name ?? book.name;
+            if (cls.Spellbook != book && !string.IsNullOrEmpty(book.Name))
+                label = label + "（" + book.Name + "）";
+            var clone = f.Clone(template, token, "施法职业：" + label,
+                "以该职业的法术书作为本进阶职业的施法基础；不改变该职业本身的法术位或可知法术。");
+            int minSpellLevel = ExtractMinSpellLevel(clone.ComponentsArray);
+            var kept = (clone.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .Where(c => !(c is Prerequisite))
+                .ToArray();
+            foreach (var level in kept.OfType<AddSpellbookLevel>())
+                Set(level, "m_Spellbook", Ref<BlueprintSpellbookReference>(book));
+            foreach (var component in kept)
+                Retarget(component, templateBook, book);
+            clone.ComponentsArray = kept
+                .Concat(new BlueprintComponent[] {
+                    new SpellbookOwnedPrerequisite { name = "SpellbookOwned",
+                        Book = Ref<BlueprintSpellbookReference>(book),
+                        MinSpellLevel = minSpellLevel }
+                }).ToArray();
+            clone.OnEnable();
+            cache.AddCachedBlueprint(clone.AssetGuid, clone);
+            return clone;
+        }
+
         private static BlueprintSpellbook ProgressionBook(BlueprintProgression progression)
         {
             foreach (var entry in progression.LevelEntries ?? Array.Empty<LevelEntry>())
@@ -344,18 +524,39 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             private static void Postfix(SimpleBlueprint __1)
             {
-                if (__1 is BlueprintSpellbook || __1 is BlueprintFeatureSelection) Pending = true;
+                if (__1 is BlueprintSpellbook b && Eligible(b))
+                    KnownBookCount = -1;
             }
         }
 
         [HarmonyPatch(typeof(BlueprintFeatureSelection), "get_AllFeatures")]
         private static class SelectionOpenedPatch
         {
-            private static void Postfix()
+            private static void Prefix(BlueprintFeatureSelection __instance)
             {
-                if (!Pending || Cache == null) return;
-                Pending = false;
-                Reconcile(Cache);
+                if (Cache == null || Reconciling || __instance == null || !SpellbookRecognitionSettings.Enabled) return;
+                var refs = (BlueprintFeatureReference[])Get(__instance, "m_AllFeatures");
+                int count = refs?.Length ?? 0;
+                if (count == 0 || count > 250) return;
+
+                lock (PickerGate)
+                {
+                    if (InjectedBookVersion.TryGetValue(__instance.AssetGuid, out int ver) && ver == KnownBookCount)
+                        return;
+                    if (CheckedNonPickers.TryGetValue(__instance.AssetGuid, out int nonCount) && nonCount == count)
+                        return;
+                }
+
+                Reconciling = true;
+                try
+                {
+                    CleanupDragonDiscipleDuplicate(Cache);
+                    if (KnownBookCount <= 0) RefreshBooks(Cache);
+                    if (CachedBooks.Length > 0)
+                        TryInjectSelection(Cache, new PsychicAssets(Cache), __instance);
+                }
+                catch (Exception e) { ModEntry.LogSpellDiagnostic("Spellbook recognition on-open skipped: " + e.Message); }
+                finally { Reconciling = false; }
             }
         }
     }
@@ -423,21 +624,28 @@ namespace CallOfTheWild.Wrath.Prototype
     public sealed class SpellbookOwnedPrerequisite : Prerequisite
     {
         public BlueprintSpellbookReference Book;
+        public int MinSpellLevel;
 
         protected override bool CheckInternal(FeatureSelectionState selectionState, UnitDescriptor unit, LevelUpState state)
         {
             var book = Book?.Get();
-            if (book == null) return false;
-            foreach (var owned in unit.Spellbooks)
-                if (owned?.Blueprint == book) return true;
-            // A level-up preview unit can lag a level behind on spellbook
-            // instances; the class's default book is unambiguous when the class
-            // is present. Archetype variants deliberately skip this fallback.
-            var cls = book.CharacterClass;
-            return cls != null && cls.Spellbook == book &&
-                   unit.Progression.Classes.Any(c => c.CharacterClass == cls);
+            if (book == null || unit == null) return false;
+
+            Spellbook instance = unit.GetSpellbook(book);
+            if (instance == null)
+            {
+                var cls = book.CharacterClass;
+                if (cls != null && cls.Spellbook == book &&
+                    unit.Progression.Classes.Any(c => c.CharacterClass == cls))
+                {
+                    instance = unit.DemandSpellbook(cls);
+                }
+            }
+            if (instance == null) return false;
+            return MinSpellLevel <= 0 || instance.MaxSpellLevel >= MinSpellLevel;
         }
 
-        protected override string GetUITextInternal(UnitDescriptor unit) => "必须已拥有该施法职业";
+        protected override string GetUITextInternal(UnitDescriptor unit)
+            => MinSpellLevel > 0 ? $"必须已拥有该施法职业且可施放 {MinSpellLevel} 环法术" : "必须已拥有该施法职业";
     }
 }

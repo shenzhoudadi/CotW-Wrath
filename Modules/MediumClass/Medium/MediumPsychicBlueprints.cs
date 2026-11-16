@@ -51,15 +51,16 @@ namespace MediumClass.Medium
                     }
                 } })
                 .Configure();
+            var centerFact = Main.Integrated
+                ? BlueprintTool.GetRef<BlueprintUnitFactReference>("e66116541ac4546c9084a7bcfa47e5a6")
+                : BlueprintTool.GetRef<BlueprintUnitFactReference>(Guids.MediumPsychicCenterSelf);
             FeatureConfigurator.New("MediumPsychicCasting", Guids.MediumPsychicCastingFeature)
                 .SetDisplayName("MediumPsychicCasting.Name")
                 .SetDescription("MediumPsychicCasting.Description")
                 .SetIcon("assets/icons/spiritarchmage.png")
                 .SetIsClassFeature(true)
                 .SetRanks(1)
-                .AddComponent<AddFacts>(c => c.m_Facts = new[] {
-                    BlueprintTool.GetRef<BlueprintUnitFactReference>(Guids.MediumPsychicCenterSelf)
-                })
+                .AddComponent<AddFacts>(c => c.m_Facts = new[] { centerFact })
                 .Configure();
             // Retain the old GUID as a hidden, source-owned compatibility wrapper.
             // Existing saves get the canonical feat through native AddFacts; new

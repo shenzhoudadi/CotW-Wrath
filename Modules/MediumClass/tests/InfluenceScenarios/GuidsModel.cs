@@ -14,5 +14,4 @@ public const string SpiritSurgeAbility = "3869754d-a331-4000-bf81-82e325f21a75";
 public const string MarshalMarshalsOrdersAbility = "b13b604a-d2d6-4d2e-b4e2-7e668b8c4391";
 public const string MarshalLegendaryMarshalAbility = "46d392d6-99aa-4a26-9e98-3c07e9304560";
 public const string MediumSpiritMastery = "7f43ca94-7b10-4660-8f38-09ae8b0e1773";
-public const string SpiritBinderFeature = "ad3ac75a-5b1b-464b-a9e4-e1279f0a52c0";
 }}

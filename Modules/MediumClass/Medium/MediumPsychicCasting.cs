@@ -32,13 +32,14 @@ namespace MediumClass.Medium
             BlueprintGuid.Parse("e4b8a158e8aabfe41b5e0bd334d8c386"), // ThrowingAxeOfSilenceBuff
             BlueprintGuid.Parse("73e09d4c3e3a4d918988a0aae069f372")  // SlaughteringSilenceBuff
         };
-        internal static bool IsPsychic(BlueprintSpellbook book) => book?.AssetGuid == BlueprintGuid.Parse(Guids.MediumSpellbook);
+        internal static bool IsPsychic(BlueprintSpellbook book) => MediumSpiritSpellbookRules.IsMediumBook(book);
         internal static bool IsPsychic(AbilityData spell) => spell != null && spell.SourceItem == null &&
             spell.Blueprint.Type == Kingmaker.UnitLogic.Abilities.Blueprints.AbilityType.Spell && IsPsychic(spell.Spellbook?.Blueprint);
 
         internal static bool IsEmotionBlocked(AbilityData spell)
         {
             if (!IsPsychic(spell) || spell.HasMetamagic(Logical)) return false;
+            if (spell.Caster?.State?.HasCondition(UnitCondition.Frightened) == true) return true;
             return spell.Caster.Buffs.Enumerable.Any(b => !b.IsSuppressed && b.IsTurnedOn &&
                 (((b.Context?.SpellDescriptor ?? SpellDescriptor.None) | BlueprintDescriptor(b.Blueprint)) & EmotionBlock) != 0);
         }

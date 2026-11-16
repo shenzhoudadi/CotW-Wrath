@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Spells;
@@ -16,6 +17,7 @@ using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Designers;
 using Kingmaker.ElementsSystem;
+using Kingmaker.EntitySystem;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
@@ -492,17 +494,44 @@ namespace CallOfTheWild.Wrath.Prototype
         // Eternal Song has no separate "maintained" buff: stopping the song is
         // exactly removing the freeze buffs this caster applied. Both the manual
         // button and the native performance-toggle hook go through this path.
+        //
+        // The freeze is a clone of the native Time Stop effect buff, which carries
+        // an Untargetable component. GameHelper.GetTargetsAround() explicitly
+        // filters out untargetable units, so the old 200ft scan could never see
+        // the frozen target at all - that is why neither the manual button nor
+        // switching performances stopped the song. Enumerate the persistent unit
+        // pool directly (no range / untargetable filter) and match by blueprint
+        // GUID rather than by object identity so a reloaded blueprint cache or a
+        // re-resolved reference cannot break the comparison.
         internal static void StopEternalSong(UnitEntityData caster)
         {
-            if (FreezeBuff != null) StopEternalSong(caster, FreezeBuff);
+            var freeze = FreezeBuff;
+            if (caster == null || freeze == null) return;
+            var units = Game.Instance?.State?.Units;
+            if (units == null) return;
+            var freezeGuid = freeze.AssetGuid;
+            foreach (var unit in units.ToArray())
+            {
+                var buffs = unit?.Buffs?.Enumerable;
+                if (buffs == null) continue;
+                foreach (var buff in buffs.ToArray())
+                {
+                    if (buff?.Blueprint == null || buff.Blueprint.AssetGuid != freezeGuid) continue;
+                    if (!AppliedBy(buff, caster)) continue;
+                    buff.Remove();
+                }
+            }
         }
 
-        private static void StopEternalSong(UnitEntityData caster, BlueprintBuff freeze)
+        // A buff applied inside a saving throw / AsChild context can nest the
+        // caster one or more parent contexts up, so walk the chain rather than
+        // relying on a single MaybeCaster comparison.
+        private static bool AppliedBy(EntityFact buff, UnitEntityData caster)
         {
-            if (caster == null || freeze == null) return;
-            foreach (var unit in GameHelper.GetTargetsAround(caster.Position, new Feet(200), false, false))
-                foreach (var buff in unit.Buffs.Enumerable.ToArray())
-                    if (buff.Blueprint == freeze && buff.Context?.MaybeCaster == caster) buff.Remove();
+            var ctx = buff?.MaybeContext;
+            for (int depth = 0; ctx != null && depth < 8; depth++, ctx = ctx.ParentContext)
+                if (ctx.MaybeCaster == caster) return true;
+            return false;
         }
 
         private sealed class Identity<T> : IEqualityComparer<T> where T : class
@@ -683,9 +712,11 @@ namespace CallOfTheWild.Wrath.Prototype
         [TypeId("d1c00000000000000000000000000008")]
         public sealed class SublimeChordStopEternalSong : ContextAction
         {
+            // Kept for old serialized action shapes; the freeze is now resolved
+            // by GUID from the built blueprint, never by this reference.
             public BlueprintBuffReference Freeze;
             public override string GetCaption() => "停止永恒之歌";
-            public override void RunAction() => StopEternalSong(Context?.MaybeCaster, Freeze?.Get());
+            public override void RunAction() => StopEternalSong(Context?.MaybeCaster);
         }
 
         // Starting Eternal Song stops every other maintained performance. Uses

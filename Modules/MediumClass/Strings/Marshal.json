@@ -51,6 +51,42 @@
     "zhCN": "振奋呼声·豁免"
   },
   {
+    "Key": "MarshalInspiringCallAttackStandard.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Call - Attack (Standard Action)",
+    "zhCN": "振奋呼声·攻击（标准动作）"
+  },
+  {
+    "Key": "MarshalInspiringCallSavesStandard.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Call - Saves (Standard Action)",
+    "zhCN": "振奋呼声·豁免（标准动作）"
+  },
+  {
+    "Key": "MarshalInspiringCallAttackMove.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Call - Attack (Move Action)",
+    "zhCN": "振奋呼声·攻击（移动动作）"
+  },
+  {
+    "Key": "MarshalInspiringCallSavesMove.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Call - Saves (Move Action)",
+    "zhCN": "振奋呼声·豁免（移动动作）"
+  },
+  {
+    "Key": "MarshalInspiringCallAttackSwift.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Call - Attack (Swift Action)",
+    "zhCN": "振奋呼声·攻击（迅捷动作）"
+  },
+  {
+    "Key": "MarshalInspiringCallSavesSwift.Name",
+    "ProcessTemplates": false,
+    "enGB": "Inspiring Call - Saves (Swift Action)",
+    "zhCN": "振奋呼声·豁免（迅捷动作）"
+  },
+  {
     "Key": "MarshalInspiringCall.Description",
     "enGB": "As a standard action, you can grant all allies who can see and hear you a competence bonus equal to your spirit bonus on either saving throws or attack and damage rolls. You choose which bonus to grant each time you use inspiring call. This ability lasts for 1 round. If you have the decisive strike greater spirit power, you can use inspiring call as a move action. If you have the legendary marshal supreme spirit power, you can use inspiring call as a swift action.",
     "zhCN": "以一个标准动作，你可以使所有能看见并听见你的盟友，在豁免检定或攻击检定与伤害掷骰上，获得等同于你英灵同调的表现加值。每次使用振奋呼声时，你都可以选择给予哪种加值。此能力持续1轮。如果你拥有高等英灵之力果断出击，就可以用一个移动动作使用振奋呼声。如果你拥有至高英灵之力传奇统帅，就可以用一个迅捷动作使用振奋呼声。"
@@ -64,7 +100,7 @@
   {
     "Key": "MarshalLesser.Description",
     "enGB": "You can use spirit surge on attack rolls, saving throws, ability checks, concentration checks, and skill checks for yourself or an ally. On yourself, Spirit Surge and Marshal's Orders also cover the spirit bonus categories of every spirit you currently channel. Each category receives the same spirit surge roll plus your marshal spirit bonus (including Spirit Focus) exactly once. For example, channeling Champion adds non-spell weapon damage without doubling attacks, skills, or saves. Orders on allies retain the order's normal categories and use your marshal bonus.",
-    "zhCN": "You can use spirit surge on attack rolls, saving throws, ability checks, concentration checks, and skill checks for yourself or an ally. On yourself, Spirit Surge and Marshal's Orders also cover the spirit bonus categories of every spirit you currently channel. Each category receives the same spirit surge roll plus your marshal spirit bonus (including Spirit Focus) exactly once. For example, channeling Champion adds non-spell weapon damage without doubling attacks, skills, or saves. Orders on allies retain the order's normal categories and use your marshal bonus."
+    "zhCN": "你可以将灵力奔涌用于自己或盟友的攻击检定、豁免检定、属性检定、专注检定和技能检定。对自己使用时，灵力奔涌与统帅之令还会覆盖你当前已降灵的所有英灵的英灵同调类别，每个类别仅计算一次同一份灵力奔涌骰加上你的统帅英灵同调（含英灵专攻）。例如同时降灵勇士时，会额外覆盖非法术武器伤害，而不会让攻击、技能或豁免重复叠加。对盟友使用时保持统帅之令原本覆盖的检定类别，并附加你的统帅英灵同调。"
   },
   {
     "Key": "MarshalGreaterSwift.Name",
