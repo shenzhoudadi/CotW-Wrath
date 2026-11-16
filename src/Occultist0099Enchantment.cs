@@ -103,9 +103,9 @@ namespace CallOfTheWild.Wrath.Prototype
                 copiedCommands.Add(Run(save));
             }
 
-            var level = SchoolProperty("EnchantmentEffectiveLevel", Occultist0099SchoolValueKind.EffectiveLevel);
-            var spellLevel = SchoolProperty("EnchantmentDCLevel", Occultist0099SchoolValueKind.DCLevel);
-            var resonance = SchoolProperty("GloriousPresenceValue", Occultist0099SchoolValueKind.Resonance);
+            var level = Occultist0099SchoolValue.Create("EnchantmentEffectiveLevel", School, Occultist0099SchoolValueKind.EffectiveLevel);
+            var spellLevel = Occultist0099SchoolValue.Create("EnchantmentDCLevel", School, Occultist0099SchoolValueKind.DCLevel);
+            var resonance = Occultist0099SchoolValue.Create("GloriousPresenceValue", School, Occultist0099SchoolValueKind.Resonance);
             var rank = new ContextRankConfig { name = "GloriousPresenceRank" };
             SetEnum(rank, "m_BaseValueType", "CustomProperty");
             Set(rank, "m_CustomProperty", Ref<BlueprintUnitPropertyReference>(resonance));
@@ -217,12 +217,6 @@ namespace CallOfTheWild.Wrath.Prototype
             }
         }
 
-        private static BlueprintUnitProperty SchoolProperty(string token, Occultist0099SchoolValueKind value)
-            => Identify(new BlueprintUnitProperty { ComponentsArray = new BlueprintComponent[]
-            {
-                new Occultist0099SchoolValue { name = token, School = School, Value = value, Settings = new PropertySettings() }
-            } }, token, "", "", null);
-
         private static AddContextStatBonus StatBonus(StatType stat, ModifierDescriptor descriptor)
             => new AddContextStatBonus { name = "Occultist" + stat, Stat = stat, Descriptor = descriptor, Value = Rank() };
 
@@ -252,6 +246,12 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         public string School;
         public Occultist0099SchoolValueKind Value;
+
+        internal static BlueprintUnitProperty Create(string token, string school, Occultist0099SchoolValueKind value)
+            => Identify(new BlueprintUnitProperty { ComponentsArray = new BlueprintComponent[]
+            {
+                new Occultist0099SchoolValue { name = token, School = school, Value = value, Settings = new PropertySettings() }
+            } }, token, "", "", null);
 
         protected override int GetBaseValue(UnitEntityData unit)
             => Occultist0099NativeScope.InRuntimeContext(

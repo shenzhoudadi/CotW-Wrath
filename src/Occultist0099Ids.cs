@@ -59,6 +59,8 @@ namespace CallOfTheWild.Wrath.Prototype
         public const string SchoolValueTypeId = "0099c0e1a1b24c0d8e5f60000000000b";
         public const string SameRaceTypeId = "0099c0e1a1b24c0d8e5f60000000000c";
         public const string SchoolPowerGrantTypeId = "0099c0e1a1b24c0d8e5f60000000000d";
+        public const string EnergyShieldTypeId = "0099c0e1a1b24c0d8e5f60000000000e";
+        public const string GlobeOfNegationTypeId = "0099c0e1a1b24c0d8e5f60000000000f";
 
         // The per-unit spell-state holder fact (O-S02). Distinct from the
         // Mental Focus fact so the two state machines stay separable.

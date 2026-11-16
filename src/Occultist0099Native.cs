@@ -170,6 +170,7 @@ namespace CallOfTheWild.Wrath.Prototype
         public BlueprintAbilityResourceReference FocusResource;
         public BlueprintBuffReference WardingTalisman;
         public BlueprintBuffReference MindBarrierBuff;
+        public BlueprintBuffReference[] AbjurationEffects = Array.Empty<BlueprintBuffReference>();
         public Occultist0099SchoolResonance[] SchoolResonances = Array.Empty<Occultist0099SchoolResonance>();
 
         private Occultist0099FocusPart Ledger
@@ -252,7 +253,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (part?.State == null || part.DeferReconciliation) return;
             if (ClassLevel() <= 0) Occultist0099Focus.RetireClass(part.State);
             else Occultist0099Focus.RemoveClass(part.State);
-            RemoveMindBarrier();
+            RemoveAbjurationEffects();
             SyncResonance();
         }
 
@@ -275,7 +276,7 @@ namespace CallOfTheWild.Wrath.Prototype
             bool reset = BeginCycle(identity, false);
             Occultist0099Focus.Validate(State);
             SyncResourceMirror();
-            if (reset) RemoveMindBarrier();
+            if (reset) RemoveAbjurationEffects();
             SyncResonance();
         }
 
@@ -286,7 +287,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 Occultist0099Focus.RespecRemoveSchool(State, school);
             if (result != Occultist0099Outcome.Ok) return;
             SyncResourceMirror();
-            if (!present && school == Occultist0099Ids.SliceSchool) RemoveMindBarrier();
+            if (!present && school == Occultist0099Ids.SliceSchool) RemoveAbjurationEffects();
             SyncResonance();
         }
 
@@ -295,7 +296,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var state = State;
             if (!state.Enabled)
             {
-                RemoveMindBarrier();
+                RemoveAbjurationEffects();
                 return;
             }
             var active = new HashSet<string>(Owner.Progression.Features.Enumerable.Where(f => f.Active)
@@ -307,7 +308,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (present) Occultist0099Focus.SetSchoolPresent(state, school, true);
                 else Occultist0099Focus.RespecRemoveSchool(state, school);
             }
-            if (!CanRetainMindBarrier()) RemoveMindBarrier();
+            if (!CanRetainMindBarrier()) RemoveAbjurationEffects();
         }
 
         internal bool Operate(Occultist0099FocusAction action, string school, string executionId, bool commit)
@@ -335,10 +336,15 @@ namespace CallOfTheWild.Wrath.Prototype
             return true;
         }
 
-        private void RemoveMindBarrier()
+        private void RemoveAbjurationEffects()
         {
             var blueprint = MindBarrierBuff?.Get();
             if (blueprint != null) Owner.Buffs.GetBuff(blueprint)?.Remove();
+            foreach (var reference in AbjurationEffects)
+            {
+                var effect = reference?.Get();
+                if (effect != null) Owner.Buffs.GetBuff(effect)?.Remove();
+            }
         }
 
         private void SyncResonance()

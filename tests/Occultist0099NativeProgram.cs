@@ -17,6 +17,7 @@ using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Blueprints.Root;
+using Kingmaker.Controllers;
 using Kingmaker.Controllers.Rest;
 using Kingmaker.Controllers.Rest.State;
 using Kingmaker.Designers.Mechanics.Buffs;
@@ -27,6 +28,7 @@ using Kingmaker.EntitySystem.Entities;
 using Kingmaker.EntitySystem.Persistence.JsonUtility;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.Enums.Damage;
 using Kingmaker.Inspect;
 using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem;
@@ -40,6 +42,7 @@ using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
 using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Class.LevelUp;
@@ -202,7 +205,8 @@ internal static class Occultist0099NativeTests
             __result = Empty<AbilityExecutionContext>();
             return false;
         }
-        bool recalculate = __instance.ResourceLogic is Occultist0099FocusResourceLogic logic && logic.School == "Enchantment";
+        bool recalculate = __instance.ResourceLogic is Occultist0099FocusResourceLogic &&
+            __instance.Blueprint.GetComponent<ContextCalculateAbilityParams>() != null;
         __result = new AbilityExecutionContext(__instance, __1 ?? (recalculate ? __instance.CalculateParams() : AbilityParams.Empty), __0);
         if (recalculate) __result.Recalculate();
         return false;
@@ -1783,7 +1787,7 @@ internal static class Occultist0099NativeTests
             Occultist0099Ids.SpellbookFactTypeId, Occultist0099Ids.FocusPropertyTypeId,
             Occultist0099Ids.FocusOperationTypeId, Occultist0099Ids.ImplementSchoolTypeId,
             Occultist0099Ids.ImplementSlotTypeId, Occultist0099Ids.SchoolValueTypeId, Occultist0099Ids.SameRaceTypeId,
-            Occultist0099Ids.SchoolPowerGrantTypeId
+            Occultist0099Ids.SchoolPowerGrantTypeId, Occultist0099Ids.EnergyShieldTypeId, Occultist0099Ids.GlobeOfNegationTypeId
         })
             Check(!nativeIds.Contains(Guid.Parse(id)),
                 "GATE private TypeId " + id + " has no native collision");
@@ -1964,7 +1968,7 @@ internal static class Occultist0099NativeTests
         classData.Level = 7;
         Check(bindingPick.Check(state, unit.Descriptor), "ENCH native focus choice accepts Binding Pattern at real level seven");
         bindingPick.Apply(state, unit.Descriptor);
-        foreach (var power in powers.Features.Where(power => power != bindingPower))
+        foreach (var power in new[] { Asset<BlueprintFeature>("InspiredAssaultPower"), Asset<BlueprintFeature>("ObeyPower") })
         {
             var pick = new SelectFeature(state.AddSelection(null, progression, powers, 7), power);
             Check(pick.Check(state, unit.Descriptor), "ENCH native focus choice offers " + power.name);
@@ -2070,6 +2074,209 @@ internal static class Occultist0099NativeTests
         caseStatus["Enchantment"] = "native_progression_choice_focus_and_reused_action_graphs";
     }
 
+    private static bool DispelDiceBoundary(ref RuleRollD20 __result)
+    {
+        __result = Empty<RuleRollD20>();
+        Set(__result, "m_Result", 20);
+        return false;
+    }
+
+    private static void AbjurationPowersNative(BlueprintsCache detached, BlueprintCharacterClass character)
+    {
+        T Asset<T>(string token) where T : BlueprintScriptableObject => (T)detached.Load(P(Occultist0099Ids.Id(token)));
+        var unit = Unit("abjuration-powers", character, 11, 16);
+        var attacker = Unit("abjuration-powers-incoming", character, 12, 16);
+        Set(unit, "IsTurnedOn", true);
+        Set(unit.Progression, "m_Selections", new Dictionary<BlueprintFeatureSelection, FeatureSelectionData>());
+        unit.Facts.Add(new Feature(Asset<BlueprintFeature>("MentalFocusFact"), unit.Descriptor));
+        var implement = new Feature(Asset<BlueprintFeature>("slot-1-Abjuration-Implement"), unit.Descriptor);
+        unit.Facts.Add(implement);
+        var book = unit.Descriptor.DemandSpellbook(character.Spellbook);
+        Set(book, "m_BaseLevelInternal", 11);
+        var state = LevelState(book);
+        var powerSelection = Asset<BlueprintFeatureSelection>("FocusPowerSelection");
+        foreach (var power in new[] { (Token: "EnergyShield", Level: 3), (Token: "Unraveling", Level: 5), (Token: "GlobeOfNegation", Level: 11) })
+        {
+            var option = Asset<BlueprintFeature>(power.Token + "Power");
+            var pick = new SelectFeature(state.AddSelection(null, character.Progression, powerSelection, power.Level), option);
+            var data = unit.Progression.GetClassData(character);
+            data.Level = power.Level - 1;
+            Check(!pick.Check(state, unit.Descriptor), "ABJ " + power.Token + " unavailable before its actual class level");
+            data.Level = power.Level;
+            Check(pick.Check(state, unit.Descriptor), "ABJ " + power.Token + " selectable via native Focus Power choice");
+            pick.Apply(state, unit.Descriptor);
+            data.Level = 11;
+        }
+        AbilityData Granted(string token) => unit.Abilities.Enumerable.Single(ability => ability.Blueprint == Asset<BlueprintAbility>(token)).Data;
+        var invest = Granted("InvestFocusAbility");
+        var locked = Granted("LockFocusAbility");
+        var energy = Granted("EnergyShieldAbility");
+        var globe = Granted("GlobeOfNegationAbility");
+        var unravel = Granted("UnravelingAbility");
+        var energyBuff = Asset<BlueprintBuff>("EnergyShieldBuff");
+        var globeBuff = Asset<BlueprintBuff>("GlobeOfNegationBuff");
+        var before = unit.Get<Occultist0099FocusPart>().State;
+        var pool = before.Schools["Abjuration"];
+        var globeModule = Production("PsychicGlobeSpells");
+        harmony.CreateClassProcessor(globeModule.GetNestedType("DeliveryPatch", BindingFlags.NonPublic)).Patch();
+        harmony.CreateClassProcessor(globeModule.GetNestedType("AreaPatch", BindingFlags.NonPublic)).Patch();
+        var apply = AccessTools.Method(typeof(AbilityExecutionProcess), "DoApplyEffect");
+        var delivery = AccessTools.Method(globeModule.GetNestedType("DeliveryPatch", BindingFlags.NonPublic), "Prefix");
+        var tryArea = AccessTools.Method(typeof(AreaEffectEntityData), "TryOvercomeSpellResistance");
+        var dice = AccessTools.PropertyGetter(AccessTools.Inner(typeof(RulebookEvent), "Dice"), "D20");
+        var fixedRoll = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(DispelDiceBoundary));
+        var hidden = AccessTools.PropertyGetter(typeof(BlueprintBuff), nameof(BlueprintBuff.HiddenInInspector));
+        var visibleFixtureBuff = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(NotTacticalCombat));
+        harmony.Patch(hidden, prefix: new HarmonyMethod(visibleFixtureBuff));
+        harmony.Patch(dice, prefix: new HarmonyMethod(fixedRoll));
+        applyNativeEffects = true;
+        try
+        {
+            Check(CastRule(energy).ForceFail && unit.Buffs.GetBuff(energyBuff) == null, "ABJ unlocked Energy Shield pays nothing and grants no protection");
+            for (int i = 0; i < 13; i++) CastRule(invest);
+            CastRule(locked);
+            Check(CastRule(energy).Success && unit.Buffs.GetBuff(energyBuff)?.TimeLeft == TimeSpan.FromMinutes(1) && pool.Remaining == 12,
+                "ABJ native Energy Shield pays one school point and starts the one-minute protection");
+
+            var target = new TargetWrapper(unit);
+            var damageContext = new AbilityExecutionContext(energy, AbilityParams.Empty, target);
+            var nativePool = unit.Get<Kingmaker.UnitLogic.Parts.UnitPartDamageReduction>();
+            var resistanceBlueprint = new BlueprintBuff { name = "0099N.HigherElectricResistance",
+                AssetGuid = P(Occultist0099Ids.Id("HostElectricResistance")),
+                ComponentsArray = new BlueprintComponent[] { new AddDamageResistanceEnergy { name = "0099N.ElectricResistance",
+                    Type = DamageEnergyType.Electricity, Value = 60 } } };
+            resistanceBlueprint.OnEnable();
+            var resistance = unit.Buffs.AddBuff(resistanceBlueprint, unit, TimeSpan.FromMinutes(1));
+            var electric = new EnergyDamage(DiceFormula.Zero, 20, DamageEnergyType.Electricity);
+            Rulebook.Trigger(new RuleDealDamage(attacker, unit, electric) { Reason = damageContext });
+            Check(electric.ReductionBecauseResistance.TotalValue == 20 &&
+                  nativePool.AllSources.Single(entry => entry.Settings is Occultist0099EnergyShield).GetCurrentValue() == 55,
+                "ABJ stronger native resistance takes the packet instead of stacking or spending Energy Shield");
+            resistance.Remove();
+            unit.State.AddCondition(UnitCondition.SuppressedEnergyResistance);
+            var fire = new EnergyDamage(DiceFormula.Zero, 2, DamageEnergyType.Fire);
+            Rulebook.Trigger(new RuleDealDamage(attacker, unit, fire) { Reason = damageContext });
+            unit.State.RemoveCondition(UnitCondition.SuppressedEnergyResistance);
+            Check(fire.ReductionBecauseResistance.TotalValue == 0 && nativePool.AllSources.Single().GetCurrentValue() == 55,
+                "ABJ native suppression bypasses the shield without draining the pool");
+            var acid = new EnergyDamage(DiceFormula.Zero, 40, DamageEnergyType.Acid);
+            var cold = new EnergyDamage(DiceFormula.Zero, 30, DamageEnergyType.Cold);
+            var sonic = new EnergyDamage(DiceFormula.Zero, 5, DamageEnergyType.Sonic);
+            var damage = Rulebook.Trigger(new RuleDealDamage(attacker, unit, new DamageBundle(acid, cold, sonic)) { Reason = damageContext });
+            Check(acid.ReductionBecauseResistance.TotalValue == 40 && cold.ReductionBecauseResistance.TotalValue == 15 &&
+                  sonic.ReductionBecauseResistance.TotalValue == 0 && unit.Buffs.GetBuff(energyBuff) == null && damage.Result == 20,
+                "ABJ one native pool absorbs 55 total across acid/cold in the same damage packet; sonic passes and depletion removes the buff");
+
+            Check(CastRule(globe).Success && unit.Buffs.GetBuff(globeBuff) != null && pool.Remaining == 9,
+                "ABJ native Globe of Negation pays three school points and binds to the wearer");
+            var ordinary = new AbilityData(Native<BlueprintAbility>("55f14bc84d7c85446b07a1b5dd6b2b4c"), attacker.Descriptor);
+            var incoming = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 6 }, target);
+            int Capacity() => unit.Buffs.GetBuff(globeBuff)?.Components.Single(component =>
+                component.SourceBlueprintComponent is Occultist0099GlobeOfNegation).GetData<Occultist0099GlobeData>().Remaining ?? 0;
+            bool Allows(AbilityExecutionContext context, UnitEntityData recipient)
+                => (bool)delivery.Invoke(null, new object[] { context, new TargetWrapper(recipient), null });
+            var cantrip = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 0 }, target);
+            Check(Allows(cantrip, unit) && Allows(incoming, attacker) && Capacity() == 11,
+                "ABJ original Globe semantics allow cantrips and another recipient without spending capacity");
+            var lesserId = (BlueprintGuid)AccessTools.Method(Production("PsychicAssets"), "Id")
+                .Invoke(null, new object[] { "GlobeOfInvulnerabilityLesserBuff" });
+            var lesserBlueprint = new BlueprintBuff { name = "0099N.StationaryGlobeFixture", AssetGuid = lesserId,
+                ComponentsArray = Array.Empty<BlueprintComponent>() };
+            lesserBlueprint.OnEnable();
+            var stationary = unit.Buffs.AddBuff(lesserBlueprint, unit, TimeSpan.FromMinutes(1));
+            var lesserCast = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 2 }, target);
+            apply.Invoke(null, new object[] { lesserCast, target, null });
+            Check(Capacity() == 11, "ABJ an existing CotW stationary globe intercepts its normal spell levels without spending the new globe");
+            stationary.Remove();
+            apply.Invoke(null, new object[] { incoming, target, null });
+            apply.Invoke(null, new object[] { incoming, target, null });
+            Check(Capacity() == 5, "ABJ reused native delivery blocks both applications of a sixth-circle cast and charges once");
+            var finishing = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 8 }, target);
+            apply.Invoke(null, new object[] { finishing, target, null });
+            apply.Invoke(null, new object[] { finishing, target, null });
+            var newCast = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 1 }, target);
+            Check(unit.Buffs.GetBuff(globeBuff) == null && Allows(newCast, unit),
+                "ABJ the final over-capacity spell is blocked across its effect chain, collapses the globe, and a new cast goes through");
+            var area = Empty<AreaEffectEntityData>();
+            Set(area, "m_Context", finishing);
+            Set(area, "m_Blueprint", new BlueprintAbilityAreaEffect { SpellResistance = false });
+            Set(area, "m_CreationTime", currentTime);
+            Check(!(bool)tryArea.Invoke(area, new object[] { unit }),
+                "ABJ an area arriving with the terminal direct spell is also blocked for that delivery");
+            var sameTick = currentTime;
+            try
+            {
+                currentTime += TimeSpan.FromSeconds(1);
+                Check((bool)tryArea.Invoke(area, new object[] { unit }),
+                    "ABJ the same area may apply later after the globe has collapsed");
+            }
+            finally { currentTime = sameTick; }
+            CastRule(globe);
+            var areaContext = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 3 }, target);
+            Set(area, "m_Context", areaContext);
+            Set(area, "m_CreationTime", currentTime - TimeSpan.FromSeconds(1));
+            Check((bool)tryArea.Invoke(area, new object[] { unit }) && Capacity() == 11, "ABJ existing area effect predating the globe is preserved");
+            Set(area, "m_CreationTime", currentTime + TimeSpan.FromSeconds(1));
+            Check(!(bool)tryArea.Invoke(area, new object[] { unit }) && !(bool)tryArea.Invoke(area, new object[] { unit }) && Capacity() == 8,
+                "ABJ new native area entrance is blocked and repeated entrance checks charge only once for the same spell");
+            apply.Invoke(null, new object[] { areaContext, target, null });
+            Check(Capacity() == 8, "ABJ an area-to-direct cast shares one globe charge");
+            var directFirst = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 4 }, target);
+            apply.Invoke(null, new object[] { directFirst, target, null });
+            Set(area, "m_Context", directFirst);
+            Check(!(bool)tryArea.Invoke(area, new object[] { unit }) && Capacity() == 4,
+                "ABJ a direct-to-area cast shares one globe charge");
+            var areaLast = new AbilityExecutionContext(ordinary, new AbilityParams { SpellLevel = 6 }, target);
+            Set(area, "m_Context", areaLast);
+            Check(!(bool)tryArea.Invoke(area, new object[] { unit }) && unit.Buffs.GetBuff(globeBuff) == null,
+                "ABJ a terminal area admission consumes the globe without admitting its first application");
+            apply.Invoke(null, new object[] { areaLast, target, null });
+            CastRule(globe);
+
+            var highBuff = new BlueprintBuff { name = "0099N.DispelHigh", AssetGuid = P(Occultist0099Ids.Id("HostDispelHigh")),
+                ComponentsArray = Array.Empty<BlueprintComponent>() };
+            var lowBuff = new BlueprintBuff { name = "0099N.DispelLow", AssetGuid = P(Occultist0099Ids.Id("HostDispelLow")),
+                ComponentsArray = Array.Empty<BlueprintComponent>() };
+            foreach (var buff in new[] { highBuff, lowBuff }) buff.OnEnable();
+            var source = new AbilityExecutionContext(ordinary, new AbilityParams { CasterLevel = 8, SpellLevel = 3 }, new TargetWrapper(attacker));
+            var protectedBuff = attacker.Buffs.AddBuff(highBuff, source, TimeSpan.FromMinutes(1));
+            protectedBuff.IsFromSpell = true;
+            var secondary = attacker.Buffs.AddBuff(lowBuff, source, TimeSpan.FromMinutes(1));
+            secondary.IsFromSpell = true;
+            secondary.Context.SetParams(new AbilityParams { CasterLevel = 2, SpellLevel = 1 });
+            var cast = Rulebook.Trigger(new RuleCastSpell(unravel, attacker));
+            Check(cast.Success && unravel.Blueprint.Range == AbilityRange.Touch && attacker.Buffs.GetBuff(highBuff) == null &&
+                  attacker.Buffs.GetBuff(lowBuff) == secondary && pool.Remaining == 2,
+                "ABJ Unraveling runs native one-buff targeted Dispel Magic through a private touch cast and pays one point");
+            var selfDispel = unit.Buffs.AddBuff(highBuff, source, TimeSpan.FromMinutes(1));
+            selfDispel.IsFromSpell = true;
+            selfDispel.Context.SetParams(new AbilityParams { CasterLevel = 14, SpellLevel = 3 });
+            var canTarget = AccessTools.Method(typeof(AbilityData), nameof(AbilityData.CanTarget), new[] { typeof(TargetWrapper) });
+            var legalBoundary = AccessTools.Method(typeof(Occultist0099NativeTests), nameof(LegalTargetBoundary));
+            harmony.Unpatch(canTarget, legalBoundary);
+            try
+            {
+                Check(unravel.CanTarget(target) && unravel.CanTarget(new TargetWrapper(attacker)) &&
+                      unravel.Blueprint.CanTargetFriends && unravel.Blueprint.EffectOnAlly == AbilityEffectOnUnit.Harmful,
+                    "ABJ native Unraveling targeting accepts a creature or self with the original ally indicator");
+                Check(CastRule(unravel).Success && unit.Buffs.GetBuff(highBuff) == null && unit.Buffs.GetBuff(globeBuff) != null &&
+                      pool.Remaining == 1, "ABJ native self-dispel removes the stronger fixture spell and keeps the unrelated globe");
+            }
+            finally { harmony.Patch(canTarget, prefix: new HarmonyMethod(legalBoundary)); }
+            CastRule(energy);
+            unit.RemoveFact(implement);
+            Check(unit.Buffs.GetBuff(globeBuff) == null && unit.Buffs.GetBuff(energyBuff) == null,
+                "ABJ removing the source ends both active self protections");
+        }
+        finally
+        {
+            applyNativeEffects = false;
+            harmony.Unpatch(dice, fixedRoll);
+            harmony.Unpatch(hidden, visibleFixtureBuff);
+        }
+        caseStatus["AbjurationAddedPowers"] = "native_shared_energy_pool_targeted_dispel_and_spell_globe";
+    }
+
     private static void RegistrationNative(JArray auditedRows, string donorTable)
     {
         var catalogue = (Occultist0099SpellRoot[])AccessTools.Field(Production("Occultist0099SpellCatalog"), "Roots").GetValue(null);
@@ -2089,7 +2296,8 @@ internal static class Occultist0099NativeTests
         const string proficienciesId = "c5e479367d07d62428f2fe92f39c0341";
         var rows = catalogue.Where(row => (row.School == "Abjuration" || row.School == "Enchantment" || row.IsKnack) && row.Source != "External").ToArray();
         var coreDonors = (string[])AccessTools.Field(Production("Occultist0099Enchantment"), "DonorIds").GetValue(null);
-        var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a" }
+        var expectedDonors = new[] { alchemistClassId, proficienciesId, "027d37761f3804042afa96fe3e9086cc", "f049fe38f5bb5ae48b252852727ab86a",
+            "143775c49ae6b7446b805d3b2e702298" }
             .Concat(coreDonors).Concat(rows.Select(row => row.Guid)).Distinct().ToArray();
         LoadRows(expectedDonors);
         foreach (var row in rows.Where(row => row.Source == "CotW" && cache.Load(P(row.Guid)) == null)) StageAbsentRoot(row);
@@ -2279,7 +2487,11 @@ internal static class Occultist0099NativeTests
         harmony.Patch(rootGetter, prefix: new HarmonyMethod(rootBoundary));
         harmony.Patch(ignorePrerequisites, prefix: new HarmonyMethod(retail));
         harmony.Patch(visual, prefix: new HarmonyMethod(noVisual));
-        try { EnchantmentNative(detached, publishedClass); }
+        try
+        {
+            EnchantmentNative(detached, publishedClass);
+            AbjurationPowersNative(detached, publishedClass);
+        }
         finally
         {
             harmony.Unpatch(ignorePrerequisites, retail);
@@ -2385,7 +2597,7 @@ internal static class Occultist0099NativeTests
         {
             ["workPackage"] = "COTW-0099",
             ["contract"] = Occultist0099Ids.Contract,
-            ["stage"] = "B7 Enchantment school and native implement and focus-power progression",
+            ["stage"] = "B8 Energy Shield, Unraveling and Globe of Negation",
             ["acceptanceScope"] = "native_entry_points_directed",
             ["playerGameAcceptance"] = false,
             ["gameLaunched"] = false,
@@ -2405,9 +2617,9 @@ internal static class Occultist0099NativeTests
             ["caseStatus"] = JObject.FromObject(caseStatus),
             ["result"] = failures.Count == 0 ? "NATIVE_DIRECTED_PASS" : "NATIVE_DIRECTED_FAIL",
             ["resultMeaning"] = failures.Count == 0
-                ? "Detached two-school publication, rollback, seven-slot progression, Enchantment focus effects and native source lifecycle passed in the managed fixture."
+                ? "Detached native Energy Shield reduction, targeted Unraveling and shared Globe of Negation delivery passed alongside existing directed checks."
                 : "At least one native directed assertion failed; see failures.",
-            ["boundary"] = "Uses a real detached BlueprintsCache and independent class list. Native SelectFeature, source lists, focus payments, parameter calculation and effects run for Enchantment. Saving throw fixture supplies pass or fail while recording DC; Unity presentation and combat dispatch are replaced. The mastery cap check seeds ledger mastery. Ordinary startup, the rest of the class, player UI and disk saves are outside scope.",
+            ["boundary"] = "Detached BlueprintsCache, native ability choices and focus payments. Energy Shield runs native damage reduction. Unraveling runs native targeted dispel with a supplied roll. Globe uses the normal delivery and area resistance hooks; creating and positioning a scene area is outside scope. Aegis, ordinary startup, full career and disk saves remain outside scope.",
             ["notRun"] = new JArray(
                 "game/UMM startup", "player gameplay acceptance",
                 "full historical suites", "shared class/spellbook/progression registration",
