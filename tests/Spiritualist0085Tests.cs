@@ -517,6 +517,17 @@ internal static class Spiritualist0085Tests
             Check(master.HPLeft == 3 && pet.HPLeft == 1 && overlapping.RedirectedDamage == 0 &&
                 master.Stats.TemporaryHitPoints.ModifiedValue == 0,
                 $"C14: overlapping native temporary HP use actual absorption (master {master.HPLeft}, phantom {pet.HPLeft}, redirected {overlapping.RedirectedDamage})");
+
+            Health(master, 50);
+            Health(pet, 1);
+            master.Stats.TemporaryHitPoints.AddModifier(8, ModifierDescriptor.UntypedStackable);
+            var nonlethal = Damage(master, 150);
+            nonlethal.MinHPAfterDamage = 1;
+            nonlethal.OnTrigger(null);
+            Check(nonlethal.DamageBeforeDifficulty == 57 && nonlethal.Result == 57 &&
+                master.HPLeft == 1 && pet.HPLeft == 1 && nonlethal.RedirectedDamage == 0 &&
+                master.Stats.TemporaryHitPoints.ModifiedValue == 0,
+                $"C14: native minimum HP limits a 150-point hit to 57 before transfer (master {master.HPLeft}, phantom {pet.HPLeft}, redirected {nonlethal.RedirectedDamage})");
         }
         finally
         {
