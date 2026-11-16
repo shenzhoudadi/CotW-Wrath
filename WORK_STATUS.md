@@ -1,11 +1,14 @@
 # 工作状态：先认领，避免重复
 
-更新：2026-11-15。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
+更新：2026-11-16。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
 
 ## 🚧 施工中／已认领，请勿重复开发
 
 - **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-- **COTW-0085 Spiritualist 基础职业** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D15 复用原生临时 HP 吸收，核对 1.5 倍难度取整。定向 390/390（14.574 秒），本地 TEST 包三个 DLL 回读一致。实机场景和存读档待验，安装包未上传。基线 main `bdc4e39` / 0.14.74 TEST，工作分支 `feat/cotw-0085-spiritualist`。[最新 B/D 记录](docs/work-packages/COTW-0085/D15-B15-spiritualist.md)。
+
+## 源码已合并／待 TEST
+
+- **COTW-0085 Spiritualist 基础职业** — A/B/C/D 离线完成，包内 DLL 定向 391/391。源码合入 main，等待与 COTW-0099 联合出 TEST。实机伙伴生成、存读档、重训、休息和骑乘待验。[整合记录](docs/work-packages/COTW-0085/SOURCE-MERGE.md) · [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。
 
 ## 本次0.14.69 TEST交付
 

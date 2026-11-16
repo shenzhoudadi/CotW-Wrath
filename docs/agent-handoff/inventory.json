@@ -4074,7 +4074,8 @@
       "statusBeforeUserDeferral20261021": "待迁移候选：未找到对应",
       "excludeNewImplementation": true,
       "implementationDeferred": true,
-      "userAnnotationGroup": "暂且搁置的东西"
+      "userAnnotationGroup": "暂且搁置的东西",
+      "currentWorkStatus": "SOURCE_MERGED_PENDING_TEST"
     },
     {
       "id": "COTW-0086",

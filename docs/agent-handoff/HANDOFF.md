@@ -1,6 +1,6 @@
 # 当前交接：从简继续
 
-- **COTW-0085 Spiritualist** — [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。D15 直接使用原生临时 HP 吸收后的伤害，核对 1.5 倍原生难度取整。D16 补原生最低 HP 钳制断言，B15 包内主 DLL 定向 391/391。实机场景和存读档待验，安装包未上传。工作分支 `feat/cotw-0085-spiritualist`。[验证记录](../work-packages/COTW-0085/D15-B15-spiritualist.md)。
+- **COTW-0085 Spiritualist** — A/B/C/D 离线完成，包内 DLL 定向 391/391。源码已合入 main，等 COTW-0099 一起出 TEST。伙伴生成、存读档、重训、休息和骑乘等实机路径待验。[整合记录](../work-packages/COTW-0085/SOURCE-MERGE.md) · [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 
