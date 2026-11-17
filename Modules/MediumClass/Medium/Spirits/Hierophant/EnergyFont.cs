@@ -48,7 +48,7 @@ namespace MediumClass.Medium.Spirits.Hierophant
             .SetDescription(Description)
             .AddAbilityResourceLogic(amount: 1, requiredResource: Guids.HierophantEnergyFontResource, isSpendResource: true, costIsCustom: false)
             .CopyFrom(AbilityRefs.ChannelEnergy, c => c is not (ContextRankConfig or AbilityResourceLogic))
-            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 0).WithDiv2Progression())
+            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 1).WithOnePlusDiv2Progression())
             .AddContextRankConfig(ContextRankConfigs.CustomProperty(type: AbilityRankType.DamageBonus, property: UnitPropertyRefs.MythicChannelProperty.ToString(), max: 20, min: 0))
             .Configure();
 
@@ -57,7 +57,7 @@ namespace MediumClass.Medium.Spirits.Hierophant
             .SetDescription(Description)
             .AddAbilityResourceLogic(amount: 1, requiredResource: Guids.HierophantEnergyFontResource, isSpendResource: true, costIsCustom: false)
             .CopyFrom(AbilityRefs.ChannelPositiveHarm, c => c is not (ContextRankConfig or AbilityResourceLogic))
-            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 0).WithDiv2Progression())
+            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 1).WithOnePlusDiv2Progression())
             .AddContextRankConfig(ContextRankConfigs.CustomProperty(type: AbilityRankType.DamageBonus, property: UnitPropertyRefs.MythicChannelProperty.ToString(), max: 20, min: 0))
             .Configure();
 
@@ -66,7 +66,7 @@ namespace MediumClass.Medium.Spirits.Hierophant
             .SetDescription(Description)
             .AddAbilityResourceLogic(amount: 1, requiredResource: Guids.HierophantEnergyFontResource, isSpendResource: true, costIsCustom: false)
             .CopyFrom(AbilityRefs.ChannelNegativeEnergy, c => c is not (ContextRankConfig or AbilityResourceLogic))
-            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 0).WithDiv2Progression())
+            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 1).WithOnePlusDiv2Progression())
             .AddContextRankConfig(ContextRankConfigs.CustomProperty(type: AbilityRankType.DamageBonus, property: UnitPropertyRefs.MythicChannelProperty.ToString(), max: 20, min: 0))
             .Configure();
 
@@ -75,7 +75,7 @@ namespace MediumClass.Medium.Spirits.Hierophant
             .SetDescription(Description)
             .AddAbilityResourceLogic(amount: 1, requiredResource: Guids.HierophantEnergyFontResource, isSpendResource: true, costIsCustom: false)
             .CopyFrom(AbilityRefs.ChannelNegativeHeal, c => c is not (ContextRankConfig or AbilityResourceLogic))
-            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 0).WithDiv2Progression())
+            .AddContextRankConfig(ContextRankConfigs.ClassLevel(new string[] { Guids.Medium }, type: default, max: 20, min: 1).WithOnePlusDiv2Progression())
             .AddContextRankConfig(ContextRankConfigs.CustomProperty(type: AbilityRankType.DamageBonus, property: UnitPropertyRefs.MythicChannelProperty.ToString(), max: 20, min: 0))
             .Configure();
 

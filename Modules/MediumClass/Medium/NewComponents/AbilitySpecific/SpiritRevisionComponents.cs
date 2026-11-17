@@ -35,7 +35,9 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 {
     /// <summary>
     /// Spirit attunement rules not covered by simple StatType modifiers:
-    /// - Archmage: caster level checks (SR &amp; dispel), spell attack rolls, spell DCs, Intelligence checks.
+    /// - Archmage / Hierophant: caster level checks (SR &amp; dispel), spell attack rolls, spell DCs, concentration checks.
+    /// - Archmage: Intelligence checks.
+    /// - Hierophant: Wisdom checks.
     /// - Champion / Adriel: Strength checks.
     /// - Guardian: Constitution checks.
     /// - Trickster: Dexterity checks (Robin Hood is handled by RobinHoodDexterityChecks).
@@ -72,6 +74,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             int bonus = evt.StatType switch
             {
                 StatType.Intelligence => MaxBonusFor(Guids.Archmage),
+                StatType.Wisdom => MaxBonusFor(Guids.Hierophant),
                 StatType.Strength => MaxBonusFor(Guids.Champion, Guids.Adriel),
                 StatType.Constitution => MaxBonusFor(Guids.Guardian),
                 StatType.Dexterity => MaxBonusFor(Guids.Trickster),
@@ -86,9 +89,12 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
         public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
         {
             if (evt?.AbilityData?.Blueprint == null || !evt.AbilityData.Blueprint.IsSpell) return;
-            int archmage = SpiritBonusFor(Owner, Guids.Archmage);
-            if (archmage > 0)
-                evt.AddBonusDC(archmage, ModifierDescriptor.UntypedStackable);
+            int bonus = MaxBonusFor(Guids.Archmage, Guids.Hierophant);
+            if (bonus > 0)
+            {
+                evt.AddBonusDC(bonus, ModifierDescriptor.UntypedStackable);
+                evt.AddBonusConcentration(bonus);
+            }
         }
 
         public void OnEventDidTrigger(RuleCalculateAbilityParams evt) { }
@@ -98,18 +104,18 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             if (evt?.Weapon == null) return;
             var cat = evt.Weapon.Blueprint.Category;
             if (cat != WeaponCategory.Touch && cat != WeaponCategory.Ray) return;
-            int archmage = SpiritBonusFor(Owner, Guids.Archmage);
-            if (archmage > 0)
-                evt.AddModifier(archmage, Fact, ModifierDescriptor.UntypedStackable);
+            int bonus = MaxBonusFor(Guids.Archmage, Guids.Hierophant);
+            if (bonus > 0)
+                evt.AddModifier(bonus, Fact, ModifierDescriptor.UntypedStackable);
         }
 
         public void OnEventDidTrigger(RuleCalculateAttackBonus evt) { }
 
         public void OnEventAboutToTrigger(RuleSpellResistanceCheck evt)
         {
-            int archmage = SpiritBonusFor(Owner, Guids.Archmage);
-            if (archmage > 0)
-                evt.AddSpellPenetration(archmage, ModifierDescriptor.UntypedStackable);
+            int bonus = MaxBonusFor(Guids.Archmage, Guids.Hierophant);
+            if (bonus > 0)
+                evt.AddSpellPenetration(bonus, ModifierDescriptor.UntypedStackable);
         }
 
         public void OnEventDidTrigger(RuleSpellResistanceCheck evt) { }
@@ -118,9 +124,9 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
         {
             if (evt.Check != RuleDispelMagic.CheckType.CasterLevel && evt.Check != RuleDispelMagic.CheckType.SkillCasterLevel)
                 return;
-            int archmage = SpiritBonusFor(Owner, Guids.Archmage);
-            if (archmage > 0)
-                evt.Bonus += archmage;
+            int bonus = MaxBonusFor(Guids.Archmage, Guids.Hierophant);
+            if (bonus > 0)
+                evt.Bonus += bonus;
         }
 
         public void OnEventDidTrigger(RuleDispelMagic evt) { }

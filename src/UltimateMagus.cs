@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using Kingmaker;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Prerequisites;
@@ -28,6 +29,7 @@ using Kingmaker.UnitLogic.Buffs;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Class.LevelUp;
+using Kingmaker.UnitLogic.Class.LevelUp.Actions;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
 using Kingmaker.UnitLogic.Mechanics;
@@ -168,28 +170,43 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(Class, "m_Spellbook", new BlueprintSpellbookReference());
 
             // 1st-level dual arcane spellbook pickers.
-            PreparedSelection = f.Add(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true }, T("PreparedBookSelection"),
+            PreparedSelection = f.Add(new BlueprintFeatureSelection
+            {
+                Ranks = 1,
+                IsClassFeature = true,
+                Group = FeatureGroup.ReplaceSpellbook,
+                Groups = new[] { FeatureGroup.ReplaceSpellbook }
+            }, T("PreparedBookSelection"),
                 "选择准备奥术职业", "选择你已有的一个准备奥术施法职业（不含奥能师）。奥法追随者的施法进度将按职业列表推进该法术书。");
             Set(PreparedSelection, "m_AllFeatures", Array.Empty<BlueprintFeatureReference>());
             Set(PreparedSelection, "m_Features", Array.Empty<BlueprintFeatureReference>());
 
-            SpontaneousSelection = f.Add(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true }, T("SpontaneousBookSelection"),
+            SpontaneousSelection = f.Add(new BlueprintFeatureSelection
+            {
+                Ranks = 1,
+                IsClassFeature = true,
+                Group = FeatureGroup.ReplaceSpellbook,
+                Groups = new[] { FeatureGroup.ReplaceSpellbook }
+            }, T("SpontaneousBookSelection"),
                 "选择自发奥术职业", "选择你已有的一个自发奥术施法职业（不含奥能师）。奥法追随者的施法进度将按职业列表推进该法术书。");
             Set(SpontaneousSelection, "m_AllFeatures", Array.Empty<BlueprintFeatureReference>());
             Set(SpontaneousSelection, "m_Features", Array.Empty<BlueprintFeatureReference>());
 
             // Lower-level advancement at levels 1, 4, 7.
+            // ViaSelection = true: triggered by SelectFeature.Apply Postfix so
+            // picking the same option at 4th or 7th level still fires (OnActivate
+            // only runs on the first rank of a multi-rank feature).
             AdvancePreparedOption = f.Feature(T("AdvancePreparedOption"),
                 "提升准备奥术施法等级",
                 "使你选定的准备奥术施法职业的每日法术数量、可知法术与施法者等级视同提升 1 级（不获得该职业的其它能力）。",
-                new UltimateMagusAdvanceBookComponent { IsSpontaneous = false },
+                new UltimateMagusAdvanceBookComponent { IsSpontaneous = false, ViaSelection = true },
                 new UltimateMagusLowerBookPrerequisite { IsSpontaneous = false });
             AdvancePreparedOption.Ranks = 3;
 
             AdvanceSpontaneousOption = f.Feature(T("AdvanceSpontaneousOption"),
                 "提升自发奥术施法等级",
                 "使你选定的自发奥术施法职业的每日法术数量、可知法术与施法者等级视同提升 1 级（不获得该职业的其它能力）。",
-                new UltimateMagusAdvanceBookComponent { IsSpontaneous = true },
+                new UltimateMagusAdvanceBookComponent { IsSpontaneous = true, ViaSelection = true },
                 new UltimateMagusLowerBookPrerequisite { IsSpontaneous = true });
             AdvanceSpontaneousOption.Ranks = 3;
 
@@ -200,13 +217,28 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(LowerBookSelection, "m_AllFeatures", lowerRefs);
             Set(LowerBookSelection, "m_Features", lowerRefs);
 
-            // Standard dual advancement at levels 2, 3, 5, 6, 8, 9, 10.
-            var bothAdvance = f.Feature(T("BothBooksAdvance"),
+            // Legacy shared feature kept in cache for existing save compatibility.
+            var legacyBothAdvance = f.Feature(T("BothBooksAdvance"),
                 "双奥术施法等级提升",
                 "你选定的准备奥术施法职业与自发奥术施法职业的每日法术数量、可知法术与施法者等级均视同提升 1 级（不获得其它职业能力）。",
                 new UltimateMagusAdvanceBookComponent { IsSpontaneous = false },
                 new UltimateMagusAdvanceBookComponent { IsSpontaneous = true });
-            bothAdvance.Ranks = 7;
+            legacyBothAdvance.Ranks = 7;
+
+            // Separate 1-rank features for levels 2, 3, 5, 6, 8, 9, 10 so every
+            // level-up triggers OnActivate() (a multi-rank feature only fires
+            // OnActivate on its 1st rank).
+            var bothAdvanceByLevel = new Dictionary<int, BlueprintFeature>();
+            foreach (int lvl in new[] { 2, 3, 5, 6, 8, 9, 10 })
+            {
+                var feat = f.Feature(T("BothBooksAdvance_L" + lvl),
+                    "双奥术施法等级提升",
+                    "你选定的准备奥术施法职业与自发奥术施法职业的每日法术数量、可知法术与施法者等级均视同提升 1 级（不获得其它职业能力）。",
+                    new UltimateMagusAdvanceBookComponent { IsSpontaneous = false },
+                    new UltimateMagusAdvanceBookComponent { IsSpontaneous = true });
+                feat.Ranks = 1;
+                bothAdvanceByLevel[lvl] = feat;
+            }
 
             // Arcane Spell Power at 1, 4, 7, 10 (+1 to +4 CL).
             var spellPower = f.Feature(T("ArcaneSpellPower"),
@@ -270,15 +302,15 @@ namespace CallOfTheWild.Wrath.Prototype
                 var entry = new LevelEntry { Level = lvl };
                 var list = new List<BlueprintFeatureBase>();
                 if (lvl == 1) list.AddRange(new BlueprintFeatureBase[] { PreparedSelection, SpontaneousSelection, LowerBookSelection, spellPower });
-                if (lvl == 2) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, expandedKnowledge });
-                if (lvl == 3) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, AugmentedCastingFeature });
+                if (lvl == 2) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[2], expandedKnowledge });
+                if (lvl == 3) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[3], AugmentedCastingFeature });
                 if (lvl == 4) list.AddRange(new BlueprintFeatureBase[] { LowerBookSelection, spellPower, expandedKnowledge });
-                if (lvl == 5) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, BonusMetamagicSelection });
-                if (lvl == 6) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, expandedKnowledge });
+                if (lvl == 5) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[5], BonusMetamagicSelection });
+                if (lvl == 6) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[6], expandedKnowledge });
                 if (lvl == 7) list.AddRange(new BlueprintFeatureBase[] { LowerBookSelection, spellPower });
-                if (lvl == 8) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, expandedKnowledge });
-                if (lvl == 9) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, BonusMetamagicSelection });
-                if (lvl == 10) list.AddRange(new BlueprintFeatureBase[] { bothAdvance, spellPower, expandedKnowledge });
+                if (lvl == 8) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[8], expandedKnowledge });
+                if (lvl == 9) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[9], BonusMetamagicSelection });
+                if (lvl == 10) list.AddRange(new BlueprintFeatureBase[] { bothAdvanceByLevel[10], spellPower, expandedKnowledge });
                 entry.SetFeatures(list.ToArray());
                 return entry;
             }).ToArray();
@@ -478,6 +510,7 @@ namespace CallOfTheWild.Wrath.Prototype
             try
             {
                 var f = new PsychicAssets(cache);
+                PreloadClassSpellbooks(cache);
                 var snapshot = SublimeChord.Snapshot(cache);
 
                 // 1. Discover prepared & spontaneous arcane spellbooks.
@@ -522,6 +555,22 @@ namespace CallOfTheWild.Wrath.Prototype
             finally
             {
                 Reconciling = false;
+            }
+        }
+
+        private static void PreloadClassSpellbooks(BlueprintsCache cache)
+        {
+            var root = cache.Load(BlueprintGuid.Parse(RootId)) as BlueprintRoot;
+            var classes = root?.Progression?.CharacterClasses;
+            if (classes == null) return;
+            foreach (var cls in classes)
+            {
+                if (cls == null) continue;
+                _ = cls.Spellbook;
+                var archRefs = Get(cls, "m_Archetypes") as BlueprintArchetypeReference[];
+                if (archRefs == null) continue;
+                foreach (var archRef in archRefs)
+                    _ = archRef?.Get()?.ReplaceSpellbook;
             }
         }
 
@@ -589,8 +638,21 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             private static void Postfix(SimpleBlueprint __1)
             {
-                if (__1 is BlueprintSpellbook b && (EligibleBook(b, false) || EligibleBook(b, true)))
-                    Pending = true;
+                if (__1 is BlueprintSpellbook b)
+                {
+                    if (EligibleBook(b, false))
+                    {
+                        Pending = true;
+                        if (Cache != null && PreparedSelection != null)
+                            AppendMissing(PreparedSelection, new[] { BuildBookOption(Cache, new PsychicAssets(Cache), b, false) });
+                    }
+                    else if (EligibleBook(b, true))
+                    {
+                        Pending = true;
+                        if (Cache != null && SpontaneousSelection != null)
+                            AppendMissing(SpontaneousSelection, new[] { BuildBookOption(Cache, new PsychicAssets(Cache), b, true) });
+                    }
+                }
                 else if (__1 is BlueprintFeature f && f.GetComponent<AddMetamagicFeat>() != null)
                     Pending = true;
             }
@@ -840,30 +902,126 @@ namespace CallOfTheWild.Wrath.Prototype
         [JsonProperty]
         public int TargetSpontaneousAdvances;
 
+        [JsonProperty]
+        public int PendingPreparedAdvances;
+
+        [JsonProperty]
+        public int PendingSpontaneousAdvances;
+
         public BlueprintSpellbook PreparedBook => PreparedBookRef?.Get();
         public BlueprintSpellbook SpontaneousBook => SpontaneousBookRef?.Get();
+
+        // 只记录本级的推进目标，由 Reconcile 统一执行。特征 OnActivate /
+        // SelectFeature.Apply 触发时先累计目标再立即推进，Reconcile 内部用
+        // Applied < Target 保证同一本书只推进一次（幂等），这与原版
+        // AddSpellbookLevel「每级激活一次」的假设一致。
+        public void AdvanceBook(bool isSpontaneous)
+        {
+            if (Owner == null) return;
+            if (isSpontaneous) TargetSpontaneousAdvances++;
+            else TargetPreparedAdvances++;
+            Reconcile();
+        }
 
         public void Reconcile()
         {
             if (Owner == null) return;
+            var state = Game.Instance?.LevelUpController?.State;
+
             var prep = PreparedBook;
             if (prep != null)
             {
-                var sb = Owner.DemandSpellbook(prep);
                 while (AppliedPreparedAdvances < TargetPreparedAdvances)
                 {
-                    sb.AddBaseLevel();
+                    AdvanceSpellbook(prep, state);
                     AppliedPreparedAdvances++;
+                }
+            }
+
+            var spont = SpontaneousBook;
+            if (spont != null)
+            {
+                while (AppliedSpontaneousAdvances < TargetSpontaneousAdvances)
+                {
+                    AdvanceSpellbook(spont, state);
+                    AppliedSpontaneousAdvances++;
+                }
+            }
+
+            // 选书之前就已请求的推进：书确定后在此补做。
+            FlushPending(state);
+        }
+
+        private void FlushPending(LevelUpState state)
+        {
+            var prep = PreparedBook;
+            if (prep != null)
+            {
+                while (PendingPreparedAdvances > 0)
+                {
+                    PendingPreparedAdvances--;
+                    AdvanceSpellbook(prep, state);
+                    AppliedPreparedAdvances++;
+                    TargetPreparedAdvances = Math.Max(TargetPreparedAdvances, AppliedPreparedAdvances);
                 }
             }
             var spont = SpontaneousBook;
             if (spont != null)
             {
-                var sb = Owner.DemandSpellbook(spont);
-                while (AppliedSpontaneousAdvances < TargetSpontaneousAdvances)
+                while (PendingSpontaneousAdvances > 0)
                 {
-                    sb.AddBaseLevel();
+                    PendingSpontaneousAdvances--;
+                    AdvanceSpellbook(spont, state);
                     AppliedSpontaneousAdvances++;
+                    TargetSpontaneousAdvances = Math.Max(TargetSpontaneousAdvances, AppliedSpontaneousAdvances);
+                }
+            }
+        }
+
+        private void AdvanceSpellbook(BlueprintSpellbook bookBp, LevelUpState state)
+        {
+            if (bookBp == null) return;
+            var spellbook = Owner.DemandSpellbook(bookBp);
+            int prevLevel = spellbook.BaseLevel;
+            spellbook.AddBaseLevel();
+            int nextLevel = spellbook.BaseLevel;
+            if (nextLevel <= prevLevel) return;
+
+            // 严格照抄原版 ApplySpellbook.Apply 的法术选择注册语义：
+            // 进阶职业没有自己的主法术书，引擎的 ApplySpellbook 会直接 return，
+            // 不会为被提升的奥术书创建 SpellSelectionData，所以必须在此补注册，
+            // 让升级界面（CharGenSpellsPhaseVM）显示"选择新知法术"。
+            //
+            // 关键：SetLevelSpells 是覆盖式的（每次 new 一个槽位数组），必须用
+            // 本级的纯差值 next-prev，绝不能累加旧槽位；ExtraSelected 同理用
+            // SetExtraSpells 覆盖式写入。此前的 oldLen+delta 累加 + 手动扩容
+            // 让槽位在预览/重复激活时翻倍，SelectionStateIsCompleted 永远无法
+            // 填满，导致卡在法术阶段无法升级，自发书 delta=0 时又覆盖了选择。
+            if (state == null) return;
+
+            var selectionData = state.DemandSpellSelection(bookBp, bookBp.SpellList);
+            if (bookBp.SpellsKnown != null)
+            {
+                for (int i = 0; i <= 10; i++)
+                {
+                    int prevCount = Math.Max(0, bookBp.SpellsKnown.GetCount(prevLevel, i));
+                    int nextCount = Math.Max(0, bookBp.SpellsKnown.GetCount(nextLevel, i));
+                    selectionData.SetLevelSpells(i, Math.Max(0, nextCount - prevCount));
+                }
+            }
+
+            if (bookBp.SpellsPerLevel > 0)
+            {
+                int maxSpellLevel = spellbook.MaxSpellLevel;
+                if (prevLevel == 0)
+                {
+                    selectionData.SetExtraSpells(0, maxSpellLevel);
+                    selectionData.ExtraByStat = true;
+                    selectionData.UpdateMaxLevelSpells(Owner);
+                }
+                else
+                {
+                    selectionData.SetExtraSpells(bookBp.SpellsPerLevel, maxSpellLevel);
                 }
             }
         }
@@ -898,14 +1056,29 @@ namespace CallOfTheWild.Wrath.Prototype
     public sealed class UltimateMagusAdvanceBookComponent : UnitFactComponentDelegate
     {
         public bool IsSpontaneous;
+        public bool ViaSelection;
 
         protected override void OnActivate()
         {
-            if (Owner == null) return;
-            var part = Owner.Ensure<UnitPartUltimateMagus>();
-            if (IsSpontaneous) part.TargetSpontaneousAdvances++;
-            else part.TargetPreparedAdvances++;
-            part.Reconcile();
+            if (Owner == null || ViaSelection) return;
+            Owner.Ensure<UnitPartUltimateMagus>().AdvanceBook(IsSpontaneous);
+        }
+    }
+
+    [HarmonyPatch(typeof(SelectFeature), nameof(SelectFeature.Apply))]
+    internal static class UltimateMagusSelectAdvancePatch
+    {
+        private static void Postfix(SelectFeature __instance, UnitDescriptor unit)
+        {
+            if (unit == null) return;
+            var feature = __instance?.Item?.Feature;
+            if (feature == null) return;
+            var comps = feature.GetComponents<UltimateMagusAdvanceBookComponent>();
+            foreach (var c in comps)
+            {
+                if (c.ViaSelection)
+                    unit.Ensure<UnitPartUltimateMagus>().AdvanceBook(c.IsSpontaneous);
+            }
         }
     }
 

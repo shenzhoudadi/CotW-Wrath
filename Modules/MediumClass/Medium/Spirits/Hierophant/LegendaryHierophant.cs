@@ -1,16 +1,17 @@
-﻿using BlueprintCore.Blueprints.CustomConfigurators;
+using System.Linq;
+using BlueprintCore.Blueprints.CustomConfigurators;
 using BlueprintCore.Blueprints.CustomConfigurators.Classes;
 using BlueprintCore.Blueprints.CustomConfigurators.UnitLogic.Abilities;
 using BlueprintCore.Blueprints.References;
 using BlueprintCore.Utils;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.EntitySystem.Stats;
-using MediumClass.Medium.NewComponents;
-using MediumClass.Medium.NewComponents.AbilitySpecific;
+using Kingmaker.UnitLogic.Abilities.Blueprints;
+using Kingmaker.UnitLogic.Abilities.Components;
+using Kingmaker.UnitLogic.Commands.Base;
 using MediumClass.Utilities;
 using MediumClass.Utils;
-using TabletopTweaks.Core.NewComponents.AbilitySpecific;
-using TabletopTweaks.Core.Utilities;
 using static UnityModManagerNet.UnityModManager.ModEntry;
 
 namespace MediumClass.Medium.Spirits.Hierophant
@@ -20,6 +21,7 @@ namespace MediumClass.Medium.Spirits.Hierophant
         private static readonly string FeatName = "HierophantSupreme";
         private static readonly string DisplayName = "HierophantSupreme.Name";
         private static readonly string Description = "HierophantSupreme.Description";
+        private static readonly string EbonsMiracleGuid = "355a9447-47b2-4ffc-8e2d-7759380e63b4";
         private static readonly ModLogger Logger = Logging.GetLogger(nameof(LegendaryHierophant));
 
         public static void ConfigureEnabled()
@@ -44,8 +46,7 @@ namespace MediumClass.Medium.Spirits.Hierophant
                 .SetUseMax(false)
                 .Configure();
 
-            // Preserve the old fourth blueprint so old saved references still resolve.
-            // It becomes an eighth-circle alias and is no longer granted by the feature.
+            // Preserve legacy blueprints so old saved references still resolve.
             AbilityConfigurator.New(FeatName + "Ability4", Guids.HierophantSupremeAbility4)
                 .SetDisplayName("HierophantSupreme8.Name")
                 .SetDescription("HierophantSupreme8.Description")
@@ -70,21 +71,60 @@ namespace MediumClass.Medium.Spirits.Hierophant
                 .SetIcon("assets/icons/legendaryhierophant1.png")
                 .Configure();
 
+            var miracleAbility = AbilityConfigurator.New(FeatName + "MiracleAbility", Guids.HierophantSupremeMiracleAbility)
+                .SetDisplayName(DisplayName)
+                .SetDescription(Description)
+                .SetIcon(FeatureRefs.DomainMastery.Reference.Get()?.Icon)
+                .SetType(AbilityType.SpellLike)
+                .SetRange(AbilityRange.Personal)
+                .SetCanTargetSelf(true)
+                .SetNotOffensive(true)
+                .SetActionType(UnitCommand.CommandType.Standard)
+                .AddSpellComponent(school: SpellSchool.Evocation)
+                .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: resource)
+                .Configure();
+
             FeatureConfigurator.New(FeatName, Guids.HierophantSupreme)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/legendaryhierophant.png")
                 .AddAbilityResources(amount: 0, resource: resource, restoreAmount: true, restoreOnLevelUp: false, useThisAsResource: false)
-                .AddComponent<LegendaryHierophantComponent>(c =>
-                {
-                    c.m_CharacterClass = BlueprintTool.GetRef<BlueprintCharacterClassReference>(Guids.Hierophant);
-                    c.m_Spellbook = BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.HierophantSpellbook);
-                    c.m_SpellLists = SpellTools.SpellList.ClericSpellList.ToReference<BlueprintSpellListReference>();
-                    c.m_Resource = resource.ToReference<BlueprintAbilityResourceReference>();
-                })
-                .AddFacts(new() { Guids.HierophantSupremeAbility1, Guids.HierophantSupremeAbility2, Guids.HierophantSupremeAbility3 })
+                .AddFacts(new() { miracleAbility })
                 .SetRanks(1)
                 .Configure();
+        }
+
+        internal static void ConfigureOptionalIntegration()
+        {
+            var ebonsMiracle = ResourcesLibrary.TryGetBlueprint<BlueprintAbility>(BlueprintGuid.Parse(EbonsMiracleGuid));
+            if (ebonsMiracle == null)
+            {
+                Logger.Log("EbonsContentMod Miracle blueprint not found; Hierophant Supreme Miracle variants skipped.");
+                return;
+            }
+
+            var variants = ebonsMiracle.GetComponent<AbilityVariants>();
+            if (variants?.m_Variants == null || variants.m_Variants.Length == 0)
+            {
+                Logger.Log("EbonsContentMod Miracle blueprint has no variants; skipping.");
+                return;
+            }
+
+            var configurator = AbilityConfigurator.For(Guids.HierophantSupremeMiracleAbility)
+                .SetIcon(ebonsMiracle.Icon)
+                .SetActionType(ebonsMiracle.ActionType)
+                .SetRange(ebonsMiracle.Range)
+                .SetCanTargetSelf(ebonsMiracle.CanTargetSelf)
+                .SetNotOffensive(ebonsMiracle.NotOffensive)
+                .SetShowNameForVariant(ebonsMiracle.ShowNameForVariant)
+                .SetAvailableMetamagic(ebonsMiracle.AvailableMetamagic)
+                .AddAbilityVariants(variants.m_Variants
+                    .Where(r => r?.Get() != null)
+                    .Select(r => (Blueprint<BlueprintAbilityReference>)r.Get())
+                    .ToList());
+            configurator.Configure();
+
+            Logger.Log($"Bound EbonsContentMod Miracle ({variants.m_Variants.Length} variants) to Hierophant Supreme.");
         }
     }
 }

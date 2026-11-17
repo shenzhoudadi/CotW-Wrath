@@ -117,6 +117,7 @@ namespace MediumClass.Utilities
         internal const string HierophantSupremeAbility2 = "b80ab52f-17fa-4c4c-874c-e7aa28b5903c";
         internal const string HierophantSupremeAbility3 = "7e1a9a2b-a4fd-4487-87cc-a49de74f942b";
         internal const string HierophantSupremeAbility4 = "54aecd71-0160-4cfb-836f-555b0ab6ba7b";
+        internal const string HierophantSupremeMiracleAbility = "aa989bbb-a455-4448-b8ed-56890a69bddc";
         #endregion
 
         #region Marshal

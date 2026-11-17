@@ -117,7 +117,7 @@
     "Key": "Adriel.Description",
     "ProcessTemplates": false,
     "enGB": "Adriel was born to a royal line but never claimed a throne; a peerless duelist and warlord, he won every war he fought yet died uncrowned. Channeling Adriel uses the Champion tier's spirit bonus, seance boon, influence penalty, intermediate power (Sudden Attack) and greater power (Fleet Charge), but replaces the lesser power with Challenge and the supreme power with Death Curse.\nSpirit Bonus: When you channel Adriel, your spirit bonus applies on attack rolls, CMB, non-spell damage rolls, Strength checks, Strength-based skill checks, and Fortitude saves.\nSeance Boon: You gain a +2 bonus on all non-spell damage rolls.\nInfluence Penalty: You take a penalty equal to your spirit bonus on Intelligence checks, Intelligence-based skill checks, spell DCs, spell attack rolls, and spell damage rolls.\nAdriel and the Champion share one tier: you cannot channel both at the same time.",
-    "zhCN": "阿德里尔生于王室旁支，却终其一生未曾加冕；他是无可匹敌的决斗者与统帅，赢下了参与的所有战争，最后仍未戴上王冠。降灵阿德里尔时，沿用勇士职介的英灵同调、降灵奖励、共鸣惩罚、中等英灵之力（瞬袭）与高等英灵之力（疾袭），但次级英灵之力由“挑战”取代，至高英灵之力由“恶咒”取代。\n英灵同调：降灵阿德里尔时，你的英灵同调加值作用于攻击检定、战技检定（CMB）、非法术伤害骰、力量检定、基于力量的技能检定与强韧豁免。\n降灵奖励：你的所有非法术伤害骰获得+2加值。\n共鸣惩罚：你的智力检定、基于智力的技能检定，以及法术难度等级（DC）、法术攻击检定和法术伤害掷骰承受等同于英灵同调的减值。\n阿德里尔与勇士同属一个职介：同一时间只能降灵其中之一。"
+    "zhCN": "阿德里尔生于王室旁支，却终其一生未曾加冕；他是无可匹敌的决斗者与统帅，赢下了参与的所有战争，最后仍未戴上王冠。降灵阿德里尔时，沿用勇士职介的英灵同调、降灵奖励、共鸣惩罚、中等英灵之力（瞬袭）与高等英灵之力（狂飙猛进），但次级英灵之力由“挑战”取代，至高英灵之力由“恶咒”取代。\n英灵同调：降灵阿德里尔时，你的英灵同调加值作用于攻击检定、战技检定（CMB）、非法术伤害骰、力量检定、基于力量的技能检定与强韧豁免。\n降灵奖励：你的所有非法术伤害骰获得+2加值。\n共鸣惩罚：你的智力检定、基于智力的技能检定，以及法术难度等级（DC）、法术攻击检定和法术伤害掷骰承受等同于英灵同调的减值。\n阿德里尔与勇士同属一个职介：同一时间只能降灵其中之一。"
   },
   {
     "Key": "MediumAdrielChallenge.Name",

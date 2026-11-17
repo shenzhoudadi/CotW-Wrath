@@ -77,6 +77,7 @@ namespace CallOfTheWild.Wrath.Prototype
             "b40316f05d4772e4894688e6743602bd", // HexChannelerChannelFeature
             "7c8d5e2ab326fdb4cabafc1c84a5c8e2", // HexChannelerChannelNegativeFeature
             "b423fbf947bc51344bac21752c47471c", // HexChannelerChannelPositiveFeature
+            "ec07fe4e-9496-4f5e-941e-957754b2781d", // HierophantEnergyFont
         };
 
         private static readonly HashSet<BlueprintGuid> ChannelResourceGuids =
@@ -366,6 +367,8 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (ability == null) return false;
             string n = ability.name ?? "";
+            if (n.StartsWith("HierophantEnergyFont", StringComparison.OrdinalIgnoreCase))
+                return true;
             if (n.IndexOf("Channel", StringComparison.OrdinalIgnoreCase) >= 0 &&
                 (n.IndexOf("Energy", StringComparison.OrdinalIgnoreCase) >= 0 ||
                  n.IndexOf("Positive", StringComparison.OrdinalIgnoreCase) >= 0 ||
@@ -443,11 +446,14 @@ namespace CallOfTheWild.Wrath.Prototype
 
         internal static bool IsDivineSpell(AbilityData data)
         {
-            var book = data?.Spellbook?.Blueprint;
-            if (book == null || data.SourceItem != null) return false;
-            if (book.IsArcane || book.IsMythic || book.IsAlchemist) return false;
-            if (PsychicCasting.IsPsychic(book)) return false;
-            if (book.AssetGuid == BlueprintGuid.Parse(MediumIntegration.BookId)) return false;
+            // The feat's prerequisite (PrerequisiteDivineSpellcaster) already
+            // gates ownership to characters who can cast divine spells. The
+            // effect itself applies to ANY spell the character casts, not just
+            // divine ones — this was the user's original intent.
+            if (data == null || data.SourceItem != null) return false;
+            var book = data.Spellbook?.Blueprint;
+            if (book == null) return false;
+            if (book.IsMythic) return false;
             return true;
         }
 
@@ -573,7 +579,8 @@ namespace CallOfTheWild.Wrath.Prototype
     [TypeId("d1c00000000000000000000000000016")]
     public sealed class DivineMetamagicBuffComponent : UnitFactComponentDelegate,
         IInitiatorRulebookHandler<RuleCalculateAbilityParams>,
-        IInitiatorRulebookHandler<RuleCastSpell>
+        IInitiatorRulebookHandler<RuleCastSpell>,
+        IInitiatorRulebookSubscriber
     {
         public Metamagic Metamagic;
         public int Cost = 1;

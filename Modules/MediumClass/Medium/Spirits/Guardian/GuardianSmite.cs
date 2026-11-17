@@ -41,9 +41,10 @@ namespace MediumClass.Medium.Spirits.Guardian
                 .AddComponent<GuardianDeterminationReachComponent>()
                 .Configure();
 
+            // Keep legacy temp-HP blueprints resolvable for existing saves, but do not grant them.
             var tempHpBuff = BuffConfigurator.New(FeatName + "TempHpBuff", Guids.GuardianGreaterTempHpBuff)
-                .SetDisplayName("GuardianGreaterTempHp.Name")
-                .SetDescription("GuardianGreaterTempHp.Description")
+                .SetDisplayName(DisplayName)
+                .SetDescription(Description)
                 .SetIcon("assets/icons/spiritguardian.png")
                 .SetFlags(BlueprintBuff.Flags.RemoveOnRest)
                 .SetStacking(StackingType.Replace)
@@ -80,8 +81,8 @@ namespace MediumClass.Medium.Spirits.Guardian
                 .Configure();
 
             var tempHpAbility = AbilityConfigurator.New(FeatName + "TempHpAbility", Guids.GuardianGreaterTempHpAbility)
-                .SetDisplayName("GuardianGreaterTempHp.Name")
-                .SetDescription("GuardianGreaterTempHp.Description")
+                .SetDisplayName(DisplayName)
+                .SetDescription(Description)
                 .SetIcon("assets/icons/spiritguardian.png")
                 .SetType(AbilityType.Supernatural)
                 .SetRange(AbilityRange.Personal)
@@ -97,7 +98,7 @@ namespace MediumClass.Medium.Spirits.Guardian
             FeatureConfigurator.New(FeatName, Guids.GuardianGreater)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
-                .AddFacts(new() { fullRoundAbility, freeReachAbility, tempHpAbility })
+                .AddFacts(new() { fullRoundAbility, freeReachAbility })
                 .Configure();
 
             var secondaryFreeReach = AbilityConfigurator.New(FeatName + "SecondaryFreeAbility", Guids.SecondaryGuardianGreaterFreeAbility)
@@ -105,7 +106,7 @@ namespace MediumClass.Medium.Spirits.Guardian
                 .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResourceGuardian)
                 .Configure();
 
-            var secondaryTempHp = AbilityConfigurator.New(FeatName + "SecondaryTempHpAbility", Guids.SecondaryGuardianGreaterTempHpAbility)
+            AbilityConfigurator.New(FeatName + "SecondaryTempHpAbility", Guids.SecondaryGuardianGreaterTempHpAbility)
                 .CopyFrom(tempHpAbility, c => c is not AbilityResourceLogic)
                 .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResourceGuardian)
                 .Configure();
@@ -118,7 +119,7 @@ namespace MediumClass.Medium.Spirits.Guardian
             FeatureConfigurator.New(FeatName + "Secondary", Guids.SecondaryGuardianGreater)
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
-                .AddFacts(new() { fullRoundAbility, secondaryFreeReach, secondaryTempHp })
+                .AddFacts(new() { fullRoundAbility, secondaryFreeReach })
                 .AddRemoveFeatureOnApply(Guids.GuardianGreater)
                 .Configure();
         }

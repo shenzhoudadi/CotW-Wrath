@@ -104,6 +104,10 @@ namespace Kingmaker.UI.UnitSettings {
     public class MechanicActionBarSlotSpell:MechanicActionBarSlot {
         public AbilityData Spell; public int GetResource()=>AbilityCastRateUtils.GetAvailableCastsCountFromResources(Spell);
     }
+    public class MechanicActionBarSlotSpontaneusConvertedSpell:MechanicActionBarSlot {
+        public AbilityData Spell;
+        [MethodImpl(MethodImplOptions.NoInlining)] public int GetResource()=>AbilityCastRateUtils.GetAvailableCastsCountFromResources(Spell);
+    }
     public class MechanicActionBarSlotAbility:MechanicActionBarSlot {
         public AbilityData Ability;
         [MethodImpl(MethodImplOptions.NoInlining)] public int GetResource()=>AbilityCastRateUtils.GetAvailableCastsCountFromResources(Ability);

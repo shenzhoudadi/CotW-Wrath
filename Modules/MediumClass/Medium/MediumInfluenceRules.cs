@@ -289,12 +289,24 @@ namespace MediumClass.Medium
         }
     }
 
+    [HarmonyPatch(typeof(MechanicActionBarSlotSpontaneusConvertedSpell), nameof(MechanicActionBarSlotSpontaneusConvertedSpell.GetResource))]
+    internal static class InfluenceConvertedActionBarCounterPatch
+    {
+        private static bool Prefix(MechanicActionBarSlotSpontaneusConvertedSpell __instance, ref int __result)
+        {
+            if (!MediumInfluenceRules.UsesInfluence(__instance.Spell)) return true;
+            __result = MediumInfluenceRules.Amount(__instance.Spell.Caster);
+            return false;
+        }
+    }
+
     [HarmonyPatch(typeof(MechanicActionBarSlot), nameof(MechanicActionBarSlot.GetCountText))]
     internal static class InfluenceActionBarLabelPatch
     {
         private static bool Prefix(MechanicActionBarSlot __instance, ref string __result)
         {
             var ability = (__instance as MechanicActionBarSlotAbility)?.Ability
+                ?? (__instance as MechanicActionBarSlotSpontaneusConvertedSpell)?.Spell
                 ?? (__instance as MechanicActionBarSlotSpell)?.Spell;
             if (!MediumInfluenceRules.UsesInfluence(ability)) return true;
             __result = MediumInfluenceRules.Amount(ability.Caster) + "/" + MediumInfluenceRules.Cap(ability.Caster);

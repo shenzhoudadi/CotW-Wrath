@@ -114,6 +114,9 @@ var legendary=Ability(hero,BlueprintTool.Get<BlueprintScriptableObject>(Guids.Ma
 Check(!MediumInfluenceRules.IsFreeSurge(legendary),"Legendary Marshal never consumes daily free allowance");
 var slot=new MechanicActionBarSlotAbility{Ability=paid};
 Equal(5,slot.GetResource(),"action bar current points");Equal("5/5",slot.GetCountText(5),"action bar cap label");
+var variantSlot=new MechanicActionBarSlotSpontaneusConvertedSpell{Spell=channel};
+Equal(5,variantSlot.GetResource(),"converted sub-ability slot shows current accumulated influence");
+Equal("5/5",variantSlot.GetCountText(5),"converted sub-ability slot label");
 hero.Facts.Add(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid));hero.Progression.MythicLevel=9;
 Equal(14,common.GetMaxAmount(hero),"mythic cap native resource API");
 Equal(5,MediumInfluenceRules.Amount(hero),"mythic cap doesn't refill counter");

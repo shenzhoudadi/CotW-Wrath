@@ -148,6 +148,7 @@ namespace MediumClass
 
                     RunStage("delayed blueprints", () => RootConfigurator.ConfigureDelayedBlueprints());
                     RunStage("optional TTT Medium capstone", Medium.HardenedSoul.ConfigureOptionalIntegration);
+                    RunStage("optional EbonsContentMod Miracle", Medium.Spirits.Hierophant.LegendaryHierophant.ConfigureOptionalIntegration);
                     RunStage("optional TTT Spirit Affinity", Medium.SpiritAffinityOptional.ConfigureDelayed);
                     RunStage("delayed Spirit Feat pool", Medium.SpiritFeat.ConfigureDelayed);
                     delayedState = InitState.Succeeded;
