@@ -1,20 +1,16 @@
 # 工作状态：先认领，避免重复
 
-更新：2026-11-16。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
-
-## 🚧 施工中／已认领，请勿重复开发
-
-- **COTW-0099 Occultist 基础职业** — [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。A/C 准备，生产尚未开始；协调方为维护者／本会话，B 单一整合负责人待合同冻结后指定。基线 main `939e04d` / 0.14.74 TEST。[独立分工与接手](docs/work-packages/OCCULT-BASE-CLASSES/OCCULTIST.md)。
-
-## 源码已合并／待 TEST
-
-- **COTW-0085 Spiritualist 基础职业** — A/B/C/D 离线完成，包内 DLL 定向 391/391。源码合入 main，等待与 COTW-0099 联合出 TEST。实机伙伴生成、存读档、重训、休息和骑乘待验。[整合记录](docs/work-packages/COTW-0085/SOURCE-MERGE.md) · [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。
+更新：2026-11-17。以本页和关联issue协调实际施工，不把旧inventory／HOLD描述当自动开工队列。
 
 ## 本次0.14.69 TEST交付
 
 - **COTW-0117 Spirit Whisperer** — [issue #7](https://github.com/shenzhoudadi/CotW-Wrath/issues/7)。A/C/B/D和最终整合复查完成，十魂域Wizard变体及唯一隔离桥已合入源码；174条隔离检查37.59秒，合并后编译8.138秒、0警告／0错误。保留D报告的选标／控制器等边界，不宣称玩家游戏通过。[交付范围与未测](docs/spirit-whisperer/README.md)。已纳入[0.14.69 Combined TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.69-Combined-TEST)，GitHub上传下载核对后关闭issue，不重复开发。
 
 ## 已完成开发／TEST交付
+
+- **COTW-0099 Occultist 基础职业** — 已合入 main。包内 DLL 定向 994/994，含实际启动注册及 TypeId 原生绑定。实机角色创建、存读档、重训与真实提供方组合待验。[0.14.75 联合 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST) · [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。
+
+- **COTW-0085 Spiritualist 基础职业** — 已合入 main。包内 DLL 定向 391/391，实机伙伴生成、存读档、重训、休息和骑乘待验。[0.14.75 联合 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST) · [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付。211 条定向及包内 DLL 复跑通过，4/4 附件下载核对一致。[验证与未测范围](docs/work-packages/COTW-0046/RELEASE-VERIFY.md)。
 

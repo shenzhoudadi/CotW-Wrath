@@ -1,6 +1,6 @@
 # COTW-0085 Spiritualist · 基础职业
 
-> **源码已合入 main，待与 COTW-0099 联合出 TEST。** A/B/C/D 离线完成，包内 DLL 定向 391/391。[最终整合与实机待验边界](../COTW-0085/SOURCE-MERGE.md)。以下为推进过程与原始分工。
+> **已合入 main，并完成 0.14.75 联合 TEST 交付。** 包内 DLL 定向 391/391，实机伙伴生成、存读档、重训、休息和骑乘待验。[GitHub 预发布](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST) · [源码整合记录](../COTW-0085/SOURCE-MERGE.md)。以下为推进过程与原始分工。
 
 状态为 **D15 已修，托管定向通过，实机待验**。分支 `feat/cotw-0085-spiritualist`。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。范围是 Wisdom 六环自发念力施法、Phantom、六种原作基础情绪，以及主人完整职业进度。COTW-0086–0091 变体沿用原状态。原作 `createPhantoms` 实际接通 Anger、Despair、Hatred、Fear、Zeal、Kindness，Whimsy 沿用原作未接通状态。 [施工认领 #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)
 

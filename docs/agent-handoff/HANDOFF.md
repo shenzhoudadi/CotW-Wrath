@@ -1,6 +1,8 @@
 # 当前交接：从简继续
 
-- **COTW-0085 Spiritualist** — A/B/C/D 离线完成，包内 DLL 定向 391/391。源码已合入 main，等 COTW-0099 一起出 TEST。伙伴生成、存读档、重训、休息和骑乘等实机路径待验。[整合记录](../work-packages/COTW-0085/SOURCE-MERGE.md) · [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。
+- **COTW-0099 Occultist 基础职业** — 已合入 main。包内 DLL 定向 994/994，含实际启动注册及 TypeId 原生绑定。实机角色创建、存读档、重训与真实提供方组合待验。[0.14.75 联合 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST) · [issue #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)。
+
+- **COTW-0085 Spiritualist 基础职业** — 已合入 main。包内 DLL 定向 391/391，实机伙伴生成、存读档、重训、休息和骑乘待验。[0.14.75 联合 TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST) · [issue #16](https://github.com/shenzhoudadi/CotW-Wrath/issues/16)。
 
 - **COTW-0046 Speaker for the Past** — [0.14.74 Speaker for the Past TEST](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) 已交付，211 条隔离定向与包内 DLL 复跑通过，4/4 附件下载一致。[验证说明](../work-packages/COTW-0046/RELEASE-VERIFY.md)。
 

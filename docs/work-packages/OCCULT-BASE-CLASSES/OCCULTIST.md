@@ -1,6 +1,8 @@
 # COTW-0099 Occultist · 基础职业
 
-状态为 **A/C 准备，生产实现尚未开始**。基线 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。工作分支建议 `feat/cotw-0099-occultist`。范围是 Intelligence 六环自发念力施法、法器学派与 Panoply、Mental Focus 与职业本体进度。COTW-0056 同名 Arcanist 变体、COTW-0100–0105 与 Relic Hunter（0140）沿用原状态。 [施工认领 #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)
+> **已合入 main，并完成 0.14.75 联合 TEST 交付。** 包内 DLL 定向 994/994。实机角色创建、存读档与重训待验。[GitHub 预发布](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST)。以下保留认领时的范围和分工。
+
+认领阶段的基线为 `939e04d543875ff28314b808dcc996d16227acc3` / 0.14.74 TEST。工作分支建议 `feat/cotw-0099-occultist`。范围是 Intelligence 六环自发念力施法、法器学派与 Panoply、Mental Focus 与职业本体进度。COTW-0056 同名 Arcanist 变体、COTW-0100–0105 与 Relic Hunter（0140）沿用原状态。 [施工认领 #15](https://github.com/shenzhoudadi/CotW-Wrath/issues/15)
 
 每个角色开始先读本页与 `AGENTS.md`。阶段原件写入本机 `C:/Users/xuenc/agent-tools/occultist-next/`，保留来源路径、GUID 与失败原件。A 和 C 可读原作、当前仓库及本机合法游戏元数据，不提交第三方程序集或原生蓝图。B 不启动游戏或 UMM，不跑整套测试。D 以新增编译、离线注册和本职业定向检查为准，实机存读档／重训界面等未测边界如实列明。
 
