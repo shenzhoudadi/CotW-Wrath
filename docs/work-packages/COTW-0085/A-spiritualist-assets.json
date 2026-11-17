@@ -1,0 +1,3062 @@
+{
+  "item": "COTW-0085",
+  "baseline": "939e04d543875ff28314b808dcc996d16227acc3",
+  "original": {
+    "repo": "Holic75/KingmakerRebalance",
+    "ref": "1332fb0db844b7863f484ca978bea2349fe49769",
+    "ownerSource": "Classes/Spiritualist.cs"
+  },
+  "wrathEvidence": {
+    "version": "2.7.0x",
+    "assetDumpSha256": "BE61C9B723EF06558DA8D7CFC7F0C7EA869F60BA9952EBBBBD116CF681863EA5",
+    "managedSha256": "2CB7160B7154D4FFACC77B9C51B1EB26199E1294300F04FDFC073367B2EF8953"
+  },
+  "phantomShared": {
+    "constitution": 13,
+    "intelligence": 7,
+    "wisdom": 10,
+    "charisma": 13,
+    "speedFeet": 30,
+    "mediumSlamDice": [
+      "1d6",
+      "1d8",
+      "1d10",
+      "2d6",
+      "2d8"
+    ],
+    "angerSlamDice": [
+      "1d8",
+      "2d6",
+      "2d8",
+      "3d6",
+      "3d8"
+    ],
+    "diceStartLevels": [
+      1,
+      4,
+      7,
+      10,
+      13
+    ]
+  },
+  "emotions": [
+    {
+      "name": "Anger",
+      "source": "Classes/Phantoms/Anger.cs",
+      "choiceLine": 136,
+      "goodSaves": [
+        "Fortitude",
+        "Will"
+      ],
+      "skills": [
+        "Persuasion",
+        "LoreNature"
+      ],
+      "strength": 14,
+      "dexterity": 12,
+      "baseTrait": "Str/Cha instead of Dex/Cha, larger slams, Power Attack",
+      "phantomFeatures": [
+        {
+          "ownerLevel": 1,
+          "name": "Powerful Strikes"
+        },
+        {
+          "ownerLevel": 7,
+          "name": "Aura of Fury"
+        },
+        {
+          "ownerLevel": 12,
+          "name": "Ferocious Mien"
+        },
+        {
+          "ownerLevel": 17,
+          "name": "Furious Wail"
+        }
+      ],
+      "ownerSpellLike": [
+        {
+          "ownerLevel": 5,
+          "originalGuid": "c60969e7f264e6d4b84a1499fdcf9039",
+          "originalComment": "enlarge person",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 7,
+          "originalGuid": "97b991256e43bb140b263c326f690ce2",
+          "originalComment": "rage",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 9,
+          "originalGuid": "e80a4d6c0efa5774cbd515e3e37095b0",
+          "originalComment": "longstrider greater",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 16,
+          "originalGuid": "f09453607e683784c8fca646eec49162",
+          "originalComment": "shout",
+          "wrathStatus": "native"
+        }
+      ],
+      "sourceGuidReferences": [
+        {
+          "guid": "7812ad3672a4b9a4fb894ea402095167",
+          "sourceLine": 31,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "9972f33f977fc724c838e59641b2fca5",
+          "sourceLine": 44,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "97b991256e43bb140b263c326f690ce2",
+          "sourceLine": 51,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "b3acbaa70e97c3649992e8f1e4bfe8dd",
+          "sourceLine": 60,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "4f139d125bb602f48bfaec3d3e1937cb",
+          "sourceLine": 66,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "a1ffec0ce7c167a40aaea13dc49b757b",
+          "sourceLine": 67,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "a1ffec0ce7c167a40aaea13dc49b757b",
+          "sourceLine": 68,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "c60969e7f264e6d4b84a1499fdcf9039",
+          "sourceLine": 83,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "b24583190f36a8442b212e45226c54fc",
+          "sourceLine": 90,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "9972f33f977fc724c838e59641b2fca5",
+          "sourceLine": 104,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "c60969e7f264e6d4b84a1499fdcf9039",
+          "sourceLine": 149,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "97b991256e43bb140b263c326f690ce2",
+          "sourceLine": 150,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "e80a4d6c0efa5774cbd515e3e37095b0",
+          "sourceLine": 151,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f09453607e683784c8fca646eec49162",
+          "sourceLine": 152,
+          "wrathStatus": "present"
+        }
+      ]
+    },
+    {
+      "name": "Despair",
+      "source": "Classes/Phantoms/Despair.cs",
+      "choiceLine": 156,
+      "goodSaves": [
+        "Fortitude",
+        "Will"
+      ],
+      "skills": [
+        "Persuasion",
+        "Stealth"
+      ],
+      "strength": 12,
+      "dexterity": 14,
+      "baseTrait": "Power from Despair",
+      "phantomFeatures": [
+        {
+          "ownerLevel": 1,
+          "name": "Miserable Strike"
+        },
+        {
+          "ownerLevel": 7,
+          "name": "Aura of Despair"
+        },
+        {
+          "ownerLevel": 12,
+          "name": "Despairing Shout"
+        },
+        {
+          "ownerLevel": 17,
+          "name": "Inescapable Despair"
+        }
+      ],
+      "ownerSpellLike": [
+        {
+          "ownerLevel": 5,
+          "originalSymbol": "Witch.ill_omen",
+          "candidate": {
+            "guid": "ca577309cedc4f1daf6fe5795fb2619b",
+            "provider": "Wrath",
+            "catalogName": "IllOmen"
+          },
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 7,
+          "originalSymbol": "NewSpells.stricken_heart",
+          "candidate": {
+            "guid": "8e4e94698fa142a98cfc44ad05ff8c91",
+            "provider": "CharacterOptionsPlus",
+            "catalogName": "StrickenHeart"
+          },
+          "wrathStatus": "existingProviderCandidate"
+        },
+        {
+          "ownerLevel": 9,
+          "originalGuid": "f492622e473d34747806bdb39356eb89",
+          "originalComment": "slow",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 16,
+          "originalGuid": "4baf4109145de4345861fe0f2209d903",
+          "originalComment": "crushing despair",
+          "wrathStatus": "native"
+        }
+      ],
+      "sourceGuidReferences": [
+        {
+          "guid": "25ec6cb6ab1845c48a95f9c20b034220",
+          "sourceLine": 28,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f08a7239aa961f34c8301518e71d4cdf",
+          "sourceLine": 29,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "36897b36a4bd63146b1d8509a17fc5ad",
+          "sourceLine": 30,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "e6f2fc5d73d88064583cb828801212f4",
+          "sourceLine": 35,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "dd2918e4a77c50044acba1ac93494c36",
+          "sourceLine": 88,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "b3acbaa70e97c3649992e8f1e4bfe8dd",
+          "sourceLine": 98,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "4baf4109145de4345861fe0f2209d903",
+          "sourceLine": 105,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f492622e473d34747806bdb39356eb89",
+          "sourceLine": 171,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "4baf4109145de4345861fe0f2209d903",
+          "sourceLine": 172,
+          "wrathStatus": "present"
+        }
+      ]
+    },
+    {
+      "name": "Hatred",
+      "source": "Classes/Phantoms/Hatred.cs",
+      "choiceLine": 143,
+      "goodSaves": [
+        "Fortitude",
+        "Reflex"
+      ],
+      "skills": [
+        "Mobility",
+        "Perception"
+      ],
+      "strength": 12,
+      "dexterity": 14,
+      "baseTrait": "Weapon Finesse",
+      "phantomFeatures": [
+        {
+          "ownerLevel": 1,
+          "name": "Hated Target"
+        },
+        {
+          "ownerLevel": 7,
+          "name": "Hateful Aura"
+        },
+        {
+          "ownerLevel": 12,
+          "name": "Sneak Attack"
+        },
+        {
+          "ownerLevel": 17,
+          "name": "Shared Hatred"
+        }
+      ],
+      "ownerSpellLike": [
+        {
+          "ownerLevel": 5,
+          "originalGuid": "fbdd8c455ac4cde4a9a3e18c84af9485",
+          "originalComment": "doom",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 7,
+          "originalSymbol": "NewSpells.inflict_pain",
+          "candidate": {
+            "guid": "e023af1af9c147549a8e7bd246967861",
+            "provider": "ExpandedContent",
+            "catalogName": "InflictPainAbility"
+          },
+          "wrathStatus": "existingProviderCandidate"
+        },
+        {
+          "ownerLevel": 9,
+          "originalGuid": "989ab5c44240907489aba0a8568d0603",
+          "originalComment": "bestow curse,",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 16,
+          "originalGuid": "f34fb78eaaec141469079af124bcfa0f",
+          "originalComment": "enervation,",
+          "wrathStatus": "native"
+        }
+      ],
+      "sourceGuidReferences": [
+        {
+          "guid": "90e54424d682d104ab36436bd527af09",
+          "sourceLine": 32,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "9b9eac6709e1c084cb18c3a366e0ec87",
+          "sourceLine": 33,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "8de64fbe047abc243a9b4715f643739f",
+          "sourceLine": 39,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "b48674cef2bff5e478a007cf57d8345b",
+          "sourceLine": 71,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "8a80d991f3d68e84293e098a6faa7620",
+          "sourceLine": 84,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "08cb5f4c3b2695e44971bf5c45205df0",
+          "sourceLine": 113,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "fbdd8c455ac4cde4a9a3e18c84af9485",
+          "sourceLine": 157,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "989ab5c44240907489aba0a8568d0603",
+          "sourceLine": 159,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f34fb78eaaec141469079af124bcfa0f",
+          "sourceLine": 160,
+          "wrathStatus": "present"
+        }
+      ]
+    },
+    {
+      "name": "Fear",
+      "source": "Classes/Phantoms/Fear.cs",
+      "choiceLine": 186,
+      "goodSaves": [
+        "Reflex",
+        "Will"
+      ],
+      "skills": [
+        "Persuasion",
+        "Stealth"
+      ],
+      "strength": 12,
+      "dexterity": 14,
+      "baseTrait": "Stealthy",
+      "phantomFeatures": [
+        {
+          "ownerLevel": 1,
+          "name": "Horrifying Strike"
+        },
+        {
+          "ownerLevel": 7,
+          "name": "Increase Fear"
+        },
+        {
+          "ownerLevel": 12,
+          "name": "Frightful Attack"
+        },
+        {
+          "ownerLevel": 17,
+          "name": "Shelter Allies"
+        }
+      ],
+      "ownerSpellLike": [
+        {
+          "ownerLevel": 5,
+          "originalGuid": "8bc64d869456b004b9db255cdd1ea734",
+          "originalComment": "bane",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 7,
+          "originalSymbol": "NewSpells.savage_maw",
+          "wrathStatus": "existingCotWRoot",
+          "candidate": {
+            "guid": "d81f20775f4ef87375ec494a98955282",
+            "provider": "CotW-Wrath",
+            "token": "SavageMaw"
+          }
+        },
+        {
+          "ownerLevel": 9,
+          "originalGuid": "8a28a811ca5d20d49a863e832c31cce1",
+          "originalComment": "vampyric touch",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 16,
+          "originalGuid": "6717dbaef00c0eb4897a1c908a75dfe5",
+          "originalComment": "phantasmal killer",
+          "wrathStatus": "native"
+        }
+      ],
+      "sourceGuidReferences": [
+        {
+          "guid": "25ec6cb6ab1845c48a95f9c20b034220",
+          "sourceLine": 31,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f08a7239aa961f34c8301518e71d4cdf",
+          "sourceLine": 32,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f08a7239aa961f34c8301518e71d4cdf",
+          "sourceLine": 33,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f4c61d62e328424697f291b76bc3b9cc",
+          "sourceLine": 33,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "c5c86809a1c834e42a2eb33133e90a28",
+          "sourceLine": 91,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f915d82077db4e3b8c00d954a98d2c3a",
+          "sourceLine": 114,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "08cb5f4c3b2695e44971bf5c45205df0",
+          "sourceLine": 154,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "8a80d991f3d68e84293e098a6faa7620",
+          "sourceLine": 158,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "c7e1d5ef809325943af97f093e149c4f",
+          "sourceLine": 170,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "8bc64d869456b004b9db255cdd1ea734",
+          "sourceLine": 199,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "8a28a811ca5d20d49a863e832c31cce1",
+          "sourceLine": 201,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "6717dbaef00c0eb4897a1c908a75dfe5",
+          "sourceLine": 202,
+          "wrathStatus": "present"
+        }
+      ]
+    },
+    {
+      "name": "Zeal",
+      "source": "Classes/Phantoms/Zeal.cs",
+      "choiceLine": 177,
+      "goodSaves": [
+        "Fortitude",
+        "Reflex"
+      ],
+      "skills": [
+        "Mobility",
+        "LoreNature"
+      ],
+      "strength": 12,
+      "dexterity": 14,
+      "baseTrait": "Tracking; Fortitude/Reflex from code, Fortitude/Will in original prose",
+      "phantomFeatures": [
+        {
+          "ownerLevel": 1,
+          "name": "Ruthless Combatant"
+        },
+        {
+          "ownerLevel": 7,
+          "name": "Determination Aura"
+        },
+        {
+          "ownerLevel": 12,
+          "name": "Haste"
+        },
+        {
+          "ownerLevel": 17,
+          "name": "Zeal's Resolve"
+        }
+      ],
+      "ownerSpellLike": [
+        {
+          "ownerLevel": 5,
+          "originalGuid": "90e59f4a4ada87243b7b3535a06d0638",
+          "originalComment": "bless",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 7,
+          "originalSymbol": "NewSpells.force_sword",
+          "wrathStatus": "existingCotWRoot",
+          "candidate": {
+            "guid": "f9ce1e9088de0d502a98bcce636b0615",
+            "provider": "CotW-Wrath",
+            "token": "ForceSword"
+          }
+        },
+        {
+          "ownerLevel": 9,
+          "originalGuid": "9d5d2d3ffdd73c648af3eb3e585b1113",
+          "originalComment": "divine favor",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 16,
+          "originalGuid": "0087fc2d64b6095478bc7b8d7d512caf",
+          "originalComment": "freedom of movement",
+          "wrathStatus": "native"
+        }
+      ],
+      "sourceGuidReferences": [
+        {
+          "guid": "7812ad3672a4b9a4fb894ea402095167",
+          "sourceLine": 32,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f18cbcb39a1b35643a8d129b1ec4e716",
+          "sourceLine": 34,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "7812ad3672a4b9a4fb894ea402095167",
+          "sourceLine": 41,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "7812ad3672a4b9a4fb894ea402095167",
+          "sourceLine": 50,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "f18cbcb39a1b35643a8d129b1ec4e716",
+          "sourceLine": 52,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "7812ad3672a4b9a4fb894ea402095167",
+          "sourceLine": 62,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "87ab2fed7feaaff47b62a3320a57ad8d",
+          "sourceLine": 75,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "63f322580ec0e7c4c96fc62ecabad40f",
+          "sourceLine": 86,
+          "wrathStatus": "notInDump"
+        },
+        {
+          "guid": "486eaff58293f6441a5c2759c4872f98",
+          "sourceLine": 92,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "3bc40c9cbf9a0db4b8b43d8eedf2e6ec",
+          "sourceLine": 111,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "6507d2da389ed55448e0e1e5b871c013",
+          "sourceLine": 155,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "90e59f4a4ada87243b7b3535a06d0638",
+          "sourceLine": 190,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "9d5d2d3ffdd73c648af3eb3e585b1113",
+          "sourceLine": 192,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "0087fc2d64b6095478bc7b8d7d512caf",
+          "sourceLine": 193,
+          "wrathStatus": "present"
+        }
+      ]
+    },
+    {
+      "name": "Kindness",
+      "source": "Classes/Phantoms/Kindness.cs",
+      "choiceLine": 208,
+      "goodSaves": [
+        "Fortitude",
+        "Will"
+      ],
+      "skills": [
+        "Persuasion",
+        "LoreReligion"
+      ],
+      "strength": 12,
+      "dexterity": 14,
+      "baseTrait": "Benevolent",
+      "phantomFeatures": [
+        {
+          "ownerLevel": 1,
+          "name": "Opening Strike"
+        },
+        {
+          "ownerLevel": 7,
+          "name": "Etheric Healing"
+        },
+        {
+          "ownerLevel": 12,
+          "name": "Expanded Aid"
+        },
+        {
+          "ownerLevel": 17,
+          "name": "Exceptional Aid"
+        }
+      ],
+      "ownerSpellLike": [
+        {
+          "ownerLevel": 5,
+          "originalGuid": "90e59f4a4ada87243b7b3535a06d0638",
+          "originalComment": "bless",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 7,
+          "originalGuid": "03a9630394d10164a9410882d31572f0",
+          "originalComment": "aid",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 9,
+          "originalGuid": "5ab0d42fb68c9e34abae4921822b9d63",
+          "originalComment": "heroism",
+          "wrathStatus": "native"
+        },
+        {
+          "ownerLevel": 16,
+          "originalGuid": "a5e23522eda32dc45801e32c05dc9f96",
+          "originalComment": "good hope",
+          "wrathStatus": "native"
+        }
+      ],
+      "sourceGuidReferences": [
+        {
+          "guid": "55a037e514c0ee14a8e3ed14b47061de",
+          "sourceLine": 30,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "9d5d2d3ffdd73c648af3eb3e585b1113",
+          "sourceLine": 41,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "8d6073201e5395d458b8251386d72df1",
+          "sourceLine": 101,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "caae1dc6fcf7b37408686971ee27db13",
+          "sourceLine": 102,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "02b187038a8dce545bb34bbfb346428d",
+          "sourceLine": 147,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "02b187038a8dce545bb34bbfb346428d",
+          "sourceLine": 148,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "03a9630394d10164a9410882d31572f0",
+          "sourceLine": 173,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "76f8f23f6502def4dbefedffdc4d4c43",
+          "sourceLine": 183,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "90e59f4a4ada87243b7b3535a06d0638",
+          "sourceLine": 221,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "03a9630394d10164a9410882d31572f0",
+          "sourceLine": 222,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "5ab0d42fb68c9e34abae4921822b9d63",
+          "sourceLine": 223,
+          "wrathStatus": "present"
+        },
+        {
+          "guid": "a5e23522eda32dc45801e32c05dc9f96",
+          "sourceLine": 224,
+          "wrathStatus": "present"
+        }
+      ]
+    }
+  ],
+  "privateSpellList": [
+    {
+      "circle": 0,
+      "sourceLine": 2386,
+      "originalGuid": "55f14bc84d7c85446b07a1b5dd6b2b4c",
+      "originalComment": "daze",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 0,
+      "sourceLine": 2387,
+      "originalGuid": "c3a8f31778c3980498d8f00c980be5f5",
+      "originalComment": "guidance",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 0,
+      "sourceLine": 2388,
+      "originalGuid": "95f206566c5261c42aa5b3e7e0d1e36c",
+      "originalComment": "mage light",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 0,
+      "sourceLine": 2389,
+      "originalGuid": "7bc8e27cba24f0e43ae64ed201ad5785",
+      "originalComment": "resistance",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 0,
+      "sourceLine": 2390,
+      "originalGuid": "5bf3315ce1ed4d94e8805706820ef64d",
+      "originalComment": "touch of fatigue",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 0,
+      "sourceLine": 2391,
+      "originalGuid": "d3a852385ba4cd740992d1970170301a",
+      "originalComment": "virtue",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2393,
+      "originalSymbol": "NewSpells.burst_of_adrenaline",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "b0a50deb87a2b4e7bf38d9aff5c9ffcc",
+        "provider": "CotW-Wrath",
+        "token": "BurstOfAdrenaline"
+      }
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2394,
+      "originalSymbol": "NewSpells.burst_of_insight",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "21f223c63c1f113605311045378b2f2d",
+        "provider": "CotW-Wrath",
+        "token": "BurstOfInsight"
+      }
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2395,
+      "originalGuid": "bd81a3931aa285a4f9844585b5d97e51",
+      "originalComment": "cause fear",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2396,
+      "originalSymbol": "NewSpells.chill_touch",
+      "candidate": {
+        "guid": "3f184aa1610d498dbdaf41eec77b1319",
+        "provider": "CharacterOptionsPlus",
+        "catalogName": "ChillTouch"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2397,
+      "originalGuid": "5590652e1c2225c4ca30c4a699ab3649",
+      "originalComment": "cure light wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2398,
+      "originalGuid": "fbdd8c455ac4cde4a9a3e18c84af9485",
+      "originalComment": "doom",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2399,
+      "originalGuid": "4f8181e7a7f1d904fbaea64220e83379",
+      "originalComment": "expeditious retreat",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2400,
+      "originalGuid": "e5af3674bb241f14b9a9f6b0c7dc3d27",
+      "originalComment": "inflict light wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2401,
+      "originalGuid": "9e1ad5d6f87d19e4d8883d63a6e35568",
+      "originalComment": "mage armor",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2402,
+      "originalGuid": "403cf599412299a4f9d5d925c7b9fb33",
+      "originalComment": "magic fang",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2403,
+      "originalSymbol": "NewSpells.obscuring_mist",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "91651f6f9af8b82e5aff6e2cb7aedfa3",
+        "provider": "CotW-Wrath",
+        "token": "ObscuringMist"
+      }
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2404,
+      "originalGuid": "433b1faf4d02cc34abb0ade5ceda47c4",
+      "originalComment": "protection from alignment",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2405,
+      "originalGuid": "55a037e514c0ee14a8e3ed14b47061de",
+      "originalComment": "remove fear",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2406,
+      "originalSymbol": "NewSpells.sanctuary",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "7443e319a5ad24c95eeeb7ae3925b44a",
+        "provider": "CotW-Wrath",
+        "token": "Sanctuary"
+      }
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2407,
+      "originalGuid": "ef768022b0785eb43a18969903c537c4",
+      "originalComment": "shield",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2408,
+      "originalGuid": "8fd74eddd9b6c224693d9ab241f25e84",
+      "originalComment": "summon monster 1",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 1,
+      "sourceLine": 2409,
+      "originalGuid": "ad10bfec6d7ae8b47870e3a545cc8900",
+      "originalComment": "touch of gracelessness",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2411,
+      "originalGuid": "03a9630394d10164a9410882d31572f0",
+      "originalComment": "aid",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2412,
+      "originalSymbol": "NewSpells.animate_dead_lesser",
+      "wrathStatus": "nativeCandidateRequiresBehaviorComparison",
+      "candidate": {
+        "guid": "57fcf8016cf04da4a8b33d2add14de7e",
+        "provider": "Wrath",
+        "note": "Stock root lives in spell circle 3. Spiritualist source explicitly uses circle 2. Fork PR #14 changes the implementation. Keep circle 2 and compare behavior before reuse."
+      }
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2413,
+      "originalSymbol": "NewSpells.blade_tutor",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "f5a85ff13a2f60a0fccc2cedf29bfa43",
+        "provider": "CotW-Wrath",
+        "token": "BladeTutor"
+      }
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2414,
+      "originalGuid": "14ec7a4e52e90fa47a4c8d63c69fd5c1",
+      "originalComment": "blur",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2415,
+      "originalGuid": "b7731c2b4fa1c9844a092329177be4c3",
+      "originalComment": "boneshaker",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2416,
+      "originalGuid": "6b90c773a6543dc49b2505858ce33db5",
+      "originalComment": "cure moderate wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2417,
+      "originalGuid": "446f7bf201dc1934f96ac0a26e324803",
+      "originalComment": "eagle's splendor",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2418,
+      "originalGuid": "e1291272c8f48c14ab212a599ad17aac",
+      "originalComment": "effortless armor",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2419,
+      "originalGuid": "7a5b5bf845779a941a67251539545762",
+      "originalComment": "false life",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2420,
+      "originalSymbol": "NewSpells.force_sword",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "f9ce1e9088de0d502a98bcce636b0615",
+        "provider": "CotW-Wrath",
+        "token": "ForceSword"
+      }
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2421,
+      "originalSymbol": "NewSpells.ghoul_touch",
+      "wrathStatus": "requiresResolution"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2422,
+      "originalGuid": "65f0b63c45ea82a4f8b8325768a3832d",
+      "originalComment": "inflict moderate wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2423,
+      "originalSymbol": "NewSpells.inflict_pain",
+      "candidate": {
+        "guid": "e023af1af9c147549a8e7bd246967861",
+        "provider": "ExpandedContent",
+        "catalogName": "InflictPainAbility"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2424,
+      "originalGuid": "89940cde01689fb46946b2f8cd7b66b7",
+      "originalComment": "invisibility",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2425,
+      "originalGuid": "c28de1f98a3f432448e52e5d47c73208",
+      "originalComment": "protection from arrows",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2426,
+      "originalGuid": "e84fc922ccf952943b5240293669b171",
+      "originalComment": "restoration, lesser",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2427,
+      "originalGuid": "21ffef7791ce73f468b6fca4d9371e8b",
+      "originalComment": "resist energy",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2428,
+      "originalGuid": "08cb5f4c3b2695e44971bf5c45205df0",
+      "originalComment": "scare",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2429,
+      "originalGuid": "30e5dc243f937fc4b95d2f8f4e1b7ff3",
+      "originalComment": "see invisibility",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2430,
+      "originalSymbol": "NewSpells.shadow_claws",
+      "candidate": {
+        "guid": "7402ae487e0b41968be48c103904d237",
+        "provider": "ExpandedContent",
+        "catalogName": "ShadowClawsAbility"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2431,
+      "originalSymbol": "SpiritualWeapons.spiritual_weapon",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "b924f40705afa57283f65679a2468775",
+        "provider": "CotW-Wrath",
+        "token": "SpiritualWeapon"
+      }
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2432,
+      "originalSymbol": "NewSpells.stricken_heart",
+      "candidate": {
+        "guid": "8e4e94698fa142a98cfc44ad05ff8c91",
+        "provider": "CharacterOptionsPlus",
+        "catalogName": "StrickenHeart"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2433,
+      "originalGuid": "970c6db48ff0c6f43afc9dbb48780d03",
+      "originalComment": "summon small elemental",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 2,
+      "sourceLine": 2434,
+      "originalGuid": "1724061e89c667045a6891179ee2e8e7",
+      "originalComment": "summon monster 2",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2436,
+      "originalGuid": "4b76d32feb089ad4499c3a1ce8e1ac27",
+      "originalComment": "animate dead",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2437,
+      "originalGuid": "989ab5c44240907489aba0a8568d0603",
+      "originalComment": "bestow curse",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2438,
+      "originalGuid": "46fd02ad56c35224c9c91c88cd457791",
+      "originalComment": "blindness",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2439,
+      "originalSymbol": "NewSpells.cloak_of_winds",
+      "candidate": {
+        "guid": "6fb10fff27b84bff81746194bf8e38a8",
+        "provider": "TabletopTweaks-Base",
+        "catalogName": "CloakOfWindsAbility"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2440,
+      "originalSymbol": "NewSpells.condensed_ether",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "efcd286037f00002956d5429141f883c",
+        "provider": "CotW-Wrath",
+        "token": "CondensedEther"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2441,
+      "originalGuid": "3361c5df793b4c8448756146a88026ad",
+      "originalComment": "cure serious wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2442,
+      "originalGuid": "92681f181b507b34ea87018e8f7a528a",
+      "originalComment": "dispel magic",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2443,
+      "originalGuid": "903092f6488f9ce45a80943923576ab3",
+      "originalComment": "displacement",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2444,
+      "originalSymbol": "NewSpells.fly",
+      "candidate": {
+        "guid": "bbbd603f9da44838b8a85124aaa6ba40",
+        "provider": "TomeOfTheFirebird",
+        "catalogName": "FlySpell"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2445,
+      "originalGuid": "486eaff58293f6441a5c2759c4872f98",
+      "originalComment": "haste",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2446,
+      "originalGuid": "5ab0d42fb68c9e34abae4921822b9d63",
+      "originalComment": "heroism",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2447,
+      "originalSymbol": "NewSpells.howling_agony",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "981a4173d895e71184d9a7f557a9e1d4",
+        "provider": "CotW-Wrath",
+        "token": "HowlingAgony"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2448,
+      "originalGuid": "bd5da98859cf2b3418f6d68ea66cabbe",
+      "originalComment": "inflict serious wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2449,
+      "originalSymbol": "NewSpells.invisibility_purge",
+      "candidate": {
+        "guid": "c3647ce7d6da49faa6e86830841e56e1",
+        "provider": "CharacterOptionsPlus",
+        "catalogName": "InvisibilityPurge"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2450,
+      "originalGuid": "f1100650705a69c4384d3edd88ba0f52",
+      "originalComment": "magic fang, greater",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2451,
+      "originalSymbol": "NewSpells.pain_strike",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "5e720531367dba42cf5e57a7f0d62fba",
+        "provider": "CotW-Wrath",
+        "token": "PainStrike"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2452,
+      "originalGuid": "d2f116cfe05fcdd4a94e80143b67046f",
+      "originalComment": "protection from energy",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2453,
+      "originalGuid": "c927a8b0cd3f5174f8c0b67cdbfde539",
+      "originalComment": "remove blindness",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2454,
+      "originalGuid": "4093d5a0eb5cae94e909eb1e0e1a6b36",
+      "originalComment": "remove disiese",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2455,
+      "originalSymbol": "NewSpells.ray_of_exhaustion",
+      "wrathStatus": "native",
+      "candidate": {
+        "guid": "8eead52509987034ea9025d60cc05985",
+        "provider": "Wrath"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2456,
+      "originalSymbol": "NewSpells.rigor_mortis",
+      "candidate": {
+        "guid": "2bba038472a64f67b235674c7e27d90c",
+        "provider": "ExpandedContent",
+        "catalogName": "RigorMortisAbility"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2457,
+      "originalSymbol": "NewSpells.sands_of_time",
+      "candidate": {
+        "guid": "da49f07e431b47abaad41ef28df487f7",
+        "provider": "TabletopTweaks-Base",
+        "catalogName": "SandsOfTimeCast"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2458,
+      "originalGuid": "f492622e473d34747806bdb39356eb89",
+      "originalComment": "slow",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2459,
+      "originalSymbol": "NewSpells.spirit_bound_blade",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "2b7d086ce83da81d7286472d14814fa1",
+        "provider": "CotW-Wrath",
+        "token": "SpiritBoundBlade"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2460,
+      "originalSymbol": "SpiritualWeapons.twilight_knife",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "4a95fd344dbc3e553ad93b6adb67e5ca",
+        "provider": "CotW-Wrath",
+        "token": "TwilightKnife"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2461,
+      "originalSymbol": "Wildshape.undead_anatomyI",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "617c6b9c804b95a5e41d29944db2138c",
+        "provider": "CotW-Wrath",
+        "token": "UndeadAnatomy1"
+      }
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2462,
+      "originalGuid": "8a28a811ca5d20d49a863e832c31cce1",
+      "originalComment": "vampyric touch",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 3,
+      "sourceLine": 2463,
+      "originalGuid": "5d61dde0020bbf54ba1521f7ca0229dc",
+      "originalComment": "summon monster 3",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2465,
+      "originalSymbol": "NewSpells.aura_of_doom",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "7de857ebb47438f13aaa2f91c076bbc2",
+        "provider": "CotW-Wrath",
+        "token": "AuraOfDoom"
+      }
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2466,
+      "originalGuid": "cf6c901fb7acc904e85c63b342e9c949",
+      "originalComment": "confusion",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2467,
+      "originalGuid": "4baf4109145de4345861fe0f2209d903",
+      "originalComment": "crushing despair",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2468,
+      "originalGuid": "41c9016596fe1de4faf67425ed691203",
+      "originalComment": "cure critical wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2469,
+      "originalGuid": "e9cc9378fd6841f48ad59384e79e9953",
+      "originalComment": "death ward",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2470,
+      "originalSymbol": "NewSpells.debilitating_portent",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "b16ee7b247c27a3ff763c09b874a92f5",
+        "provider": "CotW-Wrath",
+        "token": "DebilitatingPortent"
+      }
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2471,
+      "originalGuid": "4a648b57935a59547b7a2ee86fb4f26a",
+      "originalComment": "dimensions door",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2472,
+      "originalGuid": "f34fb78eaaec141469079af124bcfa0f",
+      "originalComment": "enervation",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2473,
+      "originalGuid": "dc6af3b4fd149f841912d8a3ce0983de",
+      "originalComment": "false life, greater",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2474,
+      "originalGuid": "d2aeac47450c76347aebbc02e4f463e0",
+      "originalComment": "fear",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2475,
+      "originalGuid": "0087fc2d64b6095478bc7b8d7d512caf",
+      "originalComment": "freedom of movement",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2476,
+      "originalGuid": "651110ed4f117a948b41c05c5c7624c0",
+      "originalComment": "inflict critical wounds",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2477,
+      "originalGuid": "ecaa0def35b38f949bd1976a6c9539e0",
+      "originalComment": "invisibility greater",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2478,
+      "originalGuid": "e7240516af4241b42b2cd819929ea9da",
+      "originalComment": "neutralize poison",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2479,
+      "originalGuid": "6717dbaef00c0eb4897a1c908a75dfe5",
+      "originalComment": "phantasmal killer",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2480,
+      "originalGuid": "b48674cef2bff5e478a007cf57d8345b",
+      "originalComment": "remove curse",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2481,
+      "originalGuid": "f2115ac1148256b4ba20788f7e966830",
+      "originalComment": "restoration",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2482,
+      "originalSymbol": "NewSpells.shadow_conjuration",
+      "candidate": {
+        "guid": "caac251ca7601324bbe000372a0a1005",
+        "provider": "Wrath",
+        "catalogName": "ShadowConjuration"
+      },
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2483,
+      "originalSymbol": "NewSpells.solid_fog",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "ea8d3fc6fe47a0ce20df9b472eebf1a3",
+        "provider": "CotW-Wrath",
+        "token": "SolidFog"
+      }
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2484,
+      "originalSymbol": "SpiritualWeapons.spiritual_ally",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "b406c2835f416afb0824cec610cba20a",
+        "provider": "CotW-Wrath",
+        "token": "SpiritualAlly"
+      }
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2485,
+      "originalGuid": "e42b1dbff4262c6469a9ff0a6ce730e3",
+      "originalComment": "summon medium elemental",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 4,
+      "sourceLine": 2486,
+      "originalGuid": "7ed74a3ec8c458d4fb50b192fd7be6ef",
+      "originalComment": "summon monster 4",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2488,
+      "originalGuid": "7792da00c85b9e042a0fdfc2b66ec9a8",
+      "originalComment": "break enchantment",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2489,
+      "originalGuid": "d5847cad0b0e54c4d82d6c59a3cda6b0",
+      "originalComment": "breath of life",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2490,
+      "originalGuid": "548d339ba87ee56459c98e80167bdf10",
+      "originalComment": "cloudkill",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2491,
+      "originalSymbol": "NewSpells.curse_major",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "3f8742f526cc110ae27e34d026fc5f6b",
+        "provider": "CotW-Wrath",
+        "token": "CurseMajor"
+      }
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2492,
+      "originalGuid": "95f7cdcec94e293489a85afdf5af1fd7",
+      "originalComment": "dismissal",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2493,
+      "originalGuid": "d7cbd2004ce66a042aeab2e95a3c5c61",
+      "originalComment": "dominate person",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2494,
+      "originalGuid": "444eed6e26f773a40ab6e4d160c67faa",
+      "originalComment": "feeblemind",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2495,
+      "originalSymbol": "NewSpells.fickle_winds",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "14246abfca8c8b96f84a4009820ea80e",
+        "provider": "CotW-Wrath",
+        "token": "FickleWinds"
+      }
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2496,
+      "originalSymbol": "NewSpells.inflict_pain_mass",
+      "candidate": {
+        "guid": "ff31ae1abe3c418db7842dcc76eca7ee",
+        "provider": "ExpandedContent",
+        "catalogName": "InflictPainMassAbility"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2497,
+      "originalGuid": "eabf94e4edc6e714cabd96aa69f8b207",
+      "originalComment": "mind fog",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2498,
+      "originalSymbol": "NewSpells.overland_flight",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "7253f42036967e31c7d1da32b5b85e22",
+        "provider": "CotW-Wrath",
+        "token": "OverlandFlight"
+      }
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2499,
+      "originalSymbol": "NewSpells.pain_strike_mass",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "d516c48f73967939c678021060dd88ad",
+        "provider": "CotW-Wrath",
+        "token": "PainStrikeMass"
+      }
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2500,
+      "originalGuid": "12fb4a4c22549c74d949e2916a2f0b6a",
+      "originalComment": "phantasmal web",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2501,
+      "originalSymbol": "NewSpells.phantom_limbs",
+      "candidate": {
+        "guid": "2aee92b93eac4290ae38a7a131abe7d7",
+        "provider": "PrestigePlus",
+        "catalogName": "NewSpell.UsePhantomLimb"
+      },
+      "wrathStatus": "existingProviderCandidate"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2502,
+      "originalGuid": "a0fc99f0933d01643b2b8fe570caa4c5",
+      "originalComment": "raise dead",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2503,
+      "originalGuid": "237427308e48c3341b3d532b9d3a001f",
+      "originalComment": "shadow evocation",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2504,
+      "originalGuid": "4fbd47525382517419c66fb548fe9a67",
+      "originalComment": "slay living",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2505,
+      "originalGuid": "0a5ddfbcfb3989543ac7c936fc256889",
+      "originalComment": "spell resistance",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2506,
+      "originalSymbol": "NewSpells.suffocation",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "355c23b51c7c4fd062926edab6390529",
+        "provider": "CotW-Wrath",
+        "token": "Suffocation"
+      }
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2507,
+      "originalGuid": "89404dd71edc1aa42962824b44156fe5",
+      "originalComment": "summon large elemental",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2508,
+      "originalGuid": "630c8b85d9f07a64f917d79cb5905741",
+      "originalComment": "summon monster 5",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2509,
+      "originalSymbol": "Wildshape.undead_anatomyII",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "f3dc5adb34bcc434f17880d1c06d2324",
+        "provider": "CotW-Wrath",
+        "token": "UndeadAnatomy2"
+      }
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2510,
+      "originalGuid": "a34921035f2a6714e9be5ca76c5e34b5",
+      "originalComment": "vampiric shadow shield",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 5,
+      "sourceLine": 2511,
+      "originalGuid": "8878d0c46dfbd564e9d5756349d5e439",
+      "originalComment": "waves of fatigue",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2513,
+      "originalGuid": "d361391f645db984bbf58907711a146a",
+      "originalComment": "banishment",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2514,
+      "originalGuid": "d42c6d3f29e07b6409d670792d72bc82",
+      "originalComment": "banshee blast",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2515,
+      "originalGuid": "a89dcbbab8f40e44e920cc60636097cf",
+      "originalComment": "circle of death",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2516,
+      "originalGuid": "76a11b460be25e44ca85904d6806e5a3",
+      "originalComment": "create undead",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2517,
+      "originalGuid": "f0f761b808dc4b149b08eaf44b99f633",
+      "originalComment": "dispel magic, greater",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2518,
+      "originalGuid": "4aa7942c3e62a164387a73184bca3fc1",
+      "originalComment": "disintegrate",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2519,
+      "originalGuid": "3167d30dd3c622c46b0c0cb242061642",
+      "originalComment": "eyebite",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2520,
+      "originalGuid": "cc09224ecc9af79449816c45bc5be218",
+      "originalComment": "harm",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2521,
+      "originalGuid": "5da172c4c89f9eb4cbb614f3a67357d3",
+      "originalComment": "heal",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2522,
+      "originalGuid": "e15e5e7045fda2244b98c8f010adfe31",
+      "originalComment": "heroism greater",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2523,
+      "originalGuid": "766ec978fa993034f86a372c8eb1fc10",
+      "originalComment": "summon huge elemental",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2524,
+      "originalGuid": "e740afbab0147944dab35d83faa0ae1c",
+      "originalComment": "summon monster 6",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2525,
+      "originalGuid": "27203d62eb3d4184c9aced94f22e1806",
+      "originalComment": "transformation",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2526,
+      "originalGuid": "4cf3d0fae3239ec478f51e86f49161cb",
+      "originalComment": "true seeing",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2527,
+      "originalGuid": "474ed0aa656cc38499cc9a073d113716",
+      "originalComment": "umbral strike",
+      "wrathStatus": "native"
+    },
+    {
+      "circle": 6,
+      "sourceLine": 2528,
+      "originalSymbol": "Wildshape.undead_anatomyIII",
+      "wrathStatus": "existingCotWRoot",
+      "candidate": {
+        "guid": "e2d1b96d811ae0a6218202b6108cc793",
+        "provider": "CotW-Wrath",
+        "token": "UndeadAnatomy3"
+      }
+    }
+  ],
+  "sourceDonors": [
+    {
+      "role": "legacyRankProgression",
+      "originalGuid": "125af359f8bc9a145968b5d8fd8159b8",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "originalAddPetDonor",
+      "originalGuid": "126712ef923ab204983d6f107629c895",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "originalSelectionExtraFact",
+      "originalGuid": "1670990255e4fe948a863bafd5dbda5d",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "spectre",
+      "originalGuid": "2f91d7337b60e3b4b9b137198a8c8745",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "originalVisual",
+      "originalGuid": "8a6986e17799d7d4b90f0c158b31c5b9",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "ghostFxBuff",
+      "originalGuid": "20f79fea035330b479fc899fa201d232",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "naturalArmor2",
+      "originalGuid": "45a52ce762f637f4c80cc741c91f58b7",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "slamWeapon",
+      "originalGuid": "767e6932882a99c4b8ca95c88d823137",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "unitBrain",
+      "originalGuid": "cf986dd7ba9d4ec46ad8a3a0406d02ae",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "neutralFaction",
+      "originalGuid": "d8de50cc80eb4dc409a983991e0b77ad",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "inquisitorClass",
+      "originalGuid": "f1a70d9e1b0b41e49874e1fa9052a1ce",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "fighterClass",
+      "originalGuid": "48ac8db94d5de7645906c7d0ad3bcfbd",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "legacyAnimalClass",
+      "originalGuid": "4cd1757a0eea7694ba5c933729a53920",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "goodSave",
+      "originalGuid": "ff4662bde9e75f145853417313842751",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "skillFocusSelection",
+      "originalGuid": "c9629ef9eebb88b479b2fbc5e836656a",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "originalRecallAbility",
+      "originalGuid": "5bdc37e4acfa209408334326076a43bc",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "normalDimensionDoor",
+      "originalGuid": "4a648b57935a59547b7a2ee86fb4f26a",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "nativeIllOmen",
+      "originalGuid": "ca577309cedc4f1daf6fe5795fb2619b",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "nativeShadowConjuration",
+      "originalGuid": "caac251ca7601324bbe000372a0a1005",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "allowDying",
+      "originalGuid": "0aeba56961779e54a8a0f6dedef081ee",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "devotion",
+      "originalGuid": "226f939b7dfd47b4697ec52f79799012",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "nativeNaturalArmorGrowth",
+      "originalGuid": "0d20d88abb7c33a47902bd99019f2ed1",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "legacyAttributeGrowth",
+      "originalGuid": "0c80276018694f24fbaf59ec7b841f2b",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "ray",
+      "originalGuid": "d3e6275cfa6e7a04b9213b7b292a011c",
+      "wrathStatus": "present"
+    },
+    {
+      "role": "touch",
+      "originalGuid": "62ef1cdb90f1d654d996556669caf7fa",
+      "wrathStatus": "present"
+    }
+  ],
+  "wrathComparisonDonors": [
+    {
+      "guid": "3853d5405ebfc0f4a86930bb7082b43b",
+      "asset": "Classes/Druid/DruidAnimalCompanionProgression.jbp",
+      "type": "BlueprintProgression",
+      "recordSha256": "1f57e6a094cf73db1f308f34f588fb34dadc6efb47b6b4354b1c1b8e67412013"
+    },
+    {
+      "guid": "f668d6897a7545458013340e51c8a92d",
+      "asset": "Classes/Druid/Archetypes/WinterChild/WinterChildAnimalCompanionProgression.jbp",
+      "type": "BlueprintProgression",
+      "recordSha256": "aa7bf7759e4f9735169b63a63cf576c096be5534c5fc389628e2e01e7345af03"
+    },
+    {
+      "guid": "57fab75111f377248810ece84193a5a5",
+      "asset": "Classes/Inquisitor/InquisitorSpellbook.jbp",
+      "type": "BlueprintSpellbook",
+      "recordSha256": "229abe61186f945e7128007d64bb10c33a27644cc7e46dd2f96f1293686d56e4"
+    },
+    {
+      "guid": "26b10d4340839004f960f9816f6109fe",
+      "asset": "Classes/Monster/Animal/AnimalCompanionClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "recordSha256": "d9bb66ab03abd2fc8bbf5b4176ff36ca0c2370e3c8e6d336ee771c649bf71155"
+    },
+    {
+      "guid": "f894e003d31461f48a02f5caec4e3359",
+      "asset": "Classes/Pets/AnimalCompanionFeatureDog.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "4261ae3585fc60d67127227ccbf778e1b2905f46873191b8c132c19eed1f7d66"
+    },
+    {
+      "guid": "1670990255e4fe948a863bafd5dbda5d",
+      "asset": "Classes/Pets/AnimalCompanionRank.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "eb4ebac2d1ffdaf3a64bde925efd1ed8db79f6e0e1e5c1480adcae32f22a171c"
+    },
+    {
+      "guid": "918939943bf32ba4a95470ea696c2ba5",
+      "asset": "Classes/Pets/AnimalCompanionUnitDog.jbp",
+      "type": "BlueprintUnit",
+      "recordSha256": "1bea019a89962c7e42882bc2ebe6d12373f493623255ff6a1534ce315509ef06"
+    }
+  ],
+  "nameCandidates": [
+    {
+      "guid": "8b2b2767bb24e5c4ab73caa4eabdcfca",
+      "asset": "Kingdom/CrusadeBuildings/Sanctuary.jbp",
+      "type": "BlueprintSettlementBuilding",
+      "recordSha256": "ff5eb9e6c78413fb6fab457925150f7fb5db2b02147a59c66c5b0ab7b5c10d37"
+    },
+    {
+      "guid": "95f206566c5261c42aa5b3e7e0d1e36c",
+      "asset": "Spells/Level0/MageLight.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "3d6c62fe80cb06c897cbb316b921764cfb22e12b2ae8c97194855b80e2ec471d"
+    },
+    {
+      "guid": "8bc64d869456b004b9db255cdd1ea734",
+      "asset": "Spells/Level1/Bane.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "24d850010c45e926f52765564811353ce0e46e03360864055a239b737422ff47"
+    },
+    {
+      "guid": "e80a4d6c0efa5774cbd515e3e37095b0",
+      "asset": "Spells/Level3/LongstriderGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4b8b2068fdac3967a7e3023d44b35fc6d297a98e16428e3f33dd711bfb040b66"
+    }
+  ],
+  "observedAssets": {
+    "0087fc2d64b6095478bc7b8d7d512caf": {
+      "guid": "0087fc2d64b6095478bc7b8d7d512caf",
+      "asset": "Spells/Level4/FreedomOfMovementCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "1d7fe1ce4858e67235ac83ef5983ba345a5a793911085a8eb2af8be929b6839f"
+    },
+    "02b187038a8dce545bb34bbfb346428d": {
+      "guid": "02b187038a8dce545bb34bbfb346428d",
+      "asset": "Classes/Paladin/Mercy/SelectionMercy.jbp",
+      "type": "BlueprintFeatureSelection",
+      "recordSha256": "48d05ffb118887c39b90ad5dcd3445d6c9d37a70e3469fc4b524d38f02cbf5da"
+    },
+    "03a9630394d10164a9410882d31572f0": {
+      "guid": "03a9630394d10164a9410882d31572f0",
+      "asset": "Spells/Level2/Aid.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "54a5ad0aa9721d5f7fc4462eafbe636e5d02ff17f5b0195c91d1ca1ef1e22b97"
+    },
+    "08cb5f4c3b2695e44971bf5c45205df0": {
+      "guid": "08cb5f4c3b2695e44971bf5c45205df0",
+      "asset": "Spells/Level2/Scare.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "9801680023e272fcd0fa903f9613ac912d3d0b1b514d67d605033b4e2ded0b08"
+    },
+    "0a5ddfbcfb3989543ac7c936fc256889": {
+      "guid": "0a5ddfbcfb3989543ac7c936fc256889",
+      "asset": "Spells/Level5/SpellResistance.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "0ef49b17b2c32f82bf44cfdf90473ed6bdcfe7b2b8e8d43bf24fcdffe8c4d009"
+    },
+    "0aeba56961779e54a8a0f6dedef081ee": {
+      "guid": "0aeba56961779e54a8a0f6dedef081ee",
+      "asset": "Classes/Druid/StormBuff.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "d3b5d37e704284d3ae08aee029457a56791302abd575831000557bb459de7cf3"
+    },
+    "0c80276018694f24fbaf59ec7b841f2b": {
+      "guid": "0c80276018694f24fbaf59ec7b841f2b",
+      "asset": "Classes/Pets/AnimalCompanionStrengthDexterityConstitution.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "8998ad6026412817c4b4fe7cf714176973d90339a5a7c812aa962d58a0af1590"
+    },
+    "0d20d88abb7c33a47902bd99019f2ed1": {
+      "guid": "0d20d88abb7c33a47902bd99019f2ed1",
+      "asset": "Classes/Pets/AnimalCompanionNaturalArmor.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "e6988aad63c81813707826bee026d5d1b247ab496556862cec02125cfe1562d8"
+    },
+    "125af359f8bc9a145968b5d8fd8159b8": {
+      "guid": "125af359f8bc9a145968b5d8fd8159b8",
+      "asset": "Classes/Cleric/Domains/Animal/DomainAnimalCompanionProgression.jbp",
+      "type": "BlueprintProgression",
+      "recordSha256": "ab27309c282c97997ce42dab0a22f9f13b7506c230eebad44377529568f014a8"
+    },
+    "126712ef923ab204983d6f107629c895": {
+      "guid": "126712ef923ab204983d6f107629c895",
+      "asset": "Classes/Pets/AnimalCompanionFeatureSmilodon.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "94e7f5ea2477b1aa52207a9b336a9b1a298fa081464004079eee8034bcd10181"
+    },
+    "12fb4a4c22549c74d949e2916a2f0b6a": {
+      "guid": "12fb4a4c22549c74d949e2916a2f0b6a",
+      "asset": "Spells/Level5/PhantasmalWeb.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "231c1f5bed1412ef09d117594853288599c267e741e4cdd742bce0e51e197904"
+    },
+    "14ec7a4e52e90fa47a4c8d63c69fd5c1": {
+      "guid": "14ec7a4e52e90fa47a4c8d63c69fd5c1",
+      "asset": "Spells/Level2/Blur.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "25272a9fa846823d5cf3810f8c9ba4ffb4e342bd7da123af406d1f3a2690d98a"
+    },
+    "1670990255e4fe948a863bafd5dbda5d": {
+      "guid": "1670990255e4fe948a863bafd5dbda5d",
+      "asset": "Classes/Pets/AnimalCompanionRank.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "eb4ebac2d1ffdaf3a64bde925efd1ed8db79f6e0e1e5c1480adcae32f22a171c"
+    },
+    "1724061e89c667045a6891179ee2e8e7": {
+      "guid": "1724061e89c667045a6891179ee2e8e7",
+      "asset": "Spells/Level2/SummonMonsterIIBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "1e9bad271fa534e438e0a17df3f7144327ff656f283d6571f5aa98ace460b4b0"
+    },
+    "20f79fea035330b479fc899fa201d232": {
+      "guid": "20f79fea035330b479fc899fa201d232",
+      "asset": "Buffs/GhostFX.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "97793c037d76b069a6f4c30b14666dfed451882cdbf141535959686379ebd592"
+    },
+    "21ffef7791ce73f468b6fca4d9371e8b": {
+      "guid": "21ffef7791ce73f468b6fca4d9371e8b",
+      "asset": "Spells/Level2/ResistEnergy.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "ab1094bd8b984aa8e6bcffa01028547ecaef77f9f317631f6068370ddac125a2"
+    },
+    "226f939b7dfd47b4697ec52f79799012": {
+      "guid": "226f939b7dfd47b4697ec52f79799012",
+      "asset": "Classes/Pets/AnimalCompanionDevotion.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "070cf561992c78f0cf86acdf429857a6570c1c3c5f3cedf03b627ea28a2fbe3b"
+    },
+    "237427308e48c3341b3d532b9d3a001f": {
+      "guid": "237427308e48c3341b3d532b9d3a001f",
+      "asset": "Spells/Level5/ShadowEvocation.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "087b1d304582e04ae2b9fdfb101de9935bcec24e2701ede4f18354cc33c234dc"
+    },
+    "25ec6cb6ab1845c48a95f9c20b034220": {
+      "guid": "25ec6cb6ab1845c48a95f9c20b034220",
+      "asset": "Buffs/Shaken.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "96bb04fdd32c881c1116029e3e5681277505f6cdb2f28bb3b472eef151dc0419"
+    },
+    "26b10d4340839004f960f9816f6109fe": {
+      "guid": "26b10d4340839004f960f9816f6109fe",
+      "asset": "Classes/Monster/Animal/AnimalCompanionClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "recordSha256": "d9bb66ab03abd2fc8bbf5b4176ff36ca0c2370e3c8e6d336ee771c649bf71155"
+    },
+    "27203d62eb3d4184c9aced94f22e1806": {
+      "guid": "27203d62eb3d4184c9aced94f22e1806",
+      "asset": "Spells/Level6/Transformation.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "161358df9e986cf87c8fc368cbac35d7edd708e48fa9dca482bff7194a8e8b83"
+    },
+    "2f91d7337b60e3b4b9b137198a8c8745": {
+      "guid": "2f91d7337b60e3b4b9b137198a8c8745",
+      "asset": "Units/NPC/Commoners/Spectre/CR7_SpectreStandard.jbp",
+      "type": "BlueprintUnit",
+      "recordSha256": "900b8f708fdbc14ecd9930d07aa8696503771354af449f06da96f1f55498beb7"
+    },
+    "30e5dc243f937fc4b95d2f8f4e1b7ff3": {
+      "guid": "30e5dc243f937fc4b95d2f8f4e1b7ff3",
+      "asset": "Spells/Level2/SeeInvisibility.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "51f1e7a9271d6d1f6cc37fb92a82e74cc9270e52224b9b4715aed0711cb8bcda"
+    },
+    "3167d30dd3c622c46b0c0cb242061642": {
+      "guid": "3167d30dd3c622c46b0c0cb242061642",
+      "asset": "Spells/Level6/Eyebite.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "d783091b67f5f5a550246dfbab8339e53a5ce907bec394dcde06e7d71fb83e69"
+    },
+    "3361c5df793b4c8448756146a88026ad": {
+      "guid": "3361c5df793b4c8448756146a88026ad",
+      "asset": "Spells/Level3/CureSeriousWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "69b77f44303005513479596cc18156dad84054398e60acf155e58ef5ef3d10d9"
+    },
+    "36897b36a4bd63146b1d8509a17fc5ad": {
+      "guid": "36897b36a4bd63146b1d8509a17fc5ad",
+      "asset": "Spells/Level3/CrushingDespairBuff.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "10b4c4f9341bb74a4b5a998ce4a5125b1644e5e9b6eeab5656774cd467036186"
+    },
+    "3853d5405ebfc0f4a86930bb7082b43b": {
+      "guid": "3853d5405ebfc0f4a86930bb7082b43b",
+      "asset": "Classes/Druid/DruidAnimalCompanionProgression.jbp",
+      "type": "BlueprintProgression",
+      "recordSha256": "1f57e6a094cf73db1f308f34f588fb34dadc6efb47b6b4354b1c1b8e67412013"
+    },
+    "3bc40c9cbf9a0db4b8b43d8eedf2e6ec": {
+      "guid": "3bc40c9cbf9a0db4b8b43d8eedf2e6ec",
+      "asset": "Classes/Cleric/Domains/Luck/LuckDomainBaseBuff.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "51520f9453537bbb46b7d7ce0fa265789f55591a2ca26abb0aa60958eabf5508"
+    },
+    "403cf599412299a4f9d5d925c7b9fb33": {
+      "guid": "403cf599412299a4f9d5d925c7b9fb33",
+      "asset": "Spells/Level1/MagicFang.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e1723325322c80c249cd225dd489d6de4009e4b836c4c23befc25515cad5a59e"
+    },
+    "4093d5a0eb5cae94e909eb1e0e1a6b36": {
+      "guid": "4093d5a0eb5cae94e909eb1e0e1a6b36",
+      "asset": "Spells/Level3/RemoveDisease.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "870ddbec8ec576e1998dd775bd863bae529e3908cf70346509bf3a9ef98aa22d"
+    },
+    "41c9016596fe1de4faf67425ed691203": {
+      "guid": "41c9016596fe1de4faf67425ed691203",
+      "asset": "Spells/Level4/CureCriticalWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "dbac0a04de8d3dcece71813d982edd80c7e5ee3532186b50e72791f4a850a468"
+    },
+    "433b1faf4d02cc34abb0ade5ceda47c4": {
+      "guid": "433b1faf4d02cc34abb0ade5ceda47c4",
+      "asset": "Spells/Level1/ProtectionFromAlignment.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5a8900dfd64bfc6f99eb254d846ef4de618b1356318dffa0ce6d8f5de825d1b2"
+    },
+    "444eed6e26f773a40ab6e4d160c67faa": {
+      "guid": "444eed6e26f773a40ab6e4d160c67faa",
+      "asset": "Spells/Level5/Feeblemind.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5ed5038ff822e2bd034bf51d42116bcdf09226e47a1169b40c3dfb887c77e859"
+    },
+    "446f7bf201dc1934f96ac0a26e324803": {
+      "guid": "446f7bf201dc1934f96ac0a26e324803",
+      "asset": "Spells/Level2/EaglesSplendor.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "d1546886300ffc0f8e68d75b91a6dad604a15b5acd95d3c35b910348b404af79"
+    },
+    "45a52ce762f637f4c80cc741c91f58b7": {
+      "guid": "45a52ce762f637f4c80cc741c91f58b7",
+      "asset": "CreatureAbilities/NaturalArmor/NaturalArmor2.jbp",
+      "type": "BlueprintUnitFact",
+      "recordSha256": "48c4f0525b3d08d7d5cb0a4517ee9085c53493d5418ac6d988d460bd5e50b7a4"
+    },
+    "46fd02ad56c35224c9c91c88cd457791": {
+      "guid": "46fd02ad56c35224c9c91c88cd457791",
+      "asset": "Spells/Level2/Blindness.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "bd45ea3164481fe72619743e53df51cf4e52d7a38523ea686cb800e83b96e8ba"
+    },
+    "474ed0aa656cc38499cc9a073d113716": {
+      "guid": "474ed0aa656cc38499cc9a073d113716",
+      "asset": "Spells/Level6/UmbralStrike.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "ee629e62f34914779c5f8bb22a83c757e3a28ebfa80df9ad7b45f6cfb1932477"
+    },
+    "486eaff58293f6441a5c2759c4872f98": {
+      "guid": "486eaff58293f6441a5c2759c4872f98",
+      "asset": "Spells/Level3/Haste.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "42d658e325a3452b0ccfdcb471fe093a6130eae1738b8cc5239fe9fd0514f671"
+    },
+    "48ac8db94d5de7645906c7d0ad3bcfbd": {
+      "guid": "48ac8db94d5de7645906c7d0ad3bcfbd",
+      "asset": "Classes/Fighter/FighterClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "recordSha256": "ab2404d52f422771ebbec45d58457cc7b3e2620eba8e029f14d4595cc5c202f9"
+    },
+    "4a648b57935a59547b7a2ee86fb4f26a": {
+      "guid": "4a648b57935a59547b7a2ee86fb4f26a",
+      "asset": "Spells/Level4/DimensionDoorBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "3188e2ff5cb97a6deceec4dd205fe0fc011b4684a7afb3348bb34f108401a54c"
+    },
+    "4aa7942c3e62a164387a73184bca3fc1": {
+      "guid": "4aa7942c3e62a164387a73184bca3fc1",
+      "asset": "Spells/Level6/Disintegrate.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "97174be55a4cf02fcca5095c1bca2b28aa490be5d29e5fc652175547f330ea38"
+    },
+    "4b76d32feb089ad4499c3a1ce8e1ac27": {
+      "guid": "4b76d32feb089ad4499c3a1ce8e1ac27",
+      "asset": "Spells/Level4/AnimateDead.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "6facf547e96928583983327a2d30977182d1febae0c05f1bd1a4585f153e91a5"
+    },
+    "4baf4109145de4345861fe0f2209d903": {
+      "guid": "4baf4109145de4345861fe0f2209d903",
+      "asset": "Spells/Level3/CrushingDespair.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "031ce31f7b1daecb2440ea8f32559f790ed599ca7fa0127d7bf14feef65ee763"
+    },
+    "4cd1757a0eea7694ba5c933729a53920": {
+      "guid": "4cd1757a0eea7694ba5c933729a53920",
+      "asset": "Classes/Monster/Animal/AnimalClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "recordSha256": "b238012c52b2a69091ebec5d09b4297fa0f24d313e41507bf1514568fca0aa97"
+    },
+    "4cf3d0fae3239ec478f51e86f49161cb": {
+      "guid": "4cf3d0fae3239ec478f51e86f49161cb",
+      "asset": "Spells/Level6/TrueSeeingCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "2cd7aa21a599d01262d9a92a082a1042441f6482fbe718eb81f320f054442ba4"
+    },
+    "4f139d125bb602f48bfaec3d3e1937cb": {
+      "guid": "4f139d125bb602f48bfaec3d3e1937cb",
+      "asset": "Spells/Level1/EnlargePersonBuff.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "f5150d3ae1265c560e27784e38ba5cf1fd3eb06a3eca5d1f9c9de8103088f401"
+    },
+    "4f8181e7a7f1d904fbaea64220e83379": {
+      "guid": "4f8181e7a7f1d904fbaea64220e83379",
+      "asset": "Spells/Level1/ExpeditiousRetreat.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "24966fd51ba8937c0766ea7f127e35feb997dcca266cf18f03b30293fc4acfa1"
+    },
+    "4fbd47525382517419c66fb548fe9a67": {
+      "guid": "4fbd47525382517419c66fb548fe9a67",
+      "asset": "Spells/Level5/SlayLivingCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e917f01e78cee02b35029d566f452d886519037240718eff07653d6fc7eb4c48"
+    },
+    "548d339ba87ee56459c98e80167bdf10": {
+      "guid": "548d339ba87ee56459c98e80167bdf10",
+      "asset": "Spells/Level5/Cloudkill.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "49b441a0f5fc5afa0d60155b77eb1ba6fbe82e221f80d2cbf2395ac0de19ef7a"
+    },
+    "5590652e1c2225c4ca30c4a699ab3649": {
+      "guid": "5590652e1c2225c4ca30c4a699ab3649",
+      "asset": "Spells/Level1/CureLightWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "f471e0861f46e2ce52097bb55cc8add0de8dd054b28ebb72b66ac893d35815d4"
+    },
+    "55a037e514c0ee14a8e3ed14b47061de": {
+      "guid": "55a037e514c0ee14a8e3ed14b47061de",
+      "asset": "Spells/Level1/RemoveFear.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "dd4115f612b35ac9ab08b20226a6612e669aa7af25a1bbeae05deb490680d348"
+    },
+    "55f14bc84d7c85446b07a1b5dd6b2b4c": {
+      "guid": "55f14bc84d7c85446b07a1b5dd6b2b4c",
+      "asset": "Spells/Level0/Daze.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "89ae377ec0e826b20a74ef5df62b4e540e29393058b8d42ba843f4bfe90b67b6"
+    },
+    "57fab75111f377248810ece84193a5a5": {
+      "guid": "57fab75111f377248810ece84193a5a5",
+      "asset": "Classes/Inquisitor/InquisitorSpellbook.jbp",
+      "type": "BlueprintSpellbook",
+      "recordSha256": "229abe61186f945e7128007d64bb10c33a27644cc7e46dd2f96f1293686d56e4"
+    },
+    "57fcf8016cf04da4a8b33d2add14de7e": {
+      "guid": "57fcf8016cf04da4a8b33d2add14de7e",
+      "asset": "Spells/Level3/AnimateDeadLesser.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4a617d511d2f62be350c28835274e927f54f4b3045e50b1241341fc599dc3c04"
+    },
+    "5ab0d42fb68c9e34abae4921822b9d63": {
+      "guid": "5ab0d42fb68c9e34abae4921822b9d63",
+      "asset": "Spells/Level3/Heroism.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "d63c9eda8a3025dc4cdb582114bd9803343fd9aef4460b3e6da533709400a8d9"
+    },
+    "5bdc37e4acfa209408334326076a43bc": {
+      "guid": "5bdc37e4acfa209408334326076a43bc",
+      "asset": "Spells/Level4/DimensionDoor.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "146e299a6abc46906e261ae0ec715a0f732c3a22ddf452fb1bb8b44088b7d929"
+    },
+    "5bf3315ce1ed4d94e8805706820ef64d": {
+      "guid": "5bf3315ce1ed4d94e8805706820ef64d",
+      "asset": "Spells/Level0/TouchOfFatigueCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "48b3a14fd0eb54011ceced56950ef9a8d7a0968371cf4aae53ac53c3617ebb1b"
+    },
+    "5d61dde0020bbf54ba1521f7ca0229dc": {
+      "guid": "5d61dde0020bbf54ba1521f7ca0229dc",
+      "asset": "Spells/Level3/SummonMonsterIIIBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "b4d121c35ba565539bf8890baf47a66fa91c1989a29c9be581886abf81ce94b0"
+    },
+    "5da172c4c89f9eb4cbb614f3a67357d3": {
+      "guid": "5da172c4c89f9eb4cbb614f3a67357d3",
+      "asset": "Spells/Level6/HealCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "13733a6b92f9083591d9d174a3944179ad768aaa73a26d03f887153cbbb076af"
+    },
+    "62ef1cdb90f1d654d996556669caf7fa": {
+      "guid": "62ef1cdb90f1d654d996556669caf7fa",
+      "asset": "Weapons/Types/Special/TouchCalculateFeature.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "735d4deb497aaea6c65b3bfa5d539d93e3d5da7c0f00bddd8fb0e9d76f137764"
+    },
+    "630c8b85d9f07a64f917d79cb5905741": {
+      "guid": "630c8b85d9f07a64f917d79cb5905741",
+      "asset": "Spells/Level5/SummonMonsterVBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4eb0540096ccd124e232191fbf7f88958af92e9bcae83db33c3d8570ef34985c"
+    },
+    "6507d2da389ed55448e0e1e5b871c013": {
+      "guid": "6507d2da389ed55448e0e1e5b871c013",
+      "asset": "Feats/SkillFocus/SkillFocusLoreNature.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "45b80559abe33e3323bda4b62a1703a2a8b129da695f46852a4006a734f1f2a9"
+    },
+    "651110ed4f117a948b41c05c5c7624c0": {
+      "guid": "651110ed4f117a948b41c05c5c7624c0",
+      "asset": "Spells/Level4/InflictCriticalWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "8c96e00713c3a5ce69547ebbc967057319957d24ba992846dfc0977bdceb62b4"
+    },
+    "65f0b63c45ea82a4f8b8325768a3832d": {
+      "guid": "65f0b63c45ea82a4f8b8325768a3832d",
+      "asset": "Spells/Level2/InflictModerateWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "8d98461d25a5a40b7449dbffa9b5b621decda6c9ff6d7205bd9502e38a1c1484"
+    },
+    "6717dbaef00c0eb4897a1c908a75dfe5": {
+      "guid": "6717dbaef00c0eb4897a1c908a75dfe5",
+      "asset": "Spells/Level4/PhantasmalKiller.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "c4314d8bbd4caf5df57467fa7a83c6d91e672329c900f3c424e6f3f4d777e200"
+    },
+    "6b90c773a6543dc49b2505858ce33db5": {
+      "guid": "6b90c773a6543dc49b2505858ce33db5",
+      "asset": "Spells/Level2/CureModerateWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "6f4c7cb484003f5efaae4077dd1fee57ed3e72409199642cf5589a2c8f3ed5e5"
+    },
+    "766ec978fa993034f86a372c8eb1fc10": {
+      "guid": "766ec978fa993034f86a372c8eb1fc10",
+      "asset": "Spells/Level6/SummonElementalHugeBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "9a076a17c66e94257fd694787cd93fc1e680c43aba8a12a9d3b939423f53c2c2"
+    },
+    "767e6932882a99c4b8ca95c88d823137": {
+      "guid": "767e6932882a99c4b8ca95c88d823137",
+      "asset": "Weapons/Items/Standard/NaturalWeapon/Slam1d6.jbp",
+      "type": "BlueprintItemWeapon",
+      "recordSha256": "571a9172fc4263a6f0ff4b5544ae16c2ba5e3a19f2ad68a40f1c89cb50b40c17"
+    },
+    "76a11b460be25e44ca85904d6806e5a3": {
+      "guid": "76a11b460be25e44ca85904d6806e5a3",
+      "asset": "Spells/Level7/CreateUndeadBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "892af7b5d524d15f0815c6c2add9e0f9f47ca91c961af0c1cf1dfaa6c6404c37"
+    },
+    "76f8f23f6502def4dbefedffdc4d4c43": {
+      "guid": "76f8f23f6502def4dbefedffdc4d4c43",
+      "asset": "Classes/Ranger/Archetypes/Freebooter/FreebootersBaneAbility.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e9760f96b50e8da0b3d3e1547218cea515b323a7caf255c074ee0459199e9e4a"
+    },
+    "7792da00c85b9e042a0fdfc2b66ec9a8": {
+      "guid": "7792da00c85b9e042a0fdfc2b66ec9a8",
+      "asset": "Spells/Level5/BreakEnchantment.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "ea3fcf0ac5e673dca0bd57e4a165f5d4f5b4ce428ca579a816df8bf63fc3356a"
+    },
+    "7812ad3672a4b9a4fb894ea402095167": {
+      "guid": "7812ad3672a4b9a4fb894ea402095167",
+      "asset": "Feats/ImprovedUnarmedStrike.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "ffe44834c92e9d1963311fc5ae6ff0fb7e70042fb32f30b8b0e93910e326edbf"
+    },
+    "7a5b5bf845779a941a67251539545762": {
+      "guid": "7a5b5bf845779a941a67251539545762",
+      "asset": "Spells/Level2/FalseLife.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "71d1e28ebe7ad19b1090f6286bcb5bb6f4c2f30aea60630862cbf11cee7ea5d7"
+    },
+    "7bc8e27cba24f0e43ae64ed201ad5785": {
+      "guid": "7bc8e27cba24f0e43ae64ed201ad5785",
+      "asset": "Spells/Level0/Resistance.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "916956f329046b0683b3430450b65ac0b4f8f689cdf4415b47635cb0769d316f"
+    },
+    "7ed74a3ec8c458d4fb50b192fd7be6ef": {
+      "guid": "7ed74a3ec8c458d4fb50b192fd7be6ef",
+      "asset": "Spells/Level4/SummonMonsterIVBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e27db6a8a46183fc857dbc0ca0f2e7de447f445faaed21b6476ec39a36ff3b6d"
+    },
+    "87ab2fed7feaaff47b62a3320a57ad8d": {
+      "guid": "87ab2fed7feaaff47b62a3320a57ad8d",
+      "asset": "Spells/Level3/HeroismBuff.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "c9145fd8e48720012aa5b5194d5a3930f5a4811bba2f303882f31068376ffe07"
+    },
+    "8878d0c46dfbd564e9d5756349d5e439": {
+      "guid": "8878d0c46dfbd564e9d5756349d5e439",
+      "asset": "Spells/Level5/WavesOfFatigue.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "102871115541d03249d364760004dc69bc838ad8408c93fcdf3d72f73fad41b4"
+    },
+    "89404dd71edc1aa42962824b44156fe5": {
+      "guid": "89404dd71edc1aa42962824b44156fe5",
+      "asset": "Spells/Level5/SummonElementalLargeBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5b5f673b775f1dc950732688db4b0b8d3180325e070aa0e98f7f77163975c77c"
+    },
+    "89940cde01689fb46946b2f8cd7b66b7": {
+      "guid": "89940cde01689fb46946b2f8cd7b66b7",
+      "asset": "Spells/Level2/Invisibility.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "c92f6f1ae59b998dfb50d6f0b014fb1368e503fc92a093ebe893c616c7837e64"
+    },
+    "8a28a811ca5d20d49a863e832c31cce1": {
+      "guid": "8a28a811ca5d20d49a863e832c31cce1",
+      "asset": "Spells/Level3/VampiricTouchCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "8e5fc2924f8ffb6ed199f103b3efaaaa41a186972ad9e0643223deeb459c0bd4"
+    },
+    "8a6986e17799d7d4b90f0c158b31c5b9": {
+      "guid": "8a6986e17799d7d4b90f0c158b31c5b9",
+      "asset": "Classes/Pets/AnimalCompanionUnitSmilodon.jbp",
+      "type": "BlueprintUnit",
+      "recordSha256": "7299d7576e7801761c8c0727644c9fb613fb882e2f35acbea58139d405966848"
+    },
+    "8b2b2767bb24e5c4ab73caa4eabdcfca": {
+      "guid": "8b2b2767bb24e5c4ab73caa4eabdcfca",
+      "asset": "Kingdom/CrusadeBuildings/Sanctuary.jbp",
+      "type": "BlueprintSettlementBuilding",
+      "recordSha256": "ff5eb9e6c78413fb6fab457925150f7fb5db2b02147a59c66c5b0ab7b5c10d37"
+    },
+    "8bc64d869456b004b9db255cdd1ea734": {
+      "guid": "8bc64d869456b004b9db255cdd1ea734",
+      "asset": "Spells/Level1/Bane.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "24d850010c45e926f52765564811353ce0e46e03360864055a239b737422ff47"
+    },
+    "8d6073201e5395d458b8251386d72df1": {
+      "guid": "8d6073201e5395d458b8251386d72df1",
+      "asset": "Classes/Paladin/LayOnHands/LayOnHandsSelf.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "d74f43375a7d627219129f735aecfc8d64e494205a152cad50cecbc5223c5d45"
+    },
+    "8eead52509987034ea9025d60cc05985": {
+      "guid": "8eead52509987034ea9025d60cc05985",
+      "asset": "Spells/Level3/RayOfExhaustion.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "74fdf2eeaa69844cfe92a62a158e1e503025316078920e1b13ff830987ec8934"
+    },
+    "8fd74eddd9b6c224693d9ab241f25e84": {
+      "guid": "8fd74eddd9b6c224693d9ab241f25e84",
+      "asset": "Spells/Level1/SummonMonsterISingle.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5876087f0d81b47100c671f09f9586f411c993ebf7df19da1eec1dc806d88ae7"
+    },
+    "903092f6488f9ce45a80943923576ab3": {
+      "guid": "903092f6488f9ce45a80943923576ab3",
+      "asset": "Spells/Level3/Displacement.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "db201e323d9fb716962de39846f015af4a764c2c4ae70dbc2f105345d8f4786a"
+    },
+    "90e54424d682d104ab36436bd527af09": {
+      "guid": "90e54424d682d104ab36436bd527af09",
+      "asset": "Feats/WeaponFinesse.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "6be0e954b71dfc056d0c94309d6d8ede09422d1794b762bed3663f90d21e1d68"
+    },
+    "90e59f4a4ada87243b7b3535a06d0638": {
+      "guid": "90e59f4a4ada87243b7b3535a06d0638",
+      "asset": "Spells/Level1/Bless.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "882b06e94f65fc292ccd87864261f81aa16c2c58c4de11a91dd1cb4aaea729c3"
+    },
+    "918939943bf32ba4a95470ea696c2ba5": {
+      "guid": "918939943bf32ba4a95470ea696c2ba5",
+      "asset": "Classes/Pets/AnimalCompanionUnitDog.jbp",
+      "type": "BlueprintUnit",
+      "recordSha256": "1bea019a89962c7e42882bc2ebe6d12373f493623255ff6a1534ce315509ef06"
+    },
+    "92681f181b507b34ea87018e8f7a528a": {
+      "guid": "92681f181b507b34ea87018e8f7a528a",
+      "asset": "Spells/Level3/DispelMagic.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "1ef6c423fd2fc34c16a83eac2d89c32185ab91210e20f0bcaaa9b3f0bd6c1d1a"
+    },
+    "95f206566c5261c42aa5b3e7e0d1e36c": {
+      "guid": "95f206566c5261c42aa5b3e7e0d1e36c",
+      "asset": "Spells/Level0/MageLight.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "3d6c62fe80cb06c897cbb316b921764cfb22e12b2ae8c97194855b80e2ec471d"
+    },
+    "95f7cdcec94e293489a85afdf5af1fd7": {
+      "guid": "95f7cdcec94e293489a85afdf5af1fd7",
+      "asset": "Spells/Level5/Dismissal.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "06f6a3a72eba264aad621bab2b8ef3f3a69b738f78a6fc3576ed311cc61aed83"
+    },
+    "970c6db48ff0c6f43afc9dbb48780d03": {
+      "guid": "970c6db48ff0c6f43afc9dbb48780d03",
+      "asset": "Spells/Level2/SummonElementalSmallBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4983762e99d586e45ff7790648afc4d9be68e2e1d33c737d2ef4f6ad21f4c5ff"
+    },
+    "97b991256e43bb140b263c326f690ce2": {
+      "guid": "97b991256e43bb140b263c326f690ce2",
+      "asset": "Spells/Level3/Rage.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "f0d93abea450f284ebcea5e08bc2c587a9ee7e461f2d45ffb0a6e3d2a1951122"
+    },
+    "989ab5c44240907489aba0a8568d0603": {
+      "guid": "989ab5c44240907489aba0a8568d0603",
+      "asset": "Spells/Level3/BestowCurse.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "ffcab80b71abc60a1781da12f1133157668c1118bcc245f63011cb0bdb44d17f"
+    },
+    "9972f33f977fc724c838e59641b2fca5": {
+      "guid": "9972f33f977fc724c838e59641b2fca5",
+      "asset": "Feats/PowerAttack/PowerAttackFeature.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "14b699bad1a9bb366e5699e4047da9eebfa2b1de55d5614d8f701f1370fb0186"
+    },
+    "9b9eac6709e1c084cb18c3a366e0ec87": {
+      "guid": "9b9eac6709e1c084cb18c3a366e0ec87",
+      "asset": "Classes/Rogue/SneakAttack.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "e04cf1b03a65817db76010088f9d177e307757f313aac071edc65794c81075e5"
+    },
+    "9d5d2d3ffdd73c648af3eb3e585b1113": {
+      "guid": "9d5d2d3ffdd73c648af3eb3e585b1113",
+      "asset": "Spells/Level1/DivineFavor.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "fb11c881a1d06adca5b6bbb1465c473761c2cf622dd091faf5c46d18abf90df9"
+    },
+    "9e1ad5d6f87d19e4d8883d63a6e35568": {
+      "guid": "9e1ad5d6f87d19e4d8883d63a6e35568",
+      "asset": "Spells/Level1/MageArmor.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "3f5592fa732dce6b5c5660ed583625a5f926693317ed1845735738c106570899"
+    },
+    "a0fc99f0933d01643b2b8fe570caa4c5": {
+      "guid": "a0fc99f0933d01643b2b8fe570caa4c5",
+      "asset": "Spells/Level5/RaiseDead.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4583330086464d33471583fe6b6491a69a7e35deb8837eb5ac3843cefbdf048a"
+    },
+    "a1ffec0ce7c167a40aaea13dc49b757b": {
+      "guid": "a1ffec0ce7c167a40aaea13dc49b757b",
+      "asset": "Spells/Level3/RageBuff.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "f67a4ebd03eb080397f3954260f7688d32c69b2a89bdbdb714b8d0c715f3202e"
+    },
+    "a34921035f2a6714e9be5ca76c5e34b5": {
+      "guid": "a34921035f2a6714e9be5ca76c5e34b5",
+      "asset": "Spells/Level5/VampiricShadowShield.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "231b440c3c134351927b38a65f4fe0685509fb0ae1f8b13d17cb7da56c6f07a4"
+    },
+    "a5e23522eda32dc45801e32c05dc9f96": {
+      "guid": "a5e23522eda32dc45801e32c05dc9f96",
+      "asset": "Spells/Level3/GoodHope.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "3d7b9c3155ceaf465f5d31c4e35482223fc8fed8c5287dc55734cd00e9f1289b"
+    },
+    "a89dcbbab8f40e44e920cc60636097cf": {
+      "guid": "a89dcbbab8f40e44e920cc60636097cf",
+      "asset": "Spells/Level6/CircleOfDeath.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "68458a160d006eabc693d32bed3579ec56486988c7fcc9d10b6b7bdd737be2a1"
+    },
+    "ad10bfec6d7ae8b47870e3a545cc8900": {
+      "guid": "ad10bfec6d7ae8b47870e3a545cc8900",
+      "asset": "Spells/Level1/TouchOfGracelessnessCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "a3c59549962ae27dd0ae7846bb32b1cc330a12b6ed51072922fae69328024666"
+    },
+    "b24583190f36a8442b212e45226c54fc": {
+      "guid": "b24583190f36a8442b212e45226c54fc",
+      "asset": "Spells/Level9/WailOfBanshee.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "b54c3e0ab715086cc98db75a125a2cd697d75cdc7d86bd26dcc51fe06c5ed80f"
+    },
+    "b48674cef2bff5e478a007cf57d8345b": {
+      "guid": "b48674cef2bff5e478a007cf57d8345b",
+      "asset": "Spells/Level3/RemoveCurse.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "2194da94cb539d11367263b738c4ffb2b7ed1458ce0f37467e1671e176dbe375"
+    },
+    "b7731c2b4fa1c9844a092329177be4c3": {
+      "guid": "b7731c2b4fa1c9844a092329177be4c3",
+      "asset": "Spells/Level2/Boneshaker.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "c45002028288d87771f20560b44ed6a93b904042e2e6db4f7cfce5eb8e873634"
+    },
+    "bd5da98859cf2b3418f6d68ea66cabbe": {
+      "guid": "bd5da98859cf2b3418f6d68ea66cabbe",
+      "asset": "Spells/Level3/InflictSeriousWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "cff21d5a8ae7f2affd1db122086fb4d30d32c77bedf1f0a9ba2189a6b89e5dd6"
+    },
+    "bd81a3931aa285a4f9844585b5d97e51": {
+      "guid": "bd81a3931aa285a4f9844585b5d97e51",
+      "asset": "Spells/Level1/CauseFear.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "d3e0d2ad2769e748f7b12c2c30eca9f6c696af3b51a5ace449d677c5a950706d"
+    },
+    "c28de1f98a3f432448e52e5d47c73208": {
+      "guid": "c28de1f98a3f432448e52e5d47c73208",
+      "asset": "Spells/Level2/ProtectionFromArrows.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "9e0855228de5d1a84bda178fda30ed7ddde14afc233f9db239a02ff640277462"
+    },
+    "c3a8f31778c3980498d8f00c980be5f5": {
+      "guid": "c3a8f31778c3980498d8f00c980be5f5",
+      "asset": "Spells/Level0/Guidance.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e9b81446c19f58a57d9154c33793d475301ca4b1f6e47a6d2b0337cc8fbff061"
+    },
+    "c5c86809a1c834e42a2eb33133e90a28": {
+      "guid": "c5c86809a1c834e42a2eb33133e90a28",
+      "asset": "Spells/Level1/RemoveFearBuff.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "fc0372bfbfd68bf195333cef8c1cd2976d12b4fc4eb9f5e67868a11e2c0fa937"
+    },
+    "c60969e7f264e6d4b84a1499fdcf9039": {
+      "guid": "c60969e7f264e6d4b84a1499fdcf9039",
+      "asset": "Spells/Level1/EnlargePerson.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "b2fd4f22989cedbc03103230ad38a68afbfe00b231b80240f704c8a6611c33b7"
+    },
+    "c7e1d5ef809325943af97f093e149c4f": {
+      "guid": "c7e1d5ef809325943af97f093e149c4f",
+      "asset": "Feats/Stealthy.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "109137136790ebe4a2e771cd076a3d2c031b2b1cc7deb459dff596317fd7329d"
+    },
+    "c927a8b0cd3f5174f8c0b67cdbfde539": {
+      "guid": "c927a8b0cd3f5174f8c0b67cdbfde539",
+      "asset": "Spells/Level3/RemoveBlindness.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "0184143bf509783340316df5b9225e5f2be58e0252c6148109b17a4658f421b9"
+    },
+    "c9629ef9eebb88b479b2fbc5e836656a": {
+      "guid": "c9629ef9eebb88b479b2fbc5e836656a",
+      "asset": "Feats/SkillFocus/SkillFocusSelection.jbp",
+      "type": "BlueprintFeatureSelection",
+      "recordSha256": "4357104c172437f55a44be46f0d14cc1ed36ede32fd50274e2d28273d1c82fb6"
+    },
+    "ca577309cedc4f1daf6fe5795fb2619b": {
+      "guid": "ca577309cedc4f1daf6fe5795fb2619b",
+      "asset": "Spells/DLC5NewSpells/IllOmen.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e47a288228e047a0fa95e96d1627093eabbf584302f167eb5f490dc87fdb48cc"
+    },
+    "caac251ca7601324bbe000372a0a1005": {
+      "guid": "caac251ca7601324bbe000372a0a1005",
+      "asset": "Spells/Level4/ShadowConjuration.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "67f2f5a2dcbce74f59d4f3a270cc1d951316281a06d60238cc1560f81c0d700d"
+    },
+    "caae1dc6fcf7b37408686971ee27db13": {
+      "guid": "caae1dc6fcf7b37408686971ee27db13",
+      "asset": "Classes/Paladin/LayOnHands/LayOnHandsOthers.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "8bc2f8264ca010e3af96b1e742ea8603712d671990a6b50480060da05bb022ef"
+    },
+    "cc09224ecc9af79449816c45bc5be218": {
+      "guid": "cc09224ecc9af79449816c45bc5be218",
+      "asset": "Spells/Level6/HarmCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "6a6aa817e39707677ddd4e75ebc21e60ece3f7cc8324c512b1d9aafbfcc0ec25"
+    },
+    "cf6c901fb7acc904e85c63b342e9c949": {
+      "guid": "cf6c901fb7acc904e85c63b342e9c949",
+      "asset": "Spells/Level4/ConfusionSpell.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "0c7a7c097989db6e85420d3c16aaec321d391c204ebc78ff1dd4b356d0aa54c0"
+    },
+    "cf986dd7ba9d4ec46ad8a3a0406d02ae": {
+      "guid": "cf986dd7ba9d4ec46ad8a3a0406d02ae",
+      "asset": "Brain/Companions/Character_Brain.jbp",
+      "type": "BlueprintBrain",
+      "recordSha256": "d829c9ba8d7364c41391879bb81172a93b8650a346e20e9892591bfe2da8c45c"
+    },
+    "d2aeac47450c76347aebbc02e4f463e0": {
+      "guid": "d2aeac47450c76347aebbc02e4f463e0",
+      "asset": "Spells/Level4/Fear.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "084eebee11823fc538ed116273f52eaae1d8cf8182c642398f80acb9c3576195"
+    },
+    "d2f116cfe05fcdd4a94e80143b67046f": {
+      "guid": "d2f116cfe05fcdd4a94e80143b67046f",
+      "asset": "Spells/Level3/ProtectionFromEnergy.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "428ebc9075a5c6ada773b44dc2ed37b697fe7d4cba34ff8df66b17a3f64fa86f"
+    },
+    "d361391f645db984bbf58907711a146a": {
+      "guid": "d361391f645db984bbf58907711a146a",
+      "asset": "Spells/Level7/Banishment.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "0d6727ffa30606d958b31c29e5e8c0bd5f5e254af9fafe785194481c809e5cf1"
+    },
+    "d3a852385ba4cd740992d1970170301a": {
+      "guid": "d3a852385ba4cd740992d1970170301a",
+      "asset": "Spells/Level0/Virtue.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "856e1c55886b462a2513f144c156aaa1e2fe6d8f0710f9c1111f5c89cb853357"
+    },
+    "d3e6275cfa6e7a04b9213b7b292a011c": {
+      "guid": "d3e6275cfa6e7a04b9213b7b292a011c",
+      "asset": "Weapons/Types/Special/RayCalculateFeature.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "c1ace5a53357c1737402c2e268abcff464a6689d65d46c95414546ae2f2225dd"
+    },
+    "d42c6d3f29e07b6409d670792d72bc82": {
+      "guid": "d42c6d3f29e07b6409d670792d72bc82",
+      "asset": "Spells/Level6/BansheeBlast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "6151b50a2f832efbe261ffed2551460282f1f06ec3929cbcbc98e78a75b728e1"
+    },
+    "d5847cad0b0e54c4d82d6c59a3cda6b0": {
+      "guid": "d5847cad0b0e54c4d82d6c59a3cda6b0",
+      "asset": "Spells/Level5/BreathOfLifeCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "f3547bd17b9f830d9c20c01e8432a68da4c9f10dcb06356526a8b888197774d6"
+    },
+    "d7cbd2004ce66a042aeab2e95a3c5c61": {
+      "guid": "d7cbd2004ce66a042aeab2e95a3c5c61",
+      "asset": "Spells/Level5/DominatePerson.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "839d6846b6ed308a6b1b48fbccd5bb59672821eed65b80afc17f2d338b5e7a3b"
+    },
+    "d8de50cc80eb4dc409a983991e0b77ad": {
+      "guid": "d8de50cc80eb4dc409a983991e0b77ad",
+      "asset": "Factions/Neutrals.jbp",
+      "type": "BlueprintFaction",
+      "recordSha256": "6f7590ee750b79d66d7e2c1f3132de98f170ef59a41e6806bc6b7d7ad2834669"
+    },
+    "dc6af3b4fd149f841912d8a3ce0983de": {
+      "guid": "dc6af3b4fd149f841912d8a3ce0983de",
+      "asset": "Spells/Level4/FalseLifeGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "1f720b7e32394ee76820938b8dba6bdba211d4ccef975a19c6006e52288c37e5"
+    },
+    "dd2918e4a77c50044acba1ac93494c36": {
+      "guid": "dd2918e4a77c50044acba1ac93494c36",
+      "asset": "Spells/Level3/OverwhelmingGrief.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "6229f107f46a28aac60d3a203d056315cb0a84c55aa43bfe7a1713e85cc9c80f"
+    },
+    "e1291272c8f48c14ab212a599ad17aac": {
+      "guid": "e1291272c8f48c14ab212a599ad17aac",
+      "asset": "Spells/Level2/EffortlessArmor.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "1ec0578ff00922dcfb91ae1a172411fa7f53d5762fd8393b1e0a283d32e29e89"
+    },
+    "e15e5e7045fda2244b98c8f010adfe31": {
+      "guid": "e15e5e7045fda2244b98c8f010adfe31",
+      "asset": "Spells/Level6/HeroismGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "e60a51fe167bf9e6554b3741c33fea1f760fb593869e46e47432416a1635832f"
+    },
+    "e42b1dbff4262c6469a9ff0a6ce730e3": {
+      "guid": "e42b1dbff4262c6469a9ff0a6ce730e3",
+      "asset": "Spells/Level4/SummonElementalMediumBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "420cfae041a7b0925d949df932d6b1661e19cc220203fc46b614b5f6e0880e19"
+    },
+    "e5af3674bb241f14b9a9f6b0c7dc3d27": {
+      "guid": "e5af3674bb241f14b9a9f6b0c7dc3d27",
+      "asset": "Spells/Level1/InflictLightWoundsCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "65056478eebc4d7c7ba72c8f0c6c3e5ca04e7aff2b7da1f550a0a005eb702070"
+    },
+    "e6f2fc5d73d88064583cb828801212f4": {
+      "guid": "e6f2fc5d73d88064583cb828801212f4",
+      "asset": "Buffs/Fatigued.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "945505e021bddd94ac508a7337e02b8869995f22d3b6526ee343684884678b4e"
+    },
+    "e7240516af4241b42b2cd819929ea9da": {
+      "guid": "e7240516af4241b42b2cd819929ea9da",
+      "asset": "Spells/Level3/NeutralizePoison.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "57b99b46eba11d9ae2e24ebbcd238caa51dcca16832a00a797a8b65b7d62ac9f"
+    },
+    "e740afbab0147944dab35d83faa0ae1c": {
+      "guid": "e740afbab0147944dab35d83faa0ae1c",
+      "asset": "Spells/Level6/SummonMonsterVIBase.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5afd95e815bd0b44603964abfae9293f6970f9323f23e3c65480ca5d20ba20e6"
+    },
+    "e80a4d6c0efa5774cbd515e3e37095b0": {
+      "guid": "e80a4d6c0efa5774cbd515e3e37095b0",
+      "asset": "Spells/Level3/LongstriderGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4b8b2068fdac3967a7e3023d44b35fc6d297a98e16428e3f33dd711bfb040b66"
+    },
+    "e84fc922ccf952943b5240293669b171": {
+      "guid": "e84fc922ccf952943b5240293669b171",
+      "asset": "Spells/Level2/RestorationLesser.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4969f0733e2b9e42a9a476ff4b2edab4d4a98c88cb1c2ae610eb4304c61e5742"
+    },
+    "e9cc9378fd6841f48ad59384e79e9953": {
+      "guid": "e9cc9378fd6841f48ad59384e79e9953",
+      "asset": "Spells/Level4/DeathWardCast.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "2dba0817c78c9b51f26235e428dd199724b2954beda09d2501ea72d9a5fd9499"
+    },
+    "eabf94e4edc6e714cabd96aa69f8b207": {
+      "guid": "eabf94e4edc6e714cabd96aa69f8b207",
+      "asset": "Spells/Level5/MindFog.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "9a17ac5a294d8208f177b5866dbfca06e66c23973029a0ff8487d645e894081f"
+    },
+    "ecaa0def35b38f949bd1976a6c9539e0": {
+      "guid": "ecaa0def35b38f949bd1976a6c9539e0",
+      "asset": "Spells/Level4/InvisibilityGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5636a619b4af7a06b08c5eb1f372f1988a5455df4851fbb1a6166dfb998f2088"
+    },
+    "ef768022b0785eb43a18969903c537c4": {
+      "guid": "ef768022b0785eb43a18969903c537c4",
+      "asset": "Spells/Level1/MageShield.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "5cfffb458a0a3906c20e0aa86fb51d39f7704d3ff64bb787f59bd451669230d2"
+    },
+    "f08a7239aa961f34c8301518e71d4cdf": {
+      "guid": "f08a7239aa961f34c8301518e71d4cdf",
+      "asset": "Buffs/Frightened.jbp",
+      "type": "BlueprintBuff",
+      "recordSha256": "cac25aeefa52bbc8eb0b6e749a23879058aac21d8fed0d3ab9dda3b8bc2c19e9"
+    },
+    "f09453607e683784c8fca646eec49162": {
+      "guid": "f09453607e683784c8fca646eec49162",
+      "asset": "Spells/Level4/Shout.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "b86fed4ac635f1d3dce8069cb55e7164bd754f39012ea0de3fb5ca9afe7e58e8"
+    },
+    "f0f761b808dc4b149b08eaf44b99f633": {
+      "guid": "f0f761b808dc4b149b08eaf44b99f633",
+      "asset": "Spells/Level6/DispelMagicGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "b177d5a504e51f4e5bce94270c9859102a5de4e4e43a160fd2ab032e6355276e"
+    },
+    "f1100650705a69c4384d3edd88ba0f52": {
+      "guid": "f1100650705a69c4384d3edd88ba0f52",
+      "asset": "Spells/Level3/MagicFangGreater.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "2422218fd12020ba5a221e29ce5e41c8da346d0e8f3ad8c8841dec2072253157"
+    },
+    "f18cbcb39a1b35643a8d129b1ec4e716": {
+      "guid": "f18cbcb39a1b35643a8d129b1ec4e716",
+      "asset": "Weapons/Types/NaturalWeapon/SlamType.jbp",
+      "type": "BlueprintWeaponType",
+      "recordSha256": "210ccc978cf3a0804ce71365fe2ef226dd9d5f29b298f629a48ad81b9b1412a4"
+    },
+    "f1a70d9e1b0b41e49874e1fa9052a1ce": {
+      "guid": "f1a70d9e1b0b41e49874e1fa9052a1ce",
+      "asset": "Classes/Inquisitor/InquisitorClass.jbp",
+      "type": "BlueprintCharacterClass",
+      "recordSha256": "20f0128ae1869145059b315b6ec5034f9c15c75588fa8621f64b8f4b2c70ef98"
+    },
+    "f2115ac1148256b4ba20788f7e966830": {
+      "guid": "f2115ac1148256b4ba20788f7e966830",
+      "asset": "Spells/Level4/Restoration.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "d102534c3633509dd366a26be49e20f44201037ee024f5b38e00c0b26042d811"
+    },
+    "f34fb78eaaec141469079af124bcfa0f": {
+      "guid": "f34fb78eaaec141469079af124bcfa0f",
+      "asset": "Spells/Level4/Enervation.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "4534df8b5a4f166604f7a95de02baff8c8e9717e8e30f23936bc23208a65c609"
+    },
+    "f492622e473d34747806bdb39356eb89": {
+      "guid": "f492622e473d34747806bdb39356eb89",
+      "asset": "Spells/Level3/Slow.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "357b78c34b31186e860c42343190168f2fb37d2e568d8bcab075d0348fde805d"
+    },
+    "f668d6897a7545458013340e51c8a92d": {
+      "guid": "f668d6897a7545458013340e51c8a92d",
+      "asset": "Classes/Druid/Archetypes/WinterChild/WinterChildAnimalCompanionProgression.jbp",
+      "type": "BlueprintProgression",
+      "recordSha256": "aa7bf7759e4f9735169b63a63cf576c096be5534c5fc389628e2e01e7345af03"
+    },
+    "f894e003d31461f48a02f5caec4e3359": {
+      "guid": "f894e003d31461f48a02f5caec4e3359",
+      "asset": "Classes/Pets/AnimalCompanionFeatureDog.jbp",
+      "type": "BlueprintFeature",
+      "recordSha256": "4261ae3585fc60d67127227ccbf778e1b2905f46873191b8c132c19eed1f7d66"
+    },
+    "fbdd8c455ac4cde4a9a3e18c84af9485": {
+      "guid": "fbdd8c455ac4cde4a9a3e18c84af9485",
+      "asset": "Spells/Level1/Doom.jbp",
+      "type": "BlueprintAbility",
+      "recordSha256": "41c519759a3cc4b49586abeadc1e75e45755cadf2022b8dd3f09d50037614c18"
+    },
+    "ff4662bde9e75f145853417313842751": {
+      "guid": "ff4662bde9e75f145853417313842751",
+      "asset": "Classes/Basic/SavesHigh.jbp",
+      "type": "BlueprintStatProgression",
+      "recordSha256": "dc9f36ee46e589ac3555fc8a17ad30a78db68e3cfa17a643a24c2108b4ae3b67"
+    }
+  }
+}

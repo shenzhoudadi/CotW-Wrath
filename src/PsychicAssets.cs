@@ -95,6 +95,14 @@ namespace CallOfTheWild.Wrath.Prototype
             lock (Get(pack, "m_Lock"))
                 if (!((IDictionary)Get(pack, "m_Strings")).Contains(key)) pack.PutString(key, value);
         }
+        internal static string PeekText(BlueprintUnitFact fact, bool description = false) {
+            if (fact == null) return null;
+            var ls = Get(fact, description ? "m_Description" : "m_DisplayName") as LocalizedString;
+            if (ls == null) return null;
+            if (!string.IsNullOrEmpty(ls.Key) && Strings.TryGetValue(ls.Key, out var cached)) return cached;
+            if (ls.Shared?.String != null && !string.IsNullOrEmpty(ls.Shared.String.Key) && Strings.TryGetValue(ls.Shared.String.Key, out cached)) return cached;
+            return null;
+        }
         internal static void ApplyLocalization() {
             foreach (var pair in Strings) PutFallback(pair.Key, pair.Value);
         }
@@ -139,6 +147,12 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         // For private runtime assets whose non-component data must not alias a
         // native blueprint. Blueprint/prefab assets remain read-only references.
+        internal static T CopyBlueprint<T>(T original) where T : BlueprintScriptableObject {
+            var cloned = (T)MemberwiseCloneMethod.Invoke(original, null);
+            cloned.ComponentsArray = (original.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                .Select(c => (BlueprintComponent)DeepCopy(c, new Dictionary<object, object>(ObjectIdentity.Instance))).ToArray();
+            return cloned;
+        }
         internal static T CopyData<T>(T value) => (T)DeepCopy(value, new Dictionary<object, object>(ObjectIdentity.Instance));
         internal BlueprintBuff Buff(string token, string name, string description, params BlueprintComponent[] components)
             => Add(new BlueprintBuff { Stacking = StackingType.Replace, ComponentsArray = components }, token, name, description);

@@ -98,7 +98,15 @@ namespace CallOfTheWild.Wrath.Prototype
     {public BlueprintBuffReference Buff;public bool FromCaster=true;protected override string GetConditionCaption()=>"Performance immunity";protected override bool CheckCondition()=>Target?.Unit?.Buffs.Enumerable.Any(b=>b.Blueprint.AssetGuid==Buff.Guid&&(!FromCaster||b.Context?.MaybeCaster==Context.MaybeCaster))==true;}
     [TypeId("8da53bf49a454639978772cb1f93299c")]
     public sealed class CourtBardCharismaCheck01445:UnitBuffComponentDelegate,IInitiatorRulebookHandler<RuleSkillCheck>,IInitiatorRulebookSubscriber
-    {public void OnEventAboutToTrigger(RuleSkillCheck e){if(e.StatType==StatType.Charisma)e.AddTemporaryModifier(e.Bonus.AddModifier(Context[AbilityRankType.Default],Fact,ModifierDescriptor.UntypedStackable));}public void OnEventDidTrigger(RuleSkillCheck e){} }
+    {
+        public ModifierDescriptor Descriptor = ModifierDescriptor.UntypedStackable;
+        public void OnEventAboutToTrigger(RuleSkillCheck e)
+        {
+            if (e.StatType == StatType.Charisma)
+                e.AddTemporaryModifier(e.Bonus.AddModifier(Context[AbilityRankType.Default], Fact, Descriptor));
+        }
+        public void OnEventDidTrigger(RuleSkillCheck e) { }
+    }
 
     // DarkCodex SetResourceDecreasing can enable list mode and then discard
     // the list when another provider already supplied a free-performance fact.

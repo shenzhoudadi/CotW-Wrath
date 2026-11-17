@@ -28,7 +28,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static readonly BlueprintGuid PlantGuid=BlueprintGuid.Parse(MagaambyanTelepath01447.PlantId);
         internal static bool CanPay(AbilityData ability,UnitEntityData caster)
         {
-            if(ability==null||caster==null||ability.Caster?.Unit!=caster||ability.StickyTouch!=null||!PsychicCasting.IsPsychic(ability)||(ability.SpellDescriptor&SpellDescriptor.MindAffecting)==0)return false;
+            if(ability==null||caster==null||ability.Caster?.Unit!=caster||ability.StickyTouch!=null||ability.Spellbook?.Blueprint?.AssetGuid!=PsychicAmplificationBinding.LegacyBookId||!PsychicCasting.IsPsychic(ability)||(ability.SpellDescriptor&SpellDescriptor.MindAffecting)==0)return false;
             // RuleCastSpell checks CanTarget AFTER paying. Its last two points
             // must remain valid for that cast, including later delivery scans.
             var paid=ReferenceEquals(CurrentCast?.Spell,ability)?CurrentCast.Context:ContextData<MechanicsContext.Data>.Current?.Context?.SourceAbilityContext;

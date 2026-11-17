@@ -108,6 +108,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     BlueprintRegistration.RegisterInitial(cache, state, ReportModule);
                     state.Run(MediumIntegration.ModuleName, () => MediumIntegration.Register(cache), ReportModule);
                     state.Run(WayOfTheShieldIntegration.ModuleName, () => WayOfTheShieldIntegration.Register(cache), ReportModule);
+                    state.Run(Occultist0099Startup.ModuleName, () => Occultist0099Startup.Register(cache), ReportModule);
                     state.InitialDispatchCompleted = true;
                 } else if (state.PendingCount != 0) BlueprintRegistration.RetryInitial(state, ReportModule);
                 registrationCompleted = true;

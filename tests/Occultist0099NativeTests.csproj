@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- COTW-0099 D-0099-01 directed native host. Isolated managed process only:
+       no game, no UMM, no other suite. Real Wrath Managed assemblies are
+       resolved through the reviewed engine02 publicized copy by EngineLauncher.
+       The reference set mirrors tests/PsychicTests.csproj exactly. -->
+  <PropertyGroup>
+    <UseGameHarmonyReference>true</UseGameHarmonyReference>
+    <TargetFramework>net472</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <StartupObject>Occultist0099NativeLauncher</StartupObject>
+    <LangVersion>latest</LangVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>Occultist0099NativeTests</AssemblyName>
+    <GameManaged>$(WrathPath)\Wrath_Data\Managed</GameManaged>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Occultist0099NativeProgram.cs" />
+    <ProjectReference Include="..\CallOfTheWild.Wrath.Prototype.csproj"><Private>false</Private></ProjectReference>
+    <Reference Include="UniRx"><HintPath>$(GameManaged)\UniRx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Owlcat.Runtime.UI"><HintPath>$(GameManaged)\Owlcat.Runtime.UI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="Assembly-CSharp"><HintPath>$(GameManaged)\Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManaged)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(GameManaged)\Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Owlcat.Runtime.Core"><HintPath>$(GameManaged)\Owlcat.Runtime.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Owlcat.Runtime.Validation"><HintPath>$(GameManaged)\Owlcat.Runtime.Validation.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

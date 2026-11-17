@@ -1,0 +1,132 @@
+{
+  "contract": "C-0085-20261115-r1",
+  "status": "specified-not-run",
+  "cases": [
+    {
+      "id": "C01",
+      "evidence": "registration",
+      "given": "Base-class 0085 graph is installed in a local blueprint cache.",
+      "steps": ["Load the private class and its level-one selection.", "Inspect all six primary grants and the private spellbook.", "Run registration again."],
+      "expect": ["Exactly Anger, Despair, Hatred, Fear, Zeal and Kindness.", "Each option has one native AddPet and a different marked unit blueprint.", "No duplicate registration, shared-list mutation or Medium registration.", "The 137 source rows retain source circles, with any unavailable approved optional roots explicitly reported."]
+    },
+    {
+      "id": "C02",
+      "evidence": "native-host",
+      "given": "A real non-preview owner in a holding state commits Anger at Spiritualist 1.",
+      "steps": ["Trace AddPet through SetMaster to UnitPartPetMaster and AddClassLevels.", "Reapply the grant and repeat the area event.", "Run Dog as a native control."],
+      "expect": ["One player-owned Anger Phantom with correct class and level.", "Reapplication preserves the original entity and facts.", "Dog uses its original AnimalCompanion slot, rank and growth.", "No Phantom-specific global mutation and no ability to mount the Phantom."]
+    },
+    {
+      "id": "C03",
+      "evidence": "native-host",
+      "given": "Anger exists with owner Spiritualist 1 and distinct animal companion.",
+      "steps": ["Commit another Spiritualist level.", "Take an unrelated level, mythic rank and animal-only rank modifier.", "Recheck at Spiritualist 20."],
+      "expect": ["Same Phantom entity at 2, 2, and 20 respectively.", "The animal follows its own progression.", "No borrowed Smilodon size upgrade or incorrect owner-supplied pet class."]
+    },
+    {
+      "id": "C04",
+      "evidence": "native-host",
+      "given": "Manifested living Phantom with partially spent resources, equipment and damage.",
+      "steps": ["Confine twice.", "Manifest twice at a safe local surface."],
+      "expect": ["Same unique ID and owner in both directions.", "Confined has no combat actions, targeting or aura and never enters a death state.", "Manifest places only the Phantom and preserves HP, equipment, applied permanent facts and spent resources.", "Repeated or rejected calls have no additional effect."]
+    },
+    {
+      "id": "C05",
+      "evidence": "native-host",
+      "given": "Owner level 6, a living manifested Phantom, plus a second owner's Phantom and an animal companion.",
+      "steps": ["Recall from a useful distance.", "Repeat at the same landing location.", "Repeat while confined, dead, missing, cross-area, with blocked landing, and with 0 uses."],
+      "expect": ["One successful movement and one use spent.", "The caster and other units stay put.", "Failed or redundant calls spend nothing and create nothing.", "The resource maxima at 6/10/14/18 are 1/2/3/4."]
+    },
+    {
+      "id": "C06",
+      "evidence": "native-host-then-player",
+      "given": "A manifested Phantom in a controlled fight.",
+      "steps": ["Reduce HP to zero without final death.", "Cause native actual or final death.", "Attempt all three actions, then perform a native legal recovery."],
+      "expect": ["Confine rejects HP below one.", "Death stays native and suppresses active combat linkage.", "Commands never revive a dead unit.", "Legal recovery returns the same ID once, with native HP and life state."]
+    },
+    {
+      "id": "C07",
+      "evidence": "player",
+      "given": "One Phantom is finally dead and a second owner's Phantom is alive and confined, with resources spent.",
+      "steps": ["Cancel rest, then complete rest in a local area.", "Repeat with world-map rest and enter a local area."],
+      "expect": ["Cancelled rest changes neither.", "Completed rest resurrects only the native eligible dead entity, releases living confinement and restores uses through rest.", "World-map recovery waits to show the same entity until safe local placement."]
+    },
+    {
+      "id": "C08",
+      "evidence": "player",
+      "given": "Save separately with one living manifested, one living confined and one dead Phantom.",
+      "steps": ["Load each save and change areas twice, including a world-map leg.", "Temporarily remove/rejoin the owner where possible."],
+      "expect": ["Same IDs and legal owner references, with original visibility intent or death.", "No phantom appears in other areas, no resource refill, no duplicate buffs, no extra entity.", "The appropriate action bar and party portrait reflect each state."]
+    },
+    {
+      "id": "C09",
+      "evidence": "native-host-then-player",
+      "given": "Two owners, one Anger each. Owner A also has an animal companion.",
+      "steps": ["Open and cancel Owner A's respec with a different selected emotion in preview.", "Commit A to Spiritualist 0.", "Repeat from the original save and respec into Kindness."],
+      "expect": ["Preview and cancellation preserve all live IDs and state.", "Zero removes only A's Phantom and its source-owned state/facts.", "Kindness leaves exactly one new valid entity, with no old Anger grants, attached state or ex-pet resurrection.", "B's and A's other pet remain intact. Removable items return exactly once."]
+    },
+    {
+      "id": "C10",
+      "evidence": "native-host-then-player",
+      "given": "An equipped Anger Phantom and an owner eligible to respec.",
+      "steps": ["Commit the same primary emotion at the same level.", "From the initial state commit the same emotion at a lower level with unrelated multiclass levels."],
+      "expect": ["Retain valid native reuse at the same level.", "Lower level commits exactly one valid correctly levelled Phantom. If native removal requires new identity, old references, gear and owned effects are cleared once.", "Normal reapply/load never takes the replacement path."]
+    },
+    {
+      "id": "C11",
+      "evidence": "directed",
+      "given": "Levels 1, 9, 10 and 12, with one existing non-0085 matching Skill Focus.",
+      "steps": ["Compare confined, manifested and dead.", "Repeat reapply and swap the primary emotion by commit."],
+      "expect": ["Shared is confined only and +4. Fused is one persistent grant for a valid primary, including during death, scaling +4 to +8 from 12.", "Only the missing Skill Focus is added. Independent Skill Focus survives all removal and swapping."]
+    },
+    {
+      "id": "C12",
+      "evidence": "directed",
+      "given": "Owner at 3/8/13/17/18 with a valid Phantom.",
+      "steps": ["Toggle Bonded Manifestation while confined, manifested and dead.", "Use valid tendrils, exhaust rounds, rest, then manifest."],
+      "expect": ["Only live confinement enables it, minimum one round per activation.", "Shield increases from +4 to +6. Tendrils use the primary dice, with the 18th-level full-round two-roll attack.", "Daily budget 3+L, then 3+2L from 17. Dual Bond leaves confinement required.", "Manifest is blocked while active, and removal or rest clears the effect."]
+    },
+    {
+      "id": "C13",
+      "evidence": "directed",
+      "given": "A manifested Phantom with CON 13 about to fall to −15 HP, with Etheric Tether on.",
+      "steps": ["Deal the decisive packet with the owner at 10 HP.", "Retry with owner at 2 HP, then with wrong-source target and a direct Kill."],
+      "expect": ["Transfers exactly 3 in the first case, leaving Phantom at −12, owner at 7.", "Transfers at most one in the second case and native death proceeds.", "Wrong source and direct Kill transfer zero."]
+    },
+    {
+      "id": "C14",
+      "evidence": "directed",
+      "given": "Level 14, Spiritual Bond on. Owner at 5 HP and manifested Phantom at 1 HP with CON 13.",
+      "steps": ["Deal 20 HP damage to the owner.", "Try enabling Etheric Tether concurrently or use a hidden, dead or wrong-owner Phantom."],
+      "expect": ["Exactly 13 damage transferred, Phantom ends at −12 and owner at −2.", "Same-source mutually exclusive toggles. Derived damage does not recurse.", "Hidden, dead and wrong-owner targets transfer zero."]
+    },
+    {
+      "id": "C15",
+      "evidence": "directed",
+      "given": "Owner at 4, then 12, with active Phantom, another owner and allied party members.",
+      "steps": ["Compare 10 ft and outside 10 ft.", "Apply grappled, helpless, unconscious, confined and dead states.", "Check both owners' effects by source."],
+      "expect": ["Before 12 only owner +2 shield/circumstance; from 12 owner +4, other legal allies +2, no self benefit for emitting Phantom.", "Lost conditions immediately remove the matching benefit without changing other source facts."]
+    },
+    {
+      "id": "C16",
+      "evidence": "directed",
+      "given": "Each primary emotion in turn at levels 1/5/7/9/12/16/17/20.",
+      "steps": ["Inspect saves, skill ranks, slam dice and exactly the matching grants.", "At 20 select a different secondary emotion and attempt to select the primary again."],
+      "expect": ["All 24 pet feature entries and 24 owner SLA entries match A. Each SLA has its own use count and Wisdom/Spiritualist DC.", "Potent gives its four capabilities on the same entity once, keeping the primary skills, saves, basic trait and SLA.", "No duplicate pet or second strength/dexterity progression."]
+    },
+    {
+      "id": "C17",
+      "evidence": "directed",
+      "given": "Wrong-marked unit with reserved Type, orphaned reference, and valid entities for other owners and PetTypes.",
+      "steps": ["Send add, restore, recall, respec and remove events in duplicate and out of order.", "Resolve the orphan only after native loading."],
+      "expect": ["Only a fully matching current owner, source and entity are affected.", "Conflicts are logged and foreign state is preserved.", "No missing reference creates a second control path or a duplicate Phantom."]
+    },
+    {
+      "id": "C18",
+      "evidence": "player",
+      "given": "Core Anger lifecycle has a real native-host result.",
+      "steps": ["At level 1 create an Anger Spiritualist next to a character with Dog.", "Confine and manifest in combat and out of combat, then inspect touch animation and slam attacks.", "At level 6 test Recall with obstructed placement.", "Run C07 through C10 in player environments."],
+      "expect": ["Readable English actions, valid action timing, portraits, animations, equipment, navmesh and targeting.", "No phantom mount, no change to the Dog's mount behavior.", "Record scene IDs, save positions and actual results separately from native-host or model checks."]
+    }
+  ]
+}

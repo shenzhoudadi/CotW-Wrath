@@ -70,18 +70,22 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool IsPreparation(AbilityExecutionContext context,AbilityApplyEffect effect)
             =>context?.AbilityBlueprint?.StickyTouch!=null ||
               (effect is AbilityEffectRunAction run && run.Actions?.Actions?.Length>0 && run.Actions.Actions.All(a=>a is ContextActionSpawnAreaEffect));
+        private static bool BlocksDelivery(UnitEntityData target, MechanicsContext context, AreaEffectEntityData area = null)
+            => Blocks(target, context, area) || (target?.Get<Occultist0099FocusPart>() != null &&
+                Occultist0099GlobeOfNegation.TryBlock(target, context, area == null ? (TimeSpan?)null : (TimeSpan)CreationTime.GetValue(area)));
+
         [HarmonyPatch(typeof(AbilityExecutionProcess),"DoApplyEffect")]
         internal static class DeliveryPatch
         {
             static bool Prefix(AbilityExecutionContext __0,TargetWrapper __1,AbilityApplyEffect __2)
-                =>IsPreparation(__0,__2) || (!PsychicFlightGroundPatch.BlocksTar(__1?.Unit,__0) && !Blocks(__1?.Unit,__0));
+                =>IsPreparation(__0,__2) || (!PsychicFlightGroundPatch.BlocksTar(__1?.Unit,__0) && !BlocksDelivery(__1?.Unit,__0));
         }
         [HarmonyPatch(typeof(AreaEffectEntityData),"TryOvercomeSpellResistance")]
         internal static class AreaPatch
         {
             static bool Prefix(AreaEffectEntityData __instance,UnitEntityData unit,ref bool __result)
             {
-                if(!Blocks(unit,__instance.Context,__instance))return true;
+                if(!BlocksDelivery(unit,__instance.Context,__instance))return true;
                 __result=false;return false;
             }
         }

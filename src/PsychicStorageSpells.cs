@@ -70,10 +70,15 @@ namespace CallOfTheWild.Wrath.Prototype {
   internal void Capture(AbilityExecutionContext c){Data.Spell=new AbilityData(c.Ability,c.Ability.Blueprint);Data.Parameters=c.Params.Clone();Data.Armed=false;}
   internal void Release(UnitEntityData target){var stored=Data.Spell;var parameters=Data.Parameters;if(stored==null||parameters==null)return;Data.Spell=null;Data.Parameters=null;Data.Armed=false;if(Kind!=3)Buff.Remove();if(stored==null||parameters==null||target==null)return;Deliver(stored,parameters,target,Kind==1||Kind==3);}
   internal static void Deliver(AbilityData stored,AbilityParams parameters,UnitEntityData target,bool touch){
-   var blueprint=touch?stored.Blueprint.GetComponent<AbilityEffectStickyTouch>()?.TouchDeliveryAbility:stored.Blueprint;if(blueprint==null)return;
+   var cast=BuildDelivery(stored,parameters,target,touch);if(cast!=null)Launch(cast);
+  }
+  internal static RuleCastSpell BuildDelivery(AbilityData stored,AbilityParams parameters,UnitEntityData target,bool touch,bool directTouch=false){
+   var blueprint=touch?stored.Blueprint.GetComponent<AbilityEffectStickyTouch>()?.TouchDeliveryAbility:stored.Blueprint;
+   if(blueprint==null&&directTouch&&stored.Blueprint.Range==AbilityRange.Touch)blueprint=stored.Blueprint;
+   if(blueprint==null)return null;
    var spell=new AbilityData(blueprint,stored.Caster){MetamagicData=SnapshotMetamagic(stored,parameters),SaveSpellbookSlot=true,OverrideCasterLevel=parameters.CasterLevel,OverrideDC=parameters.DC,OverrideSpellLevel=parameters.SpellLevel};
-   if(!spell.CanTarget(new TargetWrapper(target)))return;
-   var cast=new RuleCastSpell(spell,new TargetWrapper(target)){IsCutscene=true};cast.Context.SetParams(parameters.Clone());cast.Context.ForceAlwaysHit=touch;cast.Context.IsForced=true;PsychicStoragePatch.MarkRelease(cast.Context);Launch(cast);
+   if(!spell.CanTarget(new TargetWrapper(target)))return null;
+   var cast=new RuleCastSpell(spell,new TargetWrapper(target)){IsCutscene=true};cast.Context.SetParams(parameters.Clone());cast.Context.ForceAlwaysHit=touch;cast.Context.IsForced=true;PsychicStoragePatch.MarkRelease(cast.Context);return cast;
   }
   internal static MetamagicData SnapshotMetamagic(AbilityData stored,AbilityParams p){var m=stored.MetamagicData?.Clone()??new MetamagicData();m.Add(p.Metamagic);return m;}
   [MethodImpl(MethodImplOptions.NoInlining)]

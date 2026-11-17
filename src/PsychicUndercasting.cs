@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using Kingmaker.Blueprints;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.EntitySystem.Entities;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities;
@@ -18,12 +19,14 @@ namespace CallOfTheWild.Wrath.Prototype
         // and are excluded from the spells-known quota. Learning one normally promotes
         // it to permanent. No parallel list of permanent learned spells is serialized.
         [ThreadStatic] private static HashSet<Spellbook> reconciling;
+        internal static bool IsUndercastBook(BlueprintSpellbook book)
+            => PsychicCasting.IsPsychic(book) && !Occultist0099NativeScope.IsPrivateBook(book);
         internal static bool Owned(BlueprintAbility ability) => ability != null &&
             ability.name != null && ability.name.StartsWith("CotWWrathPsychic", StringComparison.Ordinal) &&
             ability.GetComponent<PsychicUndercastFamily>() != null;
         internal static void Reconcile(Spellbook book)
         {
-            if (!PsychicCasting.IsPsychic(book?.Blueprint)) return;
+            if (!IsUndercastBook(book?.Blueprint)) return;
             if (reconciling == null) reconciling = new HashSet<Spellbook>();
             if (!reconciling.Add(book)) return;
             try {
@@ -66,7 +69,7 @@ namespace CallOfTheWild.Wrath.Prototype
             private static void Postfix(UnitEntityData original, UnitEntityData target)
             {
                 if(original==null || target==null || ReferenceEquals(original,target)) return;
-                foreach(var source in original.Descriptor.Spellbooks.Where(b=>PsychicCasting.IsPsychic(b.Blueprint))) {
+                foreach(var source in original.Descriptor.Spellbooks.Where(b=>IsUndercastBook(b.Blueprint))) {
                     var destination=target.Descriptor.GetSpellbook(source.Blueprint);
                     if(destination==null || ReferenceEquals(source,destination)) continue;
                     TemporaryKnowledge01464.RestoreCopy(source,destination);
@@ -121,7 +124,7 @@ namespace CallOfTheWild.Wrath.Prototype
             private static void Postfix(LevelUpState state, UnitDescriptor unit)
             {
                 var blueprint = state.SelectedClass?.Spellbook;
-                if (!PsychicCasting.IsPsychic(blueprint)) return;
+                if (!IsUndercastBook(blueprint)) return;
                 var book = unit.GetSpellbook(blueprint);
                 if (book == null) return;
                 var known = book.GetAllKnownSpells().Where(a => !a.IsTemporary && a.MetamagicData == null && Owned(a.Blueprint)).ToArray();
@@ -143,7 +146,7 @@ namespace CallOfTheWild.Wrath.Prototype
             {
                 __state = Array.Empty<AbilityData>();
                 PsychicLearningDiagnostics.Selection(__instance,unit,"before");
-                if (!PsychicCasting.IsPsychic(__instance.Spellbook) || !Owned(__instance.Spell)) return;
+                if (!IsUndercastBook(__instance.Spellbook) || !Owned(__instance.Spell)) return;
                 var book = unit.GetSpellbook(__instance.Spellbook);
                 if (book == null || book.IsKnown(__instance.Spell)) return;
                 var lower = __instance.Spell.GetComponent<PsychicUndercastFamily>().LowerSpells;
