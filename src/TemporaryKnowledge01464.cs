@@ -62,7 +62,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var live=new Dictionary<Spellbook,HashSet<AbilityData>>();
                 foreach(var entry in (List<UnitPartTemporarySpellsKnown.Entry>)EntriesField.GetValue(__instance))
                     entry.Spells.RemoveAll(a=>{
-                        var book=a?.Spellbook;if(book==null||!PsychicCasting.IsPsychic(book.Blueprint))return false;
+                        var book=a?.Spellbook;if(book==null||!PsychicUndercasting.IsUndercastBook(book.Blueprint))return false;
                         if(!live.TryGetValue(book,out var known))live.Add(book,known=new HashSet<AbilityData>(book.GetAllKnownSpells(),AbilityIdentity.Instance));
                         return !known.Contains(a);
                     });
@@ -70,7 +70,7 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         static void Reconcile(UnitPartTemporarySpellsKnown part)
         {
-            foreach(var book in part.Owner.Descriptor.Spellbooks.Where(b=>PsychicCasting.IsPsychic(b.Blueprint)))PsychicUndercasting.Reconcile(book);
+            foreach(var book in part.Owner.Descriptor.Spellbooks.Where(b=>PsychicUndercasting.IsUndercastBook(b.Blueprint)))PsychicUndercasting.Reconcile(book);
         }
         [HarmonyPatch]
         internal static class SourcesAddedPatch

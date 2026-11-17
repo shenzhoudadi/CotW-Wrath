@@ -19,16 +19,27 @@ namespace CallOfTheWild.Wrath.Prototype {
   }
   internal sealed class RollState {internal int Chance;internal RuleRollD100 Roll;}
   [HarmonyPrefix] static bool Prefix(RuleAttackRoll __instance,ref bool __result,out RollState __state){
-   __state=null;int chance=Chance(__instance.Initiator,__instance.Target);if(chance==0)return true;
-   var roll=Rulebook.Trigger(new RuleRollD100(__instance.Initiator));
-   __state=new RollState {Chance=chance,Roll=roll};
-   if((int)roll>chance)return true;
-   __result=false;return false;
+   return RollIndependent(__instance,Chance(__instance.Initiator,__instance.Target),ref __result,out __state);
   }
-  [HarmonyPostfix] static void Postfix(RuleAttackRoll __instance,RollState __state){
+  internal static bool RollIndependent(RuleAttackRoll attack,int chance,ref bool result,out RollState state){
+   state=null;if(chance<=0)return true;
+   var roll=Rulebook.Trigger(new RuleRollD100(attack.Initiator));
+   state=new RollState {Chance=chance,Roll=roll};
+   if((int)roll>chance)return true;
+   result=false;return false;
+  }
+  [HarmonyPostfix] static void Postfix(RuleAttackRoll __instance,RollState __state) => Report(__instance,__state);
+  internal static void Report(RuleAttackRoll __instance,RollState __state){
    if(__state==null)return;
-   // Preserve stronger native non-concealment miss-roll diagnostics if one ran.
-   if(__instance.MissChanceRoll==null||__instance.MissChanceValue<__state.Chance){Set(__instance,"<MissChanceValue>k__BackingField",__state.Chance);Set(__instance,"<MissChanceRoll>k__BackingField",__state.Roll);}
+   var previous = __instance.MissChanceRoll;
+   bool missed = (int)__state.Roll <= __state.Chance;
+   bool previousMissed = previous != null && (int)previous <= __instance.MissChanceValue;
+   if (previous == null || (missed && !previousMissed) ||
+       (missed == previousMissed && __instance.MissChanceValue < __state.Chance))
+   {
+    Set(__instance,"<MissChanceValue>k__BackingField",__state.Chance);
+    Set(__instance,"<MissChanceRoll>k__BackingField",__state.Roll);
+   }
   }
  }
 }

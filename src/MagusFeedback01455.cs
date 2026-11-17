@@ -12,9 +12,12 @@ namespace CallOfTheWild.Wrath.Prototype
     internal static class SkirnirStorageSource01455
     {
         static readonly System.Reflection.FieldInfo OwnedFact=AccessTools.Field(typeof(AbilityData),"m_Fact")??throw new System.MissingFieldException(typeof(AbilityData).FullName,"m_Fact");
+        internal static Ability BoundFact(AbilityData converted) => OwnedFact.GetValue(converted) as Ability;
         internal static void Bind(AbilityData converted,Ability source)
         {
-            if(converted==null||source==null||!ReferenceEquals(converted.Blueprint,source.Blueprint)||!ReferenceEquals(converted.Caster,source.Owner)||converted.Blueprint.GetComponent<SkirnirStoreSpell01454>()==null)throw new System.InvalidOperationException("01455 storage source identity mismatch.");
+            if(converted==null||source==null||!ReferenceEquals(converted.Blueprint,source.Blueprint)||!ReferenceEquals(converted.Caster,source.Owner)||
+                (converted.Blueprint.GetComponent<SkirnirStoreSpell01454>()==null&&converted.Blueprint.GetComponent<Occultist0099AegisStoreSpell>()==null))
+                throw new System.InvalidOperationException("Storage source identity mismatch.");
             OwnedFact.SetValue(converted,source);
         }
     }

@@ -58,11 +58,15 @@ namespace CallOfTheWild.Wrath.Prototype
             foreach(var a in variants)Set(a,"m_Parent",Ref<BlueprintAbilityReference>(root));return root;
         }
         internal static void Build(PsychicAssets f){
+            var anchor=BuildAnchor(f);
+            Wrathful(f,anchor);Flames(f,anchor);Vines(f);Dazzling(f,anchor);
+        }
+        private static BlueprintWeaponEnchantment BuildAnchor(PsychicAssets f){
             // An effect-free anchor records the exact weapon through native serialized
             // BuffEnchantWornItemData, even when a requested property already exists.
             var anchor=f.Clone(f.Native<BlueprintWeaponEnchantment>("6cbb732b9d638724a960d784634dcdcf"),"WeaponSpellAnchorEnchantment","","Temporary spell anchor.");
             anchor.ComponentsArray=Array.Empty<BlueprintComponent>();Set(anchor,"m_EnchantmentCost",0);Set(anchor,"m_EnchantName",new Kingmaker.Localization.LocalizedString());Set(anchor,"m_Description",new Kingmaker.Localization.LocalizedString());anchor.WeaponFxPrefab=new PrefabLink();Set(anchor,"m_HiddenInUI",true);Set(anchor,"m_Prefix",new Kingmaker.Localization.LocalizedString());Set(anchor,"m_Suffix",new Kingmaker.Localization.LocalizedString());
-            Wrathful(f,anchor);Flames(f,anchor);Vines(f);Dazzling(f,anchor);
+            return anchor;
         }
         static PsychicFixedWeaponEnchantment Enchant(BlueprintWeaponEnchantment anchor,BlueprintWeaponEnchantment effect,bool off=false)=>new PsychicFixedWeaponEnchantment {name="FixedWeaponSpell",Anchor=Ref<BlueprintItemEnchantmentReference>(anchor),Effect=effect==null?null:Ref<BlueprintItemEnchantmentReference>(effect),OffHand=off};
         static void Wrathful(PsychicAssets f,BlueprintWeaponEnchantment anchor){

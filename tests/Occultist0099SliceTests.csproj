@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Occultist0099SliceProgram.cs" />
+    <Compile Include="..\src\Occultist0099Rules.cs" Link="Occultist0099Rules.cs" />
+    <Compile Include="..\src\Occultist0099Spells.cs" Link="Occultist0099Spells.cs" />
+    <Compile Include="..\src\Occultist0099SpellCatalog.cs" Link="Occultist0099SpellCatalog.cs" />
+    <Compile Include="..\src\Occultist0099Ids.cs" Link="Occultist0099Ids.cs" />
+  </ItemGroup>
+</Project>

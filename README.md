@@ -1,6 +1,6 @@
-> [0.14.74 Speaker for the Past TEST](docs/releases/0.14.74-TEST.md) · [工作状态](WORK_STATUS.md)
+> [0.14.75 Occultist + Spiritualist TEST](docs/releases/0.14.75-TEST.md) · [下载](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST)
 
-> 猫猫堡快去复楚
+> 笨笨猫猫堡
 
 # Call of the Wild — Wrath
 

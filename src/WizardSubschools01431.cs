@@ -259,14 +259,21 @@ namespace CallOfTheWild.Wrath.Prototype
             var context = evt.Context;
             if (context?.Params == null || !ReferenceEquals(context.Ability, evt.Spell) || !EmpowerEligible(evt.Spell) || !evt.ShouldSpendResource ||
                 !(evt.Success || evt.IsSpellFailed || evt.IsArcaneSpellFailed) || (context.Params.Metamagic & Metamagic.Empower) == 0 || PaidContexts.TryGetValue(context, out _)) return;
-            PaidContexts.Add(context, new PaidMetamagic { Mask = Metamagic.Empower });
+            PreservePaidEmpower(context);
         }
+        internal static void PreservePaidEmpower(AbilityExecutionContext context)
+            => PaidContexts.GetValue(context, _ => new PaidMetamagic { Mask = Metamagic.Empower });
         protected override void OnTurnOn() { }
         protected override void OnTurnOff() => base.OnTurnOff();
         bool Ready => Fact.IsActive && Fact.IsTurnedOn && !Fact.IsDisposed && !(Fact is Buff b && b.IsSuppressed) && Resource?.Get() != null && Owner.Resources.GetResourceAmount(Resource.Get()) > 0;
         internal static bool RealSpell(AbilityData spell) => spell != null && spell.Blueprint.IsSpell && spell.Spellbook != null && spell.SourceItem == null && spell.StickyTouch == null;
         internal static bool EmpowerEligible(AbilityData spell) => RealSpell(spell) && (spell.Blueprint.AvailableMetamagic & Metamagic.Empower) != 0;
-        internal int FailureChance() { int level = Owner.Progression.GetClassLevel(Wizard.Get()); return level >= 16 ? 10 : level >= 12 ? 15 : 20; }
+        internal static int FailureChance(int level) => level >= 16 ? 10 : level >= 12 ? 15 : 20;
+        internal int FailureChance() => FailureChance(Owner.Progression.GetClassLevel(Wizard.Get()));
+        internal static void ApplyFailure(RuleCastSpell rule, int level)
+        {
+            if ((int)RulebookEvent.Dice.D100 <= FailureChance(level)) rule.SpellFailureChance = 200;
+        }
         public new void OnEventAboutToTrigger(RuleCalculateAbilityParams evt) { if (Ready && EmpowerEligible(evt.AbilityData)) base.OnEventAboutToTrigger(evt); }
         public new void OnEventDidTrigger(RuleCalculateAbilityParams evt) { }
         public new void OnEventAboutToTrigger(RuleCastSpell evt)
@@ -275,7 +282,7 @@ namespace CallOfTheWild.Wrath.Prototype
             if (!Claimed.GetOrCreateValue(evt).Add(buff)) return;
             // CotW rolls the prophecy risk independently of other failure
             // effects; the native RuleCastSpell then owns actual failure.
-            if ((int)RulebookEvent.Dice.D100 <= FailureChance()) evt.SpellFailureChance = 200;
+            ApplyFailure(evt, Owner.Progression.GetClassLevel(Wizard.Get()));
         }
         public new void OnEventDidTrigger(RuleCastSpell evt)
         {

@@ -112,7 +112,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 var c=b.Blueprint.GetComponent<PsychicAmplificationComponent>();var mimic=b.Blueprint.GetComponent<MimicMetamagic01458>();int cost;
                 if(c!=null){if(!Candidate(c,a))continue;cost=c.Cost;}
                 else if(mimic!=null){if(!MimicMetamagic01458.RawEligible(mimic,a))continue;cost=mimic.Price;}
-                else{if((a.SpellDescriptor&SpellDescriptor.MindAffecting)==0)continue;cost=2;}
+                else{if(book!=PsychicAmplificationBinding.LegacyBookId||(a.SpellDescriptor&SpellDescriptor.MindAffecting)==0)continue;cost=2;}
                 string key=Key(b.Blueprint);if(result.Count>=limit||result.Contains(key)||points<cost)continue;points-=cost;result.Add(key);
             }return result;
         }
@@ -133,7 +133,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     PsychicAmplificationBinding.InScope(b.Blueprint,book)&&
                     (b.Blueprint.GetComponent<MimicMetamagic01458>()!=null||
                      b.Blueprint.GetComponent<PsychicAmplificationComponent>()?.Kind>=PsychicAmplificationKind.WillOfTheDead))==true;
-                plan=new CastPlan{Allowed=advanced?Plan(e.Spell):new HashSet<string>{key}};Plans.Add(e,plan);
+                plan=new CastPlan{Allowed=advanced?Plan(e.Spell):Real(e.Spell)&&(key!="Nature"||book==PsychicAmplificationBinding.LegacyBookId)?new HashSet<string>{key}:new HashSet<string>()};Plans.Add(e,plan);
             }
             return plan.Allowed.Contains(key)&&plan.Claimed.Add(key);
         }
@@ -277,8 +277,12 @@ namespace CallOfTheWild.Wrath.Prototype
     internal static class MimicMetamagicEligibility01458Patch
     {
         static void Postfix(AbilityData __instance,Metamagic metamagic,ref bool __result){
-            if(__result||metamagic==0)return;
-            var mask=MimicMetamagic01458.Preview(__instance);var remaining=metamagic&~mask;
+            if(__result||metamagic==0||__instance?.Caster==null)return;
+            var book = __instance.SpellbookBlueprint ?? __instance.Fact?.Spellbook?.Blueprint;
+            var mask = Occultist0099NativeScope.IsPrivateBook(book)
+                ? Occultist0099Paraphernalia.PreviewMetamagic(__instance)
+                : MimicMetamagic01458.Preview(__instance);
+            var remaining = metamagic & ~mask;
             if(remaining!=metamagic)__result=remaining==0||__instance.HasMetamagic(remaining);
         }
     }
@@ -290,5 +294,11 @@ namespace CallOfTheWild.Wrath.Prototype
     {static bool Prefix(RuleCastSpell __instance){if(PsychicAdvancedRuntime01458.SurgeValid(__instance.Spell,__instance.Context))return true;__instance.ForceFail=true;return false;}}
     [HarmonyPatch(typeof(MechanicsContext),nameof(MechanicsContext.Recalculate))]
     internal static class MimicMetamagicRecalculate01458Patch
-    {static void Postfix(MechanicsContext __instance)=>MimicMetamagic01458.Restore(__instance);}
+    {
+        static void Postfix(MechanicsContext __instance)
+        {
+            MimicMetamagic01458.Restore(__instance);
+            Occultist0099Paraphernalia.Restore(__instance);
+        }
+    }
 }

@@ -67,6 +67,7 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private static IEnumerable<Type> PatchTypes() => Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => Occultist0099Slice.Published || !Occultist0099Slice.IsRuntimePatch(t))
             .Where(t => t.GetCustomAttributes(typeof(HarmonyPatch), false).Any());
         private static bool IsPsychicPatch(Type type) => type.DeclaringType == typeof(TopplingSpell) || type == typeof(PsychicSpiritualAllyFlankingPatch) || type == typeof(PsychicEyeControlPatch) || type == typeof(PsychicSpiritAttackLogPatch) || type == typeof(PsychicEyeClickPatch) || type == typeof(PsychicEyeHoverPatch) || type.DeclaringType == typeof(PsychicCasting) ||
             type.DeclaringType == typeof(PsychicAmplificationMenu) ||
@@ -107,6 +108,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     BlueprintRegistration.RegisterInitial(cache, state, ReportModule);
                     state.Run(MediumIntegration.ModuleName, () => MediumIntegration.Register(cache), ReportModule);
                     state.Run(WayOfTheShieldIntegration.ModuleName, () => WayOfTheShieldIntegration.Register(cache), ReportModule);
+                    state.Run(Occultist0099Startup.ModuleName, () => Occultist0099Startup.Register(cache), ReportModule);
                     state.InitialDispatchCompleted = true;
                 } else if (state.PendingCount != 0) BlueprintRegistration.RetryInitial(state, ReportModule);
                 registrationCompleted = true;
@@ -158,10 +160,14 @@ namespace CallOfTheWild.Wrath.Prototype
             // Existing successful provider reconciliation remains unchanged.
             if (Interlocked.CompareExchange(ref registrationInProgress, 1, 0) != 0) return;
             registrations.TryGetValue(cache, out state);
-            try { BlueprintRegistration.RegisterOptional(cache, (name, succeeded, error) => {
+            Action<string, bool, Exception> report = (name, succeeded, error) => {
                 if (succeeded) state?.Complete(name);
                 ReportModule(name, succeeded, error);
-            }); }
+            };
+            try {
+                BlueprintRegistration.RegisterOptional(cache, report);
+                Occultist0099Startup.ReconcileOptional(cache, report);
+            }
             catch (Exception exception) { modification.Logger.Error("Optional integration retry failed: " + exception); }
             finally { Volatile.Write(ref registrationInProgress, 0); }
         }

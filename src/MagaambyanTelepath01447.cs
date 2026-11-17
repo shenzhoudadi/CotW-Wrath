@@ -112,7 +112,7 @@ namespace CallOfTheWild.Wrath.Prototype
         }
         protected override void OnTurnOn(){if(!PsychicAdvancedRuntime01458.CoordinateIfNeeded(Owner,Fact))RemoveModes(Owner,false);}
         public void OnEventAboutToTrigger(RuleCastSpell e) {
-            if(Charges.TryGetValue(e,out _)||e.ForceFail||e.IsDuplicateSpellApplied||e.Context==null||e.Context.IsDuplicateSpellApplied||e.Spell?.SourceItem!=null||e.Spell?.StickyTouch!=null||!PsychicCasting.IsPsychic(e.Spell)||(e.Context.SpellDescriptor&SpellDescriptor.MindAffecting)==0||e.Context.Params.SpellLevel<=0)return;
+            if(Charges.TryGetValue(e,out _)||e.ForceFail||e.IsDuplicateSpellApplied||e.Context==null||e.Context.IsDuplicateSpellApplied||e.Spell?.SourceItem!=null||e.Spell?.StickyTouch!=null||e.Spell?.Spellbook?.Blueprint?.AssetGuid!=PsychicAmplificationBinding.LegacyBookId||!PsychicCasting.IsPsychic(e.Spell)||(e.Context.SpellDescriptor&SpellDescriptor.MindAffecting)==0||e.Context.Params.SpellLevel<=0)return;
             var wis=ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(BlueprintGuid.Parse(PsychicClass.WisdomPoolId));var cha=ResourcesLibrary.TryGetBlueprint<BlueprintAbilityResource>(BlueprintGuid.Parse(PsychicClass.CharismaPoolId));var pool=Owner.Resources.ContainsResource(wis)?wis:cha;if(pool==null||!Owner.Resources.HasEnoughResource(pool,2))return;
             if(!PsychicAdvancedRuntime01458.Claim(e,"Nature"))return;
             var charge=new Charge{Pool=pool,Before=e.Context.Params};Charges.Add(e,charge);Owner.Resources.Spend(pool,2);var copy=e.Context.Params.Clone();copy.Metamagic|=MagaambyanTelepath01447.Paid;e.Context.SetParams(copy);

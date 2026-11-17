@@ -1,3 +1,9 @@
+# 0.14.75 Occultist + Spiritualist TEST
+
+笨笨猫猫堡
+
+本包新增 Occultist 与 Spiritualist 两个基础职业。[安装和测试说明](docs/releases/0.14.75-TEST.md) · [GitHub 预发布](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST)
+
 # 0.14.74 Speaker for the Past TEST
 
 猫猫堡快去复楚

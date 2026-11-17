@@ -19,9 +19,11 @@ using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Abilities.Components.Base;
 using Kingmaker.UnitLogic.Abilities.Components.AreaEffects;
 using Kingmaker.UnitLogic.ActivatableAbilities;
+using Kingmaker.UnitLogic.Buffs.Blueprints;
 using Kingmaker.UnitLogic.Buffs.Components;
 using Kingmaker.UnitLogic.Commands.Base;
 using Kingmaker.UnitLogic.FactLogic;
+using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Conditions;
 using Kingmaker.Utility;
@@ -47,9 +49,8 @@ namespace CallOfTheWild.Wrath.Prototype
             var sticky=new AbilityEffectStickyTouch();Set(sticky,"m_TouchDeliveryAbility",Ref<BlueprintAbilityReference>(touch));
             var cast=f.Ability("PhantasmTerrorAbility01447","Terror",TerrorText,AbilityType.Supernatural,UnitCommand.CommandType.Standard,AbilityRange.Touch,sticky,Cost(uses),new SpellDescriptorComponent{Descriptor=SpellDescriptor.MindAffecting});cast.CanTargetFriends=cast.CanTargetSelf=false;SpellBatch01447.Icon(cast,terrorIcon);
             var basic=f.Feature("PhantasmTerrorFeature01447","Terror",TerrorText,Facts(cast),Grant(uses));SpellBatch01447.Icon(basic,terrorIcon);
-            var effect=f.Buff("PhantasmAuraEffect01447","Bedeveling Aura",AuraText,new AddCondition{Condition=UnitCondition.Slowed},new AddCondition{Condition=UnitCondition.DisableAttacksOfOpportunity},new PhantasmFlanked01447(),new SpellDescriptorComponent{Descriptor=SpellDescriptor.MindAffecting});SpellBatch01447.Icon(effect,auraIcon);
-            var areaApply=new AbilityAreaEffectBuff{CheckConditionEveryRound=true,Condition=new ConditionsChecker{Conditions=new Condition[]{new ContextConditionIsEnemy()}}};Set(areaApply,"m_Buff",Ref<BlueprintBuffReference>(effect));
-            var area=f.Add(new BlueprintAbilityAreaEffect{Fx=new PrefabLink{AssetId="dfadb7fa26de0384d9d9a6dabb0bea72"},Size=new Feet(30),Shape=AreaEffectShape.Cylinder,AffectEnemies=true,AggroEnemies=false,SpellResistance=false,ComponentsArray=new BlueprintComponent[]{areaApply}},"PhantasmAuraArea01447","Bedeveling Aura",AuraText);SetEnum(area,"m_TargetType","Any");
+            var effect=f.Buff("PhantasmAuraEffect01447","Bedeveling Aura",AuraText,AuraEffects());SpellBatch01447.Icon(effect,auraIcon);
+            var area=f.Add(AuraArea(effect),"PhantasmAuraArea01447","Bedeveling Aura",AuraText);
             var add=new AddAreaEffect();Set(add,"m_AreaEffect",Ref<BlueprintAbilityAreaEffectReference>(area));var host=f.Buff("PhantasmAuraHost01447","Bedeveling Aura",AuraText,add);SpellBatch01447.Icon(host,auraIcon);
             var toggle=BloodlineMutations01446.Toggle(f,"PhantasmAuraToggle01447","Bedeveling Aura",AuraText,host,rounds,auraIcon,true);toggle.ActivationType=AbilityActivationType.WithUnitCommand;Set(toggle,"m_ActivateWithUnitCommand",UnitCommand.CommandType.Standard);
             var greater=f.Feature("PhantasmAuraFeature01447","Bedeveling Aura",AuraText,Facts(toggle),Grant(rounds));SpellBatch01447.Icon(greater,auraIcon);
@@ -63,15 +64,39 @@ namespace CallOfTheWild.Wrath.Prototype
             Action verify=()=>{if(!ReferenceEquals(cache.Load(pool.AssetGuid),pool)||!ReferenceEquals(cache.Load(illusionOpposition.AssetGuid),illusionOpposition)||pool.AllFeatures.Count(x=>x==root)!=1||pool.Features.Count(x=>x==root)!=1||illusionOpposition.GetComponents<PrerequisiteNoFeature>().Count(c=>c.Feature==root)!=1)throw new InvalidOperationException("01447 Phantasm selection link missing or duplicated.");};
             SpellBatch01447.Publish(ModuleName,f,connect,undo,verify);
         }
+
+        internal static BlueprintComponent[] AuraEffects() => new BlueprintComponent[]
+        {
+            new AddCondition { Condition = UnitCondition.Slowed }, new AddCondition { Condition = UnitCondition.DisableAttacksOfOpportunity },
+            new PhantasmFlanked01447(), new SpellDescriptorComponent { Descriptor = SpellDescriptor.MindAffecting }
+        };
+
+        internal static BlueprintAbilityAreaEffect AuraArea(BlueprintBuff effect)
+        {
+            var apply = new AbilityAreaEffectBuff { CheckConditionEveryRound = true,
+                Condition = new ConditionsChecker { Conditions = new Condition[] { new ContextConditionIsEnemy() } } };
+            Set(apply, "m_Buff", Ref<BlueprintBuffReference>(effect));
+            var area = new BlueprintAbilityAreaEffect { Fx = new PrefabLink { AssetId = "dfadb7fa26de0384d9d9a6dabb0bea72" },
+                Size = new Feet(30), Shape = AreaEffectShape.Cylinder, AffectEnemies = true, AggroEnemies = false,
+                SpellResistance = false, ComponentsArray = new BlueprintComponent[] { apply } };
+            SetEnum(area, "m_TargetType", "Any");
+            return area;
+        }
     }
     [TypeId("5d49147bda184e839bac46aa14180147")]
     public sealed class PhantasmTerror01447 : ContextAction
     {
         public BlueprintCharacterClassReference Wizard;
+        public ContextValue SharedLevel;
+        public bool AlliesOnly;
         public override string GetCaption()=>"Target provokes AoO";
         public override void RunAction() {
-            var caster=Context.MaybeCaster;var target=Target.Unit;if(caster==null||target==null||target.Progression.CharacterLevel>caster.Progression.GetClassLevel(Wizard.Get()))return;
-            foreach(var unit in target.CombatState.EngagedBy.Where(u=>u!=caster).Take(100).ToArray())Game.Instance.CombatEngagementController.ForceAttackOfOpportunity(unit,target);
+            var caster = Context.MaybeCaster;
+            var target = Target.Unit;
+            if (caster == null || target == null ||
+                target.Progression.CharacterLevel > (SharedLevel?.Calculate(Context) ?? caster.Progression.GetClassLevel(Wizard.Get()))) return;
+            foreach (var unit in target.CombatState.EngagedBy.Where(unit => unit != caster && (!AlliesOnly || caster.IsAlly(unit))).Take(100).ToArray())
+                Game.Instance.CombatEngagementController.ForceAttackOfOpportunity(unit, target);
         }
     }
     [TypeId("afbf8f95dda440f19dc74d0cfa330147")]

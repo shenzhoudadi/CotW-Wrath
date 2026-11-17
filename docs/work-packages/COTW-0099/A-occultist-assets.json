@@ -1,0 +1,5297 @@
+{
+  "id": "COTW-0099",
+  "upstreamRepo": "Holic75/KingmakerRebalance",
+  "upstreamCommit": "1332fb0db844b7863f484ca978bea2349fe49769",
+  "codeBasis": "939e04d543875ff28314b808dcc996d16227acc3",
+  "docsBasis": "ca35d784ed73582c7f7f45076e9ba5cdeabbe4bf",
+  "originalPath": "Holic75/KingmakerRebalance:CallOfTheWild",
+  "originalSources": [
+    {
+      "path": "Classes/Occultist.cs",
+      "gitBlobSha1": "1054e8ef01e1a4c743647dff8b0f8e0443f46696"
+    },
+    {
+      "path": "Classes/Implements/ImplementsEngine.cs",
+      "gitBlobSha1": "a752fe6ff476659b408311a256f11af2ce0faff6"
+    },
+    {
+      "path": "Classes/Implements/Abjuration.cs",
+      "gitBlobSha1": "246b17f11afcae1d39dc1a9ef748351292304394"
+    },
+    {
+      "path": "Classes/Implements/Conjuration.cs",
+      "gitBlobSha1": "4d5f8302186d24bae525eb905e523a2b7ba309c4"
+    },
+    {
+      "path": "Classes/Implements/Divination.cs",
+      "gitBlobSha1": "c771d331c111115dd4e9152bbe143a751dcd5acd"
+    },
+    {
+      "path": "Classes/Implements/Enchantment.cs",
+      "gitBlobSha1": "88a5c38003ad9f2f1576d58bd79be073e4c43f15"
+    },
+    {
+      "path": "Classes/Implements/Evocation.cs",
+      "gitBlobSha1": "d2d1925aba27d6e3f6305191b80d318132affbf7"
+    },
+    {
+      "path": "Classes/Implements/Illusion.cs",
+      "gitBlobSha1": "ed694f519c383f4f6942d39e4702594f2912aa18"
+    },
+    {
+      "path": "Classes/Implements/Necromancy.cs",
+      "gitBlobSha1": "abba5af9147fb7f1c7b5c8e6785807b478e094b7"
+    },
+    {
+      "path": "Classes/Implements/Transmutation.cs",
+      "gitBlobSha1": "34e722b739effca4d6ecd2ad2f75edb0eb19f971"
+    },
+    {
+      "path": "Classes/Implements/TrappingsOfTheWarrior.cs",
+      "gitBlobSha1": "6009ef32a158f059474bfddfe5f19d1d8866694f"
+    },
+    {
+      "path": "Classes/Implements/MagesParaphernalia.cs",
+      "gitBlobSha1": "24bb4b84245ec4a57564c9e3bbe445157e80b5eb"
+    },
+    {
+      "path": "Classes/Implements/SaintsHolyRegalia.cs",
+      "gitBlobSha1": "0a99de3e4aa744df05726f3069ef5283d3516316"
+    },
+    {
+      "path": "Classes/Implements/PerformersAccoutrements.cs",
+      "gitBlobSha1": "70aecb9d6cc868883757fccb42e3e4d1396af0cd"
+    },
+    {
+      "path": "NewMechanics/ImplementMechanics.cs",
+      "gitBlobSha1": "36c25b51abd1eef26f252492365f698ce8b7f4fb"
+    },
+    {
+      "path": "NewMechanics/ResourceMechanics.cs",
+      "gitBlobSha1": "9c485f42e6909a14ae582c5af7018f7df69c2ae1"
+    },
+    {
+      "path": "NewMechanics/SpellbookMechanics.cs",
+      "gitBlobSha1": "c6ef29e0c5ffaa7c35435ef57261fc3105df2cab"
+    },
+    {
+      "path": "NewMechanics/NewMechanics.cs",
+      "gitBlobSha1": "0c180cf7ddaf6fe1f7e685973f9e5e39d55d0574"
+    },
+    {
+      "path": "Features/NewSpells.cs",
+      "gitBlobSha1": "641462f0e3b2396f3a09723357f33ee10aa02ab2"
+    },
+    {
+      "path": "blueprints.txt",
+      "gitBlobSha1": "1fb3a0734ae4396d232cb2146f4576a026e1c22b"
+    }
+  ],
+  "wrathMetadata": {
+    "archive": "Local native-clr-fixture.zip",
+    "guidIndex": "Local native-archive-index.json",
+    "guidIndexSha256": "d4ee120a79ac09b16eb74ee98ccc47c1f3264dde80b7566104c22a2094fdf763",
+    "scope": "Static metadata of targeted roots, not a running game cache or provider.",
+    "archiveSha256": "d717a520ce8ecd1bc50685a17dd89d306208b61607790cb97714fd4834f0ec35"
+  },
+  "classAssets": [
+    {
+      "name": "OccultistClass",
+      "guid": "1b76f3c73aa84f91a1c65513fb23aa01"
+    },
+    {
+      "name": "OccultistSpellbook",
+      "guid": "465a0ae7aa10419cb990a03e4859dca5"
+    },
+    {
+      "name": "OccultistSpellList",
+      "guid": "a6ece1eaa2de452987843dff8f7ca01b"
+    },
+    {
+      "name": "OccultistSpellCasting",
+      "guid": "a589741e5f014a72b8303307e2f781ca"
+    },
+    {
+      "name": "OccultistKnacksFeature",
+      "guid": "16e03c4c6a3a4fbba6e5bd99fe7fee31"
+    },
+    {
+      "name": "OccultistProficiencies",
+      "guid": "4523296ca3b14c08a7075156033236fc"
+    },
+    {
+      "name": "MagicItemSkillFeature",
+      "guid": "a261014ddabd4ce9800c792888ae4a66"
+    },
+    {
+      "name": "MentalFocusResource",
+      "guid": "9875cf5e23574bb895f27dc958447381"
+    },
+    {
+      "name": "LockedFocusBuff",
+      "guid": "2eebfd77864c42d08a6a9ef45878ba7c"
+    },
+    {
+      "name": "LockFocusAbility",
+      "guid": "07e3c6b926454b0ba78c556e0a252a96"
+    },
+    {
+      "name": "ResetFocusAbility",
+      "guid": "16ac4858ae70449cb801fd8a0322c7cc"
+    },
+    {
+      "name": "MentalFocusAbilityBase",
+      "guid": "a44305f75a2a43288e73006242162efe"
+    },
+    {
+      "name": "BaseImplementSelection",
+      "guid": "e5290d43c1ce46a6b05edfb6f2f051e4"
+    },
+    {
+      "name": "ImplementSelection",
+      "guid": "94dceba368604f908570992d7662db65"
+    },
+    {
+      "name": "FocusPowerSelection",
+      "guid": "14141653765345019e0155118b3fc9c4"
+    },
+    {
+      "name": "ImplementMasterySelection",
+      "guid": "accab17c59154060a7391efe2d5afaa0"
+    },
+    {
+      "name": "OccultistProgression",
+      "guid": "7287e3456ce94039bd75281bc875f71c"
+    },
+    {
+      "name": "RepowerConstructAbility",
+      "guid": "7b491fbb326144558a222e6d473cc6b0"
+    },
+    {
+      "name": "RepowerConstructSummonPool",
+      "guid": "88e5a5c2c92e4bacb8487fd7caff2751"
+    }
+  ],
+  "progression": {
+    "level1": [
+      "Proficiencies",
+      "Occultist Spellcasting",
+      "Knacks via spellcasting",
+      "Detect Magic",
+      "Mental Focus",
+      "Ray/Touch facts"
+    ],
+    "implementSlots": {
+      "1": 2,
+      "2": 1,
+      "6": 1,
+      "10": 1,
+      "14": 1,
+      "18": 1
+    },
+    "focusPowerLevels": [
+      1,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      15,
+      17,
+      19
+    ],
+    "2": [
+      "Magic Item Skill"
+    ],
+    "8": [
+      "Repower Construct"
+    ],
+    "20": [
+      "Implement Mastery"
+    ]
+  },
+  "groups": [
+    {
+      "name": "Abjuration",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Abjuration.cs",
+      "originalImplementGuid": "e88366e9f64b44ac92d0f3a52074fb0a",
+      "originalResourceGuid": "d8d6aae7c252479fb897ebbcc1c2076b",
+      "powers": [
+        {
+          "method": "createMindBarrier",
+          "line": 27,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementMindBarrierBuff",
+              "guid": "dda74e49fd854334a98b254df97ce907"
+            },
+            {
+              "name": "OccultistImplementMindBarrierAbility",
+              "guid": "e6c80c915a204fa7b1e0a9032279fb5b"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "ef768022b0785eb43a18969903c537c4",
+              "wrathPathIfPresent": "Spells/Level1/MageShield.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createUnraveling",
+          "line": 69,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 5,
+          "originalNamedAssets": [],
+          "originalGuidReferences": [
+            {
+              "guid": "143775c49ae6b7446b805d3b2e702298",
+              "wrathPathIfPresent": "Spells/Level3/DispelMagicTarget.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createEnergyShield",
+          "line": 83,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 3,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementEnergyShieldBuff",
+              "guid": "568940a6035745e3b90db341d8a31a5d"
+            },
+            {
+              "name": "OccultistImplementEnergyShieldAbility",
+              "guid": "b31fe7c487bc49fea05d5f0732b9e6f6"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "d2f116cfe05fcdd4a94e80143b67046f",
+              "wrathPathIfPresent": "Spells/Level3/ProtectionFromEnergy.jbp"
+            },
+            {
+              "guid": "8475ed069cfb5ed4daedd2945d9d7555",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createGlobeOfNegation",
+          "line": 126,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 11,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementGlobeOfNegationBuff",
+              "guid": "d21e49927bde4f1281f298bc06373e99"
+            },
+            {
+              "name": "OccultistImplementGlobeOfNegationAbility",
+              "guid": "253f2ec34ef740c6b48905e8751994c4"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "8475ed069cfb5ed4daedd2945d9d7555",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createAegis",
+          "line": 165,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementAegisArmorEnchancementBaseBuff",
+              "guid": "6c54d26ac5dd4d008145659e0e2f8c3f"
+            },
+            {
+              "name": "OccultistImplementAegisArmorEnhancementSwitchBuff",
+              "guid": "a55d132e56734378bb281c578ab4048f"
+            },
+            {
+              "name": "OccultistImplementAegisAbility",
+              "guid": "61648d95c4b04be788c2231bb0d6ed95"
+            },
+            {
+              "name": "OccultistImplementSwiftAegisAbility",
+              "guid": "42f0ac40bd534ae887446f39827c21a4"
+            },
+            {
+              "name": "OccultistImplementAegisBase",
+              "guid": "daff8c35edb04dc293c179d2d7101d97"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "9e1ad5d6f87d19e4d8883d63a6e35568",
+              "wrathPathIfPresent": "Spells/Level1/MageArmor.jbp"
+            },
+            {
+              "guid": "c66e86905f7606c4eaa5c774f0357b2b",
+              "wrathPathIfPresent": "Spells/Level4/Stoneskin.jbp"
+            },
+            {
+              "guid": "ddfb4ac970225f34dbff98a10a4a8844",
+              "wrathPathIfPresent": "Spells/Level2/ResistFire.jbp"
+            },
+            {
+              "guid": "5368cecec375e1845ae07f48cdc09dd1",
+              "wrathPathIfPresent": "Spells/Level2/ResistCold.jbp"
+            },
+            {
+              "guid": "90987584f54ab7a459c56c2d2f22cee2",
+              "wrathPathIfPresent": "Spells/Level2/ResistElectricity.jbp"
+            },
+            {
+              "guid": "fedc77de9b7aad54ebcc43b4daf8decd",
+              "wrathPathIfPresent": "Spells/Level2/ResistAcid.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createWardingTalisman",
+          "line": 306,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementWardingTalismanProperty",
+              "guid": "f92402e0ff344afca52ec90cf09af997"
+            },
+            {
+              "name": "OccultistImplementWardingTalismanBuff",
+              "guid": "2293bd77c7854ab695c5f28b7ecef3a1"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "0a5ddfbcfb3989543ac7c936fc256889",
+              "wrathPathIfPresent": "Spells/Level5/SpellResistance.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 2,
+        "2": 2,
+        "3": 4,
+        "4": 5,
+        "5": 3,
+        "6": 1
+      }
+    },
+    {
+      "name": "Conjuration",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Conjuration.cs",
+      "originalImplementGuid": "5700dab08c414c07b09b41b1def2ac33",
+      "originalResourceGuid": "0e25a83cbb5f462cba4668938558c221",
+      "powers": [
+        {
+          "method": "createServitor",
+          "line": 29,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementServitorAbility",
+              "guid": "4e308b6a719a43f5a28f9edb21928707"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "8fd74eddd9b6c224693d9ab241f25e84",
+              "wrathPathIfPresent": "Spells/Level1/SummonMonsterISingle.jbp"
+            },
+            {
+              "guid": "7ab27a0d547742741beb5d089f1c3852",
+              "wrathPathIfPresent": "Spells/Level2/SummonMonsterIISingle.jbp"
+            },
+            {
+              "guid": "15b5efe371d47c944b58444e7b734ffb",
+              "wrathPathIfPresent": "Spells/Level3/SummonMonsterIIISingle.jbp"
+            },
+            {
+              "guid": "efa433a38e9c7c14bb4e780f8a3fe559",
+              "wrathPathIfPresent": "Spells/Level4/SummonMonsterIVSingle.jbp"
+            },
+            {
+              "guid": "0964bf88b582bed41b74e79596c4f6d9",
+              "wrathPathIfPresent": "Spells/Level5/SummonMonsterVSingle.jbp"
+            },
+            {
+              "guid": "02de4dd8add69aa42a3d1330b573e2ab",
+              "wrathPathIfPresent": "Spells/Level6/SummonMonsterVISingle.jbp"
+            },
+            {
+              "guid": "2920d48574933c24391fbb9e18f87bf5",
+              "wrathPathIfPresent": "Spells/Level7/SummonMonsterVIISingle.jbp"
+            },
+            {
+              "guid": "eb6df7ddfc0669d4fb3fc9af4bd34bca",
+              "wrathPathIfPresent": "Spells/Level8/SummonMonsterVIIISingle.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createFleshMend",
+          "line": 62,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 3,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementFleshMendAbility",
+              "guid": "6d592d16fa704f049ea4ef2138bfed24"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "caae1dc6fcf7b37408686971ee27db13",
+              "wrathPathIfPresent": "Classes/Paladin/LayOnHands/LayOnHandsOthers.jbp"
+            },
+            {
+              "guid": "224fb8fd952ec4d45b6d3436a77663d9",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createPsychicFog",
+          "line": 95,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementPsychicFogBase",
+              "guid": "fd332959146f46d1ad36a374a5bf1271"
+            }
+          ],
+          "originalGuidReferences": []
+        },
+        {
+          "method": "createPurgeCorruption",
+          "line": 114,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 5,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementPurgeCorruptionBase",
+              "guid": "144cf079dc1d4c1bb63dcd4aa7956ab2"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "e7240516af4241b42b2cd819929ea9da",
+              "wrathPathIfPresent": "Spells/Level3/NeutralizePoison.jbp"
+            },
+            {
+              "guid": "4093d5a0eb5cae94e909eb1e0e1a6b36",
+              "wrathPathIfPresent": "Spells/Level3/RemoveDisease.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createSideStep",
+          "line": 134,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 7,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSideStepFeature",
+              "guid": "3399e260053946208e110941bfd12875"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "a9b8be9b87865744382f7c64e599aeb2",
+              "wrathPathIfPresent": "Spells/Level4/DimensionDoorCasterOnly.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createCastingFocus",
+          "line": 171,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementCastingFocusProperty",
+              "guid": "e58ad57ac69946e88ce025cae5c9757b"
+            },
+            {
+              "name": "OccultistImplementCastingFocusBuff",
+              "guid": "dd0a23e5aac3478b8aed858974ab1e61"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "38155ca9e4055bb48a89240a2055dcc3",
+              "wrathPathIfPresent": "Feats/AugmentSummoning/AugmentSummoning.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 2,
+        "2": 4,
+        "3": 1,
+        "4": 2,
+        "5": 2,
+        "6": 2
+      }
+    },
+    {
+      "name": "Divination",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Divination.cs",
+      "originalImplementGuid": "77c7bd4e31b849ff84f1ed7a1db84725",
+      "originalResourceGuid": "573cf87d355a4a36b4dee2bfb349e126",
+      "powers": [
+        {
+          "method": "createDivinersFortune",
+          "line": 31,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementDivinersFortuneAbility",
+              "guid": "113cc37437334c87abdc6d9b66d8c872"
+            },
+            {
+              "name": "OccultistImplementDivinersFortuneBuff",
+              "guid": "e5c2e9fd43e040a9af20aa36921b3f66"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "0d10ea99df0b06249823c760c46029b4",
+              "wrathPathIfPresent": "Classes/Wizard/Divination/DivinationSchoolBaseAbility.jbp"
+            },
+            {
+              "guid": "6d338078b1a8cdc41bf3a39f65247161",
+              "wrathPathIfPresent": "Classes/Wizard/Divination/DivinationSchoolBaseBuff.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createSuddenInsight",
+          "line": 46,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSuddenInsightBuff",
+              "guid": "19e0155807364f3991d046309d7b0e58"
+            },
+            {
+              "name": "OccultistImplementSuddenInsightAbility",
+              "guid": "6bb998121d1b43fab284e5769a1ba04b"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "ec931b882e806ce42906597e5585c13f",
+              "wrathPathIfPresent": "Spells/Level0/GuidanceBuff.jbp"
+            },
+            {
+              "guid": "c388856d0e8855f429a83ccba67944ba",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createMindEye",
+          "line": 92,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 5,
+          "originalNamedAssets": [],
+          "originalGuidReferences": []
+        },
+        {
+          "method": "createDangerSight",
+          "line": 105,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 3,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementDangerSightBuff",
+              "guid": "c0e7e5fe7dd74c3ba42c6a39ef267051"
+            },
+            {
+              "name": "OccultistImplementDangerSightAbility",
+              "guid": "626162aea495457e8bf540b342b5d309"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "ec931b882e806ce42906597e5585c13f",
+              "wrathPathIfPresent": "Spells/Level0/GuidanceBuff.jbp"
+            },
+            {
+              "guid": "c388856d0e8855f429a83ccba67944ba",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createInAccordanceWithProphecy",
+          "line": 152,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 9,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementInAccordanceWithProphecyBuff",
+              "guid": "9d9ca9080fa5428f8600b9c20841e18c"
+            },
+            {
+              "name": "OccultistImplementInAccordanceWithProphecyAbility",
+              "guid": "1f8aaedb661847a489a491cb52b85e2e"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "ef16771cb05d1344989519e87f25b3c5",
+              "wrathPathIfPresent": "Spells/Level4/DivinePower.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createThirdEye",
+          "line": 186,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementThirdEyeProperty",
+              "guid": "4cb22304407c486e939a8ff955adcdea"
+            },
+            {
+              "name": "OccultistImplementThirdEyeBonusProperty",
+              "guid": "c640c36e434b4e15b108a045baa0a235"
+            },
+            {
+              "name": "OccultistImplementThirdeye7Buff",
+              "guid": "264e8631bffc42778f05e4f21d736050"
+            },
+            {
+              "name": "OccultistImplementThirdeye13Buff",
+              "guid": "dc2121a9665443c2af90b53c80290659"
+            },
+            {
+              "name": "OccultistImplementThirdeye19Buff",
+              "guid": "415b0783910541969df065a723a34eae"
+            },
+            {
+              "name": "OccultistImplementThirdEyeBuff",
+              "guid": "a5ad5b0e9c9c47c6bc234dd829898ee3"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "0adecbf63b614e846bfe15c33f34507e",
+              "wrathPathIfPresent": "Spells/Level2/SeeInvisibilitytBuff.jbp"
+            },
+            {
+              "guid": "b3da3fbee6a751d4197e446c7e852bcb",
+              "wrathPathIfPresent": "Spells/Level6/TrueSeeing.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 1,
+        "2": 2,
+        "3": 1,
+        "4": 1,
+        "5": 2,
+        "6": 1
+      }
+    },
+    {
+      "name": "Enchantment",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Enchantment.cs",
+      "originalImplementGuid": "9a3f8199ad164e1a87da40cfd7160218",
+      "originalResourceGuid": "1b0a1264336049da9a0e6f751d84370c",
+      "powers": [
+        {
+          "method": "createCloudMind",
+          "line": 32,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementCloudMindAbility",
+              "guid": "1068f9bf5c5a46cca82be24f9ae62976"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "9934fedff1b14994ea90205d189c8759",
+              "wrathPathIfPresent": "Spells/Level0/DazeBuff.jbp"
+            },
+            {
+              "guid": "df3950af5a783bd4d91ab73eb8fa0fd3",
+              "wrathPathIfPresent": "Buffs/Staggered.jbp"
+            },
+            {
+              "guid": "28b3cd92c1fdc194d9ee1e378c23be6b",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createBindingPattern",
+          "line": 67,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 7,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementBindingPatternAbility",
+              "guid": "a0e1275a881a41beb37b215fd504a1a9"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "2cfcce5b62d3e6d4082ec31b58468cc8",
+              "wrathPathIfPresent": "Spells/Level5/HoldMonsterBuff.jbp"
+            },
+            {
+              "guid": "df3950af5a783bd4d91ab73eb8fa0fd3",
+              "wrathPathIfPresent": "Buffs/Staggered.jbp"
+            },
+            {
+              "guid": "41e8a952da7a5c247b3ec1c2dbb73018",
+              "wrathPathIfPresent": "Spells/Level5/HoldMonster.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createObey",
+          "line": 101,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [],
+          "originalGuidReferences": []
+        },
+        {
+          "method": "createInspiredAssault",
+          "line": 128,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementInspiredAssaultBuff",
+              "guid": "e27576a1bb244c73b60991db4967696c"
+            },
+            {
+              "name": "OccultistImplementInspiredAssaultAbility",
+              "guid": "9cbad7d17a284bd29aaa43874f81302e"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "5ab0d42fb68c9e34abae4921822b9d63",
+              "wrathPathIfPresent": "Spells/Level3/Heroism.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createGloriousPresence",
+          "line": 171,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementGloriousPresenceProperty",
+              "guid": "1b4944e8344a4093a6756392a98cdfc7"
+            },
+            {
+              "name": "OccultistImplementGloriousPresenceBuff",
+              "guid": "902efd2b65254cae8f74da14d5dc9117"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "90e59f4a4ada87243b7b3535a06d0638",
+              "wrathPathIfPresent": "Spells/Level1/Bless.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 3,
+        "2": 1,
+        "3": 2,
+        "4": 3,
+        "5": 4,
+        "6": 1
+      }
+    },
+    {
+      "name": "Evocation",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Evocation.cs",
+      "originalImplementGuid": "32b9a3964fef472e88a4725d82cc631c",
+      "originalResourceGuid": "891c8570ebb14a3e8d6403ca59d32288",
+      "powers": [
+        {
+          "method": "createEnergyRay",
+          "line": 30,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementEnergyRayAbilityBase",
+              "guid": "ec0b5142593d4ed4b4b8130ab6e920cb"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "435222be97067a447b2b40d3c58a058e",
+              "wrathPathIfPresent": "Classes/Sorcerer/ElementalBloodline/Earth/ScorchingRayAcid.jbp"
+            },
+            {
+              "guid": "7ef096fdc8394e149a9e8dced7576fee",
+              "wrathPathIfPresent": "Classes/Sorcerer/ElementalBloodline/Water/ScorchingRayCold.jbp"
+            },
+            {
+              "guid": "96ca3143601d6b242802655336620d91",
+              "wrathPathIfPresent": "Classes/Sorcerer/ElementalBloodline/Air/ScorchingRayElecricity.jbp"
+            },
+            {
+              "guid": "cdb106d53c65bbc4086183d54c3b97c7",
+              "wrathPathIfPresent": "Spells/Level2/ScorchingRay.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createEnergyBlast",
+          "line": 76,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 5,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementEnergyBlastAbilityBase",
+              "guid": "2bcfca634100489c90786a3772aef097"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "2e4bb367a72490b46944654f321b91a4",
+              "wrathPathIfPresent": null
+            },
+            {
+              "guid": "070bd772af57d3c46ae89218032dad80",
+              "wrathPathIfPresent": null
+            },
+            {
+              "guid": "448260fa84101684ca32750574089663",
+              "wrathPathIfPresent": null
+            },
+            {
+              "guid": "c152c5cb0af124a40bc94087f9e2bb29",
+              "wrathPathIfPresent": null
+            },
+            {
+              "guid": "9f10909f0be1f5141bf1c102041f93d9",
+              "wrathPathIfPresent": "Spells/Level1/Snowball.jbp"
+            },
+            {
+              "guid": "2d81362af43aeac4387a3d4fced489c3",
+              "wrathPathIfPresent": "Spells/Level3/Fireball.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createWallOfPower",
+          "line": 149,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 9,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementWallOfPowerAbilityBase",
+              "guid": "b688e0fc70374f42aa1c899135926214"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "2a9cebe780b6130428f3bf4b18270021",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallAcidArea.jbp"
+            },
+            {
+              "guid": "608d84e25f42d6044ba9b96d9f60722a",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallColdArea.jbp"
+            },
+            {
+              "guid": "2175d68215aa61644ad1d877d4915ece",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallElectricityArea.jbp"
+            },
+            {
+              "guid": "ac8737ccddaf2f948adf796b5e74eee7",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallFireArea.jbp"
+            },
+            {
+              "guid": "1e418794638cf95409f6e33c8c3dbe1a",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallAcidAbility.jbp"
+            },
+            {
+              "guid": "e377feb2ecec95e478e0565da621ea55",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallColdAbility.jbp"
+            },
+            {
+              "guid": "8ba05ef69b06ea04c9430427a95685f6",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallElectricityAbility.jbp"
+            },
+            {
+              "guid": "77d255c06e4c6a745b807400793cf7b1",
+              "wrathPathIfPresent": "Classes/Wizard/Evocation/ElementalWallFireAbility.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createRadiance",
+          "line": 232,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementRadianceEffectBuff",
+              "guid": "0b7f9a6ecd9643e090372db03d0274bd"
+            },
+            {
+              "name": "OccultistImplementActiveRadianceBuff",
+              "guid": "a536d6e961714ee7a612a8f63c958636"
+            },
+            {
+              "name": "OccultistImplementRadianceBuff",
+              "guid": "1a7bfda5c372462aad1341709ab8ae09"
+            },
+            {
+              "name": "OccultistImplementRadianceAbility",
+              "guid": "85e9f403b97f4d3791b1c7afec8aa09a"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "50d0501ad05f15d498c3aa8d602af273",
+              "wrathPathIfPresent": "Classes/Magus/ArcanePool/ArcaneWeaponBrilliantEnergyBuff.jbp"
+            },
+            {
+              "guid": "cc383a9eaae4d2b45a925d442b367b54",
+              "wrathPathIfPresent": "Spells/Level1/FaerieFireBuff.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createLightMatrix",
+          "line": 301,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 5,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementLightMatrixBuff",
+              "guid": "97992b5bf812467b862ef776a3734db1"
+            },
+            {
+              "name": "OccultistImplementLightMatrixAbility",
+              "guid": "1f7c1b6cace048a9b37fd03602db8147"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "95f206566c5261c42aa5b3e7e0d1e36c",
+              "wrathPathIfPresent": "Spells/Level0/MageLight.jbp"
+            },
+            {
+              "guid": "571baa4cf65bbcb4996fe429ca77d1a5",
+              "wrathPathIfPresent": "Spells/Level0/MageLightBuff.jbp"
+            },
+            {
+              "guid": "187f88d96a0ef464280706b63635f2af",
+              "wrathPathIfPresent": "Spells/Level2/BlindnessBuff.jbp"
+            },
+            {
+              "guid": "46fd02ad56c35224c9c91c88cd457791",
+              "wrathPathIfPresent": "Spells/Level2/Blindness.jbp"
+            },
+            {
+              "guid": "4ecdf240d81533f47a5279f5075296b9",
+              "wrathPathIfPresent": "Classes/Cleric/Domains/Fire/FireDomainBaseAbility.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createIntenseFocus",
+          "line": 362,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementIntenseFocusProperty",
+              "guid": "bec42389e8ef47c1b48890a3b2752a7b"
+            },
+            {
+              "name": "OccultistImplementIntenseFocusBuff",
+              "guid": "bc7e9c45924e487ba95829e1ced31f31"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "104a9f275539abf44b594e9e36f71694",
+              "wrathPathIfPresent": "Classes/Kineticist/GatherPower/GatherPowerModeHigh.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 2,
+        "2": 4,
+        "3": 4,
+        "4": 8,
+        "5": 3,
+        "6": 6
+      }
+    },
+    {
+      "name": "Illusion",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Illusion.cs",
+      "originalImplementGuid": "07e1b8090f0c40fbba8d83bb8333c7c3",
+      "originalResourceGuid": "37d8a9f4fa3240ae81dca1650d97faab",
+      "powers": [
+        {
+          "method": "createColorBeam",
+          "line": 31,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementColorBeam",
+              "guid": "b2532503cec145c4a644c56a78f40862"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "9b4d07751dd104243a94b495c571c9dd",
+              "wrathPathIfPresent": "Classes/Wizard/Illusion/IllusionSchoolBaseAbility.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createTerror",
+          "line": 51,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementTerrorAbility",
+              "guid": "57d166745f1144bfabd279eb1681391f"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "d2aeac47450c76347aebbc02e4f463e0",
+              "wrathPathIfPresent": "Spells/Level4/Fear.jbp"
+            },
+            {
+              "guid": "49a8069c238b1a8429f2123654d4f45b",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createShadowBeast",
+          "line": 79,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 9,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementShadowBeasts",
+              "guid": "fe4a9cd5ac794b538e9e68b79cac9432"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "ba0401fdeb4062f40a7aa95b6f07fe89",
+              "wrathPathIfPresent": "Classes/Wizard/WizardSpellList.jbp"
+            },
+            {
+              "guid": "8fd74eddd9b6c224693d9ab241f25e84",
+              "wrathPathIfPresent": "Spells/Level1/SummonMonsterISingle.jbp"
+            },
+            {
+              "guid": "1724061e89c667045a6891179ee2e8e7",
+              "wrathPathIfPresent": "Spells/Level2/SummonMonsterIIBase.jbp"
+            },
+            {
+              "guid": "970c6db48ff0c6f43afc9dbb48780d03",
+              "wrathPathIfPresent": "Spells/Level2/SummonElementalSmallBase.jbp"
+            },
+            {
+              "guid": "5d61dde0020bbf54ba1521f7ca0229dc",
+              "wrathPathIfPresent": "Spells/Level3/SummonMonsterIIIBase.jbp"
+            },
+            {
+              "guid": "e42b1dbff4262c6469a9ff0a6ce730e3",
+              "wrathPathIfPresent": "Spells/Level4/SummonElementalMediumBase.jbp"
+            },
+            {
+              "guid": "7ed74a3ec8c458d4fb50b192fd7be6ef",
+              "wrathPathIfPresent": "Spells/Level4/SummonMonsterIVBase.jbp"
+            },
+            {
+              "guid": "89404dd71edc1aa42962824b44156fe5",
+              "wrathPathIfPresent": "Spells/Level5/SummonElementalLargeBase.jbp"
+            },
+            {
+              "guid": "630c8b85d9f07a64f917d79cb5905741",
+              "wrathPathIfPresent": "Spells/Level5/SummonMonsterVBase.jbp"
+            },
+            {
+              "guid": "766ec978fa993034f86a372c8eb1fc10",
+              "wrathPathIfPresent": "Spells/Level6/SummonElementalHugeBase.jbp"
+            },
+            {
+              "guid": "e740afbab0147944dab35d83faa0ae1c",
+              "wrathPathIfPresent": "Spells/Level6/SummonMonsterVIBase.jbp"
+            },
+            {
+              "guid": "8eb769e3b583f594faabe1cfdb0bb696",
+              "wrathPathIfPresent": "Spells/Level7/SummonElementalGreaterBase.jbp"
+            },
+            {
+              "guid": "ab167fd8203c1314bac6568932f1752f",
+              "wrathPathIfPresent": "Spells/Level7/SummonMonsterVIIBase.jbp"
+            },
+            {
+              "guid": "8a7f8c1223bda1541b42fd0320cdbe2b",
+              "wrathPathIfPresent": "Spells/Level8/SummonElementalElderBase.jbp"
+            },
+            {
+              "guid": "d3ac756a229830243a72e84f3ab050d0",
+              "wrathPathIfPresent": "Spells/Level8/SummonMonsterVIIIBase.jbp"
+            },
+            {
+              "guid": "52b5df2a97df18242aec67610616ded0",
+              "wrathPathIfPresent": "Spells/Level9/SummonMonsterIXBase.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createUnseen",
+          "line": 146,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 7,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementUnseenBase",
+              "guid": "d0f5fdbe4cab41faba887560ce16dd50"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "ecaa0def35b38f949bd1976a6c9539e0",
+              "wrathPathIfPresent": "Spells/Level4/InvisibilityGreater.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createBedevelingAura",
+          "line": 173,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 9,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementBedevelingAuraEffectBuff",
+              "guid": "5ca53950dbe64fa19a05ad36401308b2"
+            },
+            {
+              "name": "OccultistImplementBedevelingAuraAbility",
+              "guid": "9b2a3791e57842f4a2f98fccf0742be8"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "b48674cef2bff5e478a007cf57d8345b",
+              "wrathPathIfPresent": "Spells/Level3/RemoveCurse.jbp"
+            },
+            {
+              "guid": "dfadb7fa26de0384d9d9a6dabb0bea72",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createDistortion",
+          "line": 215,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementDistortionProperty",
+              "guid": "98d9fde867d846adb32dc4fc7ff1b17d"
+            },
+            {
+              "name": "OccultistImplementDistortionBuff",
+              "guid": "59517785d25e4e09a014245006ffd8af"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "903092f6488f9ce45a80943923576ab3",
+              "wrathPathIfPresent": "Spells/Level3/Displacement.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 1,
+        "2": 3,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1
+      }
+    },
+    {
+      "name": "Necromancy",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Necromancy.cs",
+      "originalImplementGuid": "9d8b5f7dfce3401d86b40ef85ac71c71",
+      "originalResourceGuid": "eb1c581f44cd43a7a1b46716929d5b45",
+      "powers": [
+        {
+          "method": "createMindFear",
+          "line": 38,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementMindFearAbility",
+              "guid": "90aaf81a0a8341579bde241e8cab3581"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "f08a7239aa961f34c8301518e71d4cdf",
+              "wrathPathIfPresent": "Buffs/Frightened.jbp"
+            },
+            {
+              "guid": "25ec6cb6ab1845c48a95f9c20b034220",
+              "wrathPathIfPresent": "Buffs/Shaken.jbp"
+            },
+            {
+              "guid": "bd81a3931aa285a4f9844585b5d97e51",
+              "wrathPathIfPresent": "Spells/Level1/CauseFear.jbp"
+            },
+            {
+              "guid": "cbfe312cb8e63e240a859efaad8e467c",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createFleshRot",
+          "line": 76,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 3,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementFleshRotAbility",
+              "guid": "32ea4c297c9a43169e2ccdd882d723c3"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "9a38d742801be084d89bd34318c600e8",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createPainWave",
+          "line": 112,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 7,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementPainWaveAbility",
+              "guid": "5b031b685cb241dcb8831faab1a21d67"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "4e42460798665fd4cb9173ffa7ada323",
+              "wrathPathIfPresent": "Buffs/Sickened.jbp"
+            },
+            {
+              "guid": "872f843a900d8f442896e5fdae6d44d1",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createSoulboundPuppet",
+          "line": 145,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSoulboundPuppetAbilityBase",
+              "guid": "74db3574e9494180b8640d2261eaeaf6"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "363cab72f77c47745bf3a8807074d183",
+              "wrathPathIfPresent": "Classes/Rogue/RogueTalentsAdvanced/Familiar.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createSpiritShroud",
+          "line": 198,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 3,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSpiritShroudBuff",
+              "guid": "63a1947bb1bf474597c06f692afe3743"
+            },
+            {
+              "name": "OccultistImplementSpiritShroudAbility",
+              "guid": "1038a116460a4637a0feed387f36392e"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "0fdb3cca6744fd94b9436459e6d9b947",
+              "wrathPathIfPresent": "Spells/Level2/FalseLifeBuff.jbp"
+            },
+            {
+              "guid": "e93261ee4c3ea474e923f6a645a3384f",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createNecromanticServant",
+          "line": 230,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 3,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementNecromanticServantBloodyTemplateBuff",
+              "guid": "393b09c069bd4f42be44860322ba3c8f"
+            },
+            {
+              "name": "OccultistImplementNecromanticServantDamageBuff",
+              "guid": "f346579f0ed04d0facc486cc4c01d310"
+            },
+            {
+              "name": "OccultistImplementNecromanticServant",
+              "guid": "19ff2ad0ce4d46c9aa4527f45d5cb054"
+            },
+            {
+              "name": "OccultistImplementNecromanticServantSingleAbility",
+              "guid": "9eebc061da214b91a404902fdf6a88b6"
+            },
+            {
+              "name": "OccultistImplementNecromanticServantMultileAbility",
+              "guid": "ab66b6c211204497ba97968b41f5aad4"
+            },
+            {
+              "name": "OccultistImplementNecromanticServantFeature",
+              "guid": "5c728a72622a4b4eb9b64e74b4c94236"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "a603a90d24a636c41910b3868f434447",
+              "wrathPathIfPresent": "Classes/Inquisitor/Archetypes/TacticalLeader/TacticalLeaderFeatShareBuff.jbp"
+            },
+            {
+              "guid": "490248a826bbf904e852f5e3afa6d138",
+              "wrathPathIfPresent": "Classes/Inquisitor/Archetypes/MonsterTactitian/MonsterTacticianPool.jbp"
+            },
+            {
+              "guid": "2d81362af43aeac4387a3d4fced489c3",
+              "wrathPathIfPresent": "Spells/Level3/Fireball.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createNecromanticFocus",
+          "line": 327,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementNecromanticFocusProperty",
+              "guid": "8d8fbc3578ee471bbeb3b3cc18a99caa"
+            },
+            {
+              "name": "OccultistImplementNecromanticFocusBuff",
+              "guid": "64f78b75121d424b97851d4b3b6aa089"
+            }
+          ],
+          "originalGuidReferences": []
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 2,
+        "2": 5,
+        "3": 4,
+        "4": 5,
+        "5": 3,
+        "6": 3
+      }
+    },
+    {
+      "name": "Transmutation",
+      "kind": "School",
+      "members": [],
+      "sourcePath": "Classes/Implements/Transmutation.cs",
+      "originalImplementGuid": "ecf068cd6e854433b3f5af420e8b2888",
+      "originalResourceGuid": "16e83ac4208b4c3fa748363fa95e605d",
+      "powers": [
+        {
+          "method": "createLegacyWeapon",
+          "line": 37,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementLegacyWeaponEnchancementBaseBuff",
+              "guid": "98970d9a4aed45cdaedaf332ded25f33"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponSwitchBuff",
+              "guid": "49c9cbaefe5e4e39becd2c4d95369485"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchantmentAbility",
+              "guid": "c6ecb684f45b40da950d034b68f0e6d5"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchantmentAbilityBase",
+              "guid": "ac15b05688e340cb8d9f701f94e527e9"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchancementFeature",
+              "guid": "92c81ead1b444c5cb7ff3d7debb436a3"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchancement2Feature",
+              "guid": "5347bc7be1b34723acf0f4e98097d332"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchancement3Feature",
+              "guid": "298081a763fe449795ee0a79b4025b11"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchancement4Feature",
+              "guid": "5b5d8ffe56fe446995d9e40eaa3eaa4f"
+            },
+            {
+              "name": "OccultistImplementLegacyWeaponEnchancement5Feature",
+              "guid": "a84cb3b68e1a4830a1697a51f44d05a0"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "7ff088ab58c69854b82ea95c2b0e35b4",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondSwitchAbility.jbp"
+            },
+            {
+              "guid": "f1eec5cc68099384cbfc6964049b24fa",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondBrilliantEnergyChoice.jbp"
+            },
+            {
+              "guid": "66e9e299c9002ea4bb65b6f300e43770",
+              "wrathPathIfPresent": "Weapons/Enchantments/BrilliantEnergy.jbp"
+            },
+            {
+              "guid": "7902941ef70a0dc44bcfc174d6193386",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondFlamingChoice.jbp"
+            },
+            {
+              "guid": "30f90becaaac51f41bf56641966c4121",
+              "wrathPathIfPresent": "Weapons/Enchantments/Flaming.jbp"
+            },
+            {
+              "guid": "b338e43a8f81a2f43a73a4ae676353a5",
+              "wrathPathIfPresent": "Classes/Magus/ArcanePool/ArcaneWeaponFrostChoice.jbp"
+            },
+            {
+              "guid": "421e54078b7719d40915ce0672511d0b",
+              "wrathPathIfPresent": "Weapons/Enchantments/Frost.jbp"
+            },
+            {
+              "guid": "a3a9e9a2f909cd74e9aee7788a7ec0c6",
+              "wrathPathIfPresent": "Classes/Magus/ArcanePool/ArcaneWeaponShockChoice.jbp"
+            },
+            {
+              "guid": "7bda5277d36ad114f9f9fd21d0dab658",
+              "wrathPathIfPresent": "Weapons/Enchantments/Shock.jbp"
+            },
+            {
+              "guid": "688d42200cbb2334c8e27191c123d18f",
+              "wrathPathIfPresent": "Classes/Magus/ArcanePool/ArcaneWeaponGhostTouchChoice.jbp"
+            },
+            {
+              "guid": "47857e1a5a3ec1a46adf6491b1423b4f",
+              "wrathPathIfPresent": "Weapons/Enchantments/GhostTouch.jbp"
+            },
+            {
+              "guid": "27d76f1afda08a64d897cc81201b5218",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondKeenChoice.jbp"
+            },
+            {
+              "guid": "102a9c8c9b7a75e4fb5844e79deaf4c0",
+              "wrathPathIfPresent": "Weapons/Enchantments/Keen.jbp"
+            },
+            {
+              "guid": "0f20d79b7049c0f4ca54ca3d1ea44baa",
+              "wrathPathIfPresent": "Weapons/Enchantments/Disruption.jbp"
+            },
+            {
+              "guid": "ce0ece459ebed9941bb096f559f36fa8",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondHolyChoice.jbp"
+            },
+            {
+              "guid": "28a9964d81fedae44bae3ca45710c140",
+              "wrathPathIfPresent": "Weapons/Enchantments/Holy.jbp"
+            },
+            {
+              "guid": "561803a819460f34ea1fe079edabecce",
+              "wrathPathIfPresent": "Classes/Magus/ArcanePool/ArcaneWeaponUnholyChoice.jbp"
+            },
+            {
+              "guid": "d05753b8df780fc4bb55b318f06af453",
+              "wrathPathIfPresent": "Weapons/Enchantments/Unholy.jbp"
+            },
+            {
+              "guid": "d76e8a80ab14ac942b6a9b8aaa5860b1",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondAxiomaticChoice.jbp"
+            },
+            {
+              "guid": "0ca43051edefcad4b9b2240aa36dc8d4",
+              "wrathPathIfPresent": "Weapons/Enchantments/Axiomatic.jbp"
+            },
+            {
+              "guid": "57315bc1e1f62a741be0efde688087e9",
+              "wrathPathIfPresent": "Weapons/Enchantments/Anarchic.jbp"
+            },
+            {
+              "guid": "f1c0c50108025d546b2554674ea1c006",
+              "wrathPathIfPresent": "Weapons/Enchantments/Speed.jbp"
+            },
+            {
+              "guid": "ed1ef581af9d9014fa1386216b31cdae",
+              "wrathPathIfPresent": "Classes/Paladin/WeaponBond/WeaponBondSpeedChoice.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createMindOverGravity",
+          "line": 279,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 7,
+          "originalNamedAssets": [],
+          "originalGuidReferences": []
+        },
+        {
+          "method": "createPhilosophersTouch",
+          "line": 292,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementPhilosophersTouchSingleAbilityBase",
+              "guid": "2e301c33f69c4327a87fe4b9e942f990"
+            },
+            {
+              "name": "OccultistImplementPhilosophersTouchMultipleAbilityBase",
+              "guid": "21fc4ef51d584c0784f81e4fbdc3826d"
+            },
+            {
+              "name": "OccultistImplementPhilosophersTouchFeature",
+              "guid": "ceb0ed05d57140a1ae7e6acc0efe9bb1"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "352469f228a3b1f4cb269c7ab0409b8e",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createSuddenSpeed",
+          "line": 370,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [],
+          "originalGuidReferences": [
+            {
+              "guid": "4f8181e7a7f1d904fbaea64220e83379",
+              "wrathPathIfPresent": "Spells/Level1/ExpeditiousRetreat.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createSizeAlteration",
+          "line": 384,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSizeAlterationAbilityBase",
+              "guid": "f38f94d8f4d04417bde755944aafe642"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "c60969e7f264e6d4b84a1499fdcf9039",
+              "wrathPathIfPresent": "Spells/Level1/EnlargePerson.jbp"
+            },
+            {
+              "guid": "4e0e9aba6447d514f88eff1464cc4763",
+              "wrathPathIfPresent": "Spells/Level1/ReducePerson.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createQuickness",
+          "line": 409,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 5,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementQuicknessBuff",
+              "guid": "a06b788edc2c4d9c83b5aecb00ceb710"
+            },
+            {
+              "name": "OccultistImplementQuicknessAbility",
+              "guid": "fac5141b1e7d486e97dbde6a8693899e"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "03464790f40c3c24aa684b57155f3280",
+              "wrathPathIfPresent": "Spells/Level3/HasteBuff.jbp"
+            },
+            {
+              "guid": "486eaff58293f6441a5c2759c4872f98",
+              "wrathPathIfPresent": "Spells/Level3/Haste.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createPhysicalEnhancement",
+          "line": 446,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementPhysicalEnhancementProperty",
+              "guid": "3e6d9a4b28824ee6ac5d302308136865"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "99cf556b967c2074ca284e127d815711",
+              "wrathPathIfPresent": "Classes/Wizard/Transmutation/TransmutationPhysicalEnhancementToggleConstitution.jbp"
+            },
+            {
+              "guid": "3553bda4d6dfe6344ad89b25f7be939a",
+              "wrathPathIfPresent": "Classes/Wizard/Transmutation/TransmutationPhysicalEnhancementToggleDexterity.jbp"
+            },
+            {
+              "guid": "c7773d1b408fea24dbbb0f7bf3eb864e",
+              "wrathPathIfPresent": "Classes/Wizard/Transmutation/TransmutationPhysicalEnhancementToggleStrength.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 6,
+        "2": 3,
+        "3": 8,
+        "4": 4,
+        "5": 4,
+        "6": 3
+      }
+    },
+    {
+      "name": "TrappingOfTheWarrior",
+      "kind": "Panoply",
+      "members": [
+        "Abjuration",
+        "Transmutation"
+      ],
+      "sourcePath": "Classes/Implements/TrappingsOfTheWarrior.cs",
+      "originalImplementGuid": "5f65bc87e1eb442b99657dd73635e76d",
+      "originalResourceGuid": "f2eb2aa4ccd44ecd83119e126dbd1b82",
+      "powers": [
+        {
+          "method": "createCounterStrike",
+          "line": 40,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementCounterstrikeDamageBuff",
+              "guid": "d9b57578631843479d4278423a2cbba5"
+            },
+            {
+              "name": "OccultistImplementCounterstrikeBuff",
+              "guid": "22faaa7fbad6415e80e4d442a4a3394e"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "36c8971e91f1745418cc3ffdfac17b74",
+              "wrathPathIfPresent": "Spells/Level6/BladeBarrier.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createCombatTrick",
+          "line": 80,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementCombatTrickFeature",
+              "guid": "d750f61cd83948c7abb1cbc83a877cb7"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "41c8486641f7d6d4283ca9dae4147a9f",
+              "wrathPathIfPresent": "Classes/Fighter/FighterFeatSelection.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createMartialSkill",
+          "line": 96,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementTrappingOfTheWarriorFocusProperty",
+              "guid": "80d87cbaf1ae4ae5b756c9f57b395b94"
+            },
+            {
+              "name": "OccultistImplementTrappingOfTheWarriorFocusBuff",
+              "guid": "46460d1d98b74852ad8ef8015d8e94b4"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "9d5d2d3ffdd73c648af3eb3e585b1113",
+              "wrathPathIfPresent": "Spells/Level1/DivineFavor.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 8,
+        "2": 5,
+        "3": 12,
+        "4": 9,
+        "5": 7,
+        "6": 4
+      }
+    },
+    {
+      "name": "MagesParaphernalia",
+      "kind": "Panoply",
+      "members": [
+        "Divination",
+        "Evocation",
+        "Necromancy"
+      ],
+      "sourcePath": "Classes/Implements/MagesParaphernalia.cs",
+      "originalImplementGuid": "5937c70e0b734981949ed4e499947cc8",
+      "originalResourceGuid": "a9782d5d9ec0461e8fec61510c00cbe0",
+      "powers": [
+        {
+          "method": "createSpellPower",
+          "line": 37,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSpellPowerFeature",
+              "guid": "b3c96cfd4ac04915bb94b896967c8753"
+            }
+          ],
+          "originalGuidReferences": []
+        },
+        {
+          "method": "createMetamagicMaster",
+          "line": 78,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementMetamagicMasterFeature",
+              "guid": "70035bec83eb417c8c092f2067f739d4"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "2f5d1e705c7967546b72ad8218ccf99c",
+              "wrathPathIfPresent": "Feats/Metamagic/HeightenSpellFeat.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createMetamagicKnowledge",
+          "line": 127,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementMetamagicKnowledgeFeature",
+              "guid": "8ebecf0f1dd74cf183cf4cb848b39b24"
+            }
+          ],
+          "originalGuidReferences": []
+        },
+        {
+          "method": "createScholarlyKnowledge",
+          "line": 144,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementMagesParaphernaliaFocusProperty",
+              "guid": "0d936d9fef664ca0bfde407c430294ed"
+            },
+            {
+              "name": "OccultistImplementMagesParaphernaliaFocusBuff",
+              "guid": "aebebc1d86324c15b898e27257e4348b"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "55edf82380a1c8540af6c6037d34f322",
+              "wrathPathIfPresent": "Traits/Races/Elf/ElvenMagic.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 5,
+        "2": 11,
+        "3": 9,
+        "4": 14,
+        "5": 8,
+        "6": 10
+      }
+    },
+    {
+      "name": "SaintsRegalia",
+      "kind": "Panoply",
+      "members": [
+        "Abjuration",
+        "Conjuration"
+      ],
+      "sourcePath": "Classes/Implements/SaintsHolyRegalia.cs",
+      "originalImplementGuid": "e5e775801d4f4111a80de3eb14ac33ad",
+      "originalResourceGuid": "84379fce83fd4a97b6a5883de157a623",
+      "powers": [
+        {
+          "method": "createGuardianAura",
+          "line": 38,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementGuardianAuraBuff",
+              "guid": "ed0d719f112846fbb90d3ff84431a4c8"
+            },
+            {
+              "name": "OccultistImplementGuardianAuraAbility",
+              "guid": "ccb6f79c86df4a898b5ccbd8228a0727"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "183d5bb91dea3a1489a6db6c9cb64445",
+              "wrathPathIfPresent": "Spells/Level1/ShieldOfFaith.jbp"
+            },
+            {
+              "guid": "bbd6decdae32bce41ae8f06c6c5eb893",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createRestoringTouch",
+          "line": 80,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementRestoratingTouchAbility",
+              "guid": "35392832ed8a44999d6d6a659442fc66"
+            },
+            {
+              "name": "OccultistImplementRestoratingTouchDrainAbility",
+              "guid": "3e304170299f45e191867af71772fa89"
+            },
+            {
+              "name": "OccultistImplementRestoratingTouchAbilityBase",
+              "guid": "fc7ac5d75812445c820a322ba77af13c"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "f2115ac1148256b4ba20788f7e966830",
+              "wrathPathIfPresent": "Spells/Level4/Restoration.jbp"
+            },
+            {
+              "guid": "621885df4b6add9489c8edd14b844ad6",
+              "wrathPathIfPresent": null
+            }
+          ]
+        },
+        {
+          "method": "createFontOfHealing",
+          "line": 123,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementSaintsHolyRegaliaFocusProperty",
+              "guid": "1c2c9265798f48b585f242bcbbb22377"
+            },
+            {
+              "name": "OccultistImplementSaintsHolyRegaliaFocusBuff",
+              "guid": "cddb926fe77449f087a3e45885699f7f"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "47808d23c67033d4bbab86a1070fd62f",
+              "wrathPathIfPresent": "Spells/Level1/CureLightWounds.jbp"
+            },
+            {
+              "guid": "1c1ebf5370939a9418da93176cc44cd9",
+              "wrathPathIfPresent": "Spells/Level2/CureModerateWounds.jbp"
+            },
+            {
+              "guid": "6e81a6679a0889a429dec9cedcf3729c",
+              "wrathPathIfPresent": "Spells/Level3/CureSeriousWounds.jbp"
+            },
+            {
+              "guid": "0d657aa811b310e4bbd8586e60156a2d",
+              "wrathPathIfPresent": "Spells/Level4/CureCriticalWounds.jbp"
+            },
+            {
+              "guid": "5d3d689392e4ff740a761ef346815074",
+              "wrathPathIfPresent": "Spells/Level5/CureLightWoundsMass.jbp"
+            },
+            {
+              "guid": "571221cc141bc21449ae96b3944652aa",
+              "wrathPathIfPresent": "Spells/Level6/CureModerateWoundsMass.jbp"
+            },
+            {
+              "guid": "0cea35de4d553cc439ae80b3a8724397",
+              "wrathPathIfPresent": "Spells/Level7/CureSeriousWoundsMass.jbp"
+            },
+            {
+              "guid": "1f173a16120359e41a20fc75bb53d449",
+              "wrathPathIfPresent": "Spells/Level8/CureCriticalWoundsMass.jbp"
+            },
+            {
+              "guid": "41c9016596fe1de4faf67425ed691203",
+              "wrathPathIfPresent": "Spells/Level4/CureCriticalWoundsCast.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 4,
+        "2": 6,
+        "3": 5,
+        "4": 7,
+        "5": 5,
+        "6": 3
+      }
+    },
+    {
+      "name": "PerformersAccoutrements",
+      "kind": "Panoply",
+      "members": [
+        "Enchantment",
+        "Illusion"
+      ],
+      "sourcePath": "Classes/Implements/PerformersAccoutrements.cs",
+      "originalImplementGuid": "0c1c5ad292ea40acb38b04628c5b5307",
+      "originalResourceGuid": "c49510ee7e6640b5bace9bf5deea52f9",
+      "powers": [
+        {
+          "method": "createTrickstersSkill",
+          "line": 37,
+          "kind": "Resonance",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementPerformersAccoutrementsFocusProperty",
+              "guid": "93bf4e949cf5409586e74b0614e4b073"
+            },
+            {
+              "name": "OccultistImplementPerformersAccoutrementsFocusBuff",
+              "guid": "ee1b51440af1465d801a82fbac07890e"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "d99bab42783d29f48870274fb1e85bc4",
+              "wrathPathIfPresent": "Classes/ArcaneTrickster/RangedLegerdemain/RangedLegerdemainFeature.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createTrickstersEdge",
+          "line": 58,
+          "kind": "Ability",
+          "explicitSelectionMinimum": null,
+          "originalNamedAssets": [
+            {
+              "name": "OccultistImplementTrickstersEdgeAbility",
+              "guid": "3953b90e127147728d2fbdf85924219d"
+            }
+          ],
+          "originalGuidReferences": [
+            {
+              "guid": "fa12d155c229c134dbbbebf0d7b980f0",
+              "wrathPathIfPresent": "Classes/Magus/Arcanas/PrescientAttackAbility.jbp"
+            }
+          ]
+        },
+        {
+          "method": "createPuppetMaster",
+          "line": 71,
+          "kind": "Ability",
+          "explicitSelectionMinimum": 9,
+          "originalNamedAssets": [],
+          "originalGuidReferences": [
+            {
+              "guid": "3c17035ec4717674cae2e841a190e757",
+              "wrathPathIfPresent": "Spells/Level9/DominateMonster.jbp"
+            }
+          ]
+        }
+      ],
+      "potentialRootCountByLevel": {
+        "1": 4,
+        "2": 4,
+        "3": 3,
+        "4": 4,
+        "5": 5,
+        "6": 2
+      }
+    }
+  ],
+  "spellRoots": [
+    {
+      "level": 0,
+      "originalLine": 1829,
+      "originalGuid": "55f14bc84d7c85446b07a1b5dd6b2b4c",
+      "originalComment": "daze",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "55f14bc84d7c85446b07a1b5dd6b2b4c",
+        "name": "Daze",
+        "path": "Spells/Level0/Daze.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          0
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 0,
+      "originalLine": 1830,
+      "originalGuid": "f0f8e5b9808f44e4eadd22b138131d52",
+      "originalComment": "flare",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "f0f8e5b9808f44e4eadd22b138131d52",
+        "name": "Flare",
+        "path": "Spells/Level0/Flare.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          0
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 0,
+      "originalLine": 1831,
+      "originalGuid": "c3a8f31778c3980498d8f00c980be5f5",
+      "originalComment": "guidance",
+      "source": "Wrath",
+      "school": "Divination",
+      "root": {
+        "guid": "c3a8f31778c3980498d8f00c980be5f5",
+        "name": "Guidance",
+        "path": "Spells/Level0/Guidance.jbp",
+        "school": "Divination",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          0
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 0,
+      "originalLine": 1832,
+      "originalGuid": "95f206566c5261c42aa5b3e7e0d1e36c",
+      "originalComment": "mage light",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "95f206566c5261c42aa5b3e7e0d1e36c",
+        "name": "MageLight",
+        "path": "Spells/Level0/MageLight.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          0
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 0,
+      "originalLine": 1833,
+      "originalGuid": "7bc8e27cba24f0e43ae64ed201ad5785",
+      "originalComment": "resistance",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "7bc8e27cba24f0e43ae64ed201ad5785",
+        "name": "Resistance",
+        "path": "Spells/Level0/Resistance.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          0,
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 0,
+      "originalLine": 1834,
+      "originalGuid": "5bf3315ce1ed4d94e8805706820ef64d",
+      "originalComment": "touch of fatigue",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "5bf3315ce1ed4d94e8805706820ef64d",
+        "name": "TouchOfFatigueCast",
+        "path": "Spells/Level0/TouchOfFatigueCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          0
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1836,
+      "originalGuid": "4783c3709a74a794dbe7c8e7e0b1b038",
+      "originalComment": "burning hands",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "4783c3709a74a794dbe7c8e7e0b1b038",
+        "name": "BurningHands",
+        "path": "Spells/Level1/BurningHands.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1837,
+      "originalGuid": "bd81a3931aa285a4f9844585b5d97e51",
+      "originalComment": "cause fear",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "bd81a3931aa285a4f9844585b5d97e51",
+        "name": "CauseFear",
+        "path": "Spells/Level1/CauseFear.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1838,
+      "originalExpression": "NewSpells.command.AssetGuid",
+      "originalName": "CommandSpellAbility",
+      "originalGuid": "ee88e59d9ecb40df851a5498d03d79f6",
+      "originalComment": "",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "feb70aab86cc17f4bb64432c83737ac2",
+        "name": "Command",
+        "path": "Spells/Level1/Command/Command.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1839,
+      "originalGuid": "5590652e1c2225c4ca30c4a699ab3649",
+      "originalComment": "cure light wounds",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "5590652e1c2225c4ca30c4a699ab3649",
+        "name": "CureLightWoundsCast",
+        "path": "Spells/Level1/CureLightWoundsCast.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1,
+          2
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1840,
+      "originalGuid": "c60969e7f264e6d4b84a1499fdcf9039",
+      "originalComment": "enlarge person",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "c60969e7f264e6d4b84a1499fdcf9039",
+        "name": "EnlargePerson",
+        "path": "Spells/Level1/EnlargePerson.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1841,
+      "originalGuid": "4f8181e7a7f1d904fbaea64220e83379",
+      "originalComment": "expeditious retreat",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "4f8181e7a7f1d904fbaea64220e83379",
+        "name": "ExpeditiousRetreat",
+        "path": "Spells/Level1/ExpeditiousRetreat.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1842,
+      "originalGuid": "3e9d1119d43d07c4c8ba9ebfd1671952",
+      "originalComment": "gravity bow",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "3e9d1119d43d07c4c8ba9ebfd1671952",
+        "name": "HurricaneBow",
+        "path": "Spells/Level1/HurricaneBow.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1843,
+      "originalGuid": "fd4d9fd7f87575d47aafe2a64a6e2d8d",
+      "originalComment": "hypnotism",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "fd4d9fd7f87575d47aafe2a64a6e2d8d",
+        "name": "HideousLaughter",
+        "path": "Spells/Level2/HideousLaughter.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1,
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1844,
+      "originalGuid": "e5af3674bb241f14b9a9f6b0c7dc3d27",
+      "originalComment": "inflict light wounds",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "e5af3674bb241f14b9a9f6b0c7dc3d27",
+        "name": "InflictLightWoundsCast",
+        "path": "Spells/Level1/InflictLightWoundsCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1845,
+      "originalGuid": "779179912e6c6fe458fa4cfb90d96e10",
+      "originalComment": "lead blades",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "779179912e6c6fe458fa4cfb90d96e10",
+        "name": "LeadBlades",
+        "path": "Spells/Level1/LeadBlades.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1846,
+      "originalGuid": "9e1ad5d6f87d19e4d8883d63a6e35568",
+      "originalComment": "mage armor",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "9e1ad5d6f87d19e4d8883d63a6e35568",
+        "name": "MageArmor",
+        "path": "Spells/Level1/MageArmor.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1847,
+      "originalExpression": "NewSpells.magic_weapon.AssetGuid",
+      "originalName": "MagicWeaponBaseAbility",
+      "originalGuid": "2bc2e3cb301d4ecd8f1370cd7afd3774",
+      "originalComment": "",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "d7fdd79f0f6b6a2418298e936bb68e40",
+        "name": "MagicWeapon",
+        "path": "Spells/Level1/MagicWeapon/MagicWeapon.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1848,
+      "originalGuid": "4e0e9aba6447d514f88eff1464cc4763",
+      "originalComment": "reduce person",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "4e0e9aba6447d514f88eff1464cc4763",
+        "name": "ReducePerson",
+        "path": "Spells/Level1/ReducePerson.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1849,
+      "originalGuid": "ef768022b0785eb43a18969903c537c4",
+      "originalComment": "shield",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "ef768022b0785eb43a18969903c537c4",
+        "name": "MageShield",
+        "path": "Spells/Level1/MageShield.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1850,
+      "originalGuid": "ab395d2335d3f384e99dddee8562978f",
+      "originalComment": "shocking grasp",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "ab395d2335d3f384e99dddee8562978f",
+        "name": "ShockingGraspCast",
+        "path": "Spells/Level1/ShockingGraspCast.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1851,
+      "originalGuid": "bb7ecad2d3d2c8247a38f44855c99061",
+      "originalComment": "sleep",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "bb7ecad2d3d2c8247a38f44855c99061",
+        "name": "Sleep",
+        "path": "Spells/Level1/Sleep.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1852,
+      "originalGuid": "f001c73999fb5a543a199f890108d936",
+      "originalComment": "vanish",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "f001c73999fb5a543a199f890108d936",
+        "name": "Vanish",
+        "path": "Spells/Level1/Vanish.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1853,
+      "originalExpression": "NewSpells.warding_weapon.AssetGuid",
+      "originalName": "WardingWeaponAbility",
+      "originalGuid": "3908e53932904377b48e915528556403",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Abjuration",
+      "root": {
+        "guid": "1ce11d27e8d07955d1012a6abaabfbe0",
+        "name": "CotWWrathPsychicWardingWeapon",
+        "token": "WardingWeapon",
+        "sourcePath": "src/PsychicWardingSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 1,
+      "originalLine": 1854,
+      "originalGuid": "2c38da66e5a599347ac95b3294acbe00",
+      "originalComment": "true strike - to compensate for missing spells",
+      "source": "Wrath",
+      "school": "Divination",
+      "root": {
+        "guid": "2c38da66e5a599347ac95b3294acbe00",
+        "name": "TrueStrike",
+        "path": "Spells/Level1/TrueStrike.jbp",
+        "school": "Divination",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1856,
+      "originalExpression": "NewSpells.allied_cloak.AssetGuid",
+      "originalName": "AlliedCloakAbility",
+      "originalGuid": "220b26ce4f294580879d846516ad6aff",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Abjuration",
+      "root": {
+        "guid": "57252e407614fb087709d40d6c86353b",
+        "name": "CotWWrathPsychicAlliedCloak",
+        "token": "AlliedCloak",
+        "sourcePath": "src/PsychicSupportSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1857,
+      "originalExpression": "NewSpells.animate_dead_lesser.AssetGuid",
+      "originalName": "AniamteDeadLesserAbility",
+      "originalGuid": "0acbfa325da240c381a1fa7295fd1011",
+      "originalComment": "",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "57fcf8016cf04da4a8b33d2add14de7e",
+        "name": "AnimateDeadLesser",
+        "path": "Spells/Level3/AnimateDeadLesser.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2,
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      },
+      "decision": "Wrath root is native level 3. Occupies level 2 only in the Occultist list."
+    },
+    {
+      "level": 2,
+      "originalLine": 1858,
+      "originalGuid": "14ec7a4e52e90fa47a4c8d63c69fd5c1",
+      "originalComment": "blur",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "14ec7a4e52e90fa47a4c8d63c69fd5c1",
+        "name": "Blur",
+        "path": "Spells/Level2/Blur.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1859,
+      "originalExpression": "NewSpells.blade_tutor.AssetGuid",
+      "originalName": "BladeTutorAbility",
+      "originalGuid": "f707f46016cf4d58bf7bb777d84b73c3",
+      "originalComment": "should probably also be there due to flavor",
+      "source": "CotW",
+      "school": "Conjuration",
+      "root": {
+        "guid": "f5a85ff13a2f60a0fccc2cedf29bfa43",
+        "name": "CotWWrathPsychicBladeTutor",
+        "token": "BladeTutor",
+        "sourcePath": "src/PsychicBladeTutor.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1860,
+      "originalGuid": "6b90c773a6543dc49b2505858ce33db5",
+      "originalComment": "cure moderate wounds",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "6b90c773a6543dc49b2505858ce33db5",
+        "name": "CureModerateWoundsCast",
+        "path": "Spells/Level2/CureModerateWoundsCast.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2,
+          3
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1861,
+      "originalGuid": "b48b4c5ffb4eab0469feba27fc86a023",
+      "originalComment": "delay poison",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "b48b4c5ffb4eab0469feba27fc86a023",
+        "name": "DelayPoison",
+        "path": "Spells/Level2/DelayPoison.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1,
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1862,
+      "originalGuid": "e1291272c8f48c14ab212a599ad17aac",
+      "originalComment": "effortless armor",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "e1291272c8f48c14ab212a599ad17aac",
+        "name": "EffortlessArmor",
+        "path": "Spells/Level2/EffortlessArmor.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1863,
+      "originalGuid": "7a5b5bf845779a941a67251539545762",
+      "originalComment": "false life",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "7a5b5bf845779a941a67251539545762",
+        "name": "FalseLife",
+        "path": "Spells/Level2/FalseLife.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1864,
+      "originalGuid": "4709274b2080b6444a3c11c6ebbe2404",
+      "originalComment": "find traps",
+      "source": "Wrath",
+      "school": "Divination",
+      "root": {
+        "guid": "4709274b2080b6444a3c11c6ebbe2404",
+        "name": "FindTraps",
+        "path": "Spells/Level2/FindTraps.jbp",
+        "school": "Divination",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1865,
+      "originalExpression": "NewSpells.flaming_sphere.AssetGuid",
+      "originalName": "FlamingSphereAbility",
+      "originalGuid": "1e19175908fc4e2ab4720f5d0da5cf5d",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "3a379b053e2400f114235e2784dabfae",
+        "name": "CotWWrathPsychicFlamingSphere",
+        "token": "FlamingSphere",
+        "sourcePath": "src/PsychicOrbSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1866,
+      "originalExpression": "NewSpells.force_sword.AssetGuid",
+      "originalName": "ForceSwordAbility",
+      "originalGuid": "d7ea430e3b504d99a97712ea1e3ba1d3",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "f9ce1e9088de0d502a98bcce636b0615",
+        "name": "CotWWrathPsychicForceSword",
+        "token": "ForceSword",
+        "sourcePath": "src/PsychicRestorativeSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1868,
+      "originalExpression": "NewSpells.ghostbane_dirge.AssetGuid",
+      "originalName": "GhostbaneDirgeAbility",
+      "originalGuid": "a4cc18d3069249a2b0a0d4780aeddbd0",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "20ac1e6d10b90157af08fea7aab76a5e",
+        "name": "CotWWrathPsychicGhostbaneDirge",
+        "token": "GhostbaneDirge",
+        "sourcePath": "src/PsychicGhostbaneDirge.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1869,
+      "originalGuid": "ce7dad2b25acf85429b6c9550787b2d9",
+      "originalComment": "glitterdust",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "ce7dad2b25acf85429b6c9550787b2d9",
+        "name": "Glitterdust",
+        "path": "Spells/Level2/Glitterdust.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1870,
+      "originalExpression": "NewSpells.ice_slick.AssetGuid",
+      "originalName": "IceSlickAbility",
+      "originalGuid": "7b04d87b0cdf4ffc9ee1a8939a2cd91d",
+      "originalComment": "instead of frost fall ?",
+      "source": "External",
+      "school": "Evocation",
+      "root": {
+        "guid": "ff0cd8273f354ed7a81118cd716124ed",
+        "name": "IceSlick",
+        "provider": "CharacterOptionsPlus",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1871,
+      "originalGuid": "65f0b63c45ea82a4f8b8325768a3832d",
+      "originalComment": "inflict moderate wounds",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "65f0b63c45ea82a4f8b8325768a3832d",
+        "name": "InflictModerateWoundsCast",
+        "path": "Spells/Level2/InflictModerateWoundsCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1872,
+      "originalExpression": "NewSpells.inflict_pain.AssetGuid",
+      "originalName": "InflictPainAbility",
+      "originalGuid": "e47b3d30b07d4a0f94f8e801f44bdfd8",
+      "originalComment": "",
+      "source": "External",
+      "school": "Enchantment",
+      "root": {
+        "guid": "e023af1af9c147549a8e7bd246967861",
+        "name": "InflictPainAbility",
+        "provider": "ExpandedContent",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1873,
+      "originalGuid": "89940cde01689fb46946b2f8cd7b66b7",
+      "originalComment": "invisibility",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "89940cde01689fb46946b2f8cd7b66b7",
+        "name": "Invisibility",
+        "path": "Spells/Level2/Invisibility.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1874,
+      "originalGuid": "3e4ab69ada402d145a5e0ad3ad4b8564",
+      "originalComment": "mirror image",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "3e4ab69ada402d145a5e0ad3ad4b8564",
+        "name": "MirrorImage",
+        "path": "Spells/Level2/MirrorImage.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1875,
+      "originalGuid": "dee3074b2fbfb064b80b973f9b56319e",
+      "originalComment": "pernicious poison",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "dee3074b2fbfb064b80b973f9b56319e",
+        "name": "PerniciousPoison",
+        "path": "Spells/Level2/PerniciousPoison.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1876,
+      "originalGuid": "21ffef7791ce73f468b6fca4d9371e8b",
+      "originalComment": "resist energy",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "21ffef7791ce73f468b6fca4d9371e8b",
+        "name": "ResistEnergy",
+        "path": "Spells/Level2/ResistEnergy.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          1,
+          2
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1877,
+      "originalGuid": "30e5dc243f937fc4b95d2f8f4e1b7ff3",
+      "originalComment": "see invisibility",
+      "source": "Wrath",
+      "school": "Divination",
+      "root": {
+        "guid": "30e5dc243f937fc4b95d2f8f4e1b7ff3",
+        "name": "SeeInvisibility",
+        "path": "Spells/Level2/SeeInvisibility.jbp",
+        "school": "Divination",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2,
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1878,
+      "originalGuid": "08cb5f4c3b2695e44971bf5c45205df0",
+      "originalComment": "scare",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "08cb5f4c3b2695e44971bf5c45205df0",
+        "name": "Scare",
+        "path": "Spells/Level2/Scare.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1879,
+      "originalGuid": "c3893092a333b93499fd0a21845aa265",
+      "originalComment": "sound burst",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "c3893092a333b93499fd0a21845aa265",
+        "name": "SoundBurst",
+        "path": "Spells/Level2/SoundBurst.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 2,
+      "originalLine": 1880,
+      "originalExpression": "NewSpells.weapon_of_awe.AssetGuid",
+      "originalName": "WeaponOfAweAbility",
+      "originalGuid": "df4aa255eeba498bac4d69fbb267a1f9",
+      "originalComment": "weapon of awe",
+      "source": "External",
+      "school": "Transmutation",
+      "root": {
+        "guid": "685de54b0964499e9a5daf234a618c54",
+        "name": "WeaponOfAwe",
+        "provider": "CharacterOptionsPlus",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1883,
+      "originalGuid": "4b76d32feb089ad4499c3a1ce8e1ac27",
+      "originalComment": "animate dead",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "4b76d32feb089ad4499c3a1ce8e1ac27",
+        "name": "AnimateDead",
+        "path": "Spells/Level4/AnimateDead.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1884,
+      "originalGuid": "989ab5c44240907489aba0a8568d0603",
+      "originalComment": "bestow curse",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "989ab5c44240907489aba0a8568d0603",
+        "name": "BestowCurse",
+        "path": "Spells/Level3/BestowCurse.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1885,
+      "originalGuid": "2a9ef0e0b5822a24d88b16673a267456",
+      "originalComment": "call lightning",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "2a9ef0e0b5822a24d88b16673a267456",
+        "name": "CallLightning",
+        "path": "Spells/Level3/CallLightning.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1886,
+      "originalExpression": "NewSpells.cloak_of_winds.AssetGuid",
+      "originalName": "CloakOfWindsAbility",
+      "originalGuid": "57cb4fc531204af6864eaf4154f14ae4",
+      "originalComment": "",
+      "source": "External",
+      "school": "Abjuration",
+      "root": {
+        "guid": "6fb10fff27b84bff81746194bf8e38a8",
+        "name": "CloakOfWindsAbility",
+        "provider": "TabletopTweaks-Base",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1887,
+      "originalExpression": "NewSpells.countless_eyes.AssetGuid",
+      "originalName": "CountlessEyesAbility",
+      "originalGuid": "4e1a76945319464ca52578db6bf2d46c",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "8d20e33f40680ee1f860b2a23ed13c63",
+        "name": "CotWWrathPsychicCountlessEyes",
+        "token": "CountlessEyes",
+        "sourcePath": "src/PsychicUtilitySpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1888,
+      "originalGuid": "3361c5df793b4c8448756146a88026ad",
+      "originalComment": "cure serious wounds",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "3361c5df793b4c8448756146a88026ad",
+        "name": "CureSeriousWoundsCast",
+        "path": "Spells/Level3/CureSeriousWoundsCast.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1889,
+      "originalGuid": "7658b74f626c56a49939d9c20580885e",
+      "originalComment": "deep slumber",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "7658b74f626c56a49939d9c20580885e",
+        "name": "DeepSlumber",
+        "path": "Spells/Level3/DeepSlumber.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1890,
+      "originalGuid": "92681f181b507b34ea87018e8f7a528a",
+      "originalComment": "dispel magic",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "92681f181b507b34ea87018e8f7a528a",
+        "name": "DispelMagic",
+        "path": "Spells/Level3/DispelMagic.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1891,
+      "originalGuid": "903092f6488f9ce45a80943923576ab3",
+      "originalComment": "displacement",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "903092f6488f9ce45a80943923576ab3",
+        "name": "Displacement",
+        "path": "Spells/Level3/Displacement.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1892,
+      "originalGuid": "2d81362af43aeac4387a3d4fced489c3",
+      "originalComment": "fireball",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "2d81362af43aeac4387a3d4fced489c3",
+        "name": "Fireball",
+        "path": "Spells/Level3/Fireball.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1893,
+      "originalExpression": "NewSpells.flame_arrow.AssetGuid",
+      "originalName": "FlameArrowAbility",
+      "originalGuid": "d4c3243e424b4dd188cafdb0640d808e",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "28c1d9969358ef6e2ead39756e7d520a",
+        "name": "CotWWrathPsychicFlameArrow",
+        "token": "FlameArrow",
+        "sourcePath": "src/PsychicBattleSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1894,
+      "originalExpression": "NewSpells.fly.AssetGuid",
+      "originalName": "FlyAbility",
+      "originalGuid": "e70ed627e4ea48ceb44bb9c314d99994",
+      "originalComment": "",
+      "source": "External",
+      "school": "Transmutation",
+      "root": {
+        "guid": "bbbd603f9da44838b8a85124aaa6ba40",
+        "name": "FlySpell",
+        "provider": "TomeOfTheFirebird",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1895,
+      "originalGuid": "486eaff58293f6441a5c2759c4872f98",
+      "originalComment": "haste",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "486eaff58293f6441a5c2759c4872f98",
+        "name": "Haste",
+        "path": "Spells/Level3/Haste.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1896,
+      "originalGuid": "c7104f7526c4c524f91474614054547e",
+      "originalComment": "hold person",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "c7104f7526c4c524f91474614054547e",
+        "name": "HoldPerson",
+        "path": "Spells/Level3/HoldPerson.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2,
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1897,
+      "originalGuid": "bd5da98859cf2b3418f6d68ea66cabbe",
+      "originalComment": "inflict serious wounds",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "bd5da98859cf2b3418f6d68ea66cabbe",
+        "name": "InflictSeriousWoundsCast",
+        "path": "Spells/Level3/InflictSeriousWoundsCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1898,
+      "originalExpression": "NewSpells.keen_edge.AssetGuid",
+      "originalName": "KeenEdgeAbility",
+      "originalGuid": "2c9788ba8bcf4fe8a81ee83027d4dbd5",
+      "originalComment": "",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "64923c9c808143c7ab7adba5a27f0ca4",
+        "name": "KeenEdge",
+        "path": "Spells/DLC6NewSpells/KeenEdge.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1899,
+      "originalGuid": "d2cff9243a7ee804cb6d5be47af30c73",
+      "originalComment": "lightning bolt",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "d2cff9243a7ee804cb6d5be47af30c73",
+        "name": "LightningBolt",
+        "path": "Spells/Level3/LightningBolt.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1900,
+      "originalExpression": "NewSpells.locate_weakness.AssetGuid",
+      "originalName": "LocateWeaknessAbility",
+      "originalGuid": "a9739e1839f541efaf898f722bd00c3d",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Divination",
+      "root": {
+        "guid": "5c4a23853192786eecba92ac455ba5ad",
+        "name": "CotWWrathPsychicLocateWeakness",
+        "token": "LocateWeakness",
+        "sourcePath": "src/PsychicInsightSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1901,
+      "originalGuid": "2d4263d80f5136b4296d6eb43a221d7d",
+      "originalComment": "magic vestment",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "2d4263d80f5136b4296d6eb43a221d7d",
+        "name": "MagicalVestment",
+        "path": "Spells/Level3/MagicalVestment.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1902,
+      "originalExpression": "NewSpells.magic_weapon_greater.AssetGuid",
+      "originalName": "MagicWeaponGreaterAbility",
+      "originalGuid": "6e21f3a7b536486f87a4905af9a89b7e",
+      "originalComment": "",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "0f92caa35619f234298d95a4b6dda90d",
+        "name": "MagicWeaponGreater",
+        "path": "Spells/Level3/MagicWeaponGreater/MagicWeaponGreater.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1903,
+      "originalGuid": "d2f116cfe05fcdd4a94e80143b67046f",
+      "originalComment": "protection from energy",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "d2f116cfe05fcdd4a94e80143b67046f",
+        "name": "ProtectionFromEnergy",
+        "path": "Spells/Level3/ProtectionFromEnergy.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          2,
+          3
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1904,
+      "originalGuid": "7bb0c402f7f789d4d9fae8ca87b4c7e2",
+      "originalComment": "resist energy communal",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "7bb0c402f7f789d4d9fae8ca87b4c7e2",
+        "name": "ResistEnergyCommunal",
+        "path": "Spells/Level3/ResistEnergyCommunal.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1905,
+      "originalExpression": "NewSpells.sands_of_time.AssetGuid",
+      "originalName": "SandsOfTimeTouchAbilityCast",
+      "originalGuid": "7c43f44e9eb000383feedb715ebd1c16",
+      "originalComment": "",
+      "source": "External",
+      "school": "Necromancy",
+      "root": {
+        "guid": "da49f07e431b47abaad41ef28df487f7",
+        "name": "SandsOfTimeCast",
+        "provider": "TabletopTweaks-Base",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1906,
+      "originalGuid": "f492622e473d34747806bdb39356eb89",
+      "originalComment": "slow",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "f492622e473d34747806bdb39356eb89",
+        "name": "Slow",
+        "path": "Spells/Level3/Slow.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 3,
+      "originalLine": 1907,
+      "originalExpression": "SpiritualWeapons.twilight_knife.AssetGuid",
+      "originalName": "TwilightKnifeAbility",
+      "originalGuid": "ea25fb7ec2d04d7b8bef54e734c41d68",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "4a95fd344dbc3e553ad93b6adb67e5ca",
+        "name": "CotWWrathPsychicTwilightKnife",
+        "token": "TwilightKnife",
+        "sourcePath": "src/PsychicSpiritWeapons.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1909,
+      "originalExpression": "NewSpells.air_walk.AssetGuid",
+      "originalName": "AirWalkAbility",
+      "originalGuid": "1959d602338c4378a11e318234f4ef8b",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "6f15cb920b5b1569793782578910c495",
+        "name": "CotWWrathPsychicAirWalk",
+        "token": "AirWalk",
+        "sourcePath": "src/PsychicTravelSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1910,
+      "originalExpression": "NewSpells.arcane_eye.AssetGuid",
+      "originalName": "ArcaneEyeAbility",
+      "originalGuid": "2f9c2e1a88324e36b2f91ac27140c29b",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Divination",
+      "root": {
+        "guid": "7873f6a427a61105c544507323662f63",
+        "name": "CotWWrathPsychicArcaneEye",
+        "token": "ArcaneEye",
+        "sourcePath": "src/PsychicSpiritWeapons.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1911,
+      "originalExpression": "NewSpells.ball_lightning.AssetGuid",
+      "originalName": "BallLightningAbility",
+      "originalGuid": "8f45d4110fed47b2bb1b5a2303175fc6",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "f47987f52a5352f616091cbe30b5d6b3",
+        "name": "CotWWrathPsychicBallLightning",
+        "token": "BallLightning",
+        "sourcePath": "src/PsychicOrbSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1912,
+      "originalGuid": "7792da00c85b9e042a0fdfc2b66ec9a8",
+      "originalComment": "break enchantment",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "7792da00c85b9e042a0fdfc2b66ec9a8",
+        "name": "BreakEnchantment",
+        "path": "Spells/Level5/BreakEnchantment.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1913,
+      "originalGuid": "cf6c901fb7acc904e85c63b342e9c949",
+      "originalComment": "confusion",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "cf6c901fb7acc904e85c63b342e9c949",
+        "name": "ConfusionSpell",
+        "path": "Spells/Level4/ConfusionSpell.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1914,
+      "originalGuid": "f72f8f03bf0136c4180cd1d70eb773a5",
+      "originalComment": "controlled blast fireball",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "f72f8f03bf0136c4180cd1d70eb773a5",
+        "name": "ControlledFireball",
+        "path": "Spells/Level4/ControlledFireball.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1915,
+      "originalGuid": "41c9016596fe1de4faf67425ed691203",
+      "originalComment": "cure critical wounds",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "41c9016596fe1de4faf67425ed691203",
+        "name": "CureCriticalWoundsCast",
+        "path": "Spells/Level4/CureCriticalWoundsCast.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1916,
+      "originalExpression": "NewSpells.daze_mass.AssetGuid",
+      "originalName": "DazeMassAbility",
+      "originalGuid": "ec089f2399884ab78edb6da84fe2558d",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Enchantment",
+      "root": {
+        "guid": "f48b6e526d69d694507e0d0c4d954eb8",
+        "name": "CotWWrathPsychicDazeMass",
+        "token": "DazeMass",
+        "sourcePath": "src/PsychicWardingSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1917,
+      "originalGuid": "e9cc9378fd6841f48ad59384e79e9953",
+      "originalComment": "death ward",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "e9cc9378fd6841f48ad59384e79e9953",
+        "name": "DeathWardCast",
+        "path": "Spells/Level4/DeathWardCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1918,
+      "originalGuid": "4a648b57935a59547b7a2ee86fb4f26a",
+      "originalComment": "dimensions door",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "4a648b57935a59547b7a2ee86fb4f26a",
+        "name": "DimensionDoorBase",
+        "path": "Spells/Level4/DimensionDoorBase.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1919,
+      "originalGuid": "95f7cdcec94e293489a85afdf5af1fd7",
+      "originalComment": "dismissal",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "95f7cdcec94e293489a85afdf5af1fd7",
+        "name": "Dismissal",
+        "path": "Spells/Level5/Dismissal.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1920,
+      "originalGuid": "20b548bf09bb3ea4bafea78dcb4f3db6",
+      "originalComment": "echolocation",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "20b548bf09bb3ea4bafea78dcb4f3db6",
+        "name": "Echolocation",
+        "path": "Spells/Level4/Echolocation.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1922,
+      "originalGuid": "dc6af3b4fd149f841912d8a3ce0983de",
+      "originalComment": "false life greater",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "dc6af3b4fd149f841912d8a3ce0983de",
+        "name": "FalseLifeGreater",
+        "path": "Spells/Level4/FalseLifeGreater.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1923,
+      "originalGuid": "d2aeac47450c76347aebbc02e4f463e0",
+      "originalComment": "fear",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "d2aeac47450c76347aebbc02e4f463e0",
+        "name": "Fear",
+        "path": "Spells/Level4/Fear.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1924,
+      "originalExpression": "NewSpells.fire_shield.AssetGuid",
+      "originalName": "FireShieldAbility",
+      "originalGuid": "d8b35b9475df48479ee097f978f22031",
+      "originalComment": "",
+      "source": "External",
+      "school": "Evocation",
+      "root": {
+        "guid": "017970c386634351bfdea34d6a4d4c74",
+        "name": "FireShield",
+        "provider": "TomeOfTheFirebird",
+        "publishedListRequired": true,
+        "sourceRevision": "8018d5d388ef4b746e74b196d7f55e7d64877861",
+        "sourcePath": "TomeOfTheFirebird/New Content/Spells/ElementalShieldSpells.cs",
+        "configurationPath": "TomeOfTheFirebird/Config/Blueprints.json",
+        "nativeProviderLevel": 4,
+        "availability": "Require active reciprocal provider publication and both executable warm/cold variants."
+      },
+      "decision": "COTW-0489 remains an external reuse item. Use the root, with one known-spell choice for the pair."
+    },
+    {
+      "level": 4,
+      "originalLine": 1925,
+      "originalExpression": "NewSpells.flaming_sphere_greater.AssetGuid",
+      "originalName": "FlamingSphereGreaterAbility",
+      "originalGuid": "9da3f1c284d340c2bc5a558f2e4f09c7",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "9f094ac39cd8634c8d6e1aa2fce8c83b",
+        "name": "CotWWrathPsychicFlamingSphereGreater",
+        "token": "FlamingSphereGreater",
+        "sourcePath": "src/PsychicOrbSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1926,
+      "originalGuid": "0087fc2d64b6095478bc7b8d7d512caf",
+      "originalComment": "freedom of movement",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "0087fc2d64b6095478bc7b8d7d512caf",
+        "name": "FreedomOfMovementCast",
+        "path": "Spells/Level4/FreedomOfMovementCast.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1927,
+      "originalExpression": "NewSpells.globe_of_invulnerability_lesser.AssetGuid",
+      "originalName": "GlobeOfInvulnerabilityLesserBuffAbility",
+      "originalGuid": "95ce427293c04a50a80359d13ac96da6",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Abjuration",
+      "root": {
+        "guid": "7243c2cbfe8b027021a9f7b0270d7171",
+        "name": "CotWWrathPsychicGlobeOfInvulnerabilityLesser",
+        "token": "GlobeOfInvulnerabilityLesser",
+        "sourcePath": "src/PsychicGlobeSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1928,
+      "originalGuid": "41e8a952da7a5c247b3ec1c2dbb73018",
+      "originalComment": "hold monster",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "41e8a952da7a5c247b3ec1c2dbb73018",
+        "name": "HoldMonster",
+        "path": "Spells/Level5/HoldMonster.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1929,
+      "originalGuid": "fcb028205a71ee64d98175ff39a0abf9",
+      "originalComment": "ice storm",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "fcb028205a71ee64d98175ff39a0abf9",
+        "name": "IceStorm",
+        "path": "Spells/Level4/IceStorm.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction",
+          "AdditionalAbilityEffectRunActionOnClickedTarget"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1930,
+      "originalGuid": "651110ed4f117a948b41c05c5c7624c0",
+      "originalComment": "inflcit critical wounds",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "651110ed4f117a948b41c05c5c7624c0",
+        "name": "InflictCriticalWoundsCast",
+        "path": "Spells/Level4/InflictCriticalWoundsCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1931,
+      "originalGuid": "ecaa0def35b38f949bd1976a6c9539e0",
+      "originalComment": "invisibility greater",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "ecaa0def35b38f949bd1976a6c9539e0",
+        "name": "InvisibilityGreater",
+        "path": "Spells/Level4/InvisibilityGreater.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1932,
+      "originalGuid": "2a6eda8ef30379142a4b75448fb214a3",
+      "originalComment": "poison",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "2a6eda8ef30379142a4b75448fb214a3",
+        "name": "PoisonCast",
+        "path": "Spells/Level3/PoisonCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          3,
+          4
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1933,
+      "originalExpression": "NewSpells.rigor_mortis.AssetGuid",
+      "originalName": "RigorMortisAbility",
+      "originalGuid": "63c50f2583654d65b29ca1ece5e90999",
+      "originalComment": "",
+      "source": "External",
+      "school": "Transmutation",
+      "root": {
+        "guid": "2bba038472a64f67b235674c7e27d90c",
+        "name": "RigorMortisAbility",
+        "provider": "ExpandedContent",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1934,
+      "originalExpression": "NewSpells.river_of_wind.AssetGuid",
+      "originalName": "RiverOfWindAbility",
+      "originalGuid": "65d99ef142c4442084cb415732c98c99",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "abc2221c9f5d53015e7d4c31e2e752f1",
+        "name": "CotWWrathPsychicRiverOfWind",
+        "token": "RiverOfWind",
+        "sourcePath": "src/PsychicWeatherSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1935,
+      "originalExpression": "NewSpells.spirit_bound_blade.AssetGuid",
+      "originalName": "SpiritBoundBladeAbility",
+      "originalGuid": "6b7df0594b6a49ef894381e95fc6f98b",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "2b7d086ce83da81d7286472d14814fa1",
+        "name": "CotWWrathPsychicSpiritBoundBlade",
+        "token": "SpiritBoundBlade",
+        "sourcePath": "src/PsychicBoundWeapons.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      },
+      "originalSchool": "Evocation",
+      "decision": "Use current Transmutation school and canonical root; avoid mutating or cloning the shared spell."
+    },
+    {
+      "level": 4,
+      "originalLine": 1936,
+      "originalGuid": "f09453607e683784c8fca646eec49162",
+      "originalComment": "shout",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "f09453607e683784c8fca646eec49162",
+        "name": "Shout",
+        "path": "Spells/Level4/Shout.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1937,
+      "originalGuid": "c66e86905f7606c4eaa5c774f0357b2b",
+      "originalComment": "stoneskin",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "c66e86905f7606c4eaa5c774f0357b2b",
+        "name": "Stoneskin",
+        "path": "Spells/Level4/Stoneskin.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5,
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 4,
+      "originalLine": 1938,
+      "originalExpression": "NewSpells.wall_of_fire.AssetGuid",
+      "originalName": "WallOfFireSpellAbility",
+      "originalGuid": "04d2a5859cc74984ab885993c01a38e1",
+      "originalComment": "",
+      "source": "External",
+      "school": "Evocation",
+      "root": {
+        "guid": "80189142f7c640f39195defdc9777b27",
+        "name": "WallOfFireAbility",
+        "provider": "ExpandedContent",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1940,
+      "originalExpression": "NewSpells.air_walk_communal.AssetGuid",
+      "originalName": "AirWalkCommunalAbility",
+      "originalGuid": "d6e663dfe6384fc2b1e5a85470f55ed7",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "6a6d4ae77f2f6cc4544f4f4c62bb0c9d",
+        "name": "CotWWrathPsychicAirWalkCommunal",
+        "token": "AirWalkCommunal",
+        "sourcePath": "src/PsychicTravelSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1941,
+      "originalExpression": "NewSpells.battlemind_link.AssetGuid",
+      "originalName": "BattlemindlinkAbility",
+      "originalGuid": "999bde3d7d514228a7ff64a55226cf0d",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Divination",
+      "root": {
+        "guid": "aa164c673a5c7a7221168ce093febde4",
+        "name": "CotWWrathPsychicBattlemindLink",
+        "token": "BattlemindLink",
+        "sourcePath": "src/PsychicLinkedWard.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1942,
+      "originalGuid": "d5a36a7ee8177be4f848b953d1c53c84",
+      "originalComment": "call lightning storm",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "d5a36a7ee8177be4f848b953d1c53c84",
+        "name": "CallLightningStorm",
+        "path": "Spells/Level5/CallLightningStorm.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1943,
+      "originalExpression": "NewSpells.command_greater.AssetGuid",
+      "originalName": "CommandGreaterSpellAbility",
+      "originalGuid": "c8e9df1891c44e4cb1b347fa7996a511",
+      "originalComment": "",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "cb15cc8d7a5480648855a23b3ba3f93d",
+        "name": "CommandGreater",
+        "path": "Spells/Level5/CommandGreater/CommandGreater.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1944,
+      "originalGuid": "e7c530f8137630f4d9d7ee1aa7b1edc0",
+      "originalComment": "cone of cold",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "e7c530f8137630f4d9d7ee1aa7b1edc0",
+        "name": "ConeOfCold",
+        "path": "Spells/Level5/ConeOfCold.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1945,
+      "originalGuid": "5d3d689392e4ff740a761ef346815074",
+      "originalComment": "cure light wounds mass",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "5d3d689392e4ff740a761ef346815074",
+        "name": "CureLightWoundsMass",
+        "path": "Spells/Level5/CureLightWoundsMass.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1946,
+      "originalExpression": "NewSpells.curse_major.AssetGuid",
+      "originalName": "CurseMajorAbility",
+      "originalGuid": "1ad3b4d6719340b38e4536dd412d0ddc",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Necromancy",
+      "root": {
+        "guid": "3f8742f526cc110ae27e34d026fc5f6b",
+        "name": "CotWWrathPsychicCurseMajor",
+        "token": "CurseMajor",
+        "sourcePath": "src/PsychicCurseSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1947,
+      "originalGuid": "f0f761b808dc4b149b08eaf44b99f633",
+      "originalComment": "dispel magic greater",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "f0f761b808dc4b149b08eaf44b99f633",
+        "name": "DispelMagicGreater",
+        "path": "Spells/Level6/DispelMagicGreater.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6
+        ],
+        "executable": [
+          "AbilityVariants"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1948,
+      "originalGuid": "d7cbd2004ce66a042aeab2e95a3c5c61",
+      "originalComment": "dominate person",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "d7cbd2004ce66a042aeab2e95a3c5c61",
+        "name": "DominatePerson",
+        "path": "Spells/Level5/DominatePerson.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          4,
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1949,
+      "originalGuid": "ebade19998e1f8542a1b55bd4da766b3",
+      "originalComment": "fire snake",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "ebade19998e1f8542a1b55bd4da766b3",
+        "name": "FireSnake",
+        "path": "Spells/Level5/FireSnake.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1950,
+      "originalExpression": "NewSpells.ghostbane_dirge_mass.AssetGuid",
+      "originalName": "GhostbaneDirgeMassAbility",
+      "originalGuid": "4e0a8083d8d5446d94f26125bbea43ea",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "d5121f204ea6b53ce6efdf0febd36586",
+        "name": "CotWWrathPsychicGhostbaneDirgeMass",
+        "token": "GhostbaneDirgeMass",
+        "sourcePath": "src/PsychicGhostbaneDirge.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1951,
+      "originalGuid": "9da37873d79ef0a468f969e4e5116ad2",
+      "originalComment": "inflcit light wounds mass",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "9da37873d79ef0a468f969e4e5116ad2",
+        "name": "InflictLightWoundsMass",
+        "path": "Spells/Level5/InflictLightWoundsMass.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1952,
+      "originalGuid": "f63f4d1806b78604a952b3958892ce1c",
+      "originalComment": "instead of roaming pit at level 6",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "f63f4d1806b78604a952b3958892ce1c",
+        "name": "HungryPit",
+        "path": "Spells/Level5/HungryPit.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1953,
+      "originalExpression": "NewSpells.inflict_pain_mass.AssetGuid",
+      "originalName": "InflictPainMassAbility",
+      "originalGuid": "d741db6517054d80b0d6cd4d66f80113",
+      "originalComment": "",
+      "source": "External",
+      "school": "Enchantment",
+      "root": {
+        "guid": "ff31ae1abe3c418db7842dcc76eca7ee",
+        "name": "InflictPainMassAbility",
+        "provider": "ExpandedContent",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1954,
+      "originalGuid": "eabf94e4edc6e714cabd96aa69f8b207",
+      "originalComment": "mind fog",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "eabf94e4edc6e714cabd96aa69f8b207",
+        "name": "MindFog",
+        "path": "Spells/Level5/MindFog.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1955,
+      "originalExpression": "NewSpells.overland_flight.AssetGuid",
+      "originalName": "OverlandFlightAbility",
+      "originalGuid": "3433e2f772c647df9bf0ac09d0a483d9",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "7253f42036967e31c7d1da32b5b85e22",
+        "name": "CotWWrathPsychicOverlandFlight",
+        "token": "OverlandFlight",
+        "sourcePath": "src/PsychicTravelSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1956,
+      "originalExpression": "NewSpells.particulate_form.AssetGuid",
+      "originalName": "ParticulateFormAbility",
+      "originalGuid": "69a196305ada4270979e3ab542884216",
+      "originalComment": "",
+      "source": "External",
+      "school": "Transmutation",
+      "root": {
+        "guid": "99e39437184a46b994da740ce399f591",
+        "name": "ParticulateFormAbility",
+        "provider": "ExpandedContent",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1957,
+      "originalGuid": "12fb4a4c22549c74d949e2916a2f0b6a",
+      "originalComment": "phantasmal web",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "12fb4a4c22549c74d949e2916a2f0b6a",
+        "name": "PhantasmalWeb",
+        "path": "Spells/Level5/PhantasmalWeb.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1958,
+      "originalGuid": "0a5ddfbcfb3989543ac7c936fc256889",
+      "originalComment": "spell resistance",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "0a5ddfbcfb3989543ac7c936fc256889",
+        "name": "SpellResistance",
+        "path": "Spells/Level5/SpellResistance.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1959,
+      "originalGuid": "7c5d556b9a5883048bf030e20daebe31",
+      "originalComment": "stoneskin mass",
+      "source": "Wrath",
+      "school": "Abjuration",
+      "root": {
+        "guid": "7c5d556b9a5883048bf030e20daebe31",
+        "name": "StoneskinCommunal",
+        "path": "Spells/Level5/StoneskinCommunal.jbp",
+        "school": "Abjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1960,
+      "originalExpression": "NewSpells.suffocation.AssetGuid",
+      "originalName": "SuffocationAbility",
+      "originalGuid": "fcf79679d60a419ba240702fe57ba1c3",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Necromancy",
+      "root": {
+        "guid": "355c23b51c7c4fd062926edab6390529",
+        "name": "CotWWrathPsychicSuffocation",
+        "token": "Suffocation",
+        "sourcePath": "src/PsychicCataclysmSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 5,
+      "originalLine": 1961,
+      "originalGuid": "4cf3d0fae3239ec478f51e86f49161cb",
+      "originalComment": "true seeing",
+      "source": "Wrath",
+      "school": "Divination",
+      "root": {
+        "guid": "4cf3d0fae3239ec478f51e86f49161cb",
+        "name": "TrueSeeingCast",
+        "path": "Spells/Level6/TrueSeeingCast.jbp",
+        "school": "Divination",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1963,
+      "originalGuid": "36c8971e91f1745418cc3ffdfac17b74",
+      "originalComment": "blade barrier",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "36c8971e91f1745418cc3ffdfac17b74",
+        "name": "BladeBarrier",
+        "path": "Spells/Level6/BladeBarrier.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1964,
+      "originalGuid": "645558d63604747428d55f0dd3a4cb58",
+      "originalComment": "chain lightning",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "645558d63604747428d55f0dd3a4cb58",
+        "name": "ChainLightning",
+        "path": "Spells/Level6/ChainLightning.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1965,
+      "originalGuid": "7f71a70d822af94458dc1a235507e972",
+      "originalComment": "cloak of dreams",
+      "source": "Wrath",
+      "school": "Enchantment",
+      "root": {
+        "guid": "7f71a70d822af94458dc1a235507e972",
+        "name": "CloakofDreams",
+        "path": "Spells/Level6/CloakofDreams.jbp",
+        "school": "Enchantment",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          5,
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1966,
+      "originalGuid": "5ef85d426783a5347b420546f91a677b",
+      "originalComment": "cold ice strike",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "5ef85d426783a5347b420546f91a677b",
+        "name": "ColdIceStrike",
+        "path": "Spells/Level6/ColdIceStrike.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1967,
+      "originalExpression": "NewSpells.contingency.AssetGuid",
+      "originalName": "ContingencyAbility",
+      "originalGuid": "d9a85de546654b658cde30575faeb0cf",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Evocation",
+      "root": {
+        "guid": "b39dd2d96af348236b0117f57e5e445d",
+        "name": "CotWWrathPsychicContingency",
+        "token": "Contingency",
+        "sourcePath": "src/PsychicStorageSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1968,
+      "originalExpression": "NewSpells.control_construct.AssetGuid",
+      "originalName": "ControlConstructAbility",
+      "originalGuid": "efec86b954ff42e99893d55f99e51a5e",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Transmutation",
+      "root": {
+        "guid": "9b73e64452479fd58b9d11f1d4dc92e9",
+        "name": "CotWWrathPsychicControlConstruct",
+        "token": "ControlConstruct",
+        "sourcePath": "src/PsychicCataclysmSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1969,
+      "originalGuid": "571221cc141bc21449ae96b3944652aa",
+      "originalComment": "cure moderate wounds",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "571221cc141bc21449ae96b3944652aa",
+        "name": "CureModerateWoundsMass",
+        "path": "Spells/Level6/CureModerateWoundsMass.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1970,
+      "originalGuid": "4aa7942c3e62a164387a73184bca3fc1",
+      "originalComment": "disintegrate",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "4aa7942c3e62a164387a73184bca3fc1",
+        "name": "Disintegrate",
+        "path": "Spells/Level6/Disintegrate.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1971,
+      "originalExpression": "NewSpells.freezing_sphere.AssetGuid",
+      "originalName": "FreezingSphereAbility",
+      "originalGuid": "48d635c409ab422a8ea2d36b2b51ffe9",
+      "originalComment": "",
+      "source": "External",
+      "school": "Evocation",
+      "root": {
+        "guid": "b8d6c9fd15c34cb4a601c2c6f11c9ccd",
+        "name": "FreezingSphere",
+        "provider": "TomeOfTheFirebird",
+        "publishedListRequired": true,
+        "availability": "Catalog + provider source anchor. Installed and enabled availability must be checked at B registration."
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1972,
+      "originalExpression": "NewSpells.globe_of_invulnerability.AssetGuid",
+      "originalName": "GlobeOfInvulnerabilityBuffAbility",
+      "originalGuid": "4421fff35fed4afb9ea20cbd6e6a7c0d",
+      "originalComment": "",
+      "source": "CotW",
+      "school": "Abjuration",
+      "root": {
+        "guid": "8e2d102dd34eb1418ba38753ff3771d4",
+        "name": "CotWWrathPsychicGlobeOfInvulnerability",
+        "token": "GlobeOfInvulnerability",
+        "sourcePath": "src/PsychicGlobeSpells.cs",
+        "availability": "Require existing executable root from finished shared spell registration."
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1973,
+      "originalGuid": "cc09224ecc9af79449816c45bc5be218",
+      "originalComment": "harm",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "cc09224ecc9af79449816c45bc5be218",
+        "name": "HarmCast",
+        "path": "Spells/Level6/HarmCast.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1974,
+      "originalGuid": "5da172c4c89f9eb4cbb614f3a67357d3",
+      "originalComment": "heal",
+      "source": "Wrath",
+      "school": "Conjuration",
+      "root": {
+        "guid": "5da172c4c89f9eb4cbb614f3a67357d3",
+        "name": "HealCast",
+        "path": "Spells/Level6/HealCast.jbp",
+        "school": "Conjuration",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectStickyTouch"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1975,
+      "originalGuid": "03944622fbe04824684ec29ff2cec6a7",
+      "originalComment": "inflict moderate wounds mass",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "03944622fbe04824684ec29ff2cec6a7",
+        "name": "InflictModerateWoundsMass",
+        "path": "Spells/Level6/InflictModerateWoundsMass.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1976,
+      "originalGuid": "1f2e6019ece86d64baa5effa15e81ecc",
+      "originalComment": "phantasmal putrefaction",
+      "source": "Wrath",
+      "school": "Illusion",
+      "root": {
+        "guid": "1f2e6019ece86d64baa5effa15e81ecc",
+        "name": "PhantasmalPutrefaction",
+        "path": "Spells/Level6/PhantasmalPutrefaction.jbp",
+        "school": "Illusion",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1977,
+      "originalGuid": "0e67fa8f011662c43934d486acc50253",
+      "originalComment": "prediction of failure",
+      "source": "Wrath",
+      "school": "Divination",
+      "root": {
+        "guid": "0e67fa8f011662c43934d486acc50253",
+        "name": "PredictionOfFailure",
+        "path": "Spells/Level8/PredictionOfFailure.jbp",
+        "school": "Divination",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          8
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1978,
+      "originalGuid": "093ed1d67a539ad4c939d9d05cfe192c",
+      "originalComment": "sirocco",
+      "source": "Wrath",
+      "school": "Evocation",
+      "root": {
+        "guid": "093ed1d67a539ad4c939d9d05cfe192c",
+        "name": "Sirocco",
+        "path": "Spells/Level6/Sirocco.jbp",
+        "school": "Evocation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1979,
+      "originalGuid": "27203d62eb3d4184c9aced94f22e1806",
+      "originalComment": "transformation",
+      "source": "Wrath",
+      "school": "Transmutation",
+      "root": {
+        "guid": "27203d62eb3d4184c9aced94f22e1806",
+        "name": "Transformation",
+        "path": "Spells/Level6/Transformation.jbp",
+        "school": "Transmutation",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          9
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    },
+    {
+      "level": 6,
+      "originalLine": 1980,
+      "originalGuid": "474ed0aa656cc38499cc9a073d113716",
+      "originalComment": "umbral strike",
+      "source": "Wrath",
+      "school": "Necromancy",
+      "root": {
+        "guid": "474ed0aa656cc38499cc9a073d113716",
+        "name": "UmbralStrike",
+        "path": "Spells/Level6/UmbralStrike.jbp",
+        "school": "Necromancy",
+        "type": "Spell",
+        "parent": null,
+        "nativeListLevels": [
+          6,
+          7
+        ],
+        "executable": [
+          "AbilityEffectRunAction"
+        ],
+        "dlcComponents": []
+      }
+    }
+  ],
+  "sharedCatalogRows": [
+    "CloakOfWindsAbility",
+    "Command",
+    "CommandGreater",
+    "FlySpell",
+    "FreezingSphere",
+    "IceSlick",
+    "InflictPainAbility",
+    "InflictPainMassAbility",
+    "KeenEdge",
+    "MagicWeapon",
+    "MagicWeaponGreater",
+    "ParticulateFormAbility",
+    "RigorMortisAbility",
+    "SandsOfTimeCast",
+    "WallOfFireAbility",
+    "WeaponOfAwe"
+  ],
+  "localCatalogOrder": "Wrath game and existing CotW canonical roots after their registrations; explicit provider rows after active validation.",
+  "releaseValidation": {
+    "compile": "Not run",
+    "targetedRuntime": "Not run",
+    "package": "Not run",
+    "upload": "Not run"
+  },
+  "githubCoordination": {
+    "issue": 15,
+    "head": "ca35d784ed73582c7f7f45076e9ba5cdeabbe4bf",
+    "fork": "sxl1216/CotW-Wrath",
+    "pr14Head": "a45e70f4b9caec3f7dd4c2cbc1f52cb026cadbfd",
+    "pr14": "Open at review; shared build, registration and Harmony need coordination. No COTW-0099 class in inspected trees."
+  },
+  "selectedFirstVerticalSlice": "Abjuration",
+  "upstreamBlobChecks": "All 20 local source blobs matched the pinned Git tree.",
+  "dailySpellSlots": {
+    "spellbookDonor": "027d37761f3804042afa96fe3e9086cc",
+    "tableDonor": "bf4a0a03a45275d438b8c59cd5388259",
+    "spellsKnownOnDonor": null,
+    "levelForSpellCircle": {
+      "1": 1,
+      "2": 4,
+      "3": 7,
+      "4": 10,
+      "5": 13,
+      "6": 16
+    }
+  },
+  "notes": [
+    "School Focus Power effect scope is in A-occultist-map.md; donor metadata here records identity evidence only.",
+    "Known spell circles here are Occultist circles, never inferred from a donor path or list.",
+    "The Fire Shield generic gap was resolved by the optional TomeOfTheFirebird root. Runtime availability is unverified."
+  ]
+}
