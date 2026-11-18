@@ -3,6 +3,7 @@
 // Holic75/KingmakerRebalance; see LICENSE-CotW.txt.
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -45,17 +46,22 @@ namespace CallOfTheWild.Wrath.Prototype
         readonly Dictionary<BlueprintGuid, BlueprintScriptableObject> originals = new Dictionary<BlueprintGuid, BlueprintScriptableObject>();
         readonly Dictionary<BlueprintGuid, string> originalDefinitions = new Dictionary<BlueprintGuid, string>();
         readonly Dictionary<BlueprintGuid, BlueprintScriptableObject> copies = new Dictionary<BlueprintGuid, BlueprintScriptableObject>();
+        readonly Dictionary<BlueprintGuid, BlueprintScriptableObject> stagedByGuid = new Dictionary<BlueprintGuid, BlueprintScriptableObject>();
+        readonly HashSet<BlueprintScriptableObject> stagedSet = new HashSet<BlueprintScriptableObject>();
         readonly Dictionary<BlueprintGuid, string> definitions = new Dictionary<BlueprintGuid, string>();
         bool sealedGraph, published;
         internal KineticistClassBridge0020(BlueprintsCache cache) { assets = new PsychicAssets(cache ?? throw new ArgumentNullException(nameof(cache))); }
         internal IReadOnlyDictionary<BlueprintGuid, BlueprintScriptableObject> Copies => copies;
-        internal BlueprintScriptableObject Resolve(BlueprintGuid guid) => assets.Assets.Values.FirstOrDefault(a => a.AssetGuid == guid) ?? assets.Cache.Load(guid) as BlueprintScriptableObject;
-        internal bool IsStaged(BlueprintScriptableObject blueprint) => assets.Assets.Values.Any(a => ReferenceEquals(a, blueprint));
+        internal BlueprintScriptableObject Resolve(BlueprintGuid guid) => stagedByGuid.TryGetValue(guid, out var staged) ? staged : assets.Cache.Load(guid) as BlueprintScriptableObject;
+        internal bool IsStaged(BlueprintScriptableObject blueprint) => blueprint != null && stagedSet.Contains(blueprint);
         internal T Copy<T>(string originalId) where T : BlueprintScriptableObject => (T)copies[BlueprintGuid.Parse(originalId)];
         internal T Own<T>(string token) where T : BlueprintScriptableObject => assets.Find<T>(token);
         internal T Add<T>(T blueprint, string token, string title, string description) where T : BlueprintScriptableObject {
             if (sealedGraph || assets.Cache.Load(Id(token)) != null || assets.Assets.ContainsKey(token)) throw new InvalidOperationException("Private kinetic identity unavailable: " + token);
-            return assets.Add(blueprint, token, title, description);
+            var added = assets.Add(blueprint, token, title, description);
+            stagedByGuid[added.AssetGuid] = added;
+            stagedSet.Add(added);
+            return added;
         }
 
         // One donor can only have one private identity. The named-token override
@@ -70,13 +76,16 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (!(prior is T) || prior.AssetGuid != Id(token)) throw new InvalidOperationException("A kinetic donor was assigned two private identities: " + originalId);
                 return (T)prior;
             }
-            if (assets.Cache.Load(Id(token)) != null || assets.Assets.Values.Any(x => x.AssetGuid == Id(token)))
+            var targetId = Id(token);
+            if (assets.Cache.Load(targetId) != null || stagedByGuid.ContainsKey(targetId))
                 throw new InvalidOperationException("A private kinetic identity is occupied: " + token);
-            string originalDefinition = Definition(original);
+            string originalDefinition = BlueprintRegistration.StrictPublishedGraphChecks ? Definition(original) : null;
             // Reading native Name/Description warms LocalizedString caches on
             // the donor. Preserve its localized authored data instead of
             // materializing a display string while taking the graph snapshot.
             var copy = assets.Clone(original, token, original.name, "");
+            stagedByGuid[copy.AssetGuid] = copy;
+            stagedSet.Add(copy);
             // Clone the authored container fields as well as the components.
             // Runtime caches must be rebuilt, not inherited from a native asset.
             foreach (var field in AuthoredFields(original.GetType())) {
@@ -84,17 +93,19 @@ namespace CallOfTheWild.Wrath.Prototype
                 field.SetValue(copy, CopyData(field.GetValue(original)));
             }
             originals.Add(original.AssetGuid, original); copies.Add(original.AssetGuid, copy);
-            originalDefinitions.Add(original.AssetGuid, originalDefinition);
+            if (originalDefinition != null) originalDefinitions.Add(original.AssetGuid, originalDefinition);
             return copy;
         }
 
-        internal static IEnumerable<FieldInfo> AuthoredFields(Type type)
-        {
-            for (var current = type; current != null && current != typeof(SimpleBlueprint) && current != typeof(object); current = current.BaseType)
+        static readonly ConcurrentDictionary<Type, FieldInfo[]> AuthoredFieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
+        internal static FieldInfo[] AuthoredFields(Type type) => AuthoredFieldCache.GetOrAdd(type, t => {
+            var list = new List<FieldInfo>();
+            for (var current = t; current != null && current != typeof(SimpleBlueprint) && current != typeof(object); current = current.BaseType)
                 foreach (var field in current.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                     if (!field.IsStatic && !field.IsNotSerialized && (field.IsPublic || field.IsDefined(typeof(UnityEngine.SerializeField), true) || field.IsDefined(typeof(Newtonsoft.Json.JsonPropertyAttribute), true)))
-                        yield return field;
-        }
+                        list.Add(field);
+            return list.ToArray();
+        });
 
         // Snapshot the native serialization contract recursively: public,
         // SerializeField and JsonProperty fields. Tooltip/LevelEntry/action
@@ -121,13 +132,23 @@ namespace CallOfTheWild.Wrath.Prototype
         // This traversal is only over independently copied data, never through
         // a blueprint/reference into the native library. Value containers are
         // written back so references inside structs are handled too.
+        static readonly PropertyInfo CachedRefProp = AccessTools.Property(typeof(BlueprintReferenceBase), "Cached");
+        static readonly ConcurrentDictionary<Type, FieldInfo[]> RewriteFieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
+        static FieldInfo[] RewriteFields(Type type) => RewriteFieldCache.GetOrAdd(type, t => {
+            var list = new List<FieldInfo>();
+            for (var current = t; current != null && current != typeof(object) && current != typeof(BlueprintComponent) && current != typeof(Element); current = current.BaseType)
+                foreach (var field in current.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                    if (!field.IsStatic) list.Add(field);
+            return list.ToArray();
+        });
+
         object Rewrite(object value, IDictionary<BlueprintGuid, BlueprintScriptableObject> map, HashSet<object> seen)
         {
             if (value == null) return null;
             if (value is BlueprintReferenceBase reference) {
                 if (map.TryGetValue(reference.Guid, out var target)) {
                     Set(reference, "deserializedGuid", target.AssetGuid); Set(reference, "guid", target.AssetGuid.ToString());
-                    AccessTools.Property(typeof(BlueprintReferenceBase), "Cached").SetValue(reference, target, null);
+                    CachedRefProp.SetValue(reference, target, null);
                 }
                 return reference;
             }
@@ -137,9 +158,8 @@ namespace CallOfTheWild.Wrath.Prototype
             if (value is Array array) { for (int i = 0; i < array.Length; i++) array.SetValue(Rewrite(array.GetValue(i), map, seen), i); return value; }
             if (value is IList list) { for (int i = 0; i < list.Count; i++) list[i] = Rewrite(list[i], map, seen); return value; }
             // Do not traverse component/element owner backreferences or caches.
-            for (var current = type; current != null && current != typeof(object) && current != typeof(BlueprintComponent) && current != typeof(Element); current = current.BaseType)
-                foreach (var field in current.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Where(f => !f.IsStatic))
-                    field.SetValue(value, Rewrite(field.GetValue(value), map, seen));
+            foreach (var field in RewriteFields(type))
+                field.SetValue(value, Rewrite(field.GetValue(value), map, seen));
             return value;
         }
 
@@ -168,17 +188,29 @@ namespace CallOfTheWild.Wrath.Prototype
             // rather than comparing uninitialized data with normalized data.
             assets.Enable();
             sealedGraph = true;
-            foreach (var copy in assets.Assets.Values) definitions.Add(copy.AssetGuid, Definition(copy));
+            if (BlueprintRegistration.StrictPublishedGraphChecks)
+                foreach (var copy in assets.Assets.Values) definitions.Add(copy.AssetGuid, Definition(copy));
         }
 
         internal void Verify()
         {
             if (!sealedGraph) throw new InvalidOperationException("The kinetic graph has not been sealed.");
-            foreach (var pair in originals)
-                if (!ReferenceEquals(assets.Cache.Load(pair.Key), pair.Value) || Definition(pair.Value) != originalDefinitions[pair.Key])
-                    throw new InvalidOperationException("Native kinetic donor identity or definition changed: " + pair.Key + "; " + Migration01426.Difference(originalDefinitions[pair.Key], Definition(pair.Value)));
+            foreach (var pair in originals) {
+                var loaded = assets.Cache.Load(pair.Key);
+                if (!ReferenceEquals(loaded, pair.Value))
+                    throw new InvalidOperationException("Native kinetic donor identity changed: " + pair.Key);
+                if (BlueprintRegistration.StrictPublishedGraphChecks && originalDefinitions.TryGetValue(pair.Key, out var origDef)) {
+                    var curDef = Definition(pair.Value);
+                    if (curDef != origDef)
+                        throw new InvalidOperationException("Native kinetic donor identity or definition changed: " + pair.Key + "; " + Migration01426.Difference(origDef, curDef));
+                }
+            }
             foreach (var copy in assets.Assets.Values) {
-                if (Definition(copy) != definitions[copy.AssetGuid]) throw new InvalidOperationException("Private kinetic definition changed: " + copy.name + "; " + Migration01426.Difference(definitions[copy.AssetGuid], Definition(copy)));
+                if (BlueprintRegistration.StrictPublishedGraphChecks && definitions.TryGetValue(copy.AssetGuid, out var copyDef)) {
+                    var curDef = Definition(copy);
+                    if (curDef != copyDef)
+                        throw new InvalidOperationException("Private kinetic definition changed: " + copy.name + "; " + Migration01426.Difference(copyDef, curDef));
+                }
                 var current = assets.Cache.Load(copy.AssetGuid);
                 if (published ? !ReferenceEquals(current, copy) : current != null) throw new InvalidOperationException("Private kinetic cache identity changed: " + copy.name);
             }
@@ -193,7 +225,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal void PublishConnected(Action connect, Action disconnect)
         {
             if (!sealedGraph) Seal();
-            Verify(); if (published) { connect?.Invoke(); return; }
+            if (published) { Verify(); connect?.Invoke(); return; }
             var inserted = new List<BlueprintScriptableObject>();
             try {
                 foreach (var copy in assets.Assets.Values) {

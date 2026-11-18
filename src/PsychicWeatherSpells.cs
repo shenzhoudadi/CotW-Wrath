@@ -37,13 +37,17 @@ namespace CallOfTheWild.Wrath.Prototype
 {
     internal static class PsychicWeatherSpells
     {
-        internal static readonly string[] Tokens={"ObscuringMist","SolidFog","SleetStorm","RiverOfWind","FickleWinds"};
+        internal static readonly string[] Tokens={"ObscuringMist","FogCloud","SolidFog","SleetStorm","RiverOfWind","FickleWinds"};
         static ContextValue Rank()=>new ContextValue {ValueType=ContextValueType.Rank};
         static ContextRankConfig Scaling(){var r=new ContextRankConfig {name="WeatherDuration"};SetEnum(r,"m_BaseValueType","CasterLevel");return r;}
         internal static AbilityAreaEffectBuff Owned(BlueprintBuff buff,params Condition[] conditions){
             var c=new AbilityAreaEffectBuff {name=buff.name+"AreaOwner",Condition=new ConditionsChecker {Conditions=conditions},CheckConditionEveryRound=true};Set(c,"m_Buff",Ref<BlueprintBuffReference>(buff));return c;
         }
         internal static BlueprintBuff OwnedBuff(PsychicAssets f,string token,string title,string text,UnityEngine.Sprite icon,params BlueprintComponent[] components){var b=f.Buff(token,title,text,components);b.Stacking=StackingType.Stack;Set(b,"m_Icon",icon);return b;}
+        // Every fog concealment buff uses the original CotW Fog Cloud icon so players recognize one effect.
+        internal static UnityEngine.Sprite FogIcon(PsychicAssets f)=>PsychicOriginalIcons.Load("FogCloud");
+        internal const string FogConcealmentText="Attacks against or by creatures inside the cloud have a 20% miss chance within 5 feet and 50% beyond 5 feet. Blindsight and abilities that ignore fog concealment work normally.";
+        internal static BlueprintBuff ConcealmentBuff(PsychicAssets f,string token,string title,string text,params BlueprintComponent[] components)=>OwnedBuff(f,token,title,text,FogIcon(f),components);
         internal static BlueprintComponent[] Fog(bool total)=>total?new BlueprintComponent[]{
             new AddConcealment {name="WeatherIncomingTotal",Descriptor=ConcealmentDescriptor.Fog,Concealment=Concealment.Total},new PsychicOutgoingFog {name="WeatherOutgoingTotal",Total=true}
         }:new BlueprintComponent[]{
@@ -56,31 +60,59 @@ namespace CallOfTheWild.Wrath.Prototype
             if(area.Shape==AreaEffectShape.Cylinder){var radius=new AbilityAoERadius {name=token+"Radius"};Set(radius,"m_Radius",area.Size);SetEnum(radius,"m_TargetType","Any");a.ComponentsArray=a.ComponentsArray.Concat(new BlueprintComponent[]{radius}).ToArray();}
             a.CanTargetPoint=true;a.CanTargetSelf=true;a.CanTargetFriends=true;a.CanTargetEnemies=true;a.ShouldTurnToTarget=true;a.SpellResistance=area.SpellResistance;a.EffectOnAlly=a.EffectOnEnemy=AbilityEffectOnUnit.Harmful;SetEnum(a,"Animation","Point");Set(a,"m_Icon",icon);
             a.AvailableMetamagic=Metamagic.Extend|Metamagic.Heighten|Metamagic.Quicken;if(range!=AbilityRange.Long)a.AvailableMetamagic|=Metamagic.Reach;
-            a.LocalizedDuration=Text(token,"duration",rate==DurationRate.Minutes?"1 minute per caster level":"1 round per caster level");a.LocalizedSavingThrow=Text(token,"savingThrow","");return a;
+            a.LocalizedDuration=Text(token,"duration",rate==DurationRate.TenMinutes?"10 minutes per caster level":rate==DurationRate.Minutes?"1 minute per caster level":"1 round per caster level");a.LocalizedSavingThrow=Text(token,"savingThrow","");return a;
         }
         internal static BlueprintAbilityAreaEffect Area(PsychicAssets f,string token,string title,string text,PrefabLink fx,AreaEffectShape shape,int size,bool sr,params BlueprintComponent[] components){
             var a=f.Add(new BlueprintAbilityAreaEffect {Shape=shape,Size=new Feet(size),AffectEnemies=true,AggroEnemies=true,SpellResistance=sr,Fx=fx,ComponentsArray=components},token+"Area",title,text);SetEnum(a,"m_TargetType","Any");Set(a,"m_TickRoundAfterSpawn",false);return a;
         }
-        internal static void Build(PsychicAssets f){Mist(f,false);Mist(f,true);Sleet(f);River(f);Fickle(f);}
-        static void Mist(PsychicAssets f,bool solid){
-            string token=solid?"SolidFog":"ObscuringMist",title=solid?"Solid Fog":"Obscuring Mist";
-            string text="Create a 20-foot-radius cloud within medium range for 1 minute per caster level. Creatures inside have concealment (20% miss chance) against attacks within 5 feet and total concealment (50%) beyond 5 feet. Their own attacks suffer the same concealment. Blindsight and abilities that ignore fog concealment work normally. "+(solid?"Creatures move at half speed and take -2 on melee attack and damage rolls. Ordinary ranged weapon attacks into or out of the fog automatically miss; rays are unaffected by this blocking effect. Overlapping solid fogs do not stack their penalties.":"The cloud affects allies as well as enemies.");
-            var icon=f.Native<BlueprintFeature>("3c53ee4965a13d74e81b37ae34f0861b").Icon;
-            var components=Fog(false);if(solid)components=components.Concat(new BlueprintComponent[]{new AddCondition {name="SolidFogSlow",Condition=UnitCondition.Slowed},new PsychicSolidFogPenalty {name="SolidFogMeleePenalty"},new PsychicWeatherMiss {name="SolidFogRangedBlock",Incoming=true,Outgoing=true}}).ToArray();
+        internal const string StinkingCloudAreaId="aa2e0a0fe89693f4e9205fd52c5ba3e5";
+        internal static readonly string[] NativeFogAreaIds={
+            StinkingCloudAreaId,
+            "053c8fd966bbcb94bb8db6582d990650",
+            "b342e42d2ed58484c8dff9150d18f4e4",
+            "ba09d51375db5f34790184443416d84b",
+            "6cae3c64989f3684bb078efcfa9021a1",
+            "6fa0adacca8d00f4aaba1e8df77a318f",
+            "706df636208b2864aa80032b72e0aabd",
+            "6df1ac314d4e6e9418e34470b79f90d8",
+            "1a62a0463e7d4da0814167e8308f1ebd",
+            "b6017edf09fe0374fa9a9bf06135f84b"
+        };
+        internal const string ShadowyMistBuffId="8de8e078992d7a4479f3d76e21aa1195";
+        internal static void Build(PsychicAssets f){Mist(f,0);Mist(f,1);Mist(f,2);NativeFogEffects(f);Sleet(f);River(f);Fickle(f);}
+        static void NativeFogEffects(PsychicAssets f){
+            const string text="Creatures inside have concealment (20% miss chance) against attacks within 5 feet and total concealment (50%) beyond 5 feet. Their own attacks suffer the same concealment. Blindsight and abilities that ignore fog concealment work normally. The cloud affects allies as well as enemies.";
+            var fog=ConcealmentBuff(f,"NativeFogCloudConcealmentBuff","Fog Cloud Concealment",text,Fog(false));
+            var shadowArea=Area(f,"ShadowyMistFog","Shadowy Mist Form",text,new PrefabLink(),AreaEffectShape.Cylinder,20,false,Owned(fog));
+            shadowArea.AggroEnemies=false;
+        }
+        static void Mist(PsychicAssets f,int kind){
+            bool obscuring=kind==0,solid=kind==2;
+            string token=obscuring?"ObscuringMist":solid?"SolidFog":"FogCloud",title=obscuring?"Obscuring Mist":solid?"Solid Fog":"Fog Cloud";
+            string placement=obscuring?"Create a stationary 20-foot-radius cloud centered on your current position for 1 minute per caster level.":solid?"Create a 20-foot-radius cloud within medium range for 1 minute per caster level.":"Create a 20-foot-radius cloud within medium range for 10 minutes per caster level.";
+            string text=placement+" Creatures inside have concealment (20% miss chance) against attacks within 5 feet and total concealment (50%) beyond 5 feet. Their own attacks suffer the same concealment. Blindsight and abilities that ignore fog concealment work normally. "+(solid?"Creatures move at half speed and take -2 on melee attack and damage rolls. Ordinary ranged weapon attacks into or out of the fog automatically miss; rays are unaffected by this blocking effect. Overlapping solid fogs do not stack their penalties.":"The cloud affects allies as well as enemies.");
+            var icon=kind==1?PsychicOriginalIcons.Load("FogCloud"):f.Native<BlueprintFeature>("3c53ee4965a13d74e81b37ae34f0861b").Icon;
+            // Obscuring Mist and Fog Cloud carry nothing but concealment, so it lives on
+            // the spell's own buff instead of a second listed buff. Solid Fog keeps a
+            // separate fog buff because it adds speed/attack/ranged components.
+            var fog=solid?ConcealmentBuff(f,token+"Fog",title+": Concealment",FogConcealmentText,Fog(false)):null;
+            var components=solid?new BlueprintComponent[]{new AddCondition {name="SolidFogSlow",Condition=UnitCondition.Slowed},new PsychicSolidFogPenalty {name="SolidFogMeleePenalty"},new PsychicWeatherMiss {name="SolidFogRangedBlock",Incoming=true,Outgoing=true}}:Fog(false);
             var b=OwnedBuff(f,token+"Buff",title,text,icon,components);
             // Original mist prefab is absent from Wrath; use the available native Mind Fog visual.
-            var area=Area(f,token,title,text,new PrefabLink {AssetId="597682efc0419a142a3174fd6bb408f7"},AreaEffectShape.Cylinder,20,false,Owned(b));
-            AreaSpell(f,token,title,text,area,icon,SpellSchool.Conjuration,AbilityRange.Medium,DurationRate.Minutes);
+            var area=Area(f,token,title,text,new PrefabLink {AssetId="597682efc0419a142a3174fd6bb408f7"},AreaEffectShape.Cylinder,20,false,solid?new[]{Owned(fog),Owned(b)}:new[]{Owned(b)});
+            var spell=AreaSpell(f,token,title,text,area,icon,SpellSchool.Conjuration,obscuring?AbilityRange.Personal:AbilityRange.Medium,kind==1?DurationRate.TenMinutes:DurationRate.Minutes);
+            if(obscuring){spell.CanTargetPoint=false;spell.CanTargetFriends=false;spell.CanTargetEnemies=false;spell.CanTargetSelf=true;spell.ShouldTurnToTarget=false;spell.AvailableMetamagic&=~Metamagic.Reach;SetEnum(spell,"Animation","Self");}
         }
         static ContextConditionHasFact Air(PsychicAssets f,bool not=false){var c=new ContextConditionHasFact {Not=not};Set(c,"m_Fact",Ref<BlueprintUnitFactReference>(f.Native<BlueprintFeature>("dd3d0c7f4f57f304cbdbb68170b1b775")));return c;}
         static void Sleet(PsychicAssets f){
             const string text="Create a 20-foot-radius sleet storm within long range for 1 round per caster level. Creatures inside suffer total fog concealment on incoming and outgoing attacks, move at half speed, and are protected from sight-based effects. On entering and each round, a DC 10 Mobility check is required to move; failure prevents movement until the next successful check or leaving the storm, and failure by 5 or more also knocks the creature prone. Air-subtype creatures ignore these effects. Ordinary ranged weapon attacks into or out of the storm miss (including air creatures); rays are not blocked. Allies are also affected.";
             var icon=PsychicOriginalIcons.Load("SleetStorm");
-            var b=OwnedBuff(f,"SleetStormBuff","Sleet Storm",text,icon,Fog(true).Concat(new BlueprintComponent[]{new AddCondition {name="SleetSlow",Condition=UnitCondition.Slowed},new SpellImmunityToSpellDescriptor {name="SleetSightSpellImmunity",Descriptor=SpellDescriptor.Blindness|SpellDescriptor.SightBased},new BuffDescriptorImmunity {name="SleetSightBuffImmunity",Descriptor=SpellDescriptor.SightBased}}).ToArray());
+            var fog=ConcealmentBuff(f,"SleetStormFog","Sleet Storm: Concealment",FogConcealmentText,Fog(true));
+            var b=OwnedBuff(f,"SleetStormBuff","Sleet Storm",text,icon,new AddCondition {name="SleetSlow",Condition=UnitCondition.Slowed},new SpellImmunityToSpellDescriptor {name="SleetSightSpellImmunity",Descriptor=SpellDescriptor.Blindness|SpellDescriptor.SightBased},new BuffDescriptorImmunity {name="SleetSightBuffImmunity",Descriptor=SpellDescriptor.SightBased});
             var block=OwnedBuff(f,"SleetStormRangedBuff","Sleet Storm: Winds",text,icon,new PsychicWeatherMiss {name="SleetRangedBlock",Incoming=true,Outgoing=true});
             var stuck=OwnedBuff(f,"SleetStormMovementBuff","Sleet Storm: Cannot Move",text,icon,new AddCondition {name="SleetFailedMovement",Condition=UnitCondition.CantMove});
             var check=new PsychicSleetMovementFailure();Set(check,"AirSubtype",Ref<BlueprintUnitFactReference>(f.Native<BlueprintFeature>("dd3d0c7f4f57f304cbdbb68170b1b775")));
-            var area=Area(f,"SleetStorm","Sleet Storm",text,f.Native<BlueprintAbilityAreaEffect>("6ea87a0ff5df41c459d641326f9973d5").Fx,AreaEffectShape.Cylinder,20,false,Owned(b,Air(f,true)),Owned(block),Owned(stuck,check));
+            var area=Area(f,"SleetStorm","Sleet Storm",text,f.Native<BlueprintAbilityAreaEffect>("6ea87a0ff5df41c459d641326f9973d5").Fx,AreaEffectShape.Cylinder,20,false,Owned(fog,Air(f,true)),Owned(b,Air(f,true)),Owned(block),Owned(stuck,check));
             AreaSpell(f,"SleetStorm","Sleet Storm",text,area,icon,SpellSchool.Conjuration,AbilityRange.Long,DurationRate.Rounds);
         }
         static void River(PsychicAssets f){

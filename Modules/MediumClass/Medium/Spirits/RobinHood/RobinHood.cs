@@ -62,10 +62,17 @@ namespace MediumClass.Medium.Spirits.RobinHood
                 .AddFacts(new(){ability}).AddFactContextActions(deactivated:ActionsBuilder.New().Add<ContextActionRemoveBuff>(c=>c.m_Buff=hidden.ToReference<BlueprintBuffReference>())).Configure();
             var progression=ProgressionConfigurator.New("RobinHoodProgression",Guids.RobinHoodProgression)
                 .AddToClasses(Guids.RobinHood).SetLevelEntries(LevelEntryBuilder.New()
-                    .AddEntry(1,Guids.RobinHoodLesser).AddEntry(6,Guids.TricksterSurpriseStrike,Guids.TricksterSurpriseStrike)
-                    .AddEntry(9,Guids.TricksterSurpriseStrike).AddEntry(11,Guids.RobinHoodGreater)
-                    .AddEntry(12,Guids.TricksterSurpriseStrike).AddEntry(15,Guids.TricksterSurpriseStrike)
-                    .AddEntry(17,Guids.RobinHoodSupreme).AddEntry(18,Guids.TricksterSurpriseStrike)).Configure();
+                    .AddEntry(1,Guids.RobinHoodLesser)
+                    .AddEntry(6,Guids.TricksterSurpriseStrike,Guids.TricksterSurpriseStrike,Guids.TricksterSurpriseStrike)
+                    .AddEntry(8,Guids.TricksterSurpriseStrike)
+                    .AddEntry(10,Guids.TricksterSurpriseStrike)
+                    .AddEntry(11,Guids.RobinHoodGreater)
+                    .AddEntry(12,Guids.TricksterSurpriseStrike)
+                    .AddEntry(14,Guids.TricksterSurpriseStrike)
+                    .AddEntry(16,Guids.TricksterSurpriseStrike)
+                    .AddEntry(17,Guids.RobinHoodSupreme)
+                    .AddEntry(18,Guids.TricksterSurpriseStrike)
+                    .AddEntry(20,Guids.TricksterSurpriseStrike)).Configure();
             CharacterClassConfigurator.For(Guids.RobinHood)
                 .SetLocalizedName("RobinHood.Name").SetLocalizedDescription("RobinHood.Description")
                 .SetSkillPoints(0).SetHitDie(DiceType.D8).SetPrestigeClass(false).SetIsMythic(false)

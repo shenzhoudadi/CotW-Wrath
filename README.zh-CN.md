@@ -1,28 +1,14 @@
-# 0.14.75 Occultist + Spiritualist TEST
+# 0.14.76 Wild Armor / 武器特性 / Versatile Performance / Blade Rush TEST
 
-笨笨猫猫堡
+本包在 0.14.75 基础上修两处。都只经过本机编译与包内核对，**没有做玩家实机验收**。
 
-本包新增 Occultist 与 Spiritualist 两个基础职业。[安装和测试说明](docs/releases/0.14.75-TEST.md) · [GitHub 预发布](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.75-Occultist-Spiritualist-TEST)
+- **Kinetic Knight Blade Rush 修复**：DarkCodex 是 UMM 模组，它的蓝图在原生模组入口之后才发布，上一版首次尝试时必然取不到，于是整项被跳过。现在首次取不到会挂一个蓝图缓存监视：Blade Rush 一进入缓存，就把 `KineticBladeRush` 追加进 Kinetic Knight 的 3 级 `AddFeatures` 并报告注册成功。缺少 DarkCodex 时仍然完全不改动变体。**已有角色不会回溯补发**，请新建角色或重训到 3 级确认。
+- **Weapon Shift 适用范围**：从"仅德鲁伊／变形者的 Wild Shape"改为**任何变形**（Wild Shape、Beast Shape、变形类法术等）。判定改成 `UnitBody.IsPolymorphed`，前置专长链**未改动**。描述同步改为 "During any polymorph or wild shape"。
+- 其余内容与 0.14.75 相同：Wild armor（+3 护甲附魔）、武器类型 disarm/trip/sunder 特性、Versatile Performance 纯半级（2 级 +1、4 级 +2、12 级 +6）、Expanded Versatility、Martial Performance（武器名读游戏本地化）。
 
-# 0.14.74 Speaker for the Past TEST
+重点可测：Wild 变形期间 AC 不掉且结束后护甲恢复显示；连枷／镰刀类战技 +2 且白板武器仍可批量出售；Weapon Shift 在 Beast Shape 等非 Wild Shape 变形下也生效且 +2 只出现一次；Kinetic Knight 新建角色 3 级直接拿到 Blade Rush。
 
-猫猫堡快去复楚
-
-CotW 本轮选定的移植范围以 Speaker for the Past 收尾。完结撒花！既有排除项和 HOLD 仍按原范围保留，详见 [剩余清单](docs/agent-handoff/REMAINING.txt)。
-
-- **新增 COTW-0046**：Shaman 变体 Speaker for the Past，包含 16 项启示与 18 个过去秘仪法术，启示随 Shaman 等级和 Wisdom 缩放。保留角色的主精魂与常规巫术，替换精魂动物、漫游精魂和对应漫游巫术。
-- 建议实机测试降环或重训后的法术清退、普通槽与 Battle Spirit 精魂槽的隔离，以及同环最后一个临时来源结束后的超魔准备清理。已有 Oracle 的 Ancestors Mystery 可以照常使用。
-- **依赖**：需要 TabletopTweaks-Base 提供 Sands of Time。缺少该法术或必要原生资源时，本变体会延后注册。
-
-退出游戏后备份存档和旧模组目录。用安装 ZIP 内的完整 `CallOfTheWildWrathPrototype` 目录替换 Owlcat 模组目录中的同名目录。默认路径为 `%USERPROFILE%/AppData/LocalLow/Owlcat Games/Pathfinder Wrath Of The Righteous/Modifications/`。源码 ZIP 用于查阅和构建。
-
-Speaker 0046 的 211 条隔离定向断言通过，使用从安装 ZIP 取出的主 DLL 复跑一致。真实 TTT-Base 共存、玩家实机、完整存读档及重训仍待测试。反馈请附职业等级、主精魂、启用的提供方、复现步骤和日志。
-
-[GitHub 测试包](https://github.com/shenzhoudadi/CotW-Wrath/releases/tag/v0.14.74-Speaker-for-the-Past-TEST) · [工作包与验证记录](docs/work-packages/COTW-0046/README.md)
-
-[0.14.73 Cryptid Scholar 测试说明](docs/releases/0.14.73-TEST.md)
-
-# 0.14.73 Cryptid Scholar TEST
+## 上一版：0.14.73 Cryptid Scholar TEST
 
 猫猫堡是猪猪
 

@@ -1,16 +1,8 @@
 ﻿using BlueprintCore.Blueprints.CustomConfigurators.Classes;
 using BlueprintCore.Blueprints.CustomConfigurators.UnitLogic.Buffs;
-using BlueprintCore.Blueprints.References;
-using Kingmaker.Blueprints.Classes;
-using Kingmaker.Blueprints.Classes.Spells;
-using MediumClass.Medium.NewComponents.AbilitySpecific;
+using Kingmaker.Enums;
 using MediumClass.Utilities;
 using MediumClass.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static UnityModManagerNet.UnityModManager.ModEntry;
 
 namespace MediumClass.Medium.Spirits.Archmage
@@ -29,7 +21,7 @@ namespace MediumClass.Medium.Spirits.Archmage
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/spiritarchmage.png")
-                .AddComponent<ArchmageSeanceDamageBonus>()
+                .AddIncreaseAllSpellsDC(descriptor: ModifierDescriptor.UntypedStackable, spellsOnly: false, value: 1)
                 .Configure();
 
             FeatureConfigurator.New(FeatName, Guids.ArchmageSeanceBoon)

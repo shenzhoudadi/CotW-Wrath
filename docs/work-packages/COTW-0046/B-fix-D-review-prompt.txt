@@ -1,9 +1,0 @@
-读取 C:\Users\xuenc\agent-tools\speaker-next\D-review.md、C-frozen-contract.md 和 B-progress.md。继续既有 COTW-0046 的 B 单一生产负责人工作，不另开功能，不问用户。
-
-先修 D-0046-01..04：Rewind 主动预付／单次重掷销毁与跨来源防重；18 法术来源安全清理；Blood of Heroes 仅恐惧意志随等级加值；Sacred Council 只加检定而不是通用 CL。按 D-review 中每条最小正反例闭环，使用真实生产规则链，不能只检查组件存在。现有175条中与合同相反的 BonusCasterLevel expected 要记录原因后纠正，并加语义正反例，不能仅删断言换绿。
-
-一并核对 D-review 明确指出的 Spirit of Warrior 原生强韧／BAB／Transformation互斥，以及 Time Flicker displacement Standard 动作差异；补 ModuleCatalog 诊断条目。严格按已有合同修，若原生克隆的现成效果正确则保留，不重建场景或整套 Oracle。
-
-项目：D:\CodexProjects\CotW-Wrath\outputs\CallOfTheWild.Wrath.Prototype。只更改本包必要生产与测试，保留当前 Starseeker／Havocker，保留失败证据。不要启动游戏／UMM，不跑全量、旧历史或其他包；不下载旧工作树。不将模拟提供方写成真实 TTT-Base 测过。
-
-输出 C:\Users\xuenc\agent-tools\speaker-next\B-fix-D-progress.md、B-fix-D-evidence.json 和独立时间戳日志。记录逐项修复、实际命令／耗时、源码与 DLL 指纹、正反例结果与未测边界。不要覆盖先前 B-evidence 和失败原件。修好后交独立 D 复查；不要自己宣布 D PASS，不抬版本、不先发布、不关闭 issue #6。共享生产文件只由你整合。

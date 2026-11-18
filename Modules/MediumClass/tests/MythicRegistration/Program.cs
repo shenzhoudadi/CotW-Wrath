@@ -102,4 +102,25 @@ Check(!MultiSpiritRules.CanChannel(legendary, champion), "channeled legendary sp
 Equal(1, MultiSpiritRules.EffectiveSpiritFocus(legendary.State, adriel), "legendary spirit inherits its tier's spirit focus");
 Equal(1, MultiSpiritRules.EffectiveSpiritFocus(legendary.State, champion), "tier keeps its own spirit focus");
 Equal(0, MultiSpiritRules.EffectiveSpiritFocus(legendary.State, guardian), "spirit outside the seance has no focus");
+// 神话多重降灵的数量上限：神话 1-6 只能再降一位（共两位），神话 7 起再一位（共三位）。
+BlueprintTool.Assets[BlueprintGuid.Parse(Guids.Trickster)] = new BlueprintCharacterClass { AssetGuid = BlueprintGuid.Parse(Guids.Trickster) };
+BlueprintTool.Assets[BlueprintGuid.Parse(Guids.Archmage)] = new BlueprintCharacterClass { AssetGuid = BlueprintGuid.Parse(Guids.Archmage) };
+var trickster = BlueprintTool.GetRef<BlueprintCharacterClassReference>(Guids.Trickster);
+var archmage = BlueprintTool.GetRef<BlueprintCharacterClassReference>(Guids.Archmage);
+var pair = new Kingmaker.EntitySystem.Entities.UnitEntityData { State = new() };
+pair.MultipleSpirits = true;
+foreach (var spirit in new[] { champion, guardian, trickster, archmage })
+    pair.State.Spirits.Add(spirit, new());
+pair.State.ActiveSpiritClasses.Add(champion);
+Check(MultiSpiritRules.CanChannel(pair, guardian), "the mythic ability allows a second legend");
+pair.State.ActiveSpiritClasses.Add(guardian);
+Check(!MultiSpiritRules.CanChannel(pair, trickster), "a third legend is refused below mythic rank 7");
+pair.Descriptor.Progression.MythicLevel = 7;
+Check(MultiSpiritRules.CanChannel(pair, trickster), "mythic rank 7 allows a third legend");
+pair.State.ActiveSpiritClasses.Add(trickster);
+Check(!MultiSpiritRules.CanChannel(pair, archmage), "mythic rank 7 still caps the total at three");
+Equal(3, MultiSpiritRules.MaxSpirits(pair), "mythic rank 7 raises the cap to three legends");
+Equal(1, MultiSpiritRules.NextChannelCost(pair), "channeling costs one point however many legends are channeled");
+pair.Descriptor.Progression.MythicLevel = 6;
+Equal(2, MultiSpiritRules.MaxSpirits(pair), "below rank 7 only two legends may be channeled");
 Console.WriteLine($"PASS {checks} production mythic registration assertions and shipped BlueprintCore contracts (explicit API model; no Unity UI).");

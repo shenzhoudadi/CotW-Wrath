@@ -34,23 +34,25 @@ namespace CallOfTheWild.Wrath.Prototype
         sealed class ReferenceIdentity:IEqualityComparer<object>
         {internal static readonly ReferenceIdentity Instance=new ReferenceIdentity();bool IEqualityComparer<object>.Equals(object a,object b)=>ReferenceEquals(a,b);int IEqualityComparer<object>.GetHashCode(object value)=>RuntimeHelpers.GetHashCode(value);}
         static string Values(object value)=>(string)Authored.Invoke(null,new object[]{value,new HashSet<object>(ReferenceIdentity.Instance)});
+        static readonly ConcurrentDictionary<Type, FieldInfo[]> AuthoredFieldCache = new ConcurrentDictionary<Type, FieldInfo[]>();
+        static FieldInfo[] CachedFields(Type type) => AuthoredFieldCache.GetOrAdd(type, t => {
+            var list = new List<FieldInfo>();
+            for (var c = t; c != null && c != typeof(BlueprintScriptableObject); c = c.BaseType)
+                foreach (var f in c.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly).Where(f => !f.IsStatic).OrderBy(f => f.Name)) {
+                    if (f.Name.StartsWith("m_Cached", StringComparison.Ordinal)) continue;
+                    bool serialized = f.IsPublic || f.GetCustomAttributes(false).Any(a => a.GetType().FullName == "UnityEngine.SerializeField" || a.GetType().FullName == "Newtonsoft.Json.JsonPropertyAttribute");
+                    if (serialized) list.Add(f);
+                }
+            return list.ToArray();
+        });
         internal static string Definition(BlueprintScriptableObject bp)
         {
             var extra=new List<object>();
             if(bp!=null) {
-                // These newly authored resources have an independent receipt.
-                // Inspect every serialized/public authoring field, including
-                // targeting, actionbar, spellbook and feature visibility;
-                // native lazy caches are explicitly excluded, not all private
-                // fields or unknown mechanical components.
-                for(var t=bp.GetType();t!=null&&t!=typeof(BlueprintScriptableObject);t=t.BaseType)
-                    foreach(var f in t.GetFields(BindingFlags.Instance|BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.DeclaredOnly).Where(f=>!f.IsStatic).OrderBy(f=>f.Name)) {
-                        if(f.Name.StartsWith("m_Cached",StringComparison.Ordinal))continue;
-                        bool serialized=f.IsPublic||f.GetCustomAttributes(false).Any(a=>a.GetType().FullName=="UnityEngine.SerializeField"||a.GetType().FullName=="Newtonsoft.Json.JsonPropertyAttribute");
-                        if(!serialized)continue;
-                        var value=f.GetValue(bp);if(value is LocalizedString text)value=text.Key;
-                        extra.Add(new object[]{t.FullName,f.Name,value});
-                    }
+                foreach(var f in CachedFields(bp.GetType())) {
+                    var value=f.GetValue(bp);if(value is LocalizedString text)value=text.Key;
+                    extra.Add(new object[]{f.DeclaringType.FullName,f.Name,value});
+                }
                 return Values(new object[]{bp.name,bp.ComponentsArray,extra.ToArray()});
             }
             if(bp is BlueprintArchetype a)extra.Add(new object[]{a.ReplaceSpellbook,a.IsArcaneCaster,a.ReplaceStartingEquipment,a.StartingItems});
@@ -61,8 +63,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if(!Receipts.GetValue(cache,_=>new Dictionary<string,Receipt>()).TryGetValue(module,out var receipt))return false;
             for(int i=0;i<receipt.Assets.Length;i++){
                 var asset=receipt.Assets[i];if(!ReferenceEquals(cache.Load(asset.AssetGuid),asset))throw new InvalidOperationException("01454 published resource identity changed: "+asset.name);
-                var actual=Definition(asset);var expected=receipt.Shapes[i];
-                if(actual!=expected){int at=0;while(at<actual.Length&&at<expected.Length&&actual[at]==expected[at])at++;int start=Math.Max(0,at-90);throw new InvalidOperationException("01454 published resource changed: "+asset.name+"; firstDifference="+at+"; expected="+expected.Substring(start,Math.Min(240,expected.Length-start))+"; actual="+actual.Substring(start,Math.Min(240,actual.Length-start)));}
+                if(BlueprintRegistration.StrictPublishedGraphChecks){
+                    var actual=Definition(asset);var expected=receipt.Shapes[i];
+                    if(actual!=expected){int at=0;while(at<actual.Length&&at<expected.Length&&actual[at]==expected[at])at++;int start=Math.Max(0,at-90);throw new InvalidOperationException("01454 published resource changed: "+asset.name+"; firstDifference="+at+"; expected="+expected.Substring(start,Math.Min(240,expected.Length-start))+"; actual="+actual.Substring(start,Math.Min(240,actual.Length-start)));}
+                }
             }
             receipt.Verify();return true;
         }

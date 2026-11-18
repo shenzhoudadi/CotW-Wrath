@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,6 +69,33 @@ namespace CallOfTheWild.Wrath.Prototype
             f.Enable();
             if(f.Assets.Values.Select(a=>a.AssetGuid).Distinct().Count()!=f.Assets.Count) throw new InvalidOperationException("Duplicate Psychic extension identity.");
             var existing=f.Assets.Values.Select(a=>cache.Load(a.AssetGuid)).ToArray();
+            var nativeFogAreas=PsychicWeatherSpells.NativeFogAreaIds.Select(id=>f.Native<Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbilityAreaEffect>(id)).ToArray();
+            // A reloaded cache keeps the previously published instance, so patches must
+            // reference that canonical object rather than this build's staged copy.
+            T Canonical<T>(T staged) where T : BlueprintScriptableObject => cache.Load(staged.AssetGuid) as T ?? staged;
+            var nativeFog=Canonical(f.Find<Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff>("NativeFogCloudConcealmentBuff"));
+            var shadowArea=Canonical(f.Find<Kingmaker.UnitLogic.Abilities.Blueprints.BlueprintAbilityAreaEffect>("ShadowyMistFogArea"));
+            var shadowBuff=f.Native<Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff>(PsychicWeatherSpells.ShadowyMistBuffId);
+            var oldNativeFogComponents=nativeFogAreas.Select(area=>area.ComponentsArray).ToArray();
+            var oldShadowComponents=shadowBuff.ComponentsArray;
+            // GetComponents can return null on freshly loaded native areas; ComponentsArray is always materialized here.
+            Func<bool> nativeFogInstalled=()=>nativeFogAreas.All(area=>area.ComponentsArray.OfType<Kingmaker.UnitLogic.Abilities.Components.AreaEffects.AbilityAreaEffectBuff>().Count(c=>c.Buff==nativeFog)==1) &&
+                shadowBuff.ComponentsArray.OfType<Kingmaker.UnitLogic.Buffs.Components.AddAreaEffect>().Count(c=>c.AreaEffect==shadowArea)==1;
+            // Reinstalling is idempotent: our previous owners are dropped from the snapshot first, so a
+            // reloaded cache keeps exactly one source-owned patch per native area.
+            Action installNativeFog=()=>{
+                for(int i=0;i<nativeFogAreas.Length;i++){
+                    var owner=PsychicWeatherSpells.Owned(nativeFog);owner.name="CotWNativeFogAreaOwner_"+nativeFogAreas[i].AssetGuid;
+                    nativeFogAreas[i].ComponentsArray=oldNativeFogComponents[i].Where(c=>c.name!=owner.name).Concat(new BlueprintComponent[]{owner}).ToArray();
+                }
+                var emitter=new Kingmaker.UnitLogic.Buffs.Components.AddAreaEffect {name="CotWShadowyMistFogEmitter"};Set(emitter,"m_AreaEffect",Ref<BlueprintAbilityAreaEffectReference>(shadowArea));
+                shadowBuff.ComponentsArray=oldShadowComponents.Where(c=>c.name!="CotWShadowyMistFogEmitter").Concat(new BlueprintComponent[]{emitter}).ToArray();
+                if(!nativeFogInstalled())throw new InvalidOperationException("Native Fog Cloud concealment patches failed.");
+            };
+            Action restoreNativeFog=()=>{
+                for(int i=0;i<nativeFogAreas.Length;i++)nativeFogAreas[i].ComponentsArray=oldNativeFogComponents[i];
+                shadowBuff.ComponentsArray=oldShadowComponents;
+            };
             int index=0;
             foreach(var expected in f.Assets.Values) {
                 var actual=existing[index++];
@@ -83,6 +110,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var expectedSelection=Id("DisciplineSelection");
             if(existing.All(a=>a!=null)) {
                 commonLists.Verify(true);
+                if(!nativeFogInstalled()) try { installNativeFog(); } catch { restoreNativeFog(); throw; }
                 if(!oldFeatures.Any(a=>a.AssetGuid==expectedSelection) || oldFeatures.Any(a=>a.AssetGuid==BlueprintGuid.Parse(PsychicClass.PoolSelectionId)) ||
                     entries.Any(e=>oldLists[e.Level].Count(r=>r.Guid==e.Ability.AssetGuid)!=1))
                     throw new InvalidOperationException("Psychic extension shared links are incomplete or duplicated.");
@@ -95,12 +123,14 @@ namespace CallOfTheWild.Wrath.Prototype
             commonLists.Verify(false);
             try {
                 foreach(var asset in f.Assets.Values) { cache.AddCachedBlueprint(asset.AssetGuid,asset); added.Add(asset); }
+                installNativeFog();
                 for(int level=0;level<10;level++) ReplaceSpells(list.SpellsByLevel[level],oldLists[level].Concat(entries.Where(e=>e.Level==level).Select(e=>Ref<BlueprintAbilityReference>(e.Ability))).ToList());
                 commonLists.Apply();
                 first.SetFeatures(oldFeatures.Select(a=>a.AssetGuid==BlueprintGuid.Parse(PsychicClass.PoolSelectionId)?discipline:a).ToArray());
                 Set(first,"m_FeaturesList",null);
                 Set(progression,"m_UIDeterminatorsGroup",(oldUI??Array.Empty<BlueprintFeatureBaseReference>()).Select(r=>r.Guid==BlueprintGuid.Parse(PsychicClass.PoolSelectionId)?Ref<BlueprintFeatureBaseReference>(discipline):r).ToArray());
             } catch {
+                restoreNativeFog();
                 commonLists.Restore();
                 for(int level=0;level<10;level++) ReplaceSpells(list.SpellsByLevel[level],oldLists[level]);
                 first.SetFeatures(oldFeatures); Set(first,"m_FeaturesList",null); Set(progression,"m_UIDeterminatorsGroup",oldUI);

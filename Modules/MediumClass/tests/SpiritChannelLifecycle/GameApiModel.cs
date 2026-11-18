@@ -113,6 +113,8 @@ namespace Kingmaker.UnitLogic.Buffs
     {
         public List<Buff> Enumerable = new();
         public void RemoveFact(Buff buff) => Enumerable.Remove(buff);
+        public void RemoveFact(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff blueprint) =>
+            Enumerable.RemoveAll(b => b.Blueprint == blueprint);
         public Buff AddBuff(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff blueprint, object context, TimeSpan duration)
         {
             var buff = new Buff { Blueprint = blueprint };
@@ -169,6 +171,30 @@ namespace Kingmaker.EntitySystem.Entities
 namespace Kingmaker.PubSubSystem
 {
     public interface IUnitReapplyFeaturesOnLevelUpHandler { void HandleUnitReapplyFeaturesOnLevelUp(); }
+    public interface ISubscriber { }
+    public interface IInitiatorRulebookSubscriber { }
+    public interface IRulebookHandler<T> { void OnEventAboutToTrigger(T evt); void OnEventDidTrigger(T evt); }
+    public interface IInitiatorRulebookHandler<T> : IRulebookHandler<T> { }
+}
+namespace Kingmaker.RuleSystem.Rules
+{
+    public class RuleSkillCheck { public Kingmaker.EntitySystem.Stats.StatType StatType; public BonusModifier Bonus = new(); }
+    public class BonusModifier { public void AddModifier(int value, object source, Kingmaker.Enums.ModifierDescriptor desc) { } }
+    public class RuleCalculateAttackBonus { public WeaponRef Weapon; public void AddModifier(int value, object source, Kingmaker.Enums.ModifierDescriptor desc) { } }
+    public class WeaponRef { public WeaponBlueprint Blueprint = new(); }
+    public class WeaponBlueprint { public Kingmaker.Enums.WeaponCategory Category; }
+}
+namespace Kingmaker.RuleSystem.Rules.Abilities
+{
+    public class RuleCalculateAbilityParams { public AbilityDataRef AbilityData; public void AddBonusDC(int value, Kingmaker.Enums.ModifierDescriptor desc) { } }
+    public class AbilityDataRef { public AbilityBlueprint Blueprint = new(); }
+    public class AbilityBlueprint { public bool IsSpell; }
+}
+namespace Kingmaker.RuleSystem.Rules.Damage
+{
+    public class RuleCalculateDamage { public ParentRuleRef ParentRule; public List<BaseDamage> DamageBundle = new(); }
+    public class ParentRuleRef { public Kingmaker.RuleSystem.Rules.Abilities.AbilityBlueprint SourceAbility; }
+    public class BaseDamage { public bool Precision; public bool IgnoreModifiers; public void AddModifier(int value, object source) { } }
 }
 namespace Owlcat.Runtime.Core.Utils
 {
@@ -208,6 +234,16 @@ namespace MediumClass.Medium
     {
         internal static int EffectiveSpiritFocus(NewUnitParts.UnitPartMedium medium, BlueprintCharacterClassReference spirit) =>
             spirit?.Get() != null && medium.Spirits.TryGetValue(spirit, out var entry) ? entry.SpiritFocus : 0;
+    }
+    internal static class SpiritBonusValue
+    {
+        internal static int ForSpirit(UnitEntityData owner, BlueprintCharacterClassReference spirit)
+        {
+            var medium = owner?.Get<NewUnitParts.UnitPartMedium>();
+            if (medium == null || spirit == null || !medium.Spirits.TryGetValue(spirit, out var entry)) return 0;
+            return owner.Progression.Features.GetRank(entry.SpiritBonus.SpiritBonusFeature)
+                + MultiSpiritRules.EffectiveSpiritFocus(medium, spirit);
+        }
     }
 }
 namespace MediumClass.Medium.NewComponents.AbilitySpecific
@@ -272,6 +308,7 @@ namespace MediumClass.Utilities
     public static class Guids
     {
         public const string RobinHood="RobinHood";
+        public const string Champion="Champion", Adriel="Adriel";
         public const string TestSpiritAbility = "TestSpiritAbility";
         public const string SpiritPower = "SpiritPower", Archmage = "Archmage", Hierophant = "Hierophant", Trickster = "Trickster",
             AstralBeacon = "AstralBeacon", MediumSpellcasterFeatProhibitArchmage = "ForbidArchmage", MediumSpellcasterFeatProhibitHierophant = "ForbidHierophant",
@@ -323,7 +360,7 @@ namespace Kingmaker.EntitySystem.Stats
         public void RemoveModifiersFrom(object source) => Modifiers.RemoveAll(modifier => modifier.Source == source);
     }
 }
-namespace Kingmaker.Enums { public enum ModifierDescriptor { UntypedStackable, Penalty } }
+namespace Kingmaker.Enums { public enum ModifierDescriptor { UntypedStackable, Penalty } public enum WeaponCategory { None, Touch, Ray } }
 namespace Kingmaker.QA { }
 namespace Kingmaker.UnitLogic.Buffs.Blueprints { public class BlueprintBuff : Kingmaker.Blueprints.Facts.BlueprintFact { } }
 namespace Kingmaker.UnitLogic.Mechanics { }
@@ -346,6 +383,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             SpiritIntermediatePowerMove, SpiritIntermediatePowerSwift, SpiritOverwriteIntermediate,
             SpiritGreaterPower, SpiritOverwriteGreater, SpiritSupremePower;
     }
+    internal static class MediumSpiritualDefenseComponent { public static void RefreshFor(Kingmaker.EntitySystem.Entities.UnitEntityData owner) { } }
+    internal static class MediumAdvancedWeaponTrainingComponent { public static void RefreshFor(Kingmaker.EntitySystem.Entities.UnitEntityData owner) { } }
 }
 namespace BlueprintCore.Blueprints.References
 {

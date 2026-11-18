@@ -13,6 +13,7 @@ using Kingmaker.UnitLogic.Abilities.Components;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
 using MediumClass.Medium.NewActions;
 using MediumClass.Medium.NewComponents;
+using MediumClass.Medium.NewComponents.AbilitySpecific;
 using MediumClass.Utilities;
 using MediumClass.Utils;
 using System;
@@ -42,21 +43,12 @@ namespace MediumClass.Medium.Spirits.Archmage
                 .AddAbilityUseTrigger(action: ActionsBuilder.New().RemoveSelf(),
                 spellbooks: new() { BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.ArchmageSpellbook),
                     BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.MediumSpellbook),
+                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.DevotedMediumSpellbook),
+                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.LoremasterSpellbook),
                     BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.HierophantSpellbook)
                 },
                 fromSpellbook: true, afterCast: true, forMultipleSpells: false, checkAbilityType: false, minSpellLevel: false, exactSpellLevel: false, spellDescriptor: SpellDescriptor.None, range: Kingmaker.UnitLogic.Abilities.Blueprints.AbilityRange.Touch)
-                .AddIncreaseSpellSpellbookDC(1, descriptor: Kingmaker.Enums.ModifierDescriptor.UntypedStackable, spellbooks: new()
-                {
-                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.ArchmageSpellbook),
-                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.MediumSpellbook),
-                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.HierophantSpellbook)
-                })
-                .AddCasterLevelForSpellbook(1, descriptor: Kingmaker.Enums.ModifierDescriptor.UntypedStackable, spellbooks: new()
-                {
-                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.ArchmageSpellbook),
-                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.MediumSpellbook),
-                    BlueprintTool.GetRef<BlueprintSpellbookReference>(Guids.HierophantSpellbook)
-                })
+                .AddComponent<ArcaneSurgeScalingComponent>()
                 .AddComponent<AddResourcelessSpell>()
                 .SetFlags(BlueprintBuff.Flags.RemoveOnRest)
                 .Configure();
@@ -65,7 +57,7 @@ namespace MediumClass.Medium.Spirits.Archmage
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/arcanesurge.png")
-                .AddAbilityEffectRunAction(actions: ActionsBuilder.New().Add<ContextActionSpiritInfluence>().ApplyBuffPermanent(buff))
+                .AddAbilityEffectRunAction(actions: ActionsBuilder.New().Add<ContextActionSpiritInfluence>().ApplyBuffPermanentFixed(buff))
                 .AddAbilityResourceLogic(amount: 1, isSpendResource: true, requiredResource: Guids.MediumInfluenceResource)
                 .SetActionType(Kingmaker.UnitLogic.Commands.Base.UnitCommand.CommandType.Free)
                 .Configure();

@@ -60,7 +60,7 @@ namespace MediumClass.Medium.Spirits.Trickster
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .SetIcon("assets/icons/spirittrickstertrickfate.png")
-                .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuffPermanent(d20buff))
+                .AddAbilityEffectRunAction(actions: ActionsBuilder.New().ApplyBuffPermanentFixed(d20buff))
                 .AddAbilityResourceLogic(1, isSpendResource:true, requiredResource: resource)
                 .Configure();
 

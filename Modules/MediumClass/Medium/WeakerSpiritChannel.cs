@@ -62,7 +62,7 @@ namespace MediumClass.Medium
                 })
                 .AddAbilityEffectRunAction(
                     actions: ActionsBuilder.New()
-                        .ApplyBuffPermanent(buff, asChild: false, isFromSpell: false, isNotDispelable: true))
+                        .ApplyBuffPermanentFixed(buff, asChild: false, isFromSpell: false, isNotDispelable: true))
                 .Configure();
 
             BlueprintAbility WeakerSpiritAbilitiesGreater = AbilityConfigurator.New(FeatName + "ThreeAbility", Guids.WeakerSpiritChannelThreeAbility)
@@ -76,7 +76,7 @@ namespace MediumClass.Medium
                 .SetIcon("assets/icons/foregospirit3.png")
                 .AddAbilityEffectRunAction(
                     actions: ActionsBuilder.New()
-                        .ApplyBuffPermanent(buff, asChild: false, isFromSpell: false, isNotDispelable: true))
+                        .ApplyBuffPermanentFixed(buff, asChild: false, isFromSpell: false, isNotDispelable: true))
                 .Configure();
 
             BlueprintAbility WeakerSpiritAbilitiesIntermediate = AbilityConfigurator.New(FeatName + "TwoAbility", Guids.WeakerSpiritChannelTwoAbility)
@@ -90,7 +90,7 @@ namespace MediumClass.Medium
                 })
                 .AddAbilityEffectRunAction(
                     actions: ActionsBuilder.New()
-                        .ApplyBuffPermanent(buff, asChild: false, isFromSpell: false, isNotDispelable: true))
+                        .ApplyBuffPermanentFixed(buff, asChild: false, isFromSpell: false, isNotDispelable: true))
                 .Configure();
 
             BlueprintAbility WeakerSpiritAbilitiesLesser = AbilityConfigurator.New(FeatName + "OneAbility", Guids.WeakerSpiritChannelOneAbility)
@@ -104,7 +104,7 @@ namespace MediumClass.Medium
                 })
                 .AddAbilityEffectRunAction(
                     actions: ActionsBuilder.New()
-                        .ApplyBuffPermanent(buff,asChild: false, isFromSpell: false, isNotDispelable: true))
+                        .ApplyBuffPermanentFixed(buff,asChild: false, isFromSpell: false, isNotDispelable: true))
                 .Configure();
 
             BlueprintAbility WeakerSpiritAbilities = AbilityConfigurator.New(FeatName + "Abilities", Guids.WeakerSpiritChannelAbilities)

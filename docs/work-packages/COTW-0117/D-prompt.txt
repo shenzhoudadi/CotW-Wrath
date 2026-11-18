@@ -1,2 +1,0 @@
-先完整读取 C:\Users\xuenc\agent-tools\spirit-whisperer-next\HANDOFF-0117-ABCD-20261108.md（跨机器可读 GitHub docs/work-packages/COTW-0117/README.md），以及最新 WORK_STATUS、issue #7 和 A/C/B产物、实际候选diff与指纹。
-只执行独立角色 D：生产只读，写 D-review.md，具体可定位问题退原B修。核对十族实际分支、层级例外、属性与混职隔离、资源只付一次和来源安全清理；不把组件存在判行为PASS。沿用同内容证据，只按真实更改最小复查，不追加全历史／十族全场景门槛、不启游戏／UMM。明确是否可TEST交付及未测边界。

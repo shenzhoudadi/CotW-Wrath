@@ -64,6 +64,21 @@ CombatLog.SpiritSurge(recipient, plain);
 Same("B 灵力涌动：1d10 = 9；意志豁免：骰点 9 = +9", thread.Messages.Single().Text, "no Marshal term, no invented modifiers");
 Check(new SurgeRoll(new[] { 8, 8 }, new[] { 1, 1 }).Notation == "2d8" && new SurgeRoll(new[] { 6 }, new[] { 6 }).Notation == "1d6", "dice notation");
 
+// Assured Surge reroll display (zh & en)
+thread = Reset();
+var rerollReport = new SpiritSurgeReport(new SurgeRoll(new[] { 6 }, new[] { 5 }, new[] { 2 }, new[] { 5 }));
+rerollReport.Lines.Add(new() { Stats = new[] { StatType.AdditionalAttackBonus }, Total = 5 });
+CombatLog.SpiritSurge(recipient, rerollReport);
+Same("B 灵力涌动：1d6 = 5(重骰2,5)；攻击：骰点 5(重骰2,5) = +5",
+    thread.Messages.Single().Text, "Assured Surge shows both draws in Chinese");
+
+thread = Reset(chinese: false);
+var rerollReport2 = new SpiritSurgeReport(new SurgeRoll(new[] { 8, 8 }, new[] { 6, 7 }, new[] { 6, 3 }, new[] { 2, 7 }));
+rerollReport2.Lines.Add(new() { Stats = new[] { StatType.SaveWill }, Total = 13 });
+CombatLog.SpiritSurge(recipient, rerollReport2);
+Same("B Spirit Surge: 2d8 = 6(reroll 6,2) + 7(reroll 3,7) = 13; Will save: roll 6(reroll 6,2) + 7(reroll 3,7) = 13 = +13",
+    thread.Messages.Single().Text, "Assured Surge shows both draws per die in English");
+
 // --- empty and missing reports write nothing ----------------------------------------------------------------------
 thread = Reset();
 CombatLog.SpiritSurge(recipient, new SpiritSurgeReport(new SurgeRoll(new[] { 6 }, new[] { 3 })));

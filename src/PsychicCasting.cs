@@ -50,6 +50,7 @@ namespace CallOfTheWild.Wrath.Prototype
         internal static bool IsEmotionBlocked(AbilityData spell)
         {
             if (!IsPsychic(spell) || spell.HasMetamagic(Logical)) return false;
+            if (spell.Caster?.State?.HasCondition(UnitCondition.Frightened) == true) return true;
             return spell.Caster.Buffs.Enumerable.Any(b => !b.IsSuppressed && b.IsTurnedOn &&
                 // This exact buff emits the aura; its owner is not a fear victim.
                 // Native contexts inherit (and save) the spell's descriptors.

@@ -94,27 +94,27 @@ namespace MediumClass.Medium.Spirits.Archmage
         {
             var SpellSlotsTable = SpellsTableConfigurator.New(ClassName + "SpellSlotsTable", Guids.ArchmageSpellSlotsTable)
                 .SetLevels(new SpellsLevelEntry[] {
-                    new SpellsLevelEntry{ Count = new int[] { 1 } },//0
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1 } },//1
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1 } },//2
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1 } },//3
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1 } },//4
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1 } },//5
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1 } },//6
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1 } },//7
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1 } },//8
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1 } },//9
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1 } },//10
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1 } },//11
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1 } },//12
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1 } },//13
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1 } },//14
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1 } },//15
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1, 1 } },//16
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1, 1 } },//17
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1, 1 } },//18
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1, 1 } },//19
-                    new SpellsLevelEntry{ Count = new int[] { 1, 1, 1, 1, 1, 1, 1 } },//20
+                    new SpellsLevelEntry{ Count = new int[] { 2 } },//0
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2 } },//1
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2 } },//2
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2 } },//3
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2 } },//4
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2 } },//5
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2 } },//6
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2 } },//7
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2 } },//8
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2 } },//9
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2 } },//10
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2 } },//11
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2 } },//12
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2 } },//13
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2 } },//14
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2 } },//15
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2, 2 } },//16
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2, 2 } },//17
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2, 2 } },//18
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2, 2 } },//19
+                    new SpellsLevelEntry{ Count = new int[] { 2, 2, 2, 2, 2, 2, 2 } },//20
                     })
                 .Configure();
 

@@ -4,6 +4,7 @@ using BlueprintCore.Utils;
 using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
+using Kingmaker.EntitySystem.Stats;
 using Kingmaker.PubSubSystem;
 using Kingmaker.UI.UnitSettings;
 using Kingmaker.UnitLogic;
@@ -49,11 +50,33 @@ namespace MediumClass.Medium
         }
 
         internal static int Amount(UnitDescriptor owner) => owner == null ? 0 : State(owner).Accumulated;
-        internal static int Cap(UnitDescriptor owner) => InfluenceMath.BaseCap +
+        internal static int Cap(UnitDescriptor owner) => BaseCap(owner) +
             (owner?.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicInfluence.FeatureGuid)) == true
                 ? InfluenceMath.MythicBonus(owner.Progression.MythicLevel) : 0) +
-            (HardenedSoul.HasFeature(owner) ? 3 : 0) +
-            (SpiritBinder.HasFeature(owner) ? 1 : 0);
+            (HardenedSoul.HasFeature(owner) ? 3 : 0);
+
+        /// <summary>
+        /// A flat 3, plus half the Medium class level, plus the casting
+        /// attribute modifier (Charisma by default, Wisdom for Devoted Medium,
+        /// Intelligence for Loremaster). This is the authoritative cap:
+        /// <see cref="InfluenceCapPatch"/> replaces BlueprintAbilityResource.GetMaxAmount
+        /// for every influence resource, so the blueprint's own Amount block
+        /// never decides the limit.
+        /// A negative modifier floors at 0 instead of producing a negative cap.
+        /// </summary>
+        internal static int BaseCap(UnitDescriptor owner)
+        {
+            if (owner == null) return 0;
+            int level = 0;
+            var medium = BlueprintGuid.Parse(Guids.Medium);
+            foreach (var data in owner.Progression.Classes)
+                if (data?.CharacterClass != null && data.CharacterClass.AssetGuid == medium)
+                    level += data.Level;
+            var statType = MediumAttributeRules.CastingStat(owner);
+            int attrBonus = owner.Stats.GetStat(statType) is ModifiableValueAttributeStat stat
+                ? stat.BonusWithoutTemp : 0;
+            return Math.Max(0, 3 + level / 2 + attrBonus);
+        }
         internal static bool CanAccept(UnitDescriptor owner, int cost) => owner != null
             && owner.Resources.GetResource(BlueprintTool.Get<BlueprintAbilityResource>(Guids.MediumInfluenceResource)) != null
             && InfluenceMath.CanAccept(Amount(owner), cost, Cap(owner));
@@ -87,9 +110,9 @@ namespace MediumClass.Medium
             RefreshPenalty(owner);
         }
 
-        /// <summary>共鸣惩罚是否应当生效。缚灵者的英灵从不安宁，因此不看累计值。</summary>
+        /// <summary>共鸣惩罚是否应当生效。</summary>
         internal static bool PenaltyApplies(UnitDescriptor owner) => HasSpirit(owner)
-            && (SpiritBinder.HasFeature(owner) || Amount(owner) >= InfluenceMath.PenaltyThreshold);
+            && Amount(owner) >= InfluenceMath.PenaltyThreshold;
 
         internal static void RefreshPenalty(UnitDescriptor owner)
         {
@@ -266,12 +289,24 @@ namespace MediumClass.Medium
         }
     }
 
+    [HarmonyPatch(typeof(MechanicActionBarSlotSpontaneusConvertedSpell), nameof(MechanicActionBarSlotSpontaneusConvertedSpell.GetResource))]
+    internal static class InfluenceConvertedActionBarCounterPatch
+    {
+        private static bool Prefix(MechanicActionBarSlotSpontaneusConvertedSpell __instance, ref int __result)
+        {
+            if (!MediumInfluenceRules.UsesInfluence(__instance.Spell)) return true;
+            __result = MediumInfluenceRules.Amount(__instance.Spell.Caster);
+            return false;
+        }
+    }
+
     [HarmonyPatch(typeof(MechanicActionBarSlot), nameof(MechanicActionBarSlot.GetCountText))]
     internal static class InfluenceActionBarLabelPatch
     {
         private static bool Prefix(MechanicActionBarSlot __instance, ref string __result)
         {
             var ability = (__instance as MechanicActionBarSlotAbility)?.Ability
+                ?? (__instance as MechanicActionBarSlotSpontaneusConvertedSpell)?.Spell
                 ?? (__instance as MechanicActionBarSlotSpell)?.Spell;
             if (!MediumInfluenceRules.UsesInfluence(ability)) return true;
             __result = MediumInfluenceRules.Amount(ability.Caster) + "/" + MediumInfluenceRules.Cap(ability.Caster);

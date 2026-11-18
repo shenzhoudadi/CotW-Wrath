@@ -148,6 +148,9 @@ namespace MediumClass
 
                     RunStage("delayed blueprints", () => RootConfigurator.ConfigureDelayedBlueprints());
                     RunStage("optional TTT Medium capstone", Medium.HardenedSoul.ConfigureOptionalIntegration);
+                    RunStage("optional EbonsContentMod Miracle", Medium.Spirits.Hierophant.LegendaryHierophant.ConfigureOptionalIntegration);
+                    RunStage("optional TTT Spirit Affinity", Medium.SpiritAffinityOptional.ConfigureDelayed);
+                    RunStage("delayed Spirit Feat pool", Medium.SpiritFeat.ConfigureDelayed);
                     delayedState = InitState.Succeeded;
                 }
                 catch (Exception e)
@@ -218,7 +221,7 @@ namespace MediumClass
                 Logger.Log("Configuring Classes.");
                 Medium.MediumClass.ConfigureEnabled();
                 // 变体依赖已配置好的通灵者本体（职业与升级表）。
-                SpiritBinder.Configure();
+                Features.MediumSpecific.MediumArchetypes.Configure();
                 Prowler.ProwlerBuild.ConfigureBlueprints();
             }
             private static void ConfigureClassFeats()

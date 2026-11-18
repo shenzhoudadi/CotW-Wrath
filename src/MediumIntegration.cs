@@ -17,6 +17,8 @@ namespace CallOfTheWild.Wrath.Prototype
     {
         internal const string ModuleName = "Medium class";
         internal const string BookId = "182182848e8e40c8b029adfa64eba37f";
+        internal const string DevotedBookId = "308dce29b6a749f780a7cfb8c237b089";
+        internal const string LoremasterBookId = "2dd7b92ff2a04445b51b0ca0d7d414f5";
         internal const string CenterId = "719630b974ad5a9f8bf3742c3b07dd3f";
         private static Type entry;
         private static Exception preparationError;
@@ -58,6 +60,11 @@ namespace CallOfTheWild.Wrath.Prototype
             var logical = cache.Load(BlueprintGuid.Parse(PsychicClass.LogicalId)) as BlueprintFeature
                 ?? throw new InvalidOperationException("Shared Logical Spell was not registered.");
             BindSharedBlueprints(book, logical);
+            foreach (var variantId in new[] { DevotedBookId, LoremasterBookId })
+            {
+                if (cache.Load(BlueprintGuid.Parse(variantId)) is BlueprintSpellbook variantBook)
+                    BindSharedBlueprints(variantBook, logical);
+            }
         }
 
         internal static void BindSharedBlueprints(BlueprintSpellbook book, BlueprintFeature logical)

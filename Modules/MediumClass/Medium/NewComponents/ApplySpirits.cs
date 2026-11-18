@@ -26,6 +26,7 @@ using MediumClass.Medium.NewComponents.AbilitySpecific;
 using MediumClass.Prowler;
 using MediumClass.Utilities;
 using MediumClass.Utils;
+using Newtonsoft.Json;
 using Owlcat.QA.Validation;
 using Owlcat.Runtime.Core.Utils;
 using TabletopTweaks.Core.NewUnitParts;
@@ -62,6 +63,10 @@ namespace MediumClass.NewComponents
 
 		public override void OnDeactivate()
 		{
+            // Astral Beacon and Trance of Many last as long as this channel
+            // does: retire their buffs first so each component revokes exactly
+            // the ranks it lent, instead of leaving them to the sweep below.
+            MediumClass.Medium.SecondaryLend.RetireAll(Owner);
             var powers = MediumClass.Medium.MediumSpiritPowerCleanup.Catalogue(Owner);
             // Native removal detaches the marker before child-fact/UI callbacks.
             // Retire the choice first so such callbacks cannot regrant its powers.
@@ -77,23 +82,46 @@ namespace MediumClass.NewComponents
                 && medium.Spirits.ContainsKey(medium.PrimarySpirit);
         }
 
-        private void AddPower(BlueprintFeatureReference reference, int ranks = 1)
+        // Instance wrappers keep every existing call site unchanged; the real
+        // bodies take the owner so the Astral Beacon / Trance of Many buff
+        // components (which have their own fact context) grant the same powers.
+        private void AddPower(BlueprintFeatureReference reference, int ranks = 1) => AddPower(Owner, reference, ranks);
+
+        /// <summary>Grants up to <paramref name="ranks"/> ranks; returns how many were added.</summary>
+        private static int AddPower(UnitEntityData owner, BlueprintFeatureReference reference, int ranks = 1)
         {
             // Move/swift/overwrite powers are optional for several spirits.
             var blueprint = reference?.Get();
-            if (blueprint == null) return;
-            int current = Owner.Progression.Features.GetRank(blueprint);
-            for (int i = current; i < ranks; i++) Owner.AddFact(blueprint);
+            if (blueprint == null || owner == null) return 0;
+            int current = owner.Progression.Features.GetRank(blueprint);
+            int added = 0;
+            for (int i = current; i < ranks; i++) { owner.AddFact(blueprint); added++; }
+            return added;
         }
 
-        private void RemovePower(BlueprintFeatureReference reference)
+        private void RemovePower(BlueprintFeatureReference reference) => RemovePower(Owner, reference);
+
+        private static void RemovePower(UnitEntityData owner, BlueprintFeatureReference reference)
         {
             var blueprint = reference?.Get();
-            if (blueprint == null) return;
+            if (blueprint == null || owner == null) return;
             // FeatureCollection.RemoveFact removes a single rank. These are
             // spirit-specific powers, so end every granted rank on teardown.
-            int ranks = Owner.Progression.Features.GetRank(blueprint);
-            for (int i = 0; i < ranks; i++) Owner.RemoveFact(blueprint);
+            int ranks = owner.Progression.Features.GetRank(blueprint);
+            for (int i = 0; i < ranks; i++) owner.RemoveFact(blueprint);
+        }
+
+        /// <summary>
+        /// Removes at most <paramref name="ranks"/> ranks, never more than the
+        /// unit currently holds. A temporary grant must not strip a rank that a
+        /// fully channeled spirit (or any other source) also provided.
+        /// </summary>
+        private static void RemoveRanks(UnitEntityData owner, BlueprintFeatureReference reference, int ranks)
+        {
+            var blueprint = reference?.Get();
+            if (blueprint == null || owner == null || ranks <= 0) return;
+            int removable = Math.Min(ranks, owner.Progression.Features.GetRank(blueprint));
+            for (int i = 0; i < removable; i++) owner.RemoveFact(blueprint);
         }
 
 		private void ApplySpiritSpellbook(BlueprintCharacterClassReference spirit)
@@ -118,10 +146,8 @@ namespace MediumClass.NewComponents
             {
                 int ranks = (spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.Trickster)
                     || spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.RobinHood))
-                    ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(Owner) / 3) : 1;
+                    ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(Owner) / 2) : 1;
                 AddPower(entry.SpiritIntermediatePower, ranks);
-                AddPower(entry.SpiritIntermediatePowerMove);
-                AddPower(entry.SpiritIntermediatePowerSwift);
             }
             else
             {
@@ -129,10 +155,26 @@ namespace MediumClass.NewComponents
                 RemovePower(entry.SpiritIntermediatePowerMove);
                 RemovePower(entry.SpiritIntermediatePowerSwift);
             }
-            if (rank >= 3) AddPower(entry.SpiritGreaterPower);
-            else RemovePower(entry.SpiritGreaterPower);
-            if (rank >= 4) AddPower(entry.SpiritSupremePower);
-            else RemovePower(entry.SpiritSupremePower);
+            if (rank >= 3)
+            {
+                AddPower(entry.SpiritGreaterPower);
+                AddPower(entry.SpiritIntermediatePowerMove);
+            }
+            else
+            {
+                RemovePower(entry.SpiritGreaterPower);
+                RemovePower(entry.SpiritIntermediatePowerMove);
+            }
+            if (rank >= 4)
+            {
+                AddPower(entry.SpiritSupremePower);
+                AddPower(entry.SpiritIntermediatePowerSwift);
+            }
+            else
+            {
+                RemovePower(entry.SpiritSupremePower);
+                RemovePower(entry.SpiritIntermediatePowerSwift);
+            }
         }
 
         private void TryApplySpirit() => RefreshActiveSpirits();
@@ -148,9 +190,10 @@ namespace MediumClass.NewComponents
                 CheckWeakerSpiritAndApply(spirit);
                 ApplySpiritSpellbook(spirit);
             }
-            if (Owner.Progression.Features.HasFact(BlueprintTool.Get<BlueprintFeature>(Guids.AstralBeacon)))
-                foreach (var spirit in medium.Spirits.Keys.Where(s => !medium.IsActiveSpirit(s)))
-                    ApplySecondarySpirits(spirit);
+            // Astral Beacon is no longer an all-day flag on the 20th level
+            // feature: it is a two-round buff naming one legend, and
+            // MediumAstralBeaconComponent grants/revokes that legend's
+            // intermediate+greater+supreme powers through GrantSecondary.
             RefreshSpiritModifiers();
         }
 
@@ -169,41 +212,105 @@ namespace MediumClass.NewComponents
                 else if (buff.Blueprint == BlueprintTool.Get<BlueprintBuff>(Guids.MediumSpiritInfluenceBuff))
                     buff.CallComponents<MediumContextSpiritInfluenceComponent>(component => component.RefreshAllies());
             }
+            MediumSpiritualDefenseComponent.RefreshFor(Owner);
+            MediumAdvancedWeaponTrainingComponent.RefreshFor(Owner);
         }
 
-		private void ApplySecondarySpirits(BlueprintCharacterClassReference spirit)
-		{
-            var entry = medium.Spirits[spirit];
+        /// <summary>
+        /// What a temporary lend actually added, per power slot. Stored in the
+        /// buff component's runtime data so the revoke removes exactly these
+        /// ranks — never a rank a fully channeled spirit provided as well.
+        /// </summary>
+        public class SecondaryGrant
+        {
+            [JsonProperty] public int Intermediate;
+            [JsonProperty] public int Move;
+            [JsonProperty] public int Swift;
+            [JsonProperty] public int Greater;
+            [JsonProperty] public int Supreme;
+            /// <summary>Highest tier granted so far: 0 = none, 1 = intermediate, 2 = +greater, 3 = +supreme.</summary>
+            [JsonProperty] public int Tiers;
+        }
+
+        /// <summary>
+        /// Astral Beacon / Trance of Many lend a legend's powers without
+        /// channeling it. The buff components call these statics, so the
+        /// overwrite-power handling and the Trickster rank scaling stay shared
+        /// with the fully channeled path instead of being re-implemented.
+        /// <paramref name="tiers"/>: 1 = intermediate only, 2 = +greater,
+        /// 3 = +supreme. Passing the buff's existing <paramref name="grant"/>
+        /// tops it up to a higher tier without re-granting what it already
+        /// holds, which is how Trance of Many upgrades at 14th and 18th level.
+        /// </summary>
+        internal static SecondaryGrant GrantSecondary(UnitEntityData owner,
+            BlueprintCharacterClassReference spirit, int tiers = 3, SecondaryGrant grant = null)
+        {
+            grant = grant ?? new SecondaryGrant();
+            var entry = Entry(owner, spirit);
+            if (entry == null) return grant;
             int ranks = (spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.Trickster)
                     || spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.RobinHood))
-                ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(Owner) / 3) : 1;
-            if (entry.OverwriteIntermediatePower?.Get() != null)
+                ? Math.Max(1, ProwlerSpiritRules.SpiritClassLevel(owner) / 2) : 1;
+            if (grant.Tiers < 1)
             {
-                RemovePower(entry.SpiritIntermediatePower);
-                AddPower(entry.OverwriteIntermediatePower, ranks);
+                if (entry.OverwriteIntermediatePower?.Get() != null)
+                    RemovePower(owner, entry.SpiritIntermediatePower);
+                grant.Tiers = 1;
             }
-            else AddPower(entry.SpiritIntermediatePower, ranks);
-            AddPower(entry.SpiritIntermediatePowerMove);
-            AddPower(entry.SpiritIntermediatePowerSwift);
-            if (entry.OverwriteGreaterPower?.Get() != null)
+            // Trickster and Robin Hood scale their intermediate power with
+            // level, so a top-up after leveling must raise these ranks too.
+            grant.Intermediate += AddPower(owner, entry.OverwriteIntermediatePower?.Get() != null
+                ? entry.OverwriteIntermediatePower : entry.SpiritIntermediatePower, ranks);
+            if (tiers >= 2 && grant.Tiers < 2)
             {
-                RemovePower(entry.SpiritGreaterPower);
-                AddPower(entry.OverwriteGreaterPower);
+                if (entry.OverwriteGreaterPower?.Get() != null)
+                {
+                    RemovePower(owner, entry.SpiritGreaterPower);
+                    grant.Greater = AddPower(owner, entry.OverwriteGreaterPower);
+                }
+                else grant.Greater = AddPower(owner, entry.SpiritGreaterPower);
+                grant.Move = AddPower(owner, entry.SpiritIntermediatePowerMove);
+                grant.Tiers = 2;
             }
-            else AddPower(entry.SpiritGreaterPower);
-            AddPower(entry.SpiritSupremePower);
-		}
+            if (tiers >= 3 && grant.Tiers < 3)
+            {
+                grant.Supreme = AddPower(owner, entry.SpiritSupremePower);
+                grant.Swift = AddPower(owner, entry.SpiritIntermediatePowerSwift);
+                grant.Tiers = 3;
+            }
+            return grant;
+        }
 
-		private void RemoveSecondarySpirits(BlueprintCharacterClassReference spirit)
-		{
-			RemovePower(medium.Spirits[spirit].SpiritIntermediatePower);
-			RemovePower(medium.Spirits[spirit].SpiritIntermediatePowerMove);
-			RemovePower(medium.Spirits[spirit].SpiritIntermediatePowerSwift);
-			RemovePower(medium.Spirits[spirit].OverwriteIntermediatePower);
-			RemovePower(medium.Spirits[spirit].SpiritGreaterPower);
-			RemovePower(medium.Spirits[spirit].OverwriteGreaterPower);
-			RemovePower(medium.Spirits[spirit].SpiritSupremePower);
-		}
+        internal static void RevokeSecondary(UnitEntityData owner, BlueprintCharacterClassReference spirit,
+            SecondaryGrant grant)
+        {
+            if (grant == null) return;
+            var entry = Entry(owner, spirit);
+            if (entry == null) return;
+            // If the legend was channeled for real while the buff ran, the
+            // channel owns these powers now; tearing them down here would strip
+            // the primary spirit.
+            if (owner.Get<UnitPartMedium>()?.IsActiveSpirit(spirit) == true) return;
+            RemoveRanks(owner, entry.OverwriteIntermediatePower?.Get() != null
+                ? entry.OverwriteIntermediatePower : entry.SpiritIntermediatePower, grant.Intermediate);
+            RemoveRanks(owner, entry.SpiritIntermediatePowerMove, grant.Move);
+            RemoveRanks(owner, entry.SpiritIntermediatePowerSwift, grant.Swift);
+            RemoveRanks(owner, entry.OverwriteGreaterPower?.Get() != null
+                ? entry.OverwriteGreaterPower : entry.SpiritGreaterPower, grant.Greater);
+            RemoveRanks(owner, entry.SpiritSupremePower, grant.Supreme);
+        }
+
+        private static UnitPartMedium.SpiritEntry Entry(UnitEntityData owner, BlueprintCharacterClassReference spirit)
+        {
+            var state = owner?.Get<UnitPartMedium>();
+            var blueprint = spirit?.Get();
+            if (state == null || blueprint == null) return null;
+            // Blueprints resolve to one shared instance per GUID, so reference
+            // equality is the same test IsActiveSpirit uses.
+            foreach (var pair in state.Spirits)
+                if (pair.Key?.Get() == blueprint) return pair.Value;
+            return null;
+        }
 
 		// Token: 0x0600BDCF RID: 48591 RVA: 0x00318090 File Offset: 0x00316290
 		private void Revert(BlueprintFeature[] powers)

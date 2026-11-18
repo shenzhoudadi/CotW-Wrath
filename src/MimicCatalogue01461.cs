@@ -12,6 +12,8 @@ using Kingmaker.Blueprints.Classes.Prerequisites;
 using Kingmaker.Blueprints.Classes.Selection;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Designers.Mechanics.Facts;
+using Kingmaker.Localization;
+using Kingmaker.Localization.Shared;
 using Kingmaker.UnitLogic.Abilities;
 using Kingmaker.UnitLogic.ActivatableAbilities;
 using Kingmaker.UnitLogic.Buffs.Blueprints;
@@ -26,6 +28,42 @@ namespace CallOfTheWild.Wrath.Prototype
     // No shared feat pool, existing component or metamagic provider is rewritten.
     internal static class MimicCatalogue01461
     {
+        internal const string RootToken="MimicMetamagicFeature01461";
+        const string MimicName="Mimic Metamagic";
+        // One composed label per metamagic, shared by its feature, buff, toggle
+        // and first-pick selector. Key and source survive a rebuild so the text
+        // can be recomputed once the localization pack is installed.
+        sealed class Composed{internal string Key;internal BlueprintFeature Source;}
+        static List<Composed> ComposedLabels=new List<Composed>();
+        // "<translated Mimic Metamagic><separator><the name the owning mod gives
+        // that metamagic>" so nobody has to translate the pairs by hand. The
+        // prefix comes from the optional QL source, never from a frozen string,
+        // and the suffix is read through the live pack, which is why the label is
+        // also recomputed in ApplyLabels().
+        internal static void ApplyLabels()
+        {
+            var labels=ComposedLabels;if(labels.Count==0)return;
+            if(LocalizationManager.CurrentPack==null)return;
+            foreach(var item in labels)Override(item.Key,Compose(item.Source));
+        }
+        static string Compose(BlueprintFeature feat)
+        {
+            string prefix=QlTexts01460.Resolve(Key(RootToken,"name"),MimicName),suffix=Native(feat);
+            if(string.IsNullOrWhiteSpace(suffix))return prefix;
+            return prefix+(LocalizationManager.CurrentPack?.Locale==Locale.zhCN?"：":": ")+suffix;
+        }
+        // A provider may register its feat before the pack exists, so the pack is
+        // the authority and the resolved property is only the last resort.
+        static string Native(BlueprintFeature feat)
+        {
+            var pack=LocalizationManager.CurrentPack;
+            if(pack!=null&&Get(feat,"m_DisplayName") is LocalizedString label&&!string.IsNullOrEmpty(label.Key))
+            {
+                string text=pack.GetText(label.Key,false);
+                if(!string.IsNullOrWhiteSpace(text))return text;
+            }
+            return feat.Name;
+        }
         sealed class State
         {
             internal BlueprintsCache Cache;internal BlueprintCharacterClass Class;internal BlueprintFeature[] Stock;
@@ -79,32 +117,42 @@ namespace CallOfTheWild.Wrath.Prototype
             T Asset<T>(string token,Func<T> create)where T:BlueprintScriptableObject{
                 if(all.TryGetValue(token,out var old))return (T)old;var bp=create();all.Add(token,bp);return bp;
             }
-            void Present(BlueprintUnitFact target,BlueprintUnitFact source){Set(target,"m_DisplayName",Get(source,"m_DisplayName"));Set(target,"m_Description",Get(source,"m_Description"));Icon(target,source);}
+            var labels=new List<Composed>();var names=new Dictionary<BlueprintFeature,LocalizedString>();
+            LocalizedString Name(string token,BlueprintFeature feat){var label=Text(token,"label",Compose(feat));labels.Add(new Composed{Key=label.Key,Source=feat});return label;}
+            void Dress(BlueprintUnitFact target,BlueprintUnitFact source,LocalizedString name){Set(target,"m_DisplayName",name);Set(target,"m_Description",Get(source,"m_Description"));Icon(target,source);}
             var leaves=new List<BlueprintFeature>();
             foreach(var row in available.OrderBy(p=>unchecked((uint)(int)p.Key)))
             {
                 string token="MimicMetamagicOption"+unchecked((uint)(int)row.Key);int cost=PsychicCompletionAmplifications01458.MetaCost(row.Key);
+                var name=Name(token+"01461",row.Value);
                 var buff=Asset(token+"Buff01458",()=>f.Buff(token+"Buff01458",row.Value.Name,row.Value.Description,new MimicMetamagic01458{Metamagic=row.Key,Price=2*Math.Max(1,cost),LevelCost=cost}));
-                Present(buff,row.Value);
-                var toggle=Asset(token+"01458Toggle",()=>PsychicCompletionAmplifications01458.Toggle(f,token+"01458",buff));Present(toggle,row.Value);modes?.Add(toggle);
+                Dress(buff,row.Value,name);
+                var toggle=Asset(token+"01458Toggle",()=>PsychicCompletionAmplifications01458.Toggle(f,token+"01458",buff));Dress(toggle,row.Value,name);modes?.Add(toggle);
                 var leaf=Asset(token+"Feature01458",()=>{var b=f.Feature(token+"Feature01458",row.Value.Name,row.Value.Description,Facts(toggle));if(row.Key==TopplingSpell.Metamagic)b.ComponentsArray=b.ComponentsArray.Concat(new[]{new TopplingSpellDamage()}).ToArray();return b;});
-                Present(leaf,row.Value);leaves.Add(leaf);
+                Dress(leaf,row.Value,name);names.Add(leaf,name);leaves.Add(leaf);
             }
             var roots=new List<BlueprintFeatureSelection>();var views=new Dictionary<BlueprintFeatureSelection,BlueprintFeatureReference[]>();
-            PrerequisiteFeature Need(BlueprintFeature feature){var p=new PrerequisiteFeature();Set(p,"m_Feature",Ref<BlueprintFeatureReference>(feature));return p;}
-            for(int tier=1;tier<=leaves.Count/2;tier++)
+            // One selector per metamagic. Picking it grants that metamagic and then
+            // asks for the second one out of the remaining list, which is how each
+            // use of the amplification adds two options. Its own
+            // PrerequisiteNoFeature keeps the pair distinct and also stops a
+            // metamagic from being taken twice across uses.
+            var selectors=new List<BlueprintFeatureSelection>();
+            foreach(var leaf in leaves)
             {
-                var first=new List<BlueprintFeatureSelection>();foreach(var leaf in leaves)
-                {
-                    var meta=leaf.GetComponent<Kingmaker.UnitLogic.FactLogic.AddFacts>().Facts.OfType<BlueprintActivatableAbility>().Single().Buff.GetComponent<MimicMetamagic01458>().Metamagic;
-                    string token="MimicMetamagic"+tier+"FirstFlag"+unchecked((uint)(int)meta)+"01461";
-                    var selector=Asset(token,()=>{var no=new PrerequisiteNoFeature();Set(no,"m_Feature",Ref<BlueprintFeatureReference>(leaf));var bp=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,ComponentsArray=new BlueprintComponent[]{no,Facts(leaf)}},token,leaf.Name,leaf.Description);var choices=leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});
-                    Present(selector,leaf);views.Add(selector,leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray());first.Add(selector);
-                }
-                string rootToken="MimicMetamagic"+tier+"Feature01458";var previous=roots.LastOrDefault();
-                var root=Asset(rootToken,()=>{var prerequisite=new PrerequisiteFeature();var reference=new BlueprintFeatureReference();Set(reference,"deserializedGuid",BlueprintGuid.Parse(PsychicClass.MajorId));Set(prerequisite,"m_Feature",reference);var components=new List<BlueprintComponent>{prerequisite};if(previous!=null)components.Add(Need(previous));var bp=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,ComponentsArray=components.ToArray()},rootToken,"Mimic Metamagic "+tier,D("MimicMetamagicSelection"));Icon(bp,leaves[0]);var choices=first.Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});
-                roots.Add(root);views.Add(root,first.Select(Ref<BlueprintFeatureReference>).ToArray());
+                var meta=leaf.GetComponent<Kingmaker.UnitLogic.FactLogic.AddFacts>().Facts.OfType<BlueprintActivatableAbility>().Single().Buff.GetComponent<MimicMetamagic01458>().Metamagic;
+                string token="MimicMetamagicFirstFlag"+unchecked((uint)(int)meta)+"01461";
+                var selector=Asset(token,()=>{var no=new PrerequisiteNoFeature();Set(no,"m_Feature",Ref<BlueprintFeatureReference>(leaf));var bp=f.Add(new BlueprintFeatureSelection{Ranks=1,IsClassFeature=true,ComponentsArray=new BlueprintComponent[]{no,Facts(leaf)}},token,leaf.Name,leaf.Description);var choices=leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});
+                Dress(selector,leaf,names[leaf]);views.Add(selector,leaves.Where(v=>v!=leaf).Select(Ref<BlueprintFeatureReference>).ToArray());selectors.Add(selector);
             }
+            // A single repeatable entry replaces the numbered "Mimic Metamagic 1..N"
+            // chain. Ranks is what the native Extra Mercy style selections use to
+            // stay selectable after the first pick; the pool greys it out once the
+            // ranks run out, and every already-owned metamagic stays unavailable
+            // because the leaves keep Ranks 1.
+            var root=Asset(RootToken,()=>{var prerequisite=new PrerequisiteFeature();var reference=new BlueprintFeatureReference();Set(reference,"deserializedGuid",BlueprintGuid.Parse(PsychicClass.MajorId));Set(prerequisite,"m_Feature",reference);var bp=f.Add(new BlueprintFeatureSelection{Ranks=Math.Max(1,leaves.Count/2),IsClassFeature=true,ComponentsArray=new BlueprintComponent[]{prerequisite}},RootToken,MimicName,D("MimicMetamagicSelection"));Icon(bp,leaves[0]);var choices=selectors.Select(Ref<BlueprintFeatureReference>).ToArray();Set(bp,"m_Features",choices);Set(bp,"m_AllFeatures",choices);return bp;});
+            roots.Add(root);views.Add(root,selectors.Select(Ref<BlueprintFeatureReference>).ToArray());
+            ComposedLabels=labels;
             s.Assets=all;s.Leaves=leaves.ToArray();s.Roots=roots.ToArray();s.Views.Clear();foreach(var pair in views)s.Views.Add(pair.Key,pair.Value);
         }
         internal static void Seal(BlueprintsCache cache,params BlueprintFeatureSelection[] pools)

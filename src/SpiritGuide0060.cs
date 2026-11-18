@@ -34,11 +34,10 @@ namespace CallOfTheWild.Wrath.Prototype
 {
     // COTW-0060 Spirit Guide, the complete Oracle archetype. The dangerous-path
     // ownership slice (C03 skill pairing, C06 level/stat isolation, C10 Wisdom
-    // branches, C13 source-safe temporary knowledge) and the full ten-spirit
-    // catalogue (F-0060-SPIRITS) live behind one atomic registration: the
-    // identity gate rejects the whole package when any of the 90 bonded spells
-    // (including the four external roots), any tier/hex donor, the parametrized
-    // spell-learning feature or the Extra Channel feat is unavailable, and
+    // branches, C13 source-safe temporary knowledge) and the live Shaman-spirit
+    // catalogue (F-0060-SPIRITS) live behind one atomic registration. The identity
+    // gate validates every discovered tier, hex and bonded spell donor together
+    // with the parametrized spell-learning feature and Extra Channel feat, and
     // RegisterOptional retries the late external providers. Registration is a
     // real 0060-owned transaction: private identities, native parent connection,
     // pool snapshots, rollback, never a partial publish.
@@ -65,7 +64,7 @@ namespace CallOfTheWild.Wrath.Prototype
                     throw new InvalidOperationException("0060 published archetype identity changed.");
                 for (int i = 0; i < state.Assets.Length; i++)
                     if (!ReferenceEquals(cache.Load(state.Assets[i].AssetGuid), state.Assets[i]) ||
-                        ArchetypeBatch01445.Definition(state.Assets[i]) != state.Definitions[i])
+                        (BlueprintRegistration.StrictPublishedGraphChecks && ArchetypeBatch01445.Definition(state.Assets[i]) != state.Definitions[i]))
                         throw new InvalidOperationException("0060 published private blueprint changed: " + state.Assets[i].name);
                 var existing = (BlueprintArchetypeReference[])Get(state.Oracle, "m_Archetypes") ?? Array.Empty<BlueprintArchetypeReference>();
                 if (existing.Count(r => r != null && r.Guid == state.Root) != 1)
@@ -153,9 +152,10 @@ namespace CallOfTheWild.Wrath.Prototype
                 "A spirit guide's mystery no longer grants its extra class skills; the oracle's base class skills and any background contribution remain.",
                 new SpiritGuideSkills0060.Adapter0060());
 
-            // F-0060-SPIRITS: the ten spirit progressions, the 39-entry hex pool,
-            // the 90-spell temporary-knowledge table, Lore Arcane Enlightenment and
-            // the private Life Extra Channel.
+            // F-0060-SPIRITS: discover all currently published Shaman spirits,
+            // clone their owned hexes, spirit spells and level-1/8 powers, then
+            // adapt them to the Oracle 3/4/7/15 axis. Life keeps a private Extra
+            // Channel feat tied to its cloned channel resource.
             var spirits = SpiritGuideSpirits0060.Build(f, oracle, cache);
 
             // C04: the archetype replaces the revelations at 3/7/15 with the spirit
@@ -204,24 +204,4 @@ namespace CallOfTheWild.Wrath.Prototype
         }
     }
 
-    // Q10: a bounded private clone of the 0117 metal-hit shock that reads Wisdom
-    // (hex_secondary_stat) instead of Charisma. It is not shared with the native
-    // Charisma-reading effect buff and carries its own serialized TypeId.
-    [TypeId("0060a1b2c3d4e5f60718293a4b5c6d7e")]
-    internal sealed class SparklingAura0060 : UnitFactComponentDelegate, ITargetRulebookHandler<RuleAttackWithWeapon>
-    {
-        public void OnEventAboutToTrigger(RuleAttackWithWeapon evt) { }
-
-        public void OnEventDidTrigger(RuleAttackWithWeapon evt)
-        {
-            if (evt.Target != Owner || evt.AttackRoll == null || !evt.AttackRoll.IsHit || evt.AttackRoll.IsFake) return;
-            var type = evt.Weapon?.Blueprint?.Type;
-            if (type == null || !type.Category.HasSubCategory(WeaponSubCategory.Metal)) return;
-            var caster = Fact?.MaybeContext?.MaybeCaster ?? Owner;
-            int wis = caster.Stats.Wisdom.Bonus;
-            if (wis <= 0) return;
-            var damage = new EnergyDamage(new DiceFormula(0, DiceType.Zero), wis, DamageEnergyType.Electricity);
-            Rulebook.Trigger(new RuleDealDamage(caster, Owner, new DamageBundle(new BaseDamage[] { damage })));
-        }
-    }
 }

@@ -4,44 +4,47 @@
     <BaseOutputPath Condition="'$(IsBundledMediumProject)' != 'true'">$(MSBuildThisFileDirectory)..\..\work\prototype-build\$(MSBuildProjectName)\bin\</BaseOutputPath>
     <WrathPath Condition="'$(WrathPath)' == ''">$(WOTR_GAME_PATH)</WrathPath>
     <UseGameHarmonyReference Condition="'$(UseGameHarmonyReference)' == ''">false</UseGameHarmonyReference>
-    <HarmonyReferencePath Condition="'$(HarmonyReferencePath)' == ''">$(WrathPath)\Wrath_Data\Managed\0Harmony.dll</HarmonyReferencePath>
+    <HarmonyReferencePath Condition="'$(HarmonyReferencePath)' == ''">$(WrathPath)\Wrath_Data\Managed\UnityModManager\0Harmony.dll</HarmonyReferencePath>
   </PropertyGroup>
   <!-- One compile reference for all projects that compile Harmony-dependent code.
        Pure metadata tools remove this unused reference in Directory.Build.targets,
        but still execute the same mandatory version/hash guard.
-       Update both the literal identity and SHA only after auditing a new game runtime. -->
+       Update both the literal identity and SHA only after auditing a new game runtime.
+       Baseline re-audited 2026-11-07: UMM 0.33.2 ships Harmony 2.3.6.0 under
+       Wrath_Data/Managed/UnityModManager; the old Managed-root 2.0.4.0 DLL is no
+       longer present in the installed game. -->
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.4.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(WrathPath)\Wrath_Data\Managed\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.3.6.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(WrathPath)\Wrath_Data\Managed\UnityModManager\0Harmony.dll</HintPath>
       <SpecificVersion>true</SpecificVersion>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
   <Target Name="ValidatePinnedGameHarmony" BeforeTargets="PrepareForBuild;ResolveAssemblyReferences;CoreCompile">
     <Error Code="COTWHARMONY001" Condition="'$(WrathPath)' == ''"
-           Text="Set WOTR_GAME_PATH or WrathPath to the installed game. Harmony must come from Wrath_Data/Managed/0Harmony.dll." />
+           Text="Set WOTR_GAME_PATH or WrathPath to the installed game. Harmony must come from Wrath_Data/Managed/UnityModManager/0Harmony.dll." />
     <PropertyGroup>
-      <_CotwGameHarmonyPath>$([System.IO.Path]::GetFullPath('$(WrathPath)\Wrath_Data\Managed\0Harmony.dll'))</_CotwGameHarmonyPath>
+      <_CotwGameHarmonyPath>$([System.IO.Path]::GetFullPath('$(WrathPath)\Wrath_Data\Managed\UnityModManager\0Harmony.dll'))</_CotwGameHarmonyPath>
       <_CotwRequestedHarmonyPath Condition="'$(HarmonyReferencePath)' != ''">$([System.IO.Path]::GetFullPath('$(HarmonyReferencePath)'))</_CotwRequestedHarmonyPath>
       <_CotwRequestedHarmonyAlias Condition="'$(HarmonyReference)' != ''">$([System.IO.Path]::GetFullPath('$(HarmonyReference)'))</_CotwRequestedHarmonyAlias>
     </PropertyGroup>
     <Error Code="COTWHARMONY002" Condition="!Exists('$(_CotwGameHarmonyPath)')"
-           Text="The required game Harmony DLL is missing: $(_CotwGameHarmonyPath). No UMM/NuGet fallback is allowed." />
+           Text="The required game Harmony DLL is missing: $(_CotwGameHarmonyPath). No NuGet or replacement-copy fallback is allowed." />
     <GetAssemblyIdentity AssemblyFiles="$(_CotwGameHarmonyPath)">
       <Output TaskParameter="Assemblies" ItemName="_CotwHarmonyIdentity" />
     </GetAssemblyIdentity>
-    <Error Code="COTWHARMONY003" Condition="'%(_CotwHarmonyIdentity.Version)' != '2.0.4.0'"
-           Text="Game Harmony must be 2.0.4.0; found %(_CotwHarmonyIdentity.Version) at $(_CotwGameHarmonyPath)." />
+    <Error Code="COTWHARMONY003" Condition="'%(_CotwHarmonyIdentity.Version)' != '2.3.6.0'"
+           Text="Game Harmony must be 2.3.6.0; found %(_CotwHarmonyIdentity.Version) at $(_CotwGameHarmonyPath)." />
     <GetFileHash Files="$(_CotwGameHarmonyPath)" Algorithm="SHA256" HashEncoding="hex">
       <Output TaskParameter="Hash" PropertyName="_CotwGameHarmonySha256" />
     </GetFileHash>
-    <Error Code="COTWHARMONY004" Condition="'$(_CotwGameHarmonySha256)' != 'DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5'"
-           Text="Game Harmony SHA256 differs from the audited 2.0.4.0 runtime: $(_CotwGameHarmonySha256). Refusing to compile." />
+    <Error Code="COTWHARMONY004" Condition="'$(_CotwGameHarmonySha256)' != 'DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80'"
+           Text="Game Harmony SHA256 differs from the audited 2.3.6.0 runtime: $(_CotwGameHarmonySha256). Refusing to compile." />
     <!-- Legacy command-line properties may only repeat the actual game path. -->
     <Error Code="COTWHARMONY005" Condition="'$(HarmonyReferencePath)' != '' and '$(_CotwRequestedHarmonyPath)' != '$(_CotwGameHarmonyPath)'"
-           Text="HarmonyReferencePath must be the actual game Managed/0Harmony.dll, not a replacement copy." />
+           Text="HarmonyReferencePath must be the actual game Managed/UnityModManager/0Harmony.dll, not a replacement copy." />
     <Error Code="COTWHARMONY005" Condition="'$(HarmonyReference)' != '' and '$(_CotwRequestedHarmonyAlias)' != '$(_CotwGameHarmonyPath)'"
-           Text="HarmonyReference must be the actual game Managed/0Harmony.dll, not a replacement copy." />
+           Text="HarmonyReference must be the actual game Managed/UnityModManager/0Harmony.dll, not a replacement copy." />
     <ItemGroup>
       <_CotwHarmonyReferences Include="@(Reference)" Condition="$([System.String]::Copy('%(Reference.Identity)').StartsWith('0Harmony'))">
         <NormalizedHintPath>$([System.IO.Path]::GetFullPath('%(Reference.HintPath)'))</NormalizedHintPath>
@@ -52,9 +55,9 @@
            Text="Harmony NuGet packages are forbidden: @(_CotwHarmonyPackages). Use the single game reference." />
     <Error Code="COTWHARMONY007" Condition="@(_CotwHarmonyReferences->Count()) &gt; 1 or ('$(UseGameHarmonyReference)' == 'true' and '@(_CotwHarmonyReferences->Count())' != '1')"
            Text="Harmony-dependent projects require exactly one pinned game reference; found @(_CotwHarmonyReferences->Count())." />
-    <Error Code="COTWHARMONY007" Condition="'@(_CotwHarmonyReferences)' != '' and ('%(_CotwHarmonyReferences.NormalizedHintPath)' != '$(_CotwGameHarmonyPath)' or '%(_CotwHarmonyReferences.SpecificVersion)' != 'true' or '%(_CotwHarmonyReferences.Identity)' != '0Harmony, Version=2.0.4.0, Culture=neutral, PublicKeyToken=null')"
+    <Error Code="COTWHARMONY007" Condition="'@(_CotwHarmonyReferences)' != '' and ('%(_CotwHarmonyReferences.NormalizedHintPath)' != '$(_CotwGameHarmonyPath)' or '%(_CotwHarmonyReferences.SpecificVersion)' != 'true' or '%(_CotwHarmonyReferences.Identity)' != '0Harmony, Version=2.3.6.0, Culture=neutral, PublicKeyToken=null')"
            Text="Harmony compile reference identity/path/SpecificVersion must match the central pinned game reference." />
-    <Message Importance="High" Text="Pinned game Harmony: 2.0.4.0 SHA256=$(_CotwGameHarmonySha256) from $(_CotwGameHarmonyPath)" />
+    <Message Importance="High" Text="Pinned game Harmony: 2.3.6.0 SHA256=$(_CotwGameHarmonySha256) from $(_CotwGameHarmonyPath)" />
   </Target>
   <Target Name="ValidateResolvedGameHarmony" BeforeTargets="CoreCompile" DependsOnTargets="ValidatePinnedGameHarmony">
     <ItemGroup>

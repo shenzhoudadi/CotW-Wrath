@@ -122,13 +122,49 @@ namespace CallOfTheWild.Wrath.Prototype
             LimitlessId=BlueprintGuid.Parse("b5c00e781d3a45aa9a2ae169c5210b47"),ArchetypeId=Id(CourtBard01445.RootToken);
         static bool Prefix(ActivatableAbilityResourceLogic __instance,ref bool __result)
         {
-            if(__instance.RequiredResource?.AssetGuid!=ResourceId||!(bool)UseList.GetValue(__instance)||FreeList.GetValue(__instance)!=null)return true;
-            var owner=__instance.Fact.Owner;
-            if(!owner.Progression.Classes.Any(c=>c.Archetypes.Any(a=>a.AssetGuid==ArchetypeId)))return true;
-            var single=__instance.FreeBlueprint;
-            var limitless=ResourcesLibrary.BlueprintsCache.Load(LimitlessId)as BlueprintFeature;
-            __result=single!=null&&Kingmaker.UnitLogic.UnitHelper.HasFact(owner.Unit,single)||limitless!=null&&limitless.name=="LimitlessBardicPerformance"&&Kingmaker.UnitLogic.UnitHelper.HasFact(owner.Unit,limitless);
-            return false;
+            // Never let this probe break the action bar. It runs on every
+            // ActivatableAbility.ResourceCount refresh, and an exception here
+            // aborts ActionBarVM.SetMechanicSlots: abilities grey out, the spell
+            // tab disappears, and UniRx re-throws on each action bar update.
+            bool takeover=false;
+            try
+            {
+                if(__instance==null)return true;
+                var required=__instance.RequiredResource;
+                if(required==null||required.AssetGuid!=ResourceId)return true;
+                if(UseList==null||FreeList==null)return true;
+                if(!(bool)UseList.GetValue(__instance))return true;
+                if(FreeList.GetValue(__instance)!=null)return true;
+                // Only the broken list-mode combination reaches this point; the
+                // native getter would throw on m_FreeBlueprints.Length.
+                takeover=true;
+                __result=false;
+                var owner=__instance.Fact?.Owner;
+                if(owner?.Unit==null||owner.Progression==null)return false;
+                bool courtBard=false;
+                foreach(var cls in owner.Progression.Classes)
+                {
+                    if(cls?.Archetypes==null)continue;
+                    foreach(var archetype in cls.Archetypes)
+                        if(archetype!=null&&archetype.AssetGuid==ArchetypeId){courtBard=true;break;}
+                    if(courtBard)break;
+                }
+                if(!courtBard)return false;
+                var single=__instance.FreeBlueprint;
+                if(single!=null&&Kingmaker.UnitLogic.UnitHelper.HasFact(owner.Unit,single)){__result=true;return false;}
+                var limitless=ResourcesLibrary.BlueprintsCache.Load(LimitlessId)as BlueprintFeature;
+                __result=limitless!=null&&limitless.name=="LimitlessBardicPerformance"&&Kingmaker.UnitLogic.UnitHelper.HasFact(owner.Unit,limitless);
+                return false;
+            }
+            catch
+            {
+                // Our own probe failed before deciding: leave the native getter
+                // alone. After taking over, report "not free" instead of
+                // re-entering the throwing native loop.
+                if(!takeover)return true;
+                __result=false;
+                return false;
+            }
         }
     }
 }

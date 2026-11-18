@@ -21,7 +21,7 @@ namespace MediumClass.Spiritualist
 {
     class Phantom
     {
-        static public BlueprintCharacterClass phantom_class;
+        static public BlueprintCharacterClass phantom_class = null; // Spiritualist creation is disabled
 
         public static void ConfigureEnabled()
         {

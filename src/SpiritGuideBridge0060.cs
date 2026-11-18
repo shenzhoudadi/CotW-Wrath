@@ -8,6 +8,7 @@ using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.EntitySystem.Stats;
@@ -72,6 +73,10 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             internal readonly BlueprintsCache Cache;
             internal readonly Dictionary<string, BlueprintScriptableObject> Assets = new Dictionary<string, BlueprintScriptableObject>();
+            // Non-blueprint scratch space for shared helper results (option
+            // lists, candidate spell tables) that must be built once per cache
+            // but are not published blueprints themselves.
+            internal readonly Dictionary<string, object> Scratch = new Dictionary<string, object>();
             internal Factory(BlueprintsCache cache) { Cache = cache; }
 
             internal T Native<T>(string guid) where T : SimpleBlueprint => Cache.Load(BlueprintGuid.Parse(guid)) as T;
@@ -117,6 +122,11 @@ namespace CallOfTheWild.Wrath.Prototype
                     ComponentsArray = components }, token, name, description);
             internal BlueprintProgression Progression(string token, string name, string description, LevelEntry[] entries, UIGroup[] groups)
                 => Add(new BlueprintProgression { LevelEntries = entries, UIGroups = groups, Ranks = 1 }, token, name, description);
+
+            // Adapter for shared helpers that construct a blueprint themselves
+            // and only need this package's identity namespace and salt.
+            internal BlueprintSpellList NextList(BlueprintSpellList list, string token, string name, string description)
+                => Add(list, token, name, description);
             internal void Enable() { foreach (var bp in Assets.Values) bp.OnEnable(); }
         }
 
@@ -175,6 +185,23 @@ namespace CallOfTheWild.Wrath.Prototype
             if (source == null) return;
             try { SpellBatch01447.Icon(target, source); }
             catch { if (Has(target, "m_Icon") && Has(source, "m_Icon")) Set(target, "m_Icon", Get(source, "m_Icon")); }
+        }
+
+        // Reuse the donor's authored name, description and icon verbatim instead
+        // of writing a fresh one. The localized strings are shared read-only, so a
+        // spirit guide reads exactly what the game (or the mod that added the
+        // spirit) already ships, in the player's own locale.
+        internal static void Present(BlueprintUnitFact target, BlueprintUnitFact source)
+        {
+            if (target == null || source == null) return;
+            foreach (string field in new[] { "m_DisplayName", "m_Description", "m_DescriptionShort" })
+            {
+                object value = null;
+                try { value = Get(source, field); } catch (MissingFieldException) { continue; }
+                if (value == null) continue;
+                try { Set(target, field, value); } catch (MissingFieldException) { }
+            }
+            Icon(target, source);
         }
 
         // Rebuild the private element cache inherited from a shallow clone and

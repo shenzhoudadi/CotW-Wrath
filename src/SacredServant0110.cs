@@ -30,6 +30,7 @@ using Kingmaker.UnitLogic.Mechanics;
 using Kingmaker.UnitLogic.Mechanics.Actions;
 using Kingmaker.UnitLogic.Mechanics.Components;
 using Kingmaker.Utility;
+using HarmonyLib;
 using Newtonsoft.Json;
 using static CallOfTheWild.Wrath.Prototype.PsychicAssets;
 using static CallOfTheWild.Wrath.Prototype.ArchetypeBatch01445;
@@ -151,7 +152,14 @@ namespace CallOfTheWild.Wrath.Prototype
             var source = f.Native<BlueprintFeatureSelection>(DomainsId);
             var progressions = DiscoverProgressions(f).ToArray();
             if (progressions.Length == 0) return false;
-            var adaptation = AdaptProgressions(progressions, paladin, cleric, root);
+            var pending = progressions.Where(domain => !IsAdapted(domain, paladin, root)).ToArray();
+            if (pending.Length == 0)
+            {
+                InsertDomainAfterDeity(paladin, deity, source);
+                VerifyDomainAfterDeity(paladin, deity, source);
+                return true;
+            }
+            var adaptation = AdaptProgressions(pending, paladin, cleric, root);
             try
             {
                 InsertDomainAfterDeity(paladin, deity, source);
@@ -176,6 +184,14 @@ namespace CallOfTheWild.Wrath.Prototype
                     if (feature is BlueprintProgression progression && seen.Add(progression.AssetGuid))
                         yield return progression;
             }
+        }
+
+        static bool IsAdapted(BlueprintProgression domain, BlueprintCharacterClass paladin, BlueprintArchetype root)
+        {
+            var classes = (BlueprintProgression.ClassWithLevel[])Get(domain, "m_Classes") ?? Array.Empty<BlueprintProgression.ClassWithLevel>();
+            var archetypes = (BlueprintProgression.ArchetypeWithLevel[])Get(domain, "m_Archetypes") ?? Array.Empty<BlueprintProgression.ArchetypeWithLevel>();
+            return classes.Any(c => c.m_Class?.Guid == paladin.AssetGuid && c.AdditionalLevel == 0) &&
+                archetypes.Any(a => a.m_Archetype?.Guid == root.AssetGuid && a.AdditionalLevel == -3);
         }
 
         static void InsertDomainAfterDeity(BlueprintCharacterClass paladin, BlueprintFeatureSelection deity, BlueprintFeatureSelection domain)
@@ -445,12 +461,8 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var seen = new HashSet<BlueprintComponent>();
             foreach (var fact in DomainFacts(domain))
-            {
-                foreach (var component in fact.ComponentsArray ?? Array.Empty<BlueprintComponent>())
-                    if (component != null && seen.Add(component)) yield return component;
-                foreach (var nested in PsychicRemainingDisciplines01458.Graph(fact.ComponentsArray).OfType<BlueprintComponent>())
-                    if (nested != null && seen.Add(nested)) yield return nested;
-            }
+            foreach (var component in fact.ComponentsArray ?? Array.Empty<BlueprintComponent>())
+                if (component != null && seen.Add(component)) yield return component;
         }
 
         static IEnumerable<BlueprintSpellList> DomainSpellLists(IEnumerable<BlueprintScriptableObject> facts, BlueprintCharacterClass cleric)
@@ -465,6 +477,15 @@ namespace CallOfTheWild.Wrath.Prototype
                 else if (component is LearnSpellList learned && learned.CharacterClass == cleric) list = learned.SpellList;
                 if (list != null && seen.Add(list.AssetGuid)) yield return list;
             }
+        }
+
+        internal static bool SuppressClericDomainSpellbook(AddSpecialSpellList component)
+        {
+            if (component?.CharacterClass?.AssetGuid != BlueprintGuid.Parse(ClericId)) return false;
+            var root = ResourcesLibrary.TryGetBlueprint<BlueprintArchetype>(Id(RootToken));
+            var ownerProperty = AccessTools.Property(typeof(AddSpecialSpellList), "Owner");
+            var owner = ownerProperty?.GetValue(component, null) as UnitEntityData;
+            return root != null && owner != null && owner.Progression.IsArchetype(root);
         }
 
         static IEnumerable<BlueprintScriptableObject> DomainFacts(BlueprintProgression domain)
@@ -487,18 +508,33 @@ namespace CallOfTheWild.Wrath.Prototype
                         foreach (var fact in addFacts.Facts.OfType<BlueprintScriptableObject>()) queue.Enqueue(fact);
                     if (component is AddFeatureOnClassLevel onClassLevel && onClassLevel.Feature is BlueprintScriptableObject featureOnLevel)
                         queue.Enqueue(featureOnLevel);
+                    // Follow only buffs directly applied by a domain ability. This
+                    // reaches effect ranks such as Touch of Good without recursively
+                    // walking unrelated shared blueprint graphs.
+                    if (component is AbilityEffectRunAction run)
+                        foreach (var apply in PsychicRemainingDisciplines01458.Graph(run.Actions).OfType<ContextActionApplyBuff>())
+                        {
+                            var buff = (Get(apply, "m_Buff") as BlueprintBuffReference)?.Get();
+                            if (buff != null) queue.Enqueue(buff);
+                        }
                 }
-                // Resolve buff/ability/resource references that appear inside nested
-                // action graphs. Spell lists and items are deliberately excluded.
-                foreach (var reference in PsychicRemainingDisciplines01458.Graph(current.ComponentsArray).OfType<BlueprintReferenceBase>())
-                {
-                    var target = reference.GetBlueprint() as BlueprintScriptableObject;
-                    if (target == null) continue;
-                    if (target is BlueprintUnitFact || target is BlueprintAbilityResource || target is BlueprintAbilityAreaEffect)
-                        queue.Enqueue(target);
-                }
+                // The explicit feature graph plus directly applied buffs contains
+                // domain rank, upgrade and resource contracts without the previous
+                // multi-minute recursive scan of every referenced blueprint.
             }
         }
+    }
+
+    [HarmonyPatch(typeof(AddSpecialSpellList), "OnActivate")]
+    internal static class SacredServantClericDomainSpellbookActivate0110Patch
+    {
+        static bool Prefix(AddSpecialSpellList __instance) => !SacredServant0110.SuppressClericDomainSpellbook(__instance);
+    }
+
+    [HarmonyPatch(typeof(AddSpecialSpellList), "OnDeactivate")]
+    internal static class SacredServantClericDomainSpellbookDeactivate0110Patch
+    {
+        static bool Prefix(AddSpecialSpellList __instance) => !SacredServant0110.SuppressClericDomainSpellbook(__instance);
     }
 
     [TypeId("0110ca11ce571a11a000000000000001")]

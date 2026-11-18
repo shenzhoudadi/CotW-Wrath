@@ -1,2 +1,0 @@
-先完整读取 C:\Users\xuenc\agent-tools\spirit-whisperer-next\HANDOFF-0117-ABCD-20261108.md（跨机器可读 GitHub docs/work-packages/COTW-0117/README.md），以及最新 WORK_STATUS 和 issue #7。
-只执行其中角色 A：固定原作十魂域／Wizard变体映射与缺口，生产只读，不实现、不push、不启游戏／UMM、不跑全量。交付同目录的 A-source-scope.md、A-spirit-map.json、A-gaps.md。按全文完成定义交C，不写运行PASS。

@@ -30,6 +30,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             if (Fact == null || !Fact.IsActive) return;
             Owner.Ensure<UnitPartMedium>().AddSpiritEntry(SpiritClass, SpiritInfluencePenalty, SpiritInfluence, SpiritBonusFeature, SpiritSeanceBoon, base.Fact, Concentration, Stats, Penalties, 
                 SpiritLesserPower, SpiritIntermediatePower, SpiritOverwriteIntermediate, SpiritGreaterPower, SpiritOverwriteGreater, SpiritSupremePower, SpiritIntermediatePowerMove, SpiritIntermediatePowerSwift);
+            MediumSpiritualDefenseComponent.RefreshFor(Owner);
+            MediumAdvancedWeaponTrainingComponent.RefreshFor(Owner);
         }
 
         // TurnOff also runs for saving and scene unloading. Catalogue membership

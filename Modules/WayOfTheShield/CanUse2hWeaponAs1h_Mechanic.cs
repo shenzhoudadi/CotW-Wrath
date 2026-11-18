@@ -118,13 +118,9 @@ namespace Way_of_the_shield
         {
             if (newGripType == GripType.Auto) return;
             var owner = __instance.PrimaryHand.Owner?.Unit;
-            if (newGripType == GripType.TwoHanded
-                && (owner?.Get<MechanicsFeatureExtension.MechanicsFeatureExtensionPart>()?.ForceOneHanded ?? false)
-                && NewFeatsAndAbilities.OneHandedToggle.CanUseOneHandedGrip(__instance.PrimaryHand.MaybeWeapon, owner))
-            {
-                __result = false;
-                return;
-            }
+            // The forced one-handed grip toggle (OneHandedToggle) was removed.
+            // Its MechanicsFeatureExtension.ForceOneHanded slot is kept as an
+            // indexed placeholder so the remaining feature flags keep their IDs.
             if (__result) return;
             var weapon = __instance.PrimaryHand.MaybeItem as ItemEntityWeapon;
             if (weapon == null || weapon.Blueprint.Double) return;

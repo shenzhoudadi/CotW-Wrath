@@ -208,4 +208,7 @@ namespace MediumClass.Medium
     internal static class MediumSpellcasterFeat { public static void ConfigureEnabled() { } }
     internal static class WeakerSpiritChannel { public static void ConfigureEnabled() { } }
     internal static class AstralBeacon { public static void ConfigureEnabled() { } }
+    internal static class TranceOfMany { public static void ConfigureEnabled() { } }
+    internal static class SpiritAffinity { public static void ConfigureEnabled() { } }
+    internal static class SpiritFeat { public static void ConfigureEnabled() { } }
 }

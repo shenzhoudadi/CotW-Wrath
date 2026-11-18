@@ -52,7 +52,13 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (donor.name != null && donor.name.StartsWith(AssetPrefix, StringComparison.Ordinal)) return donor;
                 if (map.TryGetValue(donor.AssetGuid, out var existing)) return existing;
                 var clone = (BlueprintScriptableObject)f.Clone(donor, token + "Node" + serial++,
-                    donor.name + " (Spirit Guide)", "Private Spirit Guide adaptation of " + donor.name + ".");
+                    donor.name, string.Empty);
+                // The private node is the same power the shaman gets, so it keeps
+                // the donor's authored name, description and icon instead of a
+                // synthesized "(Spirit Guide)" label. This is what the character
+                // sheet and the ability bar actually display.
+                if (clone is BlueprintUnitFact cloneFact && donor is BlueprintUnitFact donorFact)
+                    Present(cloneFact, donorFact);
                 // Register before recursion: cyclic Buff <-> Area graphs are legal.
                 map[donor.AssetGuid] = clone;
                 SpiritGuideSpirits0060.StripSpellLists(clone);

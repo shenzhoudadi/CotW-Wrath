@@ -139,15 +139,35 @@ namespace CallOfTheWild.Wrath.Prototype
             return fact != null && unit.Descriptor.HasFact(fact);
         }
 
+        // Owlcat splits demons into three pseudo-subtypes (magic, slaughter,
+        // strength) so favored enemy can pick them apart. The tabletop game has
+        // a single demon subtype, so all three marks collapse into one token: a
+        // succubus and a babau are the same kind of monster here.
+        internal const string DemonKey = "DemonSubtype";
+        internal static readonly string[] DemonMarks =
+        {
+            "1b466705276e3124ab43f865e282c6e8", // DemonOfMagicFeature
+            "2fe24d538bbcea34cbe9e8600d92bdd2", // DemonOfSlaughterFeature
+            "561041cdb5887464883c55c75219a9dc"  // DemonOfStrengthFeature
+        };
+
         // Null is an explicit "no verified category"; there is no default key
-        // that would match every unit.
+        // that would match every unit. The anchor is a native creature-type or
+        // humanoid-group fact, exactly like the donors favored enemy uses;
+        // BlueprintUnit.Type is a per-unit blueprint and never matches two
+        // different monsters.
         internal static string KeyOf(UnitEntityData unit)
         {
             if (unit?.Descriptor == null) return null;
+            // Every demon mark is one demon subtype here, so a succubus and a
+            // babau are the same kind of monster whatever Owlcat's three-way
+            // favored-enemy split says.
+            if (DemonMarks.Any(id => Has(unit, id))) return DemonKey;
             string anchor = BroadTypes.FirstOrDefault(id => Has(unit, id))
                 ?? HumanoidEntries.FirstOrDefault(id => Has(unit, id));
             if (anchor == null) return null;
-            var set = SubtypeRaceFacts.Where(id => Has(unit, id)).Distinct().OrderBy(id => id, StringComparer.Ordinal);
+            var set = SubtypeRaceFacts.Where(id => !DemonMarks.Contains(id) && Has(unit, id))
+                .Distinct().OrderBy(id => id, StringComparer.Ordinal);
             return anchor + "|" + string.Join(",", set);
         }
     }
@@ -496,7 +516,9 @@ namespace CallOfTheWild.Wrath.Prototype
                     caster.Resources.Spend(resource, 1);
                     paid = true;
                 }
-                int bonus = Math.Min(5, caster.Progression.GetClassLevel(cls) / 4);
+                // +2 when gained at 4th, +1 for every 2 investigator levels after.
+                int scholarLevel = caster.Progression.GetClassLevel(cls);
+                int bonus = 2 + Math.Max(0, (scholarLevel - 4) / 2);
                 int rounds = new ContextValue { ValueType = ContextValueType.Rank, ValueRank = AbilityRankType.Default }.Calculate(Context);
                 if (rounds < 1) rounds = 1;
                 var duration = TimeSpan.FromSeconds(rounds * 6);

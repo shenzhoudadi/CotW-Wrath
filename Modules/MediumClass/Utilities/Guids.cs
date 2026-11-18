@@ -65,6 +65,8 @@ namespace MediumClass.Utilities
         #region Guardian
         internal const string Guardian = "ce5874c4-aef6-4b68-8344-38e2a9970373";
         internal const string GuardianLesser = "b17e10f8-2f72-46cc-b622-a65a72c1c299";
+        internal const string GuardianLesserShieldOtherToggle = "744f4460-a1ca-48e5-af45-c95873713824";
+        internal const string GuardianLesserShieldOtherBuff = "541ff019-a038-47d7-9e02-f807fd3397d6";
         internal const string GuardianProgression = "90dd3599-8162-43f3-9612-75b4b35bca2c";
 
         internal const string GuardianSeanceBoon = "d5e04574-0761-4265-bbba-dcac35f50057";
@@ -73,8 +75,14 @@ namespace MediumClass.Utilities
 
         internal const string GuardianGreater = "c31441fd-3736-421d-88cd-414d6e5fe8a5";
         internal const string GuardianGreaterAbility = "4f2e4c12-33f6-4d99-9d3b-9b4190bdf5b1";
+        internal const string GuardianGreaterFreeAbility = "5b0356eb-b336-41b3-99ae-888d1f693bae";
+        internal const string GuardianGreaterTempHpAbility = "8de859da-d390-4137-8d9c-e0bdd5d2c8aa";
+        internal const string GuardianGreaterReachBuff = "e8299b83-8760-47f0-9b31-d7bf4adb8d74";
+        internal const string GuardianGreaterTempHpBuff = "843f4fec-555a-4d52-b735-761a10cff806";
         internal const string SecondaryGuardianGreater = "3addc08b-23a9-4f5b-93c5-f5d265e39bd8";
         internal const string SecondaryGuardianGreaterAbility = "fca62ba7-bb00-40b9-a512-68d1d9b99756";
+        internal const string SecondaryGuardianGreaterFreeAbility = "9882f3f6-2ed8-48b0-ac58-c985d2e00662";
+        internal const string SecondaryGuardianGreaterTempHpAbility = "ed9115ce-10a5-43a8-888e-32bf4e84d8aa";
 
         internal const string LegendaryGuardian = "b5176b72-a61c-4f18-a5c8-ff17836663d0";
         internal const string LegendaryGuardianAbility = "a181cb9b-d82e-44f4-b78d-8b6bb12537ac";
@@ -109,6 +117,7 @@ namespace MediumClass.Utilities
         internal const string HierophantSupremeAbility2 = "b80ab52f-17fa-4c4c-874c-e7aa28b5903c";
         internal const string HierophantSupremeAbility3 = "7e1a9a2b-a4fd-4487-87cc-a49de74f942b";
         internal const string HierophantSupremeAbility4 = "54aecd71-0160-4cfb-836f-555b0ab6ba7b";
+        internal const string HierophantSupremeMiracleAbility = "aa989bbb-a455-4448-b8ed-56890a69bddc";
         #endregion
 
         #region Marshal
@@ -187,6 +196,7 @@ namespace MediumClass.Utilities
         internal const string TricksterTransferMagicAbility = "25966f3c-60de-4efd-b05d-bff180d094c0";
         internal const string SecondaryTricksterTransferMagicAbility = "133cf3c7-6ce1-403f-aee8-ed488714c6a0";
         internal const string SecondaryTricksterTransferMagic = "43cce1e9-66a8-4e45-9306-e9b96fa28fcd";
+        internal const string TricksterSwiftBreakBuff = "94c40141-02f8-478e-baff-6c121d4ddce0";
 
         internal const string TricksterSeanceBoonAbility = "b9a5cbd2-cd37-4dc7-aaee-d6a3f00e2fa8";
         internal const string TricksterSeanceBoonAthleticsBuff = "a606f24e-7f8f-47d8-bc40-3808494c1bf0";
@@ -282,13 +292,52 @@ namespace MediumClass.Utilities
         internal const string WeakerSpiritChannelBuff = "2413ac21-7921-446e-9073-fac8b6de11bd";
         internal const string AstralBeacon = "5835c65f-1774-41d9-a20b-e012f9fbb83d";
         internal const string AstralBeaconAbility = "f4b6547b-eaf7-4eeb-a135-dc751c2304a9";
-        internal const string AstralBeaconAbilityArchmage = "ac2aedb1-bc69-473d-ab66-e9e2247d2645";
-        internal const string AstralBeaconAbilityChampion = "8579ebe9-f0eb-42fc-b634-e1b64b13d09d";
-        internal const string AstralBeaconAbilityGuardian = "2d71ac0d-b742-494f-90ed-8838047d3450";
-        internal const string AstralBeaconAbilityHierophant = "0cae2e1b-9aca-45ff-ae7e-59b6837dfa9c";
-        internal const string AstralBeaconAbilityMarshal = "7c31a885-271e-4e07-9584-2bfa28be1010";
-        internal const string AstralBeaconAbilityTrickster = "828f18b5-f402-4286-ab3f-70a4ad3cd6f4";
-        internal const string AstralBeaconBuff = "744affbb-fbac-4687-b6b8-56124828a0d7";
+
+        internal const string MediumTranceOfMany = "57e5b172-9687-4259-9e48-528f74d0c572";
+        internal const string MediumTranceOfManyAbility = "5066387a-07f1-4abd-be1a-c528bac4808e";
+
+        // 3 级英灵亲和（Spirit Affinity）。3/7/11/15/19 级各选一次。
+        internal const string MediumSpiritAffinity = "ec941f99-a879-45b7-917f-8e68fcf1dd85";
+        internal const string MediumSpiritAffinityAlignedWeaponry = "d1962035-98dd-458a-a2f0-a7fa82829d9c";
+        internal const string MediumSpiritAffinityArcaneDiscovery = "8409d562-c34b-4812-941b-fc9beeeed2a9";
+        internal const string MediumSpiritAffinityArcaneDiscoverySelection = "8c65dda0-1e83-4cdf-a1c7-7c8c25377d9f";
+        internal const string MediumSpiritAffinityArmorTraining = "509a4793-4480-4b4c-b587-0765ed60149d";
+        internal const string MediumSpiritAffinityWeaponTraining = "d44d9489-d7a2-4376-89b9-761660abf7db";
+        internal const string MediumSpiritAffinityWeaponGroupPicked = "ebb96578-574b-49e3-a5de-47eea9c1730b";
+        internal const string MediumSpiritAffinityDivineSpirit = "b73f6aa9-3abe-477e-9d8d-62e6ec13266e";
+        internal const string MediumSpiritAffinityAssuredSurge = "c1a065d3-7bbf-4017-947f-58285d3349eb";
+        internal const string MediumSpiritAffinitySpiritedFamiliar = "510a9201-169a-4ce2-9a8c-352dab5ebf89";
+        internal const string MediumSpiritAffinitySpiritedFamiliarSelection = "75ae3db1-09ed-4373-b41f-048d30274e74";
+        internal const string MediumSpiritAffinitySpiritWarding = "e550b764-8367-4110-ba15-a4126e2f01da";
+        internal const string MediumSpiritAffinitySpiritWardingGreater = "6dff920d-849b-4e3f-aa00-6befd9d41f99";
+        internal const string MediumSpiritAffinitySpiritsense = "ffb1f6d7-a142-4196-a13e-77797160529d";
+        internal const string MediumSpiritAffinitySpiritsenseGreater = "c1bfddb7-b4a8-4a6d-83c7-edf4375b20d9";
+        internal const string MediumSpiritAffinitySpiritualDefense = "f890978f-aefa-400a-8d3d-69e515f11732";
+        internal const string MediumSpiritAffinitySpiritAvatar = "0bca2050-fc42-4d3c-9f93-75d8496ad7b3";
+        internal const string MediumSpiritAffinitySpiritAvatarGreater = "d3de99a8-900a-49bf-aedd-b41d6e316fa5";
+        internal const string MediumSpiritAffinityTrapfinding = "ab353d3b-0689-4b85-a8e1-2c9548a53d10";
+        internal const string MediumSpiritAffinityUncannyDodge = "065aa165-266e-4e20-bda6-38f935a4b036";
+        internal const string MediumSpiritAffinityInsightFromBeyond = "44c35095-81e6-4119-9bc6-3c54bbcd430e";
+        internal const string MediumSpiritAffinityInspiringSpirit = "b573f47f-6336-4177-b3fd-245aa5428d08";
+        internal const string MediumSpiritAffinityInspiringSpiritAreaBuff = "74e130e1-5bc7-46a9-9285-625834667eaa";
+        internal const string MediumSpiritAffinityInspiringSpiritArea = "b9cee776-7402-42a7-a6d1-86bc2090848e";
+        internal const string MediumSpiritAffinityInspiringSpiritAllyBuff = "a9900adc-23a0-410a-8408-881e574aa6d9";
+        internal const string MediumSpiritAffinityLegendarySkill = "3aaeb511-6779-4fa8-836d-d4cb419d4ad0";
+        internal const string MediumSpiritAffinityLegendarySkillAbility = "ad7d341e-c5df-4fdf-869c-f9d0c977e82e";
+        internal const string MediumSpiritAffinityLegendarySkillResource = "fc267cef-5b12-46be-b75e-ba7052abf2f2";
+        internal const string MediumSpiritAffinityForcefulMetamagic = "14db77c8-bfb0-4f90-ab92-3fd767cdb263";
+        internal const string MediumSpiritAffinityForcefulMetamagicAbility = "e617baf6-09d3-4bc4-bec9-d3baa0cc03a0";
+        internal const string MediumSpiritAffinityFortifiedResolve = "879099c9-c2cf-4eba-a0ae-fa3ebdc9025d";
+        internal const string MediumSpiritAffinityFortifiedResolveAbility = "817021f8-d9a9-472c-a40d-bd313be12ef8";
+        internal const string MediumSpiritAffinityPlentifulMagic = "8a5406b1-eb51-468f-83bd-9b1b4e3272bf";
+
+        // 4 级英灵专长（Spirit Feat）。4/8/12/16/20 级各获得一个额外专长。
+        internal const string MediumSpiritFeat = "4cff3d42-a90b-4fb6-a9cc-2d5d77709ac9";
+
+        // 原生蓝图，用于克隆组件结构（不是我们自己的资产）。
+        internal const string NativeTrapfinding = "dbb6b3bffe6db3547b31c3711653838e";
+        internal const string NativeRogueFamiliarSelection = "363cab72f77c47745bf3a8807074d183";
+        internal const string NativeBasicFeatSelection = "247a4068296e8be42890143f451b4b45";
 
         #region Robin Hood and immediate Death Curse modes
         internal const string RobinHood = "18610405-8a20-5ffe-b6f0-02f1c07d286a";
@@ -365,10 +414,16 @@ namespace MediumClass.Utilities
         internal const string SpiritFocusMarshal = "c4122dd9-a388-409d-b185-15fa9202f6f0";
         internal const string SpiritFocusTrickster = "9a7471e7-2666-4721-ad89-e2a211f22384";
 
-        // 通灵者变体：缚灵者
-        internal const string SpiritBinderArchetype = "381ebf1b-eb8f-46ac-ad42-fe1d04a611f8";
-        internal const string SpiritBinderFeature = "ad3ac75a-5b1b-464b-a9e4-e1279f0a52c0";
-        internal const string SpiritBinderBonusFeat = "34fc6c71-3581-4704-bbfc-e5c45ecaf3d4";
+        // 通灵者变体：虔信者 / 博学者
+        internal const string DevotedMediumArchetype = "cde198a7-f0c6-4519-96e4-e85214901e24";
+        internal const string DevotedMediumSpellbook = "308dce29-b6a7-49f7-80a7-cfb8c237b089";
+        internal const string DevotedMediumDiminishedSpiritBonus = "f97bfb4b-9b82-428b-8e3e-83de0774d78e";
+        internal const string DevotedMediumPactOfDedication = "80e265b9-4369-401c-93b5-68cb7cb8687c";
+        internal const string DevotedMediumDevotedSpirits = "f56be9cf-f91c-42d2-81cc-1c9f6aa1ac35";
+        internal const string LoremasterArchetype = "44c9cf95-e6b1-4ef6-a1f5-33ef024a6d55";
+        internal const string LoremasterSpellbook = "2dd7b92f-f2a0-4445-b51b-0ca0d7d414f5";
+        internal const string LoremasterScholarlyMeditations = "22f3f2d2-a184-4ae4-8921-eb8ef5b852a4";
+        internal const string LoremasterFocusedSpiritualism = "052acfd4-b6fa-482d-9e1a-b8126cea7d72";
 
         internal const string DesnaDivineFightingTechnique = "1da560cd-f770-4e2e-8b26-51cdcd4df04b";
         internal const string BackgroundMedium = "ec0b4ec5-2de4-4da7-8ab1-ee1df8272075";
@@ -412,6 +467,7 @@ namespace MediumClass.Utilities
         internal const string ProwlerChannelGuardian = "3c5f9a7b-6a6a-1850-c5a7-2b19ceeb0dc9";
         internal const string ProwlerChannelMarshal = "76f3f569-f852-ee78-1922-e0dfc8896431";
         internal const string ProwlerChannelTrickster = "6c9c0ccb-c689-4687-dc94-2818d38fb295";
+        internal const string ProwlerChannelAbility = "734e8e98-096d-4c33-af2b-6e97f72dd22e";
         #endregion
 
         internal const string ChampionFleetChargePrepareAbility = "136cd6f273c167cb67719f93a66845cd";

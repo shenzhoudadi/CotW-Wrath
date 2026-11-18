@@ -8,6 +8,7 @@ using HarmonyLib;
 using Kingmaker.Blueprints;
 using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.Classes.Selection;
+using Kingmaker.Blueprints.Classes.Spells;
 using Kingmaker.Blueprints.Facts;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.Designers.Mechanics.Facts;
@@ -68,6 +69,10 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             internal readonly BlueprintsCache Cache;
             internal readonly Dictionary<string, BlueprintScriptableObject> Assets = new Dictionary<string, BlueprintScriptableObject>();
+            // Non-blueprint scratch space: shared helper results (option lists,
+            // candidate spell tables) that must be built once per cache but are
+            // not themselves published blueprints.
+            internal readonly Dictionary<string, object> Scratch = new Dictionary<string, object>();
             internal readonly List<string> Diagnostics = new List<string>();
             internal Factory(BlueprintsCache cache) { Cache = cache; }
 
@@ -121,6 +126,11 @@ namespace CallOfTheWild.Wrath.Prototype
 
             internal BlueprintProgression Progression(string token, string name, string description, LevelEntry[] entries, UIGroup[] groups)
                 => Add(new BlueprintProgression { LevelEntries = entries, UIGroups = groups, Ranks = 1 }, token, name, description);
+
+            // Adapter for helpers that construct a blueprint themselves and only
+            // need this package's identity namespace and salt.
+            internal BlueprintSpellList NextList(BlueprintSpellList list, string token, string name, string description)
+                => Add(list, token, name, description);
 
             internal void Enable() { foreach (var bp in Assets.Values) bp.OnEnable(); }
         }
@@ -205,8 +215,36 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (name == "ContextCalculateAbilityParamsBasedOnClass")
                 {
                     if (Has(o, "m_CharacterClass")) Set(o, "m_CharacterClass", Ref<BlueprintCharacterClassReference>(wizard));
-                    if (Has(o, "StatType")) Set(o, "StatType", dcStat);
-                    audit.Add("params->Wizard/" + dcStat);
+                    if (Has(o, "StatType") && Equals(Get(o, "StatType"), StatType.Wisdom))
+                        Set(o, "StatType", dcStat);
+                    audit.Add("params->Wizard/Wisdom-to-" + dcStat);
+                }
+                // The class-less shape appears on hex leaves: it only names the
+                // stat, so Shaman's Wisdom becomes Intelligence and nothing else
+                // moves (Charisma stays Charisma).
+                else if (name == "ContextCalculateAbilityParams" && Has(o, "StatType") &&
+                         Equals(Get(o, "StatType"), StatType.Wisdom))
+                {
+                    Set(o, "StatType", dcStat);
+                    audit.Add("params-stat " + dcStat);
+                }
+                // Rank configs that read a stat bonus: Wisdom is the shaman
+                // casting stat, Charisma is a real secondary value and is kept.
+                if (name == "ContextRankConfig" && Has(o, "m_Stat") &&
+                    Equals(Get(o, "m_Stat"), StatType.Wisdom))
+                {
+                    Set(o, "m_Stat", dcStat);
+                    audit.Add("rank-stat " + dcStat);
+                }
+                // Stat bonuses keyed on a bare stat name. Only non-racial ones
+                // follow the caster: racial entries belong to the summoned pet
+                // templates, whose own Wisdom is unrelated to the shaman stat.
+                if (name == "AddStatBonus" && Has(o, "Stat") &&
+                    Equals(Get(o, "Stat"), StatType.Wisdom) &&
+                    !Equals(Get(o, "Descriptor"), ModifierDescriptor.Racial))
+                {
+                    Set(o, "Stat", dcStat);
+                    audit.Add("statbonus-stat " + dcStat);
                 }
                 if (name == "AddFeatureOnClassLevel" && Has(o, "m_Class"))
                 {
@@ -270,6 +308,25 @@ namespace CallOfTheWild.Wrath.Prototype
             if (source == null) return;
             try { SpellBatch01447.Icon(target, source); }
             catch { if (Has(target, "m_Icon") && Has(source, "m_Icon")) Set(target, "m_Icon", Get(source, "m_Icon")); }
+        }
+
+        // Reuse the donor's authored name, description and icon verbatim instead
+        // of writing a fresh one. The localized strings are shared read-only, so
+        // the clone reads exactly what the game (or the mod that added the
+        // spirit) already ships, in the player's own locale.
+        internal static void Present(BlueprintUnitFact target, BlueprintUnitFact source)
+        {
+            if (target == null || source == null) return;
+            foreach (string field in new[] { "m_DisplayName", "m_Description", "m_DescriptionShort" })
+            {
+                // Read through the same accessor Set uses, so a property-backed
+                // field is not silently skipped.
+                object value = null;
+                try { value = Get(source, field); } catch (MissingFieldException) { continue; }
+                if (value == null) continue;
+                try { Set(target, field, value); } catch (MissingFieldException) { }
+            }
+            Icon(target, source);
         }
 
         // Rebuild the private element cache inherited from a shallow clone, and

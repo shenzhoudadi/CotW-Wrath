@@ -129,7 +129,7 @@ internal static class Checks
         Check(hidden.FxOnStart!=null && hidden.FxOnRemove!=null && !ReferenceEquals(hidden.Icon,null),"Supreme reuses native presentation with valid cleanup links");
         var progression=BP<BlueprintProgression>("RobinHoodProgression");
         foreach(var pair in new[]{(1,"RobinHoodLesser"),(11,"RobinHoodGreater"),(17,"RobinHoodSupreme")}) Check(progression.LevelEntries.Single(e=>e.Level==pair.Item1).Features.Single().AssetGuid==BP<BlueprintFeature>(pair.Item2).AssetGuid,"Correct spirit power threshold "+pair.Item1);
-        Check(progression.LevelEntries.Sum(e=>e.Features.Count(f=>f==BP<BlueprintFeature>("TricksterSurpriseStrike")))==6,"Intermediate Surprise Strike grows to six ranks at 18");
+        Check(progression.LevelEntries.Sum(e=>e.Features.Count(f=>f==BP<BlueprintFeature>("TricksterSurpriseStrike")))==10,"Intermediate Surprise Strike grows to ten ranks at 20");
         var death=BP<BlueprintFeature>("MediumAdrielDeathCurse");var modes=death.GetComponent<AddFacts>().Facts.OfType<BlueprintActivatableAbility>().ToArray();
         Check(modes.Length==5,"Death Curse grants five native mode buttons");
         foreach(var mode in modes) {

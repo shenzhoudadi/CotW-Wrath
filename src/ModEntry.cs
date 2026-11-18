@@ -21,6 +21,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static bool deferredPatchesAttempted;
         private static readonly ConditionalWeakTable<BlueprintsCache, RegistrationRetry01444> registrations = new ConditionalWeakTable<BlueprintsCache, RegistrationRetry01444>();
         private static bool registrationCompleted;
+        private static int optionalPasses;
         private static readonly ModMenuIntegration menu = new ModMenuIntegration();
         private static readonly Dictionary<string, string> moduleStates = ModuleCatalog.InitialStates();
         internal static ModuleStatus[] GetModuleStatuses() => ModuleCatalog.Snapshot(moduleStates);
@@ -37,7 +38,7 @@ namespace CallOfTheWild.Wrath.Prototype
             var harmonyAssembly = typeof(Harmony).Assembly;
             mod.Logger.Log("Harmony runtime: " + harmonyAssembly.FullName + "; path=" + harmonyAssembly.Location);
             CotW.Runtime.HarmonyRuntimeCompatibility.Verify();
-            mod.Logger.Log("Harmony compile API baseline: 2.0.4.0; using the process-loaded compatible runtime without loading/replacing another copy.");
+            mod.Logger.Log("Harmony compile API baseline: 2.3.6.0; using the process-loaded compatible runtime without loading/replacing another copy.");
             var coreHarmony=new Harmony(mod.Manifest.UniqueName);
             InstallEarlyCorePatches(coreHarmony);
             psychicHarmony=new Harmony(mod.Manifest.UniqueName+".Psychic");
@@ -67,7 +68,6 @@ namespace CallOfTheWild.Wrath.Prototype
         }
 
         private static IEnumerable<Type> PatchTypes() => Assembly.GetExecutingAssembly().GetTypes()
-            .Where(t => Occultist0099Slice.Published || !Occultist0099Slice.IsRuntimePatch(t))
             .Where(t => t.GetCustomAttributes(typeof(HarmonyPatch), false).Any());
         private static bool IsPsychicPatch(Type type) => type.DeclaringType == typeof(TopplingSpell) || type == typeof(PsychicSpiritualAllyFlankingPatch) || type == typeof(PsychicEyeControlPatch) || type == typeof(PsychicSpiritAttackLogPatch) || type == typeof(PsychicEyeClickPatch) || type == typeof(PsychicEyeHoverPatch) || type.DeclaringType == typeof(PsychicCasting) ||
             type.DeclaringType == typeof(PsychicAmplificationMenu) ||
@@ -77,7 +77,7 @@ namespace CallOfTheWild.Wrath.Prototype
         private static void ApplyLocalization()
         {
             if (modification == null || LocalizationManager.CurrentPack == null) return;
-            try { modification.ApplyLocalization(); PsychicAssets.ApplyLocalization(); WayOfTheShieldIntegration.ApplyLocalization(); PsychicAssets.ApplyQLLocalization(); menu.RefreshLocalization(); }
+            try { modification.ApplyLocalization(); PsychicAssets.ApplyLocalization(); WayOfTheShieldIntegration.ApplyLocalization(); PsychicAssets.ApplyQLLocalization(); MimicCatalogue01461.ApplyLabels(); menu.RefreshLocalization(); }
             catch (Exception exception)
             {
                 modification.Logger.Error("Failed to apply prototype localization after initialization: " + exception);
@@ -112,6 +112,12 @@ namespace CallOfTheWild.Wrath.Prototype
                     state.InitialDispatchCompleted = true;
                 } else if (state.PendingCount != 0) BlueprintRegistration.RetryInitial(state, ReportModule);
                 registrationCompleted = true;
+                // The wall preview owns a persistent GameObject rather than any
+                // blueprint, so it is installed once, outside the registration
+                // transaction, and must never abort registration.
+                try { AreaPreview0293.Install(message => modification.Logger.Log(message)); }
+                catch (Exception exception) { modification.Logger.Error("Wall AoE preview install failed: " + exception); }
+                BlueprintRegistration.PublishedGraphChecksRelaxed = true;
                 WriteDiagnostics(state.PendingCount == 0 ? "Initial registration complete." : "Initial registration completed with pending modules; later ready/settings callbacks can retry them.");
                 TryMenu();
             } catch (Exception exception) {
@@ -158,16 +164,21 @@ namespace CallOfTheWild.Wrath.Prototype
             // A provider may have registered after our cache postfix. Repair only
             // the optional lists after retrying failed initial publications.
             // Existing successful provider reconciliation remains unchanged.
+            // Keep the settings-menu path cheap: RegisterOptional is idempotent
+            // per module, but every pass still forces ~40 cache.Load probes and
+            // re-runs providers that failed on a serialized-content mismatch.
+            // Run it once, then only while something is still pending (max 3).
+            int passes = Volatile.Read(ref optionalPasses);
+            if (passes >= 3) return;
+            if (passes > 0 && (!registrations.TryGetValue(cache, out var current) ||
+                               current.PendingCount == 0)) return;
             if (Interlocked.CompareExchange(ref registrationInProgress, 1, 0) != 0) return;
+            Interlocked.Increment(ref optionalPasses);
             registrations.TryGetValue(cache, out state);
-            Action<string, bool, Exception> report = (name, succeeded, error) => {
+            try { BlueprintRegistration.RegisterOptional(cache, (name, succeeded, error) => {
                 if (succeeded) state?.Complete(name);
                 ReportModule(name, succeeded, error);
-            };
-            try {
-                BlueprintRegistration.RegisterOptional(cache, report);
-                Occultist0099Startup.ReconcileOptional(cache, report);
-            }
+            }); }
             catch (Exception exception) { modification.Logger.Error("Optional integration retry failed: " + exception); }
             finally { Volatile.Write(ref registrationInProgress, 0); }
         }
@@ -176,12 +187,12 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             if (modification == null || !registrationCompleted) return;
             RegisterMenu(menu, ModMenuIntegration.FindAssembly(), modification, modification.Manifest.Version,
-                WriteDiagnostics, message => modification.Logger.Error(message));
+                message => modification.Logger.Log(message), message => modification.Logger.Error(message));
         }
 
         internal static void RegisterMenu(ModMenuIntegration integration, Assembly assembly, OwlcatModification mod,
             string version, Action<string> log, Action<string> error) =>
-            integration.TryRegister(assembly, mod, version, GetModuleStatuses(), log, error);
+            integration.TryRegister(assembly, mod, version, log, error);
 
         // Runs before ModMenu's SettingsVM postfix builds its dropdown. Also handles a
         // dependency loaded after the blueprint cache, without running Unity on a worker thread.

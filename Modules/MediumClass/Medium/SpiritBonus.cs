@@ -41,6 +41,7 @@ namespace MediumClass.Medium
                 .SetDescription(Description)
                 .SetIcon("assets/icons/tranceofthree.png")
                 .AddComponent<MediumContextSpiritBonusComponent>()
+                .AddComponent<SpiritAttunementRulesComponent>()
                 .AddComponent<RobinHoodDexterityChecks>()
                 .Configure();
 
@@ -53,7 +54,7 @@ namespace MediumClass.Medium
                 .SetRanks(10)
                 .SetAllowNonContextActions(false)
                 .AddFactsChangeTrigger(checkedFacts: new() { BlueprintTool.GetRef<BlueprintUnitFactReference>(Guids.MediumChannelSpiritPrimarySpiritBuff) }, 
-                    onFactGainedActions: ActionsBuilder.New().ApplyBuffPermanent(buff),
+                    onFactGainedActions: ActionsBuilder.New().ApplyBuffPermanentFixed(buff),
                     onFactLostActions: ActionsBuilder.New().RemoveBuff(buff))
                 .Configure();
 

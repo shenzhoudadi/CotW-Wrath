@@ -56,7 +56,7 @@ namespace Kingmaker.UnitLogic {
 namespace Kingmaker.EntitySystem.Entities {
     public class UnitEntityData {
         readonly Dictionary<Type,UnitPart> parts=new();public Kingmaker.EntitySystem.Stats.Stats Stats=new();public Progression Progression=new();public int Level=20;
-        public UnitDescriptor Descriptor;public string CharacterName="Unit";
+        public UnitDescriptor Descriptor;public string CharacterName="Unit";public bool AssuredSurge;
         public UnitEntityData(){Descriptor=new(){Unit=this};}
         public T Get<T>() where T:UnitPart=>parts.TryGetValue(typeof(T),out var v)?(T)v:null;
         public T Ensure<T>()where T:UnitPart,new(){if(Get<T>()is T p)return p;var value=new T{Owner=this};parts[typeof(T)]=value;return value;}
@@ -75,6 +75,8 @@ namespace MediumClass.Medium.NewUnitParts {
 namespace MediumClass.Medium.NewComponents.AbilitySpecific {public class MediumSpiritComponent{public StatType[] Stats;}}
 namespace MediumClass.Medium {
     public static class HardenedSoul{public static bool HasFeature(UnitDescriptor unit)=>unit?.Hardened==true;}
+    // Spirit Affinity's Assured Surge: modelled as a flag on the unit so the double roll is observable.
+    public static class SpiritAffinity{public static bool HasAssuredSurge(UnitEntityData unit)=>unit?.AssuredSurge==true;}
     // Legendary tiers are not modelled here, so a spirit's focus is its own entry.
     internal static class MultiSpiritRules{internal static int EffectiveSpiritFocus(NewUnitParts.UnitPartMedium medium,BlueprintCharacterClassReference spirit)=>medium.Spirits.TryGetValue(spirit,out var entry)?entry.SpiritFocus:0;}
 }

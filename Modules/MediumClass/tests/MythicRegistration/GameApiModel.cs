@@ -123,7 +123,12 @@ namespace Kingmaker.EntitySystem.Entities
         public bool HasFact(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff buff) => ChannelPresent;
         public Buffs Buffs = new();
     }
-    public class AlignmentOwner { public AlignmentValue Alignment = new(); }
+    public class AlignmentOwner
+    {
+        public AlignmentValue Alignment = new();
+        public MythicProgression Progression = new();
+    }
+    public class MythicProgression { public int MythicLevel; }
     public class AlignmentValue { public int ValueRaw; }
     public class Buffs { public void RemoveFact(Kingmaker.UnitLogic.Buffs.Blueprints.BlueprintBuff buff) { } }
 }

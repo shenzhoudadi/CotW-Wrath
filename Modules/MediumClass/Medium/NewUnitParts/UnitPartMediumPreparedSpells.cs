@@ -103,7 +103,7 @@ namespace MediumClass.Medium.NewUnitParts
         private bool ClearGrantedSpells()
         {
             bool changed = false;
-            var mediumBook = Owner.Descriptor.GetSpellbook(BlueprintTool.Get<BlueprintSpellbook>(Guids.MediumSpellbook));
+            var mediumBook = MediumSpiritSpellbookRules.FindMediumBook(Owner.Descriptor);
             if (mediumBook != null)
                 foreach (var spell in grantedSpells)
                     changed |= Revoke(mediumBook, spell);

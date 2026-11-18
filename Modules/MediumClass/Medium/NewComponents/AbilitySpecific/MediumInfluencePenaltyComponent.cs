@@ -8,6 +8,10 @@ using Kingmaker.Blueprints.Classes;
 using Kingmaker.Blueprints.JsonSystem;
 using Kingmaker.EntitySystem.Stats;
 using Kingmaker.Enums;
+using Kingmaker.PubSubSystem;
+using Kingmaker.RuleSystem.Rules;
+using Kingmaker.RuleSystem.Rules.Abilities;
+using Kingmaker.RuleSystem.Rules.Damage;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Buffs;
 using MediumClass.Medium.NewUnitParts;
@@ -17,7 +21,12 @@ using MediumClass.Utilities;
 namespace MediumClass.Medium.NewComponents.AbilitySpecific
 {
     [TypeId("4c5cd1ca-7eed-4a21-aa7d-2e79d5953009")]
-    class MediumInfluencePenaltyComponent : UnitFactComponentDelegate
+    class MediumInfluencePenaltyComponent : UnitFactComponentDelegate,
+        IInitiatorRulebookHandler<RuleSkillCheck>, IRulebookHandler<RuleSkillCheck>,
+        IInitiatorRulebookHandler<RuleCalculateAbilityParams>, IRulebookHandler<RuleCalculateAbilityParams>,
+        IInitiatorRulebookHandler<RuleCalculateAttackBonus>, IRulebookHandler<RuleCalculateAttackBonus>,
+        IInitiatorRulebookHandler<RuleCalculateDamage>, IRulebookHandler<RuleCalculateDamage>,
+        ISubscriber, IInitiatorRulebookSubscriber
     {
         public override void OnTurnOn() => RefreshModifiers();
 
@@ -38,8 +47,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             {
                 var entry = medium.Spirits[spirit];
                 // A legendary spirit's penalty tracks the same shared focus its bonus uses.
-                int bonus = Owner.Progression.Features.GetRank(entry.SpiritBonus.SpiritBonusFeature)
-                    + MultiSpiritRules.EffectiveSpiritFocus(medium, spirit);
+                int bonus = SpiritBonusValue.ForSpirit(Owner, spirit);
                 foreach (var stat in entry.SpiritPenalty.Stats ?? Array.Empty<StatType>())
                     values[stat] = Math.Max(values.TryGetValue(stat, out var prior) ? prior : 0, bonus);
                 if (spirit.Get() == BlueprintTool.Get<BlueprintCharacterClass>(Guids.Marshal)
@@ -78,7 +86,75 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
         }
 
 
-        public bool isSecondaryCheck;
+        private int ChampionSpellPenalty()
+        {
+            var medium = Owner?.Get<UnitPartMedium>();
+            if (medium == null) return 0;
+            int formalCount = medium.ActiveSpiritClasses.Count();
+            if (formalCount == 0) return 0;
+            bool mitigate = Owner.HasFact(BlueprintTool.Get<BlueprintFeature>(MythicSpirits.MultipleSpiritsGuid));
+
+            int maxBonus = 0;
+            foreach (var id in new[] { Guids.Champion, Guids.Adriel })
+            {
+                var spirit = BlueprintTool.GetRef<BlueprintCharacterClassReference>(id);
+                if (!medium.IsActiveSpirit(spirit) || !medium.Spirits.TryGetValue(spirit, out var entry)) continue;
+                int bonus = SpiritBonusValue.ForSpirit(Owner, spirit);
+                if (bonus > maxBonus) maxBonus = bonus;
+            }
+            if (maxBonus <= 0) return 0;
+            return InfluencePenaltyMath.Magnitude(maxBonus, formalCount, mitigate);
+        }
+
+        public void OnEventAboutToTrigger(RuleSkillCheck evt)
+        {
+            if (evt.StatType != StatType.Intelligence) return;
+            int penalty = ChampionSpellPenalty();
+            if (penalty > 0)
+                evt.Bonus.AddModifier(-penalty, Fact, ModifierDescriptor.Penalty);
+        }
+
+        public void OnEventDidTrigger(RuleSkillCheck evt) { }
+
+        public void OnEventAboutToTrigger(RuleCalculateAbilityParams evt)
+        {
+            if (evt?.AbilityData?.Blueprint == null || !evt.AbilityData.Blueprint.IsSpell) return;
+            int penalty = ChampionSpellPenalty();
+            if (penalty > 0)
+                evt.AddBonusDC(-penalty, ModifierDescriptor.Penalty);
+        }
+
+        public void OnEventDidTrigger(RuleCalculateAbilityParams evt) { }
+
+        public void OnEventAboutToTrigger(RuleCalculateAttackBonus evt)
+        {
+            if (evt?.Weapon == null) return;
+            var cat = evt.Weapon.Blueprint.Category;
+            if (cat != WeaponCategory.Touch && cat != WeaponCategory.Ray) return;
+            int penalty = ChampionSpellPenalty();
+            if (penalty > 0)
+                evt.AddModifier(-penalty, Fact, ModifierDescriptor.Penalty);
+        }
+
+        public void OnEventDidTrigger(RuleCalculateAttackBonus evt) { }
+
+        public void OnEventAboutToTrigger(RuleCalculateDamage evt)
+        {
+            var spell = evt?.ParentRule?.SourceAbility;
+            if (spell == null || !spell.IsSpell) return;
+            int penalty = ChampionSpellPenalty();
+            if (penalty <= 0) return;
+            foreach (var damage in evt.DamageBundle)
+            {
+                if (damage == null || damage.Precision || damage.IgnoreModifiers) continue;
+                damage.AddModifier(-penalty, Fact);
+                return;
+            }
+        }
+
+        public void OnEventDidTrigger(RuleCalculateDamage evt) { }
+
+        public bool isSecondaryCheck = false; // never set by production code
     }
 }
 

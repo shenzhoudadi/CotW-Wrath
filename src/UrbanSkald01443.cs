@@ -185,7 +185,7 @@ namespace CallOfTheWild.Wrath.Prototype
                 if (cls.Progression != progression || !progression.LevelEntries.Any(e => e.Level == 1 && e.Features.Contains(rage) && e.Features.Contains(profSource)) || !progression.LevelEntries.Any(e => e.Level == 10 && e.Features.Contains(dirge)) || new[] { 9, 14, 19 }.Any(n => !progression.LevelEntries.Any(e => e.Level == n && e.Features.Contains(dr)))) throw new InvalidOperationException("Urban Skald requires the actual native Skald progression.");
                 if (cls.Archetypes.Any(a => a != null && a.AssetGuid != Id(RootToken) && (a.name ?? "").Replace("_", "").Replace(" ", "").Replace("-", "").IndexOf("UrbanSkald", StringComparison.OrdinalIgnoreCase) >= 0)) throw new InvalidOperationException("External Urban Skald archetype already exists; preserved.");
                 if (state.Assets != null) {
-                    for (int i = 0; i < state.Assets.Length; i++) { ValidateOwners(state.Assets[i]); if (!ReferenceEquals(cache.Load(state.Assets[i].AssetGuid), state.Assets[i]) || Definition(state.Assets[i]) != state.Definitions[i]) throw new InvalidOperationException("Urban Skald private graph changed: " + state.Assets[i].name); }
+                    for (int i = 0; i < state.Assets.Length; i++) { if (BlueprintRegistration.StrictPublishedGraphChecks) ValidateOwners(state.Assets[i]); if (!ReferenceEquals(cache.Load(state.Assets[i].AssetGuid), state.Assets[i]) || (BlueprintRegistration.StrictPublishedGraphChecks && Definition(state.Assets[i]) != state.Definitions[i])) throw new InvalidOperationException("Urban Skald private graph changed: " + state.Assets[i].name); }
                     Attach(cls, progression, (BlueprintArchetype)cache.Load(Id(RootToken)), new[] { ProficiencyToken, ControlledToken, CrowdToken, MockeryToken }.Select(t => (BlueprintFeature)cache.Load(Id(t))).ToArray(), refusal, Stats.SelectMany(s => new[] { "Effect", "MythicEffect" }.Select(k => (BlueprintBuff)cache.Load(Id(Token(s, k))))).ToArray()); return;
                 }
                 foreach (var token in OwnTokens) if (cache.Load(Id(token)) != null) throw new InvalidOperationException("Urban Skald private identity collision: " + token);
@@ -286,7 +286,12 @@ namespace CallOfTheWild.Wrath.Prototype
         {
             var unit = Owner; if (unit == null || unit.Descriptor == null) return false;
             var cls = ResourcesLibrary.TryGetBlueprint<BlueprintCharacterClass>(UrbanSkald01443.SkaldId); if (cls == null) return false;
-            int level = unit.Descriptor.Progression.GetClassLevel(cls), budget = level >= 16 ? 3 : level >= 8 ? 2 : level >= 1 ? 1 : 0;
+            // Sublime Chord counts as Skald levels for performance effects, so
+            // the Controlled Inspired Rage allocation budget also scales with
+            // the combined level. BonusLevels() returns 0 when that module is
+            // not registered, leaving the archetype's native behaviour intact.
+            int level = unit.Descriptor.Progression.GetClassLevel(cls) + SublimeChordPerformances.BonusLevels(unit.Descriptor),
+                budget = level >= 16 ? 3 : level >= 8 ? 2 : level >= 1 ? 1 : 0;
             if (Portion < 0 || Portion >= budget) return false;
             var ids = new HashSet<BlueprintGuid>(UrbanSkald01443.AllocationAbilities.Select(PsychicAssets.Id));
             var active = unit.ActivatableAbilities.RawFacts.Where(a => ids.Contains(a.Blueprint.AssetGuid) && a.IsOn).ToArray();

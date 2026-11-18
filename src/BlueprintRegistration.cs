@@ -50,6 +50,13 @@ namespace CallOfTheWild.Wrath.Prototype
         // Each module is its own transaction: a new module failure must not remove
         // the older blueprint needed by existing experimental saves.
         [ThreadStatic] private static RegistrationRetry01444 initialPublication;
+        // The first registration pass owns the strict whole-graph fingerprints.
+        // Later optional callbacks and in-game UI hooks only reconcile already
+        // published graphs: native runtime caches and other mods can append
+        // fields/components at that point. Cache identity stays mandatory, but
+        // a changed fingerprint alone is not treated as our content being replaced.
+        internal static bool PublishedGraphChecksRelaxed;
+        internal static bool StrictPublishedGraphChecks => !PublishedGraphChecksRelaxed;
         internal static void RegisterInitial(BlueprintsCache cache, RegistrationRetry01444 state, Action<string, bool, Exception> report)
         {
             var previous = initialPublication; initialPublication = state;
@@ -84,6 +91,11 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(Inquisitions01426.ModuleName, () => Inquisitions01426.Register(cache), report);
             RegisterModule(Inquisitions01428.ModuleName, () => Inquisitions01428.Register(cache), report);
             RegisterModule(PurifyingFlames01428.ModuleName, () => PurifyingFlames01428.Register(cache), report);
+            // Before the subschools: Arcane Crafter clones the universalist
+            // progression, so it has to clone the rewritten table. That way both
+            // schools share one Metamagic Mastery feature instead of Arcane
+            // Crafter keeping the native fixed 8/12/16/20 uses.
+            RegisterModule(UniversalistMetamagic0609.ModuleName, () => UniversalistMetamagic0609.Register(cache), report);
             RegisterModule(WizardSubschools01428.ModuleName, () => WizardSubschools01428.Register(cache), report);
             RegisterModule(EnhancementSchool01429.ModuleName, () => EnhancementSchool01429.Register(cache), report);
             RegisterModule(RagePowers.ModuleName, () => RagePowers.Register(cache), report);
@@ -100,6 +112,7 @@ namespace CallOfTheWild.Wrath.Prototype
             }, report);
             RegisterModule(VindictiveBastard0111.ModuleName, () => VindictiveBastard0111.Register(cache), report);
             RegisterModule(SacredServant0110.ModuleName, () => SacredServant0110.Register(cache), report);
+            RegisterModule(WizardDiscoveries01435.ForestModule, () => WizardDiscoveries01435.RegisterForest(cache), report);
             // IroranRerolls0109's Harmony patches are installed by ModEntry's
             // assembly-wide [HarmonyPatch] sweep; only the graph registers here.
             RegisterModule(IroranPaladin0109.ModuleName, () => IroranPaladin0109.Register(cache), report);
@@ -117,7 +130,6 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterModule(KineticUtility01433.WindsightModule, () => KineticUtility01433.RegisterWindsight(cache), report);
             RegisterModule(KineticUtility01433.ColdSnapModule, () => KineticUtility01433.RegisterColdSnap(cache), report);
             RegisterModule(KineticUtility01433.SmokeStormModule, () => KineticUtility01433.RegisterSmokeStorm(cache), report);
-            RegisterModule(WizardDiscoveries01435.ForestModule, () => WizardDiscoveries01435.RegisterForest(cache), report);
             RegisterModule(WizardDiscoveries01435.ResilientModule, () => WizardDiscoveries01435.RegisterResilient(cache), report);
             RegisterModule(TimeStutter01437.ModuleName, () => TimeStutter01437.Register(cache), report);
             RegisterModule(Invoker01437.ModuleName, () => Invoker01437.Register(cache), report);
@@ -172,13 +184,34 @@ namespace CallOfTheWild.Wrath.Prototype
             RegisterAvailableModule(UrbanBloodrager01463.ModuleName, () => UrbanBloodrager01463.Register(cache), report);
             RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
             RegisterAvailableModule(Amnesiac01464.ModuleName, () => Amnesiac01464.Register(cache), report);
+            RegisterModule(WildArmor01465.ModuleName, () => WildArmor01465.Register(cache), report);
+            RegisterModule(WeaponProperties0296.ModuleName, () => WeaponProperties0296.Register(cache), report);
+            RegisterModule(VersatilePerformance0600.ModuleName, () => VersatilePerformance0600.Register(cache), report);
+            RegisterModule(AlliedSpellcaster0576.ModuleName, () => AlliedSpellcaster0576.Register(cache), report);
+            RegisterModule(UnarmedTwf0610.ModuleName, () => UnarmedTwf0610.Register(cache), report);
+            RegisterModule(AnimateDead0598.ModuleName, () => AnimateDead0598.Register(cache), report);
+            RegisterModule(WordsOfCreation.ModuleName, () => WordsOfCreation.Register(cache), report);
+            RegisterModule(DivineMetamagic.ModuleName, () => DivineMetamagic.Register(cache), report);
+            RegisterAvailableModule(Insinuator0095.ModuleName, () => Insinuator0095.Register(cache), report);
+            RegisterAvailableModule(KineticKnightBladeRush.ModuleName, () => KineticKnightBladeRush.Register(cache, report), report);
             RegisterAvailableModule(EsotericStarseeker0081.ModuleName, () => EsotericStarseeker0081.Register(cache), report);
+            RegisterAvailableModule(LoreSpirit0118.ModuleName, () => LoreSpirit0118.Register(cache), report);
+            RegisterAvailableModule(SpiritSpellListOverrides0119.ModuleName, () => SpiritSpellListOverrides0119.Register(cache), report);
+            RegisterAvailableModule(ShamanSpiritHexes0119.ModuleName, () => ShamanSpiritHexes0119.Register(cache), report);
+            RegisterAvailableModule(BattleMysteryBonusSpell0119.ModuleName, () => BattleMysteryBonusSpell0119.Register(cache), report);
             RegisterAvailableModule(SpiritWhisperer0117.ModuleName, () => SpiritWhisperer0117.Register(cache), report);
             RegisterAvailableModule(SpiritGuide0060.ModuleName, () => SpiritGuide0060.Register(cache), report);
             RegisterAvailableModule(PsychicDetective0068.ModuleName, () => PsychicDetective0068.Register(cache), report);
             RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
-            RegisterAvailableModule(SpeakerForThePast0046.ModuleName, () => SpeakerForThePast0046.Register(cache), report);
-            RegisterAvailableModule(Spiritualist0085.ModuleName, () => Spiritualist0085.Register(cache), report);
+            // Original Wrath content, not a Kingmaker port. Registered last so
+            // the automatic spellbook/performance discovery sees every provider.
+            RegisterModule(SublimeChord.ModuleName, () => SublimeChord.Register(cache), report);
+            RegisterModule(UltimateMagus.ModuleName, () => UltimateMagus.Register(cache), report);
+            // Universal spellbook recognition for the native prestige pickers.
+            // Runs after Sublime Chord so its own book exists and is excluded as
+            // a prestige book. The ModMenu toggle gates the whole pass.
+            RegisterModule("Spellbook recognition", () => SpellbookRecognition.Register(cache), report);
+            RegisterModule("Esoteric Knight psychic compatibility", () => EsotericKnightPsychicCompat.Register(cache), report);
         }
 
         internal static void RegisterOptional(BlueprintsCache cache, Action<string, bool, Exception> report)
@@ -201,8 +234,6 @@ namespace CallOfTheWild.Wrath.Prototype
                 RegisterModule(TimeStutter01437.ModuleName, () => TimeStutter01437.RegisterOptional(cache), report);
             if (cache.Load(PsychicAssets.Id(Invoker01437.RootToken)) != null)
                 RegisterModule(Invoker01437.ModuleName, () => Invoker01437.RegisterOptional(cache), report);
-            if (cache.Load(PsychicAssets.Id(WizardDiscoveries01435.ForestToken)) != null)
-                RegisterModule(WizardDiscoveries01435.ForestModule, () => WizardDiscoveries01435.RegisterForest(cache), report);
             if (cache.Load(PsychicAssets.Id(WizardDiscoveries01435.ResilientToken)) != null)
                 RegisterModule(WizardDiscoveries01435.ResilientModule, () => WizardDiscoveries01435.RegisterResilient(cache), report);
             if (cache.Load(PsychicAssets.Id(BardMasterpieces01435.ClamorToken)) != null)
@@ -268,6 +299,10 @@ namespace CallOfTheWild.Wrath.Prototype
             if(cache.Load(PsychicAssets.Id("PainDiscipline01458"))!=null)RegisterAvailableModule(PsychicDisciplineBridge01458.ModuleName, () => PsychicDisciplineBridge01458.Register(cache), report);
             if(cache.Load(PsychicAssets.Id(Amnesiac01464.RootToken))!=null)RegisterAvailableModule(Amnesiac01464.ModuleName, () => Amnesiac01464.Register(cache), report);
             RegisterAvailableModule(EsotericStarseeker0081.ModuleName, () => EsotericStarseeker0081.Register(cache), report);
+            RegisterAvailableModule(LoreSpirit0118.ModuleName, () => LoreSpirit0118.Register(cache), report);
+            RegisterAvailableModule(SpiritSpellListOverrides0119.ModuleName, () => SpiritSpellListOverrides0119.Register(cache), report);
+            RegisterAvailableModule(ShamanSpiritHexes0119.ModuleName, () => ShamanSpiritHexes0119.Register(cache), report);
+            RegisterAvailableModule(BattleMysteryBonusSpell0119.ModuleName, () => BattleMysteryBonusSpell0119.Register(cache), report);
             RegisterAvailableModule(SpiritWhisperer0117.ModuleName, () => SpiritWhisperer0117.Register(cache), report);
             RegisterAvailableModule(SpiritGuide0060.ModuleName, () => SpiritGuide0060.Register(cache), report);
             if(cache.Load(PsychicAssets.Id(SacredServant0110.RootToken))!=null)RegisterAvailableModule(SacredServant0110.ReconcileModuleName, () => SacredServant0110.Reconcile(cache), report);
@@ -277,8 +312,7 @@ namespace CallOfTheWild.Wrath.Prototype
             // HA can publish its class after initial registration; the scholar
             // gate defers until the real provider roots are present.
             RegisterAvailableModule(CryptidScholar0070.ModuleName, () => CryptidScholar0070.Register(cache), report);
-            RegisterAvailableModule(SpeakerForThePast0046.ModuleName, () => SpeakerForThePast0046.Register(cache), report);
-            RegisterAvailableModule(Spiritualist0085.ModuleName, () => Spiritualist0085.Register(cache), report);
+            RegisterModule("Esoteric Knight psychic compatibility", () => EsotericKnightPsychicCompat.Reconcile(cache), report);
         }
 
         private static void RegisterAvailableModule(string name, Func<bool> register, Action<string, bool, Exception> report)

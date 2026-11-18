@@ -76,7 +76,14 @@ namespace CallOfTheWild.Wrath.Prototype
             if (source.LevelEntries.Count(e => e.Level == 1) != 1 || source.LevelEntries.First(e => e.Level == 1).Features.Count != 1 ||
                 source.LevelEntries.First(e => e.Level == 1).Features[0].AssetGuid.ToString() != "38aab7423d96de84d8e6ab2cdbccce63")
                 throw new InvalidOperationException("Universalist first-level feature layout changed; original school preserved.");
-            const string description = "A universalist school option. Metacharge replaces Hand of the Apprentice: at wizard level 3, select one bonus metamagic feat from the registered wizard bonus feats. All prerequisites still apply. The native universalist Metamagic Mastery progression at levels 8, 12, 16 and 20 is retained.";
+            // The clone has to carry the rewritten table. If the universalist module
+            // ever runs after this one, Arcane Crafter would silently fall back to
+            // the native fixed 8/12/16/20 uses, which is exactly the bug this guard
+            // reports instead of shipping.
+            if (!source.LevelEntries.Any(e => e.Level == 8 && e.Features.Count == 1 &&
+                    e.Features[0].AssetGuid == Id(UniversalistMetamagic0609.RootToken)))
+                throw new InvalidOperationException("Universalist Metamagic Mastery must be registered before Arcane Crafter.");
+            const string description = "A universalist school option. Metacharge replaces Hand of the Apprentice: at wizard level 3, select one bonus metamagic feat from the registered wizard bonus feats. All prerequisites still apply. Metamagic Mastery is the shared tabletop version: at 8th level one entry lists every metamagic you know, and each use spends daily uses instead of handing out fixed free metamagics at 8th, 12th, 16th and 20th.";
             var choice = f.Add(new BlueprintFeatureSelection { Ranks = 1, IsClassFeature = true, IgnorePrerequisites = false, Groups = Array.Empty<FeatureGroup>(), ComponentsArray = Array.Empty<BlueprintComponent>() }, MetachargeToken, "Metacharge", "At wizard level 3, gain one bonus metamagic feat for which you qualify. Only registered wizard metamagic feats are offered.");
             var refs = Metamagics(feats); Set(choice, "m_Features", refs.ToArray()); Set(choice, "m_AllFeatures", refs.ToArray()); Set(choice, "m_Icon", Get(feats, "m_Icon"));
             var p = CloneProgression(f, source, CrafterToken, "Arcane Crafter", description);

@@ -1,4 +1,5 @@
 namespace MediumClass.Utilities { internal static class Guids {
+public const string Medium = "b11b2e0b-3076-4b9c-bbf3-ca7f851b5bb4";
 public const string MediumChannelSpiritPrimarySpiritBuff = "ff1cb998-b9c1-4771-b8a5-101a9ab98c94";
 public const string MediumInfluenceDebuff = "7e8990eb-8ed1-4625-a695-8ded5b6e166c";
 public const string MediumInfluenceResource = "8326af03-a110-4071-bce3-26b601c1c28d";
@@ -13,5 +14,4 @@ public const string SpiritSurgeAbility = "3869754d-a331-4000-bf81-82e325f21a75";
 public const string MarshalMarshalsOrdersAbility = "b13b604a-d2d6-4d2e-b4e2-7e668b8c4391";
 public const string MarshalLegendaryMarshalAbility = "46d392d6-99aa-4a26-9e98-3c07e9304560";
 public const string MediumSpiritMastery = "7f43ca94-7b10-4660-8f38-09ae8b0e1773";
-public const string SpiritBinderFeature = "ad3ac75a-5b1b-464b-a9e4-e1279f0a52c0";
 }}

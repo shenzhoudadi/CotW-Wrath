@@ -138,10 +138,16 @@ namespace CallOfTheWild.Wrath.Prototype
             Set(menuReference,"deserializedGuid",PsychicAssets.Id(PsychicAmplificationMenu.RootToken));
             Set(castingFacts,"m_Facts",new[]{Ref<BlueprintUnitFactReference>(center),menuReference});
 
+            // CotW's phrenic pool carried the native Mind Fog icon on the pool
+            // feature; the port lost it when the pool was split by discipline.
+            // The detective archetype reuses exactly this icon.
+            var poolIcon = Require<BlueprintAbility>(cache, "eabf94e4edc6e714cabd96aa69f8b207").Icon;
             var wisResource = Pool(character, WisdomPoolId, StatType.Wisdom);
             var chaResource = Pool(character, CharismaPoolId, StatType.Charisma);
+            Set(wisResource, "m_Icon", poolIcon); Set(chaResource, "m_Icon", poolIcon);
             var wis = PoolFeature(wisResource, WisdomFeatureId, "WisdomPhrenicPool");
             var cha = PoolFeature(chaResource, CharismaFeatureId, "CharismaPhrenicPool");
+            Set(wis, "m_Icon", poolIcon); Set(cha, "m_Icon", poolIcon);
             var poolSelection = Asset(new BlueprintFeatureSelection { Ranks = 1 }, PoolSelectionId, "PhrenicAbilitySelection");
             Set(poolSelection, "m_AllFeatures", new[] { Ref<BlueprintFeatureReference>(wis), Ref<BlueprintFeatureReference>(cha) });
             Set(poolSelection, "m_Features", new[] { Ref<BlueprintFeatureReference>(wis), Ref<BlueprintFeatureReference>(cha) });

@@ -87,8 +87,8 @@ public static partial class FeatRuntimeTests {
  static bool AddBuff(BuffCollection __instance,BlueprintBuff blueprint,MechanicsContext parentContext,TimeSpan? duration,ref Buff __result){__result=Added(__instance,blueprint,parentContext,duration);return false;}
  static bool AddFromCaster(BuffCollection __instance,BlueprintBuff __0,UnitEntityData __1,TimeSpan? __2,ref Buff __result){__result=Added(__instance,__0,new MechanicsContext(__1,__instance.Owner,__0,null,null),__2);return false;}
  public static void Run(string[] args){
-  var dll=Path.Combine(args[0],"0Harmony.dll");
-  Check(Assembly.LoadFrom(dll).GetName().Version==new Version(2,0,4,0),"actual game Harmony identity");using(var sha=SHA256.Create())using(var stream=File.OpenRead(dll))Check(BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","")=="DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5","actual game Harmony bytes");
+  var dll=Path.Combine(args[0],"UnityModManager","0Harmony.dll");
+  Check(Assembly.LoadFrom(dll).GetName().Version==new Version(2,3,6,0),"actual game Harmony identity");using(var sha=SHA256.Create())using(var stream=File.OpenRead(dll))Check(BitConverter.ToString(sha.ComputeHash(stream)).Replace("-","")=="DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80","actual game Harmony bytes");
   h=new Harmony("CotW.WotS.FeatTests.SceneBoundaries");game=Empty<Game>();
   Set(game,"TimeController",Empty<Kingmaker.Controllers.TimeController>());
   Set(game,"CombatEngagementController",Empty<Kingmaker.Controllers.Combat.UnitCombatEngagementController>());

@@ -35,9 +35,11 @@ namespace MediumClass.Utils
                 if (report == null || report.Lines.Count == 0) return;
                 var roll = report.Roll;
                 // "4" for one die, "3 + 6 = 9" for several: the dice are always visible, never only the sum.
-                string faces = roll.Results.Length == 1
-                    ? roll.Results[0].ToString()
-                    : string.Join(" + ", roll.Results) + " = " + roll.Total;
+                // When Assured Surge rerolls a die, show both draws next to the kept value.
+                var dice = roll.Results.Select((r, i) => FormatDie(roll, i, r)).ToArray();
+                string faces = dice.Length == 1
+                    ? dice[0]
+                    : string.Join(" + ", dice) + " = " + roll.Total;
                 var segments = report.Lines.Select(line => Segment(line, faces));
                 var header = Template(SpiritSurgeKey, "{0} Spirit Surge: {1} = {2}; {3}", "{0} 灵力涌动：{1} = {2}；{3}", 0, 1, 2, 3);
                 Write(string.Format(header, unit?.CharacterName ?? "", roll.Notation, faces,
@@ -47,6 +49,14 @@ namespace MediumClass.Utils
             {
                 Warn(e);
             }
+        }
+
+        private static string FormatDie(SurgeRoll roll, int index, int kept)
+        {
+            if (!roll.HasRerolls) return kept.ToString();
+            return string.Format(
+                Template(SpiritSurgeKey + ".Reroll", "{0}(reroll {1},{2})", "{0}(重骰{1},{2})", 0, 1, 2),
+                kept, roll.FirstDraws[index], roll.SecondDraws[index]);
         }
 
         private static string Segment(SpiritSurgeReport.Line line, string faces)

@@ -21,6 +21,8 @@ namespace MediumClass.Medium
     internal static class MediumSpiritSpellbookRules
     {
         private static readonly BlueprintGuid MediumBookId = BlueprintGuid.Parse(Guids.MediumSpellbook);
+        private static readonly BlueprintGuid DevotedMediumBookId = BlueprintGuid.Parse(Guids.DevotedMediumSpellbook);
+        private static readonly BlueprintGuid LoremasterBookId = BlueprintGuid.Parse(Guids.LoremasterSpellbook);
         private static readonly BlueprintGuid ArchmageBookId = BlueprintGuid.Parse(Guids.ArchmageSpellbook);
         private static readonly BlueprintGuid HierophantBookId = BlueprintGuid.Parse(Guids.HierophantSpellbook);
         private static readonly BlueprintGuid ArchmageId = BlueprintGuid.Parse(Guids.Archmage);
@@ -34,7 +36,26 @@ namespace MediumClass.Medium
             "UpdateSlotsSize", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
             null, new[] { typeof(int), typeof(bool) }, null);
 
-        internal static bool IsMediumBook(Spellbook book) => book?.Blueprint?.AssetGuid == MediumBookId;
+        internal static bool IsMediumBook(BlueprintSpellbook blueprint) =>
+            blueprint != null && (blueprint.AssetGuid == MediumBookId
+                || blueprint.AssetGuid == DevotedMediumBookId
+                || blueprint.AssetGuid == LoremasterBookId);
+
+        internal static bool IsMediumBook(Spellbook book) => IsMediumBook(book?.Blueprint);
+
+        internal static BlueprintSpellbook ActiveMediumBookBlueprint(UnitDescriptor owner)
+        {
+            if (Features.MediumSpecific.MediumAttributeRules.HasPactOfDedication(owner))
+                return BlueprintTool.Get<BlueprintSpellbook>(Guids.DevotedMediumSpellbook)
+                    ?? BlueprintTool.Get<BlueprintSpellbook>(Guids.MediumSpellbook);
+            if (Features.MediumSpecific.MediumAttributeRules.HasScholarlyMeditations(owner))
+                return BlueprintTool.Get<BlueprintSpellbook>(Guids.LoremasterSpellbook)
+                    ?? BlueprintTool.Get<BlueprintSpellbook>(Guids.MediumSpellbook);
+            return BlueprintTool.Get<BlueprintSpellbook>(Guids.MediumSpellbook);
+        }
+
+        internal static Spellbook FindMediumBook(UnitDescriptor owner) =>
+            owner?.Spellbooks?.FirstOrDefault(IsMediumBook);
 
         internal static bool IsPreparationBook(Spellbook book) => book != null
             && (book.Blueprint?.AssetGuid == ArchmageBookId || book.Blueprint?.AssetGuid == HierophantBookId);
@@ -131,7 +152,7 @@ namespace MediumClass.Medium
 
         internal static Spellbook MediumBook(UnitDescriptor owner)
         {
-            var book = owner.DemandSpellbook(BlueprintTool.Get<BlueprintSpellbook>(Guids.MediumSpellbook));
+            var book = FindMediumBook(owner) ?? owner.DemandSpellbook(ActiveMediumBookBlueprint(owner));
             // The ordinary Medium table does not open level-one spells before class level 4.
             // A book recovered from an early-level save still needs its actual caster levels.
             int level = Math.Min(20, MediumLevel(owner));
@@ -187,7 +208,7 @@ namespace MediumClass.Medium
         internal static void ClampRemainingSlots(UnitDescriptor owner)
         {
             if (MediumLevel(owner) <= 0) return;
-            var book = owner.GetSpellbook(BlueprintTool.Get<BlueprintSpellbook>(Guids.MediumSpellbook));
+            var book = FindMediumBook(owner);
             if (book == null) return;
             var slots = SpontaneousSlots(book);
             for (int level = 1; level < slots.Length; level++)
@@ -239,6 +260,20 @@ namespace MediumClass.Medium
                 attribute.ModifiedValue, attribute.CalculatePermanentValueWithoutTempBuffs(),
                 attribute.BaseValue, __instance.Owner.IsPlayerFaction, extraSlots);
             return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(Spellbook), nameof(Spellbook.GetSpellSlotsCount))]
+    internal static class MediumSpiritPreparationSlotsCountPatch
+    {
+        private static void Postfix(Spellbook __instance, int __0, ref int __result)
+        {
+            if (__0 >= 1 && __result > 0
+                && MediumSpiritSpellbookRules.IsPreparationBook(__instance)
+                && __instance.Owner?.HasFact(BlueprintTool.Get<BlueprintFeature>(Guids.MediumSpiritAffinityPlentifulMagic)) == true)
+            {
+                __result += 1;
+            }
         }
     }
 

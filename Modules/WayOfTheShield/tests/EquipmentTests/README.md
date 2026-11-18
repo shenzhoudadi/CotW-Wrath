@@ -1,6 +1,6 @@
 # Equipment native checks
 
-Build the module first, then this `EquipmentTests.csproj`, using the installed game's `WrathPath` property. The parent `Directory.Build.props/targets` validates the exact game Harmony 2.0.4.0 version and SHA and removes test-side competing runtime copies.
+Build the module first, then this `EquipmentTests.csproj`, using the installed game's `WrathPath` property. The parent `Directory.Build.props/targets` validates the pinned game Harmony 2.3.6.0 version and SHA (re-audited 2026-11-07; the old 2.0.4.0 baseline no longer applies) and removes test-side competing runtime copies.
 
 Run the built `EquipmentTests.exe` with two arguments:
 

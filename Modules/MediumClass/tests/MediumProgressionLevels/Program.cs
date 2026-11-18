@@ -65,9 +65,15 @@ BlueprintTool.Assets[Guids.Medium] = medium;
 var names = typeof(Guids).GetFields(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public).Where(f => f.IsLiteral).ToDictionary(f => (string)f.GetRawConstantValue(), f => f.Name);
 foreach (var multiRank in new[] { Guids.MediumSpiritBonus, Guids.SpiritPower, Guids.SpiritSurge })
     BlueprintTool.Assets[multiRank] = new BlueprintFeature { name = names[multiRank], AssetGuid = multiRank, Ranks = 10 };
-var binderMarker = new BlueprintFeature { name = "BinderMarker", AssetGuid = Guids.SpiritBinderFeature };
-var binderSelection = new BlueprintFeatureSelection { name = "BinderBonusFeat", AssetGuid = Guids.SpiritBinderBonusFeat };
-BlueprintTool.Assets[Guids.SpiritBinderFeature] = binderMarker; BlueprintTool.Assets[Guids.SpiritBinderBonusFeat] = binderSelection;
+var binderMarker = new BlueprintFeature { name = "ArchetypeMarker", AssetGuid = "archetype-marker" };
+var binderSelection = new BlueprintFeatureSelection { name = "ArchetypeBonusFeat", AssetGuid = "archetype-bonus-feat" };
+BlueprintTool.Assets["archetype-marker"] = binderMarker; BlueprintTool.Assets["archetype-bonus-feat"] = binderSelection;
+// Spirit Affinity is a selection granted at 3/7/11/15/19; only its presence in the level entries matters here.
+var affinity = new BlueprintFeatureSelection { name = "MediumSpiritAffinity", AssetGuid = Guids.MediumSpiritAffinity, Ranks = 5 };
+BlueprintTool.Assets[Guids.MediumSpiritAffinity] = affinity;
+// Spirit Feat is the extra-feat selection granted at 4/8/12/16/20.
+var spiritFeat = new BlueprintFeatureSelection { name = "MediumSpiritFeat", AssetGuid = Guids.MediumSpiritFeat, Ranks = 5 };
+BlueprintTool.Assets[Guids.MediumSpiritFeat] = spiritFeat;
 var progression = MediumProgression.Configure();
 medium.Progression = progression;
 string N(BlueprintScriptableObject b) => names.GetValueOrDefault(b.AssetGuid ?? "") ?? b.name;
@@ -182,7 +188,8 @@ foreach (int lead in Enumerable.Range(0, 20))
     for (int level = 1; level <= 20; level++)
     {
         var before = Held(unit); LevelUp(unit, medium); var after = Held(unit);
-        var entry = progression.LevelEntries.Where(e => e.Level == level).SelectMany(e => e.Features).Select(N).ToArray();
+        // Selections (Spirit Affinity) are picks, not ranked features, so they are not held.
+        var entry = progression.LevelEntries.Where(e => e.Level == level).SelectMany(e => e.Features).Where(f => !(f is IFeatureSelection)).Select(N).ToArray();
         foreach (var name in entry) Check(after.GetValueOrDefault(name) == before.GetValueOrDefault(name) + 1 || (after[name] == before.GetValueOrDefault(name) && BlueprintTool.Assets.Values.OfType<BlueprintFeature>().First(f => N(f) == name).Ranks == 1), $"Medium {level} grants {name}");
         Check(after.Sum(k => k.Value) - before.Sum(k => k.Value) >= entry.Count(n => !before.ContainsKey(n) || after[n] > before[n]) - 0, "no extra rank appears");
     }
@@ -211,16 +218,37 @@ foreach (int lead in Enumerable.Range(0, 20))
     }
     selectionsRequested.Clear();
     var unit = Build("KKKKK", before: Binder);
-    Check(selectionsRequested.Count == 0, "Binder: no bonus feat before any Medium level");
+    // Spirit Affinity is granted by the class itself, so the Binder assertions look at its own selection only.
+    List<(BlueprintScriptableObject Feature, int Level)> BinderPicks() =>
+        selectionsRequested.Where(s => s.Feature == binderSelection).ToList();
+    Check(BinderPicks().Count == 0, "Binder: no bonus feat before any Medium level");
     LevelUp(unit, medium);
-    Check(Held(unit).ContainsKey("SpiritBinderFeature") && selectionsRequested.Count == 0, "Binder Medium 1: marker, no bonus feat yet");
+    Check(Held(unit).ContainsKey("ArchetypeMarker") && BinderPicks().Count == 0, "Binder Medium 1: marker, no bonus feat yet");
     LevelUp(unit, medium); LevelUp(unit, medium);
-    Check(selectionsRequested.Select(s => s.Level).SequenceEqual(new[] { 2, 3 }), "Binder Medium 2 and 3 offer one bonus feat each");
+    Check(BinderPicks().Select(s => s.Level).SequenceEqual(new[] { 2, 3 }), "Binder Medium 2 and 3 offer one bonus feat each");
     for (int i = 0; i < 4; i++) LevelUp(unit, knight);
-    Check(selectionsRequested.Count == 2, "Knight levels offer no Binder feat");
+    Check(BinderPicks().Count == 2, "Knight levels offer no Binder feat");
     for (int i = 4; i <= 11; i++) LevelUp(unit, medium);
-    Check(selectionsRequested.Select(s => s.Level).SequenceEqual(new[] { 2, 3, 5, 7, 9, 11 }), "Binder feats at exactly 2/3/5/7/9/11");
+    Check(BinderPicks().Select(s => s.Level).SequenceEqual(new[] { 2, 3, 5, 7, 9, 11 }), "Binder feats at exactly 2/3/5/7/9/11");
     AssertInvariant(unit, "Binder run");
+}
+// 2f. Spirit Affinity: one pick at 3/7/11/15/19, never by total level.
+{
+    selectionsRequested.Clear();
+    var unit = Build("KKKKKKKKKK");
+    Check(selectionsRequested.All(s => s.Feature != affinity), "no Spirit Affinity pick without a Medium level");
+    for (int i = 0; i < 20; i++) LevelUp(unit, medium);
+    Check(selectionsRequested.Where(s => s.Feature == affinity).Select(s => s.Level).SequenceEqual(new[] { 3, 7, 11, 15, 19 }),
+        "Spirit Affinity picks at exactly Medium 3/7/11/15/19");
+}
+// 2g. Spirit Feat: one extra feat at 4/8/12/16/20, never by total level.
+{
+    selectionsRequested.Clear();
+    var unit = Build("KKKKKKKKKK");
+    Check(selectionsRequested.All(s => s.Feature != spiritFeat), "no Spirit Feat pick without a Medium level");
+    for (int i = 0; i < 20; i++) LevelUp(unit, medium);
+    Check(selectionsRequested.Where(s => s.Feature == spiritFeat).Select(s => s.Level).SequenceEqual(new[] { 4, 8, 12, 16, 20 }),
+        "Spirit Feat picks at exactly Medium 4/8/12/16/20");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -288,13 +316,13 @@ foreach (var order in new[] { "KM", "KKKKKKKM", "KMKKM", "KKKMMKKKKM", "MKKKKKKK
     void Binder(UnitEntityData unit)
     {
         var data = unit.Descriptor.Progression.SureProgressionData(progression);
-        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderFeature) } });
-        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderBonusFeat) } });
+        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { binderMarker } });
+        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { binderSelection } });
     }
     var unit = Build("KKKMM", oldBug: true, before: Binder);
     selectionsRequested.Clear();
     Recover(unit);
-    Check(Held(unit).ContainsKey("SpiritBinderFeature"), "Binder: the level-1 marker is granted by the recovery");
+    Check(Held(unit).ContainsKey("ArchetypeMarker"), "Binder: the level-1 marker is granted by the recovery");
     Check(selectionsRequested.Count == 0, "the recovery does not request or grant bonus-feat selections");
     Check(UnityModManagerNet.UnityModManager.ModEntry.ModLogger.Lines.Any(l => l.Contains("feature selection(s)")), "and it says so");
 }
@@ -307,8 +335,8 @@ foreach (var order in new[] { "KM", "KKKKKKKM", "KMKKM", "KKKMMKKKKM", "MKKKKKKK
     void Binder(UnitEntityData unit)
     {
         var data = unit.Descriptor.Progression.SureProgressionData(progression);
-        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderFeature) } });
-        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { BlueprintTool.Get<BlueprintFeature>(Guids.SpiritBinderBonusFeat) } });
+        data.ArchetypeAdds.Add(new LevelEntry { Level = 1, Features = { binderMarker } });
+        foreach (int l in new[] { 2, 3, 5, 7, 9, 11 }) data.ArchetypeAdds.Add(new LevelEntry { Level = l, Features = { binderSelection } });
     }
     foreach (bool oldBug in new[] { false, true })
     {

@@ -75,9 +75,13 @@ namespace CallOfTheWild.Wrath.Prototype
             var sickened = f.Native<BlueprintBuff>("4e42460798665fd4cb9173ffa7ada323");
             var intelligent = new AbilityTargetHasFact { name = "RequiresIntelligentTarget", Inverted = true };
             Set(intelligent, "m_CheckedFacts", new[] { Ref<BlueprintUnitFactReference>(f.Native<BlueprintFeature>("fd389783027d63343b4a5634bd81645f")), Ref<BlueprintUnitFactReference>(f.Native<BlueprintFeature>("09478937695300944a179530664e42ec")) });
+            // Bolster is a damage metamagic in this game: two more points per die
+            // to the target and a splash to the creatures next to it. The direct
+            // damage action routes through ContextActionDealDamage, so the engine
+            // adds that bonus itself once the flag is offered here.
             var offensiveMeta = Kingmaker.UnitLogic.Abilities.Metamagic.Empower | Kingmaker.UnitLogic.Abilities.Metamagic.Maximize |
                 Kingmaker.UnitLogic.Abilities.Metamagic.Quicken | Kingmaker.UnitLogic.Abilities.Metamagic.Reach | Kingmaker.UnitLogic.Abilities.Metamagic.Heighten |
-                Kingmaker.UnitLogic.Abilities.Metamagic.Persistent | Kingmaker.UnitLogic.Abilities.Metamagic.Piercing;
+                Kingmaker.UnitLogic.Abilities.Metamagic.Persistent | Kingmaker.UnitLogic.Abilities.Metamagic.Piercing | Kingmaker.UnitLogic.Abilities.Metamagic.Bolstered;
             var thrust = new List<BlueprintAbility>();
             for (int i = 0; i < 6; i++) {
                 int circle = i+1, cap = new[] { 5, 5, 10, 15, 15, 20 }[i]; var die = i == 0 ? DiceType.D6 : DiceType.D8;

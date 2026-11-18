@@ -52,11 +52,11 @@ try {
     Write-Host "Game folder: $GamePath"
     Write-Host 'Read-only collection: game DLLs and two dependency manifests. No saves or logs.'
     $managed = Join-Path $GamePath 'Wrath_Data\Managed'
-    $gameHarmony = Join-Path $managed '0Harmony.dll'
+    $gameHarmony = Join-Path $managed 'UnityModManager/0Harmony.dll'
     if (!(Test-Path -LiteralPath $gameHarmony -PathType Leaf) -or
-        ([Reflection.AssemblyName]::GetAssemblyName($gameHarmony)).Version -ne [Version]'2.0.4.0' -or
-        (Get-FileHash -LiteralPath $gameHarmony -Algorithm SHA256).Hash -cne 'DE50CD610EA22854C8930EC5433276713AEE1BB0ECD785D6B15A0661C2FA9FD5') {
-        throw 'Build references require the audited game Managed/0Harmony.dll 2.0.4.0; UMM Harmony is not a fallback.'
+        ([Reflection.AssemblyName]::GetAssemblyName($gameHarmony)).Version -ne [Version]'2.3.6.0' -or
+        (Get-FileHash -LiteralPath $gameHarmony -Algorithm SHA256).Hash -cne 'DF043F05C6E43602FA8E8F38F52A3A2CF962AAB7A65A9D85573EA25F01A63E80') {
+        throw 'Build references require the audited game Managed/UnityModManager/0Harmony.dll 2.3.6.0; replacement copies are not a fallback.'
     }
     $modMenu = Find-ModFolder $GamePath 'ModMenu'
     $ttt = Find-ModFolder $GamePath 'TabletopTweaks-Core'
@@ -86,8 +86,8 @@ try {
     )
     foreach ($group in $groups) {
         $files = @(Get-ChildItem -LiteralPath $group.Source -File -Filter '*.dll')
-        # Collect Harmony only from the audited top-level Managed directory.
-        if ($group.Destination -ne 'Wrath_Data/Managed') {
+        # Collect Harmony only from the audited UMM runtime directory.
+        if ($group.Destination -ne 'Wrath_Data/Managed/UnityModManager') {
             $files = @($files | Where-Object Name -ne '0Harmony.dll')
         }
         if ($group.Source -eq $umm -and $umm -eq $managed -and $group.Destination -like '*/UnityModManager') {

@@ -52,7 +52,7 @@ namespace MediumClass.Medium.Spirits.Trickster
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .AddComponent<ImpromptuSurpriseStrike>()
-                .AddInitiatorAttackWithWeaponTrigger(action: ActionsBuilder.New().ApplyBuffPermanent(ImpromptuSurpriseStrikeCooldown), onlyHit: true)
+                .AddInitiatorAttackWithWeaponTrigger(action: ActionsBuilder.New().ApplyBuffPermanentFixed(ImpromptuSurpriseStrikeCooldown), onlyHit: true)
                 .Configure();
 
             var SurpriseStrike = FeatureConfigurator.New(FeatName, Guids.TricksterSurpriseStrike)

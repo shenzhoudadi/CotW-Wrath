@@ -11,6 +11,7 @@ using Kingmaker.PubSubSystem;
 using Kingmaker.RuleSystem.Rules;
 using Kingmaker.UnitLogic;
 using Kingmaker.UnitLogic.Abilities.Blueprints;
+using MediumClass.Features.MediumSpecific;
 using MediumClass.Medium.NewUnitParts;
 using MediumClass.Prowler;
 using MediumClass.Utilities;
@@ -42,6 +43,8 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             [JsonProperty] public int Version;
             [JsonProperty] public int[] Sides;
             [JsonProperty] public int[] Results;
+            [JsonProperty] public int[] FirstDraws;
+            [JsonProperty] public int[] SecondDraws;
             [JsonProperty] public bool Announced;
         }
 
@@ -50,6 +53,11 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 
         public override void OnTurnOn()
         {
+            if (Context?.MaybeCaster == Owner && MediumAttributeRules.HasFocusedSpiritualism(Owner?.Descriptor))
+            {
+                RemoveModifiers();
+                return;
+            }
             var plan = BuildPlan();
             if (plan == null) return;
             // A repeated OnTurnOn without an OnTurnOff in between (reapply, load) must not stack.
@@ -64,6 +72,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
 
         public void OnEventAboutToTrigger(RuleSkillCheck evt)
         {
+            if (Context?.MaybeCaster == Owner && MediumAttributeRules.HasFocusedSpiritualism(Owner?.Descriptor)) return;
             // Attribute checks use RuleSkillCheck too. Never increase the actual
             // attribute score: that would also raise skills, saves, HP and DCs.
             if (!MarshalSpiritRules.AttributeChecks.Contains(evt.StatType)) return;
@@ -89,6 +98,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             {
                 try
                 {
+                    if (Context?.MaybeCaster == Owner && MediumAttributeRules.HasFocusedSpiritualism(Owner?.Descriptor)) return 0;
                     return BuildPlan()?.Concentration?.Total ?? 0;
                 }
                 catch (Exception e)
@@ -173,7 +183,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             BlueprintCharacterClassReference marshal)
         {
             if (!medium.IsActiveSpirit(marshal) || !medium.Spirits.TryGetValue(marshal, out var entry)) return (0, 0);
-            return (caster.Progression.Features.GetRank(entry.SpiritBonus.SpiritBonusFeature.Get()),
+            return (SpiritBonusValue.AdjustedBaseRank(caster, entry.SpiritBonus.SpiritBonusFeature.Get()),
                 MultiSpiritRules.EffectiveSpiritFocus(medium, marshal));
         }
 
@@ -185,15 +195,21 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
         {
             var data = Data;
             if (data.Version == DataVersion && SurgeRoll.IsValid(data.Sides, data.Results))
-                return new SurgeRoll(data.Sides, data.Results);
+                return new SurgeRoll(data.Sides, data.Results, data.FirstDraws, data.SecondDraws);
+            // Assured Surge rolls every surge die twice and keeps the higher result. Both draws are
+            // stored so the combat log can show the reroll directly.
+            bool assured = SpiritAffinity.HasAssuredSurge(caster);
             var roll = SpiritSurgeMath.RollDice(ProwlerSpiritRules.SpiritClassLevel(caster),
                 ProwlerSpiritRules.IsProwler(caster?.Descriptor),
                 HardenedSoul.HasFeature(caster?.Descriptor),
                 IsLegendary(),
-                sides => rnd.Next(1, sides + 1));
+                rnd,
+                assured);
             data.Version = DataVersion;
             data.Sides = roll.Sides;
             data.Results = roll.Results;
+            data.FirstDraws = roll.FirstDraws;
+            data.SecondDraws = roll.SecondDraws;
             data.Announced = false;
             return roll;
         }

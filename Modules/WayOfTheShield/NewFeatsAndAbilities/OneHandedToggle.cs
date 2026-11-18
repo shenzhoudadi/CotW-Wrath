@@ -12,6 +12,11 @@ using Way_of_the_shield.Tweaks_and_Changes;
 
 namespace Way_of_the_shield.NewFeatsAndAbilities
 {
+    // RETIRED: the forced one-handed grip toggle is no longer published or
+    // granted. Main.ConfigureIntegrated no longer calls CachePatch_Postfix and
+    // the runtime grip patch no longer consults ForceOneHanded. The component
+    // types below are kept only so old saves containing their TypeIds can still
+    // deserialize; nothing creates or grants these blueprints at runtime.
     public static class OneHandedToggle
     {
         private static bool initialized;

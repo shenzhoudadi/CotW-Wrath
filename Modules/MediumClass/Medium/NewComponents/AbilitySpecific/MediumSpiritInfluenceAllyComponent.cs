@@ -99,8 +99,7 @@ namespace MediumClass.Medium.NewComponents.AbilitySpecific
             foreach (var spirit in medium.ActiveSpiritClasses.Where(medium.Spirits.ContainsKey))
             {
                 var entry = medium.Spirits[spirit].SpiritBonus;
-                int amount = provider.Progression.Features.GetRank(entry.SpiritBonusFeature)
-                    + MultiSpiritRules.EffectiveSpiritFocus(medium, spirit);
+                int amount = SpiritBonusValue.ForSpirit(provider, spirit);
                 foreach (var stat in entry.Stats ?? Array.Empty<StatType>())
                     if (!best.TryGetValue(stat, out int current) || amount > current) best[stat] = amount;
             }

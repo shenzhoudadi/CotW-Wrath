@@ -3,9 +3,10 @@ using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 namespace CotW.Runtime {
- // Compile against the game's 2.0.4 API. At runtime Unity/UMM can bind the
- // same assembly identity to its already-loaded Harmony; never load a second
- // copy or replace either file. Validate the API actually used by this module.
+ // Compile against the pinned game Harmony 2.3.6 API (UMM 0.33.2, audited
+ // 2026-11-07). At runtime Unity/UMM can bind the same assembly identity to
+ // its already-loaded compatible 2.x Harmony; never load a second copy or
+ // replace either file. Validate the API actually used by this module.
  internal static class HarmonyRuntimeCompatibility {
   internal static void Verify()=>Verify(typeof(Harmony).Assembly);
   internal static void Verify(Assembly runtime) {

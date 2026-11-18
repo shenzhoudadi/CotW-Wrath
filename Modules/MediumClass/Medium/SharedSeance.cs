@@ -41,7 +41,7 @@ namespace MediumClass.Medium
                 .SetDisplayName(DisplayName)
                 .SetDescription(Description)
                 .AddFactsChangeTrigger(checkedFacts: new() { BlueprintTool.GetRef<BlueprintUnitFactReference>(Guids.MediumChannelSpiritPrimarySpiritBuff) },
-                    onFactGainedActions: ActionsBuilder.New().ApplyBuffPermanent(buff),
+                    onFactGainedActions: ActionsBuilder.New().ApplyBuffPermanentFixed(buff),
                     onFactLostActions: ActionsBuilder.New().RemoveBuff(buff))
                 .Configure();
         }
